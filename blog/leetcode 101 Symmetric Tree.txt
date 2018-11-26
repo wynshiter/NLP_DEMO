@@ -1,0 +1,322 @@
+content
+
+
+
+﻿﻿
+
+Symmetric Tree Total Accepted: 
+61440 Total Submissions: 
+194643 
+My Submissions
+                      
+
+
+
+
+Given a binary tree, check whether it is a mirror of itself (ie, symmetric around its center).
+For example, this binary tree is symmetric: 
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+
+
+
+But the following is not:
+    1
+   / \
+  2   2
+   \   \
+   3    3
+
+
+
+Note:
+Bonus points if you could solve it both recursively and iteratively. 
+confused what "{1,#,2,3}" means? 
+> read more on how binary tree is serialized on OJ.
+
+c++ 解决方案：
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+#include<queue>
+using namespace std;
+typedef pair<TreeNode*,TreeNode*> nodepair;
+class Solution {
+public:
+    bool isSymmetricRecursive(TreeNode*a,TreeNode*b){
+        if(a){
+            return b && a->val==b->val && 
+                isSymmetricRecursive(a->left,b->right) &&
+                isSymmetricRecursive(a->right,b->left);
+        }
+        return !b;
+    }
+    bool isSymmetricRecursive(TreeNode*root){
+        return !root || isSymmetricRecursive(root->left,root->right);
+    }
+    bool isSymmetric(TreeNode *root) {
+        // Level-order BFS.
+        queue<nodepair> q;
+        if(root)
+            q.push(make_pair(root->left,root->right));
+        while(q.size()){
+            nodepair p=q.front(); q.pop();
+            if(p.first){
+                if(!p.second)return false;
+                if(p.first->val != p.second->val) return false;
+                // the order of children pushed to q is the key to the solution.
+                q.push(make_pair(p.first->left,p.second->right));
+                q.push(make_pair(p.first->right,p.second->left));
+            }
+            else if(p.second) return false;
+        }
+        return true;
+    }
+};
+
+   
+
+第二种，非递归解决方案：
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSymmetric(TreeNode *root) {
+        TreeNode *left, *right;
+        if (!root)
+            return true;
+
+        queue<TreeNode*> q1, q2;
+        q1.push(root->left);
+        q2.push(root->right);
+        while (!q1.empty() && !q2.empty()){
+            left = q1.front();
+            q1.pop();
+            right = q2.front();
+            q2.pop();
+            if (NULL == left && NULL == right)
+                continue;
+            if (NULL == left || NULL == right)
+                return false;
+            if (left->val != right->val)
+                return false;
+            q1.push(left->left);
+            q1.push(left->right);
+            q2.push(right->right);
+            q2.push(right->left);
+        }
+        return true;
+    }
+};
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) {
+        if(!root) return true;
+        stack<TreeNode*> sk;
+        sk.push(root->left);
+        sk.push(root->right);
+
+        TreeNode* pA, *pB;
+        while(!sk.empty()) {
+            pA = sk.top();
+            sk.pop();
+            pB = sk.top();
+            sk.pop();
+
+            if(!pA && !pB) continue;
+            if(!pA || !pB) return false;
+            if(pA->val != pB->val) return false;
+
+            sk.push(pA->left);
+            sk.push(pB->right);
+            sk.push(pA->right);
+            sk.push(pB->left);
+        }
+
+        return true;
+    }
+};
+
+
+ c版本：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+bool checkNodes(struct TreeNode* a, struct TreeNode* b)
+{
+    if(a == NULL && b == NULL)
+    {
+        return true;
+    }
+
+    if(a == NULL || b == NULL)
+    {
+        return false;
+    }
+    if(a->val != b->val)
+    {
+        return false;
+    }
+    return checkNodes(a->left, b->right) && checkNodes(a->right, b->left);
+}
+bool isSymmetric(struct TreeNode* root) {
+    if(root == NULL)
+    {
+        return true;
+    }
+    return checkNodes(root->left, root->right);
+}递归方案：
+bool isSymmetric(TreeNode *root) {
+        if (!root) return true;
+        return helper(root->left, root->right);
+    }
+
+    bool helper(TreeNode* p, TreeNode* q) {
+        if (!p && !q) {
+            return true;
+        } else if (!p || !q) {
+            return false;
+        }
+
+        if (p->val != q->val) {
+            return false;
+        }
+
+        return helper(p->left,q->right) && helper(p->right, q->left); 
+    }
+
+
+python版本：
+class Solution:
+    # @param {TreeNode} root
+    # @return {boolean}
+    def helper(self, a, b):
+        if a is None and b is None:
+            return True
+        if a is None and b is not None:
+            return False
+        if a is not None and b is None:
+            return False
+        if a.val != b.val: 
+            return False
+        return self.helper(a.left, b.right) and self.helper(a.right,b.left)
+    def isSymmetric(self, root):
+        if root is None:
+            return True
+        return self.helper(root.left, root.right)
+class Solution:
+    # @param {TreeNode} root
+    # @return {boolean}
+    def isSymmetric(self, root):
+        # no tree
+        # is identical
+        if root is None: return True
+        if not self.is_identical(root.left, root.right): return False
+
+        queue = []
+        # root is identical
+        # proceed to queue up the next level
+        # (node, depth)
+
+        if root.left:
+            enqueue(queue, (root.left, 1))
+
+        if root.right:
+            enqueue(queue, (root.right, 1))
+
+        while queue:
+
+            same_level = True
+            level = []
+            while same_level:
+                # still the same level
+                if len(queue) > 0 and (len(level) == 0 or level[-1][1] == queue[0][1]):
+                    child = dequeue(queue)
+                    level.append(child)
+                    # enqueue children now to maintain level order
+                    # add to the depth
+                    if child[0].left:
+                        enqueue(queue, (child[0].left, child[1]+1))
+                    if child[0].right:
+                        enqueue(queue, (child[0].right, child[1]+1))   
+                else:
+                    same_level = False
+
+            # symmetrical has to be even
+            if len(level) % 2 != 0: return False
+            while level:
+                # grab the two extreme ends 
+                (left_node, _), (right_node, _) = level.pop(0), level.pop()
+                if not self.is_identical(left_node, right_node): return False
+
+
+        return True
+
+    def is_identical(self, left, right):
+        # if any of them is none, they need to be both none
+        if left is None or right is None:
+            return left == right
+
+        # their value should equal
+        if left.val != right.val:
+            return False
+
+        # if left has a left, then right needs to have right
+        if left.left:
+            if right.right is None:
+                return False
+
+
+        # if left has a right, then right needs to have left
+        if left.right:
+            if right.left is None:
+                return False
+
+        return True
+
+
+
+
+def enqueue(queue, item):
+    queue.append(item)
+
+def dequeue(queue):
+    return queue.pop(0)
+
+
+
+
+

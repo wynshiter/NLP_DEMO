@@ -1,0 +1,225 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/42333361				
+
+
+跨平台的网络通信，跟设备的集成控制，牵扯到在各种平台下的文件搜索问题，windows下面的已经有了。
+地址如下：
+http://blog.csdn.net/wangyaninglm/article/details/8668132
+ 
+这篇文章主要介绍一下linux下面的文件搜索实现：
+Filesearch.h
+//
+//  Filesearch.h
+//  //
+//  Created by mac mac on 13-4-28.
+//  Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+//
+
+#ifndef _Filesearch_h
+#define _Filesearch_h
+
+//#include <stdio.h>
+//#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <pwd.h>
+#include <unistd.h>
+//#include <string.h>
+#include <time.h>
+#include "mac.h"
+#include "Socket.h"
+
+
+//#define MAX_PATH 255
+
+
+
+int IsDir(char *name);
+
+void Search_File(char *path,char *name);
+
+//int search_flag = 0;
+
+/*
+ int main(int argc , char *argv[])
+{
+    static char *current_dir;
+    static char *file_name;
+    int length;
+    
+    if(argc==1)
+    {
+        printf("it takes more parameter!!!n");
+        
+    }
+    
+    if(argc==2)
+    {
+        current_dir = (char *)getcwd(current_dir,MAX_PATH);
+    }
+    
+    if(argc==3)
+    {
+        length = strlen(argv[1]);
+        
+        if(length>1 && (argv[1][length-1]=='/'))
+        {
+            argv[1][length-1]=='�';
+            
+        }
+        current_dir = argv[1];
+        file_name = argv[2];
+    }
+    
+    Search_File(current_dir,file_name);
+    
+    printf("Hello world!n");
+    return 0;
+}
+ 
+ 
+ 
+ */
+
+
+#endif
+
+
+Filesearch.cpp:
+//
+//  Filesearch.cpp
+//  mac_client
+//
+//  Created by mac mac on 13-5-21.
+//  Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+//
+#include <stdio.h>
+#include <iostream>
+#include "Filesearch.h"
+
+int search_flag = 0;
+
+int IsDir(char *name)
+{
+    struct stat buff;
+
+    if(lstat(name,&buff)<0)
+        return 0;
+
+    return S_ISDIR(buff.st_mode);
+
+}
+
+//调用的时候直接使用'/'目录作为搜索路径，相当于搜索全盘了。
+
+void Search_File(char *path,char *name)
+{
+    DIR *directory;
+    struct dirent *dir_entry;
+    char buffer[MAX_PATH];
+
+    if((directory = opendir(path)) == NULL)
+    {
+        fprintf(stderr,"%s",path);
+        printf(path);
+        perror(" ");
+        return;
+    }
+
+    while(dir_entry == readdir(directory))
+    {
+        if(!strcmp(dir_entry->d_name,".")||!strcmp(dir_entry->d_name,".."))
+        {
+            //do nothing
+        }
+        else
+        {
+            if((strcmp(path,"/")) == 0)
+            {
+                sprintf(buffer,"%s%s",path,dir_entry->d_name);
+                // printf(buffer);
+                /*  if is not  boot  directory do not add "/"*/
+
+            }
+            else
+            {
+                sprintf(buffer,"%s/%s",path,dir_entry->d_name);
+                printf(buffer);
+                printf("\n");
+            }
+
+            if(IsDir(buffer))
+            {
+                Search_File(buffer,name);
+            }
+            else
+            {
+                //find the file,if exist
+                if(strcmp(dir_entry->d_name,name)==0)
+                {
+                    printf("%sn",buffer);
+                    search_flag=1;
+
+                }
+            }
+        }
+
+    }
+
+    closedir(directory);
+
+}
+
+void setOutFiles(const char * path)//得到指定目录下面所有文件, 传输的时候还得改
+{
+    DIR *dp;
+    struct dirent *dirp;
+    char fullpath[MAX_PATH] = {0};
+    if((dp = opendir(path)) == NULL)
+    {
+        //err_quit();
+        return ;
+    }
+
+    if (strcmp(path,"/") == 0) //如果是根目录，要处理一下
+    {
+        while((dirp = readdir(dp))!= NULL)
+        {
+
+            sprintf(fullpath,"%s%s", path,dirp->d_name);
+            printf("%s\n",fullpath);
+
+        }
+
+    }
+    else
+    {
+
+        while((dirp = readdir(dp))!= NULL)
+        {
+
+            sprintf(fullpath,"%s/%s", path,dirp->d_name);
+            printf("%s\n",fullpath);
+
+        }
+    }
+
+
+}
+
+
+
+
+
+
+ 
+ 
+搭建传输的socket平台参考下面博文：
+ 
+http://blog.csdn.net/wangyaninglm/article/details/41940287
+ 
+
+

@@ -1,0 +1,126 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45700837				
+
+
+
+Maximum Depth of Binary Tree 
+ Total Accepted: 63668 Total Submissions: 141121 My Submissions  
+Question  Solution  
+Given a binary tree, find its maximum depth.
+The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+我的解决方案： 
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    int maxDepth(TreeNode* root)
+    {
+
+
+        if(NULL == root)
+            return 0;
+
+        int depth_l = maxDepth(root->left);
+        int depth_r = maxDepth(root->right);
+
+        return depth_l > depth_r  ? depth_l + 1:depth_r + 1;
+
+
+    }
+};
+一行代码的解法：
+int maxDepth(TreeNode *root)
+{
+    return root == NULL ? 0 : max(maxDepth(root -> left), maxDepth(root -> right)) + 1;
+}
+
+不用递归的解法：Breadth-first-search
+int maxDepth(TreeNode *root)
+{
+    if(root == NULL)
+        return 0;
+
+    int res = 0;
+    queue<TreeNode *> q;
+    q.push(root);
+    while(!q.empty())
+    {
+        ++ res;
+        for(int i = 0, n = q.size(); i < n; ++ i)
+        {
+            TreeNode *p = q.front();
+            q.pop();
+
+            if(p -> left != NULL)
+                q.push(p -> left);
+            if(p -> right != NULL)
+                q.push(p -> right);
+        }
+    }
+
+    return res;
+}
+
+不用递归的解法2
+int maxDepth(TreeNode *root)
+{
+    if (root == NULL) return 0;
+    stack<TreeNode *> gray;
+    stack<int> depth;
+    int out = 0;
+
+    gray.push(root);
+    depth.push(1);
+    while (!gray.empty()) {
+        TreeNode *tmp = gray.top();
+        int num = depth.top();
+        gray.pop();
+        depth.pop();
+        if (tmp->left == NULL && tmp->right == NULL) {
+            out = num > out ? num : out;
+        }
+        else {
+            if (tmp->left != NULL) {
+                gray.push(tmp->left);
+                depth.push(num + 1);
+            }
+            if (tmp->right != NULL) {
+                gray.push(tmp->right);
+                depth.push(num + 1);
+            }
+        }
+    }
+    return out;
+}
+
+python 的解决方案：
+# Definition for a  binary tree node
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    # @param root, a tree node
+    # @return an integer
+    def maxDepth(self, root):
+
+        def maxDepthHelper(root):
+            if not root: return 0
+            return max(1+maxDepthHelper(root.left), 1+maxDepthHelper(root.right))
+
+        return maxDepthHelper(root)
+ 
+
+

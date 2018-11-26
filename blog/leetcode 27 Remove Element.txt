@@ -1,0 +1,88 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46622949				
+
+
+﻿﻿
+Remove Element 
+Total Accepted: 60351 
+Total Submissions: 187833 
+My Submissions
+                      
+
+
+
+
+Given an array and a value, remove all instances of that value in place and return the new length.
+
+The order of elements can be changed. It doesn't matter what you leave beyond the new length.
+
+
+Show Tags
+
+
+c++ 解决方案：
+
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int n = nums.size();
+        int i = 0;
+        while( i < n ) { 
+            if( nums[i] == val ) {
+                swap(nums[i], nums[n-1]);
+                n--;
+            } else {
+                i++;
+            }
+        }
+        return n;
+    }
+};
+
+
+int removeElement(vector<int>& nums, int val)
+{
+    vector<int>::iterator  itr = nums.begin();
+    while (itr != nums.end())
+    {
+        if (*itr == val)
+            itr = nums.erase(itr);
+        else
+            ++itr;
+    }
+    return nums.size();
+}
+
+
+int removeElement(int A[], int n, int elem) {
+    int begin=0;
+    for(int i=0;i<n;i++) if(A[i]!=elem) A[begin++]=A[i];
+    return begin;
+}
+
+python解决方案：
+class Solution:
+# @param    A       a list of integers
+# @param    elem    an integer, value need to be removed
+# @return an integer
+def removeElement(self, A, elem):
+    i = 0
+    for j in range(len(A)):
+        if A[j] != elem:
+            A[i] = A[j]
+            i += 1
+    return i
+
+
+史上最简洁的解决方案：
+def removeElement(self, nums, val):
+        nums[:] = [x for x in nums if x!=val]
+        return len(nums)
+
+
+
+
+
+

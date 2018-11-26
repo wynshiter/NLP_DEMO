@@ -1,0 +1,141 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45368921				
+
+
+ 
+Write an algorithm to determine if a number is "happy".
+A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits, and repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a
+ cycle which does not include 1. Those numbers for which this process ends in 1 are happy numbers.
+Example: 19 is a happy number
+12 + 92 = 8282 + 22 = 6862 + 82 = 10012 + 02 + 02 = 1我的解决方案：
+
+
+// happy number.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <set>
+using namespace std;
+
+
+  bool isHappy(int n)
+    {
+        int split = 0;
+        int sum = 0;
+        
+        set<int> myset;
+        set<int>::iterator it;
+        
+        while(sum != 1)
+        {
+            do
+            {
+                split = n % 10;
+                n = n / 10;
+                sum = split* split + sum;
+            }
+			while(n>0);
+                
+            if(sum==1)
+            {
+                break;
+            }
+            else
+            {
+                    
+                it=myset.find(sum);
+				if(it!=myset.end())
+                {
+                    return false;
+                }
+                myset.insert(sum);
+				n = sum;
+				sum = 0;
+
+            }
+
+        }
+        
+        return true;
+    }
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	isHappy(19);
+	return 0;
+}
+
+
+
+
+
+
+
+最短的一个代码，用了些数论的知识吧：
+https://leetcode.com/discuss/33014/4ms-5-line-c-code
+
+bool isHappy(int n) {
+    while(n>6){
+        int next = 0;
+        while(n){next+=(n%10)*(n%10); n/=10;}
+        n = next;
+    }
+    return n==1;
+}
+
+
+
+两个python代码：
+
+
+﻿﻿
+ def isHappy(self, n):
+    return self.isHappyHelper(n, {})
+
+def isHappyHelper(self, n, prev):
+    if n == 1:
+        return True
+    elif n not in prev:
+        prev[n] = 1
+    else:
+        return False
+
+    new = 0
+    for char in str(n):
+        new += int(char)**2
+
+    return self.isHappyHelper(new, prev)
+
+
+class Solution:
+# @param {integer} n
+# @return {boolean}
+def isHappy(self, n):
+    table = []
+    n = self.convert(n)
+    while n != 1:
+        if n in table:
+            return False
+        else:
+            table.append(n)
+            n = self.convert(n)
+    return True
+
+# @param {integer} n
+# @return {integer} sum of digits
+def convert(self, n):
+    res = 0
+    while n > 0:
+        temp = n % 10
+        res += temp * temp
+        n = n // 10
+    return res
+
+
+
+﻿﻿
+
+

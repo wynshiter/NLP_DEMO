@@ -1,0 +1,181 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46612505				
+
+
+String to Integer (atoi)Total Accepted:52232
+Total Submissions:401038
+
+My Submissions 
+
+
+
+
+
+Implement atoi to convert a string to an integer.
+Hint: Carefully consider all possible input cases. If you want a challenge, please do not see below and ask yourself what are the possible input cases.
+Notes: It is intended for this problem to be specified vaguely (ie, no given input specs). You are responsible to gather all the input requirements up front.
+Update (2015-02-10):
+The signature of the C++ function had been updated. If you still see your function signature accepts aconst char * argument, please click the reload button
+to reset your code definition. 
+spoilers alert... click to show requirements for atoi.
+Requirements for atoi:
+The function first discards as many whitespace characters as necessary until the first non-whitespace character is found. Then, starting from this character, takes an optional initial plus or minus sign followed by as many numerical digits as possible, and
+ interprets them as a numerical value.
+The string can contain additional characters after those that form the integral number, which are ignored and have no effect on the behavior of this function.
+If the first sequence of non-whitespace characters in str is not a valid integral number, or if no such sequence exists because either str is empty or it contains only whitespace characters, no conversion is performed.
+If no valid conversion could be performed, a zero value is returned. If the correct value is out of the range of representable values, INT_MAX (2147483647) or INT_MIN (-2147483648) is returned.
+
+
+
+
+ 
+c++ 解决方案：
+ 
+class Solution {
+public:
+//consider a case: "  +-++--3"
+    int myAtoi(string str) 
+    {
+        long result = 0;
+    int indicator = 1;
+    for(int i = 0; i<str.size();)
+    {
+        i = str.find_first_not_of(' ');
+        if(str[i] == '-' || str[i] == '+')
+            indicator = (str[i++] == '-')? -1 : 1;
+        while('0'<= str[i] && str[i] <= '9') 
+        {
+            result = result*10 + (str[i++]-'0');
+            if(result*indicator >= INT_MAX) return INT_MAX;
+            if(result*indicator <= INT_MIN) return INT_MIN;                
+        }
+        return result*indicator;
+    }
+
+   
+    }
+};
+
+ 
+ 
+python解决方案：
+class Solution:
+    # @return an integer
+    def atoi(self, str):
+        string = str
+        buf = ''
+        # our list
+        dg_list = ['0','1','2','3','4','5','6','7','8','9']
+        dg_signal = ['-','+']
+
+        signal = ''
+
+        #there is no +/- and 0-9 at first
+        no_signal = True
+        no_dig = True
+        #strip whitespace
+        for i in string.strip():
+
+            #if i in dg_signal judge:
+            #1:it is the first -/+ and signal = -/+, then set no_signal = False . Start to next i
+            #2:it it the second -/+ So it is wrong,we return 0
+            if i in dg_signal:
+                if no_signal is False:
+                    return 0
+                if no_signal:
+                    signal += i
+                    no_signal=False
+                    continue
+            #if i is 0-9, we save it to buf
+            if i in dg_list:
+                buf+=i
+            #but if there is a -/+, and the next char is not dig, eg:+a   here we break.     
+            elif no_signal is False:
+                break
+            else:
+                #if it is not in dg_list and dg_signal,and it is also has something eg:+322a99  when i = a  and buf = +322. We jsut break a and continue 
+                #add 99 to buf
+                if len(buf)>0:
+                    break
+                #if len(buf)<0.  eg: -a. We return as the sys tips
+                if len(buf)<=0:
+                    return 0
+
+
+        #add +/-
+        if len(buf)>0:
+            buf=signal+buf
+
+        if len(buf)<=0:
+            return 0
+
+        f_result = int(buf)
+
+        if f_result >2147483647:
+            return 2147483647
+        if f_result<-2147483648:
+            return -2147483648
+
+        return f_result
+
+
+ 
+ 
+ 
+python解决方案2：
+ 
+class Solution:
+# @return an integer
+def atoi(self, str):
+    str = str.strip()
+    str = re.findall('(^[\+\-0]*\d+)\D*', str)
+
+    try:
+        result = int(''.join(str))
+        MAX_INT = 2147483647
+        MIN_INT = -2147483648
+        if result > MAX_INT > 0:
+            return MAX_INT
+        elif result < MIN_INT < 0:
+            return MIN_INT
+        else:
+            return result
+    except:
+        return 0
+
+
+ 
+ 
+python解决方案3：
+class Solution:
+# @return an integer
+def atoi(self, str):
+    str = str.strip()
+    if len(str) == 0: return 0
+    r, i, l, s = 0, 0, 0, ''  
+    if str[0] in '+-':  
+        s = str[0]
+        i = 1
+    for i in xrange(i, len(str)):
+        if '0' <= str[i] <= '9':
+            r = r*10 + ord(str[i]) - ord('0')
+            l += 1
+        else:
+            break
+    if r == 0 and (s or l == 0):
+        return 0
+    elif r > 0 and s == '-':
+        r *= -1
+    if r > 2147483647:
+        r = 2147483647
+    if r < -2147483648:
+        r = -2147483648
+    return r
+
+
+ 
+ 
+
+

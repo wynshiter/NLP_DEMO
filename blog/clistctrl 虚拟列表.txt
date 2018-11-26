@@ -1,0 +1,371 @@
+content
+
+
+
+    
+        clistctrl 虚拟列表             
+
+       
+
+一、什么是虚拟列表控件
+虚拟列表控件是指带有LVS_OWNERDATA风格的列表控件。。
+二、为什么使用虚拟列表控件
+我们知道，通常使用列表控件CListCtrl，需要调用InsertItem把要显示的数据插入列表中，之后我们就不必关心数据在哪里了，这是因为控件自己开辟了内存空间来保存这些数据。现在假设我们要显示一个数据库，里面的信息量很大，有几十万条记录。通常有两种方法解决这个问题：1是仅仅在ListCtrl中插入少量的数据，比如100个，然后通过[上一页][下一页]两个按钮进行控制，某一时刻显示的只是从xxx到xxx+100之间的记录。2是把所有数据全部插入到ListCtrl中，然后让用户通过滚动来查看数据。无疑，很多用户喜欢采用第二种方式，特别是对于已经排序的数据，用户只需用键盘输入某行的开头字符，就可以快速定位到某一行。但是，如果这样做，InsertItem插入数据的过程将是很漫长的，而且用户会看到ListCtrl刷新速度也很慢，而且所有数据都位于内存中消耗了大量的内存，当数据多达上万以后几乎是不能忍受的。
+为此，mfc特别提供了虚拟列表的支持。一个虚拟列表看起来和普通的ListCtrl一样，但是不用通过InsertItem来插入数据，它仅仅知道自己应该显示多少数据。但是它如何知道要显示什么数据呢？秘密就在于当列表控件需要显示某个数据的时候，它向父窗口要。假设这个列表控件包含100个元素，第10到20个元素（行）是可见的。当列表控件重画的时候 ，它首先请求父窗口给它第10个元素的数据，父窗口收到请求以后，把数据信息填充到列表提供的一个结构中，列表就可以用来显示了，显示第10个数据后，列表会继续请求下一个数据。
+在虚拟的样式下，ListCtrl可以支持多达DWORD个数据项。(缺省的listctrl控件最多支持int个数据项)。但是，虚拟列表的最大优点不在于此，而是它仅仅需要在内存中保持极少量的数据，从而加快了显示的速度。所以，在使用列表控件显示一个很大的数据库的情况下，采用虚拟列表最好不过了。
+不仅CListCtrl提供虚拟列表的功能， MFC的CListView类也有同样的功能。
+三、虚拟列表控件的消息
+虚拟列表总共发送三个消息给父窗口：当它需要数据的时候，它发送LVN_GETDISPINFO消息。这是最重要的消息。当用户试图查找某个元素的时候，它发送LVN_ODFINDITEM消息；还有一个消息是LVN_ODCACHEHINT，用来缓冲数据，基本上很少用到这个消息。
+虚拟列表控件使用起来非常简单。它总共只有三个相关的消息，如果你直接使用CListCtrl，应该在对话框中响应这三个消息。如果你使用CListCtrl派生类，可以在派生类中响应这三个消息的反射消息。这三个消息分别是：
+  （1）LVN_GETDISPINFO 控件请求某个数据
+  （2）LVN_ODFINDITEM  查找某个数据
+  （3）LVN_ODCACHEHINT 缓冲某一部分数据
+我们必须响应的消息是（1），多数情况下要响应(2)，极少数的情况下需要响应（3）
+四、如何使用虚拟列表控件
+1、首先要创建控件，创建一个虚拟列表和创建一个正常的 CListCtrl差不多。先在资源编辑器里面添加一个list control资源。然后选中"Owner data"属性，然后给它捆绑一个CListCtrl变量。添加列，添加imagelist等都和使用正常的listctrl一样。
+2、给虚拟列表添加元素。假设 m_list 是这个列表的控制变量。通常的情况下这样添加数据：
+m_list.InsertItem(0, _T("Hello world"));
+但是对于虚拟列表，不能这么做。只需告诉列表有多少个数据:
+//总共显示100行
+m_list.SetItemCount(100);
+3、处理它的通知消息。
+五、如何响应虚拟列表的消息
+1、处理 LVN_GETDISPINFO 通知消息
+当虚拟列表控件需要某个数据的时候，它给父窗口发送一个 LVN_GETDISPINFO通知消息，表示请求某个数据。因此列表的所有者窗口（或者它自己）必须处理这个消息。例如派生类的情况 (CMyListCtrl是一个虚拟列表类对象):
+//这里处理的是反射消息
+BEGIN_MESSAGE_MAP(CMyListCtrl, CListCtrl)
+   //{{AFX_MSG_MAP(CMyListCtrl)
+   ON_NOTIFY_REFLECT(LVN_GETDISPINFO, OnGetdispinfo)
+   //}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+在LVN_GETDISPINFO的处理函数中，必须首先检查列表请求的是什么数据，可能的值包括:
+（1）LVIF_TEXT   必须填充 pszText
+（2）LVIF_IMAGE  必须填充 iImage 
+（3）LVIF_INDENT 必须填充 iIndent
+（4）LVIF_PARAM  必须填充 lParam 
+（5）LVIF_STATE  必须填充 state 
+根据它的请求，填充所需的数据即可。
+//================= 例子代码=====================================
+下面的给出一个例子，填充的是列表所需的某个数据项的文字以及图像信息：
+LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
+LV_ITEM* pItem= &(pDispInfo)->item;
+int iItemIndx= pItem->iItem;
+if (pItem->mask & LVIF_TEXT) //字符串缓冲区有效
+{
+    switch(pItem->iSubItem){
+        case 0: //填充数据项的名字
+            lstrcpy(pItem->pszText,m_Items[iItemIndx].m_strItemText);
+            break;
+        case 1: //填充子项1
+            lstrcpy(pItem->pszText,m_Items[iItemIndx].m_strSubItem1Text);
+            break;
+        case 2: //填充子项2
+            lstrcpy(pItem->pszText,m_Items[iItemIndx].m_strSubItem2Text);
+            break;
+    }
+}
+/*注意，多数情况下要使用lstrcpyn ，因为最多复制字符的个数由pItem->cchTextMax给出：
+        lstrcpyn(pItem->pszText, text, pItem->cchTextMax);
+*/
+if (pItem->mask & LVIF_IMAGE) //是否请求图像
+        pItem->iImage= m_Items[iItemIndx].m_iImageIndex;
+甚至连某行数据是否选中（当有checkbox的情况下）的信息也需要由用户自己来维护，例如：
+//是否显示该行的选择信息?
+if(IsCheckBoxesVisible()) //自定义函数
+{
+    pItem->mask |= LVIF_STATE;
+    pItem->stateMask = LVIS_STATEIMAGEMASK;
+    if(m_database[itemid].m_checked)
+    {
+         pItem->state = INDEXTOSTATEIMAGEMASK(2);
+    }
+    else
+    {
+         pItem->state = INDEXTOSTATEIMAGEMASK(1);
+     }
+}
+2、处理 LVN_ODFINDITEM 消息
+在资源管理器里面，定位到某个文件夹，会显示很多文件，如果按下键盘的‘A’，则资源管理器会自动找到名字以 'A'打头的文件夹或者文件, 并选择该文件。继续按 A，如果还有其它名字以'A'打头的文件，则下一个文件被选中。如果输入 "AB"，则 'AB'打头的文件被选中。这就是列表控件的自动查找功能。
+当虚拟列表收到一个LVM_FINDITEM消息，它也会发送这个消息通知父窗口查找目标元素。要搜索的信息通过 LVFINDINFO 结构给出。它是 NMLVFINDITEM 结构的一个成员。当找到要搜索的数据后，应该把该数据的索引（行号）返回，如果没有找到，则返回-1。
+以对话框为例，响应函数大致如下:
+//================= 例子代码=====================================
+void CVirtualListDlg::OnOdfinditemList(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+    // pNMHDR 里面是要查找的元素的信息
+    // 要选中的目标元素的行号最后要保存在 pResult 中， 这是关键！
+    NMLVFINDITEM* pFindInfo = (NMLVFINDITEM*)pNMHDR;
+    /* pFindInfo->iStart 是查找的起始位置，一直到最后，然后从头开始，如果没有找到合适的，最终停留在iStart*/
+    *pResult = -1;
+    //是否按照文字查找？
+    if( (pFindInfo->lvfi.flags & LVFI_STRING) == 0 )
+    {
+        return;
+    }
+    //这是我们要找的字符串
+    CString searchstr = pFindInfo->lvfi.psz;
+    int startPos = pFindInfo->iStart;//保存起始位置
+    //判断是否最后一行
+    if(startPos >= m_list.GetItemCount())
+        startPos = 0;
+    int currentPos=startPos;
+    
+    //开始查找
+    do
+    {        
+        if( _tcsnicmp(m_database[currentPos].m_name, 
+                 searchstr, searchstr.GetLength()) == 0)
+        {
+            //选中这个元素，停止查找
+            *pResult = currentPos;
+            break;
+        }
+        currentPos++;
+        //从头开始
+        if(currentPos >= m_list.GetItemCount())
+            currentPos = 0;
+    }while(currentPos != startPos);       
+}
+显然，如果数据很多，必须实现一个快速查找的方法。
+关于pFindInfo->lvfi里面的信息的详细说明可以参考 MSDN。
+3、处理 LVN_ODCACHEHINT 消息。
+假如我们从数据库或者其它地方读取数据的速度比较慢，则可以利用这个消息，批量读取一些数据，然后根据请求，逐个提供给虚拟列表。LVN_ODCACHEHINT消息的用途就是给程序一个缓冲数据的机会。以提高程序的性能。
+//================= 例子代码=====================================
+使用 ClassWizard 重载 OnChildNotify 函数，检查是否 LVN_ODCACHEHINT 消息，然后准备缓冲数据：
+NMLVCACHEHINT* pcachehint=NULL;
+NMHDR* phdr = (NMHDR*)lParam;
+if(phdr->code == LVN_ODCACHEHINT)
+{
+     pcachehint= (NMLVCACHEHINT*) phdr;
+     //自定义函数，准备指定范围的数据到缓冲区
+     PrepCache(pcachehint->iFrom, pcachehint->iTo);
+}
+else ...
+注意，如果消息不是 LVN_ODCACHEHINT，则要传递给基类进行处理。
+五、如何修改ListCtrl显示的数据。
+由于是程序自己维护数据，所以只需修改数据库中的数据，然后调用CListCtrl::RedrawItems函数进行重画即可。
+六、数据的选择状态和选择框
+CListCtrl可以显示checkbox选择框。有些情况下是很有用的。对于正常的listctrl，用户可以用鼠标来修改某个元素的选择状态，但是对于虚拟列表就不行了。必须自己处理一些消息，然后自己保存数据的选中状态:
+void CVirtualListDlg::ToggleCheckBox(int item)
+{
+    m_database[item].m_checked = !m_database[item].m_checked;
+    m_list.RedrawItems(item, item);
+}
+处理 LVN_KEYDOWN消息，添加对空格键 的响应，用于切换选择状态：
+void CVirtualListDlg::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    LV_KEYDOWN* pLVKeyDown = (LV_KEYDOWN*)pNMHDR;
+    if( pLVKeyDown->wVKey == VK_SPACE )
+    {
+       int item = m_list.GetSelectionMark();
+        if(item != -1)
+            ToggleCheckBox(item);
+    }
+    *pResult = 0;
+}
+然后处理 NM_CLICK 消息:
+void CVirtualListDlg::OnClickList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    NMLISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+    LVHITTESTINFO hitinfo;
+    hitinfo.pt = pNMListView->ptAction;
+    int item = m_list.HitTest(&hitinfo);
+    if(item != -1)
+    {
+        //看看鼠标是否单击在 check box上面了?
+        if( (hitinfo.flags & LVHT_ONITEMSTATEICON) != 0)
+        {
+            ToggleCheckBox(item);
+        }
+    }
+    
+    *pResult = 0;
+}
+七、备注：
+    1、虚拟列表无法进行排序。
+    2、虚表的一个优点是容易保持和数据库的同步。修改数据库中的数据，然后重画list十分容易而且高效。
+    3、虚表的另一个优点是可以根据需要产生数据。比如在某一列加上行号。http://blog.vckbase.com/iwaswzq/archive/2006/07/07/21113.htmlhttp://www.codeproject.com/KB/list/virtuallist.aspx
+
+
+
+
+content
+
+一、什么是虚拟列表控件
+虚拟列表控件是指带有LVS_OWNERDATA风格的列表控件。。
+二、为什么使用虚拟列表控件
+我们知道，通常使用列表控件CListCtrl，需要调用InsertItem把要显示的数据插入列表中，之后我们就不必关心数据在哪里了，这是因为控件自己开辟了内存空间来保存这些数据。现在假设我们要显示一个数据库，里面的信息量很大，有几十万条记录。通常有两种方法解决这个问题：1是仅仅在ListCtrl中插入少量的数据，比如100个，然后通过[上一页][下一页]两个按钮进行控制，某一时刻显示的只是从xxx到xxx+100之间的记录。2是把所有数据全部插入到ListCtrl中，然后让用户通过滚动来查看数据。无疑，很多用户喜欢采用第二种方式，特别是对于已经排序的数据，用户只需用键盘输入某行的开头字符，就可以快速定位到某一行。但是，如果这样做，InsertItem插入数据的过程将是很漫长的，而且用户会看到ListCtrl刷新速度也很慢，而且所有数据都位于内存中消耗了大量的内存，当数据多达上万以后几乎是不能忍受的。
+为此，mfc特别提供了虚拟列表的支持。一个虚拟列表看起来和普通的ListCtrl一样，但是不用通过InsertItem来插入数据，它仅仅知道自己应该显示多少数据。但是它如何知道要显示什么数据呢？秘密就在于当列表控件需要显示某个数据的时候，它向父窗口要。假设这个列表控件包含100个元素，第10到20个元素（行）是可见的。当列表控件重画的时候 ，它首先请求父窗口给它第10个元素的数据，父窗口收到请求以后，把数据信息填充到列表提供的一个结构中，列表就可以用来显示了，显示第10个数据后，列表会继续请求下一个数据。
+在虚拟的样式下，ListCtrl可以支持多达DWORD个数据项。(缺省的listctrl控件最多支持int个数据项)。但是，虚拟列表的最大优点不在于此，而是它仅仅需要在内存中保持极少量的数据，从而加快了显示的速度。所以，在使用列表控件显示一个很大的数据库的情况下，采用虚拟列表最好不过了。
+不仅CListCtrl提供虚拟列表的功能， MFC的CListView类也有同样的功能。
+三、虚拟列表控件的消息
+虚拟列表总共发送三个消息给父窗口：当它需要数据的时候，它发送LVN_GETDISPINFO消息。这是最重要的消息。当用户试图查找某个元素的时候，它发送LVN_ODFINDITEM消息；还有一个消息是LVN_ODCACHEHINT，用来缓冲数据，基本上很少用到这个消息。
+虚拟列表控件使用起来非常简单。它总共只有三个相关的消息，如果你直接使用CListCtrl，应该在对话框中响应这三个消息。如果你使用CListCtrl派生类，可以在派生类中响应这三个消息的反射消息。这三个消息分别是：
+  （1）LVN_GETDISPINFO 控件请求某个数据
+  （2）LVN_ODFINDITEM  查找某个数据
+  （3）LVN_ODCACHEHINT 缓冲某一部分数据
+我们必须响应的消息是（1），多数情况下要响应(2)，极少数的情况下需要响应（3）
+四、如何使用虚拟列表控件
+1、首先要创建控件，创建一个虚拟列表和创建一个正常的 CListCtrl差不多。先在资源编辑器里面添加一个list control资源。然后选中"Owner data"属性，然后给它捆绑一个CListCtrl变量。添加列，添加imagelist等都和使用正常的listctrl一样。
+2、给虚拟列表添加元素。假设 m_list 是这个列表的控制变量。通常的情况下这样添加数据：
+m_list.InsertItem(0, _T("Hello world"));
+但是对于虚拟列表，不能这么做。只需告诉列表有多少个数据:
+//总共显示100行
+m_list.SetItemCount(100);
+3、处理它的通知消息。
+五、如何响应虚拟列表的消息
+1、处理 LVN_GETDISPINFO 通知消息
+当虚拟列表控件需要某个数据的时候，它给父窗口发送一个 LVN_GETDISPINFO通知消息，表示请求某个数据。因此列表的所有者窗口（或者它自己）必须处理这个消息。例如派生类的情况 (CMyListCtrl是一个虚拟列表类对象):
+//这里处理的是反射消息
+BEGIN_MESSAGE_MAP(CMyListCtrl, CListCtrl)
+   //{{AFX_MSG_MAP(CMyListCtrl)
+   ON_NOTIFY_REFLECT(LVN_GETDISPINFO, OnGetdispinfo)
+   //}}AFX_MSG_MAP
+END_MESSAGE_MAP()
+在LVN_GETDISPINFO的处理函数中，必须首先检查列表请求的是什么数据，可能的值包括:
+（1）LVIF_TEXT   必须填充 pszText
+（2）LVIF_IMAGE  必须填充 iImage 
+（3）LVIF_INDENT 必须填充 iIndent
+（4）LVIF_PARAM  必须填充 lParam 
+（5）LVIF_STATE  必须填充 state 
+根据它的请求，填充所需的数据即可。
+//================= 例子代码=====================================
+下面的给出一个例子，填充的是列表所需的某个数据项的文字以及图像信息：
+LV_DISPINFO* pDispInfo = (LV_DISPINFO*)pNMHDR;
+LV_ITEM* pItem= &(pDispInfo)->item;
+int iItemIndx= pItem->iItem;
+if (pItem->mask & LVIF_TEXT) //字符串缓冲区有效
+{
+    switch(pItem->iSubItem){
+        case 0: //填充数据项的名字
+            lstrcpy(pItem->pszText,m_Items[iItemIndx].m_strItemText);
+            break;
+        case 1: //填充子项1
+            lstrcpy(pItem->pszText,m_Items[iItemIndx].m_strSubItem1Text);
+            break;
+        case 2: //填充子项2
+            lstrcpy(pItem->pszText,m_Items[iItemIndx].m_strSubItem2Text);
+            break;
+    }
+}
+/*注意，多数情况下要使用lstrcpyn ，因为最多复制字符的个数由pItem->cchTextMax给出：
+        lstrcpyn(pItem->pszText, text, pItem->cchTextMax);
+*/
+if (pItem->mask & LVIF_IMAGE) //是否请求图像
+        pItem->iImage= m_Items[iItemIndx].m_iImageIndex;
+甚至连某行数据是否选中（当有checkbox的情况下）的信息也需要由用户自己来维护，例如：
+//是否显示该行的选择信息?
+if(IsCheckBoxesVisible()) //自定义函数
+{
+    pItem->mask |= LVIF_STATE;
+    pItem->stateMask = LVIS_STATEIMAGEMASK;
+    if(m_database[itemid].m_checked)
+    {
+         pItem->state = INDEXTOSTATEIMAGEMASK(2);
+    }
+    else
+    {
+         pItem->state = INDEXTOSTATEIMAGEMASK(1);
+     }
+}
+2、处理 LVN_ODFINDITEM 消息
+在资源管理器里面，定位到某个文件夹，会显示很多文件，如果按下键盘的‘A’，则资源管理器会自动找到名字以 'A'打头的文件夹或者文件, 并选择该文件。继续按 A，如果还有其它名字以'A'打头的文件，则下一个文件被选中。如果输入 "AB"，则 'AB'打头的文件被选中。这就是列表控件的自动查找功能。
+当虚拟列表收到一个LVM_FINDITEM消息，它也会发送这个消息通知父窗口查找目标元素。要搜索的信息通过 LVFINDINFO 结构给出。它是 NMLVFINDITEM 结构的一个成员。当找到要搜索的数据后，应该把该数据的索引（行号）返回，如果没有找到，则返回-1。
+以对话框为例，响应函数大致如下:
+//================= 例子代码=====================================
+void CVirtualListDlg::OnOdfinditemList(NMHDR* pNMHDR, LRESULT* pResult) 
+{
+    // pNMHDR 里面是要查找的元素的信息
+    // 要选中的目标元素的行号最后要保存在 pResult 中， 这是关键！
+    NMLVFINDITEM* pFindInfo = (NMLVFINDITEM*)pNMHDR;
+    /* pFindInfo->iStart 是查找的起始位置，一直到最后，然后从头开始，如果没有找到合适的，最终停留在iStart*/
+    *pResult = -1;
+    //是否按照文字查找？
+    if( (pFindInfo->lvfi.flags & LVFI_STRING) == 0 )
+    {
+        return;
+    }
+    //这是我们要找的字符串
+    CString searchstr = pFindInfo->lvfi.psz;
+    int startPos = pFindInfo->iStart;//保存起始位置
+    //判断是否最后一行
+    if(startPos >= m_list.GetItemCount())
+        startPos = 0;
+    int currentPos=startPos;
+    
+    //开始查找
+    do
+    {        
+        if( _tcsnicmp(m_database[currentPos].m_name, 
+                 searchstr, searchstr.GetLength()) == 0)
+        {
+            //选中这个元素，停止查找
+            *pResult = currentPos;
+            break;
+        }
+        currentPos++;
+        //从头开始
+        if(currentPos >= m_list.GetItemCount())
+            currentPos = 0;
+    }while(currentPos != startPos);       
+}
+显然，如果数据很多，必须实现一个快速查找的方法。
+关于pFindInfo->lvfi里面的信息的详细说明可以参考 MSDN。
+3、处理 LVN_ODCACHEHINT 消息。
+假如我们从数据库或者其它地方读取数据的速度比较慢，则可以利用这个消息，批量读取一些数据，然后根据请求，逐个提供给虚拟列表。LVN_ODCACHEHINT消息的用途就是给程序一个缓冲数据的机会。以提高程序的性能。
+//================= 例子代码=====================================
+使用 ClassWizard 重载 OnChildNotify 函数，检查是否 LVN_ODCACHEHINT 消息，然后准备缓冲数据：
+NMLVCACHEHINT* pcachehint=NULL;
+NMHDR* phdr = (NMHDR*)lParam;
+if(phdr->code == LVN_ODCACHEHINT)
+{
+     pcachehint= (NMLVCACHEHINT*) phdr;
+     //自定义函数，准备指定范围的数据到缓冲区
+     PrepCache(pcachehint->iFrom, pcachehint->iTo);
+}
+else ...
+注意，如果消息不是 LVN_ODCACHEHINT，则要传递给基类进行处理。
+五、如何修改ListCtrl显示的数据。
+由于是程序自己维护数据，所以只需修改数据库中的数据，然后调用CListCtrl::RedrawItems函数进行重画即可。
+六、数据的选择状态和选择框
+CListCtrl可以显示checkbox选择框。有些情况下是很有用的。对于正常的listctrl，用户可以用鼠标来修改某个元素的选择状态，但是对于虚拟列表就不行了。必须自己处理一些消息，然后自己保存数据的选中状态:
+void CVirtualListDlg::ToggleCheckBox(int item)
+{
+    m_database[item].m_checked = !m_database[item].m_checked;
+    m_list.RedrawItems(item, item);
+}
+处理 LVN_KEYDOWN消息，添加对空格键 的响应，用于切换选择状态：
+void CVirtualListDlg::OnKeydownList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    LV_KEYDOWN* pLVKeyDown = (LV_KEYDOWN*)pNMHDR;
+    if( pLVKeyDown->wVKey == VK_SPACE )
+    {
+       int item = m_list.GetSelectionMark();
+        if(item != -1)
+            ToggleCheckBox(item);
+    }
+    *pResult = 0;
+}
+然后处理 NM_CLICK 消息:
+void CVirtualListDlg::OnClickList(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    NMLISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+    LVHITTESTINFO hitinfo;
+    hitinfo.pt = pNMListView->ptAction;
+    int item = m_list.HitTest(&hitinfo);
+    if(item != -1)
+    {
+        //看看鼠标是否单击在 check box上面了?
+        if( (hitinfo.flags & LVHT_ONITEMSTATEICON) != 0)
+        {
+            ToggleCheckBox(item);
+        }
+    }
+    
+    *pResult = 0;
+}
+七、备注：
+    1、虚拟列表无法进行排序。
+    2、虚表的一个优点是容易保持和数据库的同步。修改数据库中的数据，然后重画list十分容易而且高效。
+    3、虚表的另一个优点是可以根据需要产生数据。比如在某一列加上行号。http://blog.vckbase.com/iwaswzq/archive/2006/07/07/21113.htmlhttp://www.codeproject.com/KB/list/virtuallist.aspx
+
+

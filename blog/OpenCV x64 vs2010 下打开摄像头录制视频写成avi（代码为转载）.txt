@@ -1,0 +1,201 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/16325283				
+
+
+首先参照下面这里进行opencv x64位机器下面的配置
+http://wiki.opencv.org.cn/index.php/VC_2010%E4%B8%8B%E5%AE%89%E8%A3%85OpenCV2.4.4
+ 
+参考到环境变量处的配置之后，文章中所说的x64位机器环境的配置就不是很清晰了，我自己摸索了一些，其实vs2010本身就不是一个64位的编译器。
+ 
+ 
+
+ 
+所以我认为，在64位的win7旗舰版系统中，这个编译器就是支持64位程序的编译运行。
+ 
+但是vs2010中没有能够直接创建64位程序啊，所以就新建win32控制台程序之后在进行设置。
+下面是我在vs2008中的新建的工程做的实验，vs2010一样，都是在属性管理器中->右键工程->属性->配置管理起->活动平台解决方案->新选择平台，选择x64
+ 
+ 
+
+ 
+接着就生成了，新的工程配置选项，如下图所示：
+ 
+ 
+
+ 
+这时候回到，最上面的连接，讲里面所说的路径，配置一下：
+ 
+http://wiki.opencv.org.cn/index.php/VC_2010%E4%B8%8B%E5%AE%89%E8%A3%85OpenCV2.4.4
+ 
+画红线的部分右键属性，这里跟连接里面的教程不太一样，由于是在64位环境下，似乎不能直接配置成所有工程的通用属性，所以每次使用的时候都要从新配置下，这点可能要注意！
+ 
+ 
+
+ 
+ 
+配置好了之后，可以使用教程中的代码进行一下测试，还要注意一个问题，教程中的代码可能不需要一些附加依赖库就能够运行，但是咱们下面的，驱动摄像头的程序就要用到很多附加依赖库。
+ 
+有时候在网上搜的时候，由于版本的不同，所以附加依赖库后面的数字是不同的，大家复制粘贴的时候注意要修改一下。下面这些差不多是所有的库了
+ 
+ 
+下面的都是带d 的，也就是debug版本 的附加依赖库： 
+ 
+
+opencv_contrib244d.lib 
+opencv_core244d.lib 
+opencv_features2d244d.lib 
+opencv_flann244d.lib 
+opencv_gpu244d.lib 
+opencv_highgui244d.lib 
+opencv_imgproc244d.lib 
+opencv_legacy244d.lib 
+opencv_ml244d.lib 
+opencv_nonfree244d.lib 
+opencv_objdetect244d.lib 
+opencv_photo244d.lib 
+opencv_stitching244d.lib 
+opencv_ts244d.lib 
+opencv_video244d.lib 
+opencv_videostab244d.lib 
+ 
+opencv_calib3d244.lib 
+opencv_contrib244.lib 
+opencv_core244.lib 
+opencv_features2d244.lib 
+opencv_flann244.lib 
+opencv_gpu244.lib 
+opencv_highgui244.lib 
+opencv_imgproc244.lib 
+opencv_legacy244.lib 
+opencv_ml244.lib 
+opencv_nonfree244.lib 
+opencv_objdetect244.lib 
+opencv_photo244.lib 
+opencv_stitching244.lib 
+opencv_ts244.lib 
+opencv_video244.lib 
+opencv_videostab244.lib 
+ 
+ 
+下面的程序来自这个连接
+http://www.cppblog.com/lanshengsheng/archive/2013/01/16/197309.html
+我用我的摄像头（蓝色妖姬M2200 免驱高清）测试，表明，能录8秒左右的avi格式的录像，因为是200次，每秒多少帧还不是很确定。
+ 
+ 
+<span style="font-family:KaiTi_GB2312;font-size:24px;">// Camera_First.cpp : 定义控制台应用程序的入口点。
+//
+
+//#include "stdafx.h"
+
+
+
+#include "cv.h"
+#include "cxcore.h" 
+#include "highgui.h"
+#include <iostream> 
+
+
+
+using namespace std; 
+int main() 
+{   
+	CvCapture* capture=cvCaptureFromCAM(-1);
+	CvVideoWriter* video=NULL;
+
+	IplImage* frame=NULL;
+
+	int n;
+
+	if(!capture) //如果不能打开摄像头给出警告
+
+	{
+
+		cout<<"Can not open the camera."<<endl;
+
+		return -1;
+
+	}
+
+	else
+
+	{
+
+		frame=cvQueryFrame(capture); //首先取得摄像头中的一帧
+
+		video=cvCreateVideoWriter("camera.avi", CV_FOURCC('X', 'V', 'I', 'D'), 25,
+			cvSize(frame->width,frame->height)); //创建CvVideoWriter对象并分配空间
+
+		//保存的文件名为camera.avi，编码要在运行程序时选择，大小就是摄像头视频的大小，帧频率是32
+
+		if(video) //如果能创建CvVideoWriter对象则表明成功
+		{
+
+			cout<<"VideoWriter has created."<<endl;
+
+		}
+
+
+		cvNamedWindow("Camera Video",1); //新建一个窗口
+
+		int i = 0;
+
+		while(i <= 200) // 让它循环200次自动停止录取
+
+		{
+
+			frame=cvQueryFrame(capture); //从CvCapture中获得一帧
+
+			if(!frame)
+
+			{
+
+				cout<<"Can not get frame from the capture."<<endl;
+
+				break;
+
+			}
+
+			n=cvWriteFrame(video,frame); //判断是否写入成功，如果返回的是1，表示写入成功
+
+			cout<<n<<endl;
+
+			cvShowImage("Camera Video",frame); //显示视频内容的图片
+
+			i++;
+
+			if(cvWaitKey(2)>0)
+
+				break; //有其他键盘响应，则退出
+
+		}
+
+
+		cvReleaseVideoWriter(&video);
+
+		cvReleaseCapture(&capture);
+
+		cvDestroyWindow("Camera Video");
+
+	}
+
+	return 0;
+
+}
+
+</span>
+ 
+ 
+ 
+ 
+另外在最后生成阶段可能出现无法调试的问题，在百度搜索了一下，可能是.suo文件出现了问题
+按照如下方式修改可以解决：
+首先打开菜单 项目->项目属性页 
+选择 配置属性->链接器->调试->生成调试信息 改为 是 
+选择 配置属性->C/C++ ->常规->调试信息格式 改为 用于“编辑并继续”的程序数据库(/ZI) 
+选择 配置属性->C/C++ ->优化->优化 改为 禁用(/Od)
+ 
+ 
+
+

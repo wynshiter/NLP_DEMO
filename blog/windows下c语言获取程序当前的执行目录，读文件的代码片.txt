@@ -1,0 +1,47 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/40616407				
+
+
+代码如下：
+#include "stdafx.h"
+#include "stdlib.h"
+#include <direct.h>
+#include <string.h>
+
+int _tmain(int argc, char* argv[])
+{
+	char* buffer;
+
+	// Get the current working directory: 
+	if( (buffer = _getcwd( NULL, 0 )) == NULL )
+		perror( "_getcwd error" );
+	else
+	{
+		printf( "%s \nLength: %d\n", buffer, strnlen(buffer,1024) );
+		free(buffer);
+	}
+
+	FILE *fp = fopen("input_left.ppm", "rb");
+	if (!fp) 
+	{
+		printf("exit");
+		return NULL;
+	}
+	else
+	{
+		printf("get");
+	}
+
+	getchar();
+
+
+	return 0;
+}
+
+
+
+ 
+
+

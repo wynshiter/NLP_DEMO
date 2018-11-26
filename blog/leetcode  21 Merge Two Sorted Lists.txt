@@ -1,0 +1,163 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46382127				
+
+
+ 
+Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
+ 
+我的解决方案：
+ 
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+ 
+
+class Solution 
+{
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) 
+    {
+        if(NULL==l1) return l2;
+        if(NULL==l2) return l1;
+       
+         ListNode* head = NULL;
+         
+         if(l1->val < l2->val)     
+         {
+             head = l1; 
+             l1 = l1->next; 
+             
+         }
+          else                       
+         { 
+             head = l2; 
+             l2 = l2->next;
+        }
+
+        ListNode* p = head;     // pointer to form new list
+        
+        while(l1!=NULL&&l2!=NULL)
+        {
+            if(l1->val < l2->val)
+            {
+                p->next = l1;
+                l1 = l1 ->next;
+            }
+            
+            else 
+            {
+                p->next = l2;
+                l2 = l2 ->next;
+            }
+            p = p->next;
+        }
+        
+        if(l1)
+        {
+            p->next = l1;
+        }
+        
+        else
+        {
+            p->next = l2;
+        }
+        
+        
+        
+        return head;
+    }
+};
+
+ 
+递归c++解法：
+class Solution {
+public:
+    ListNode *mergeTwoLists(ListNode *l1, ListNode *l2) {
+        if(l1 == NULL) return l2;
+        if(l2 == NULL) return l1;
+
+        if(l1->val < l2->val) {
+            l1->next = mergeTwoLists(l1->next, l2);
+            return l1;
+        } else {
+            l2->next = mergeTwoLists(l2->next, l1);
+            return l2;
+        }
+    }
+};
+
+
+ 
+ 
+python递归解决方案：
+ 
+def mergeTwoLists(self, l1, l2):
+    if not l1:
+        return l2
+    elif not l2:
+        return l1
+    else:
+        if l1.val <= l2.val:
+            l1.next = self.mergeTwoLists(l1.next, l2)
+            return l1
+        else:
+            l2.next = self.mergeTwoLists(l1, l2.next)
+            return l2
+
+ 
+ 
+python非递归：
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    # @param {ListNode} l1
+    # @param {ListNode} l2
+    # @return {ListNode}
+    def mergeTwoLists(self, l1, l2):
+        p1 = l1
+        p2 = l2
+        guard = ListNode(0)
+        q = guard
+        while p1 is not None and p2 is not None:
+            if p1.val <= p2.val:
+                q.next = p1
+                p1 = p1.next
+                q = q.next
+            else:
+                q.next = p2
+                p2 = p2.next
+                q = q.next
+        if p1 is not None:
+            q.next = p1
+        if p2 is not None:
+            q.next = p2
+        return guard.next
+
+
+ 
+python递归解决方案2：
+If both lists are non-empty, I first make sure a starts smaller, use its head as result, and merge the remainders behind it. Otherwise, i.e., if one or both are empty, I just return what's there.
+
+class Solution:
+    def mergeTwoLists(self, a, b):
+        if a and b:
+            if a.val > b.val:
+                a, b = b, a
+            a.next = self.mergeTwoLists(a.next, b)
+        return a or b
+
+
+ 
+
+

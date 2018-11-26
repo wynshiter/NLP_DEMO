@@ -1,0 +1,168 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/39997113				
+
+
+       
+
+首先说明的是，这个帖子是成功的编译了dll，但是这个dll使用的时候还是很容易出现各种问题的。
+发现错误可能是由于系统安装了太多版本的opencv，环境变量的设置混乱，造成dll版本加载不对的问题。
+ 
+      
+ 更新：下面这篇文章里面有加速编译的设置办法：但是编译器采用了vs2012，我根据他的所有软件版本换了编译器，以及QT库,需要特别注意的是，这些库的相应操作系统版本32bit 或者64bit版本
+QT早期版本下载地址：
+ 
+下面这个网址能够找到qt的各个版本
+http://download.qt-project.org/archive/qt/
+下面是教程地址：
+ 
+http://www.xuebuyuan.com/2108717.html
+2014.10.23 
+严格根据上文的软件跟库版本是可以编译设置成功的。
+ 
+
+Motivation:
+ 
+之前在西电跟同学听了图像方面的讲座，受益匪浅啊。人家学校的老师大多都是搞sar雷达图像的，动辄20000*30000的高分辨率。算法再怎么优化，一套流程下来至少算十天半个月。这改个参数算算等不起啊，最后发现搞这个不上GPU根本就不行，于是我想啊讲GPU引入我的这个自然图像处理跟，stereo matching，的graph cuts算法中，应该也能够得到性能的大幅度提升。
+ 
+由于之前一直在看OpenCV这个图像处理库的相关内容，所以先搜了一下看看OpenCV这个库有没有直接对CUDA加速进行支持的，我打开电脑一看OpenCV的dll库后面的后缀带了_gpu就直接贴了代码在那调试呢。结果是，小白了。自己要安装CUDA toolkit并且结合OpenCV编译一遍的。
+ 
+由于我的笔记本电脑是神舟的，显卡是NVIDIA GTX 765我也没看，直接去官网下了个最新的CUDA TOOLKIT 6.5就开始整了，最后发现，人家有专门针对笔记本的notebook版本的，傻了一天白干了，之后发现这个版本过高，还是下了notebook的5.5版本。
+ 
+最新的6.5可能是给8系，9系的新卡用的吧，我也不是很清楚，最后搞完这一套配置终于明白为啥，linux之父最讨厌nvidia了，这程序之间也是乱七八糟的关系兼容不兼容的，官网早期版本的sdk都找不到，哎。。。
+ 
+ 
+
+使用Cmake的时候，有几点要注意的，选择Visual Studio 2010的版本应该为win64这样在win7 64bit版本下面生成的OpenCV才是正确的。
+ 
+ 
+
+ 
+ 
+vs2010主要有两种模式，分别是debug 和 release。 模式可以通过如图所示的位置选择。需要注意的是，因为先前我们cmake采用的是64位VS10编译器，在这里需要选择编译器x64, 而不是win32， 否则会出错。
+ 
+ 
+整体的过程参考了下面的链接：
+http://www.xuebuyuan.com/722557.html
+http://blog.csdn.net/fengbingchun/article/details/9831837
+ 
+安装完成后，在系统环境里面会发现新添加了两个环境变量：（环境变量挨个添加吧，不要怕麻烦）
+CUDA_PATH = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\
+CUDA_PATH_V5_0 = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\
+ 
+ 
+手动配置环境变量。在系统环境变量中新建如下项：
+CUDA_SDK_PATH = C:\ProgramData\NVIDIA Corporation\CUDA Samples\v5.0
+CUDA_LIB_PATH = %CUDA_PATH%\lib\X64
+CUDA_BIN_PATH = %CUDA_PATH%\bin
+CUDA_SDK_LIB_PATH = %CUDA_SDK_PATH%\common\lib\x64
+CUDA_SDK_BIN_PATH = %CUDA_SDK_PATH%\bin\win64
+ 
+ 
+然后在系统环境变量Path 后添加如下内容：
+
+
+;%CUDA_LIB_PATH%;%CUDA_BIN_PATH%;%CUDA_SDK_LIB_PATH%;%CUDA_SDK_BIN_PATH%;
+ 
+ 
+3. 安装TBB
+去http://threadingbuildingblocks.org/download 下载tbb41_20130314oss_win.zip解压到某路径
+本人D:\tbb41_20130314oss
+添加环境变量D:\tbb41_20130314oss\bin\intel64\vc10
+ 
+ 
+编译过程有两点，可能出现：
+1.配置的时候别忘了：添加两个路径，尤其是OpenCV的一个lib库不然 编译有的库找不到，编译不成功。
+ 
+ 
+这个库不需要设置！！！（后来发现！！！）
+
+ 
+ 
+ 
+2.整个编译的过程非常的缓慢，并且出现在编译OpenCV_gpu这个模块的时候，出现c4819错误感觉非常影响速度，这个你要回到相应的cuda文件中，另存为unicode格式就好
+ 
+ 
+
+i7的处理器大概能编译3个小时左右。。。
+ 
+加速方法，可以缩短到一个小时左右！就是只针对响应的显卡版本进行设置：
+由于这样直接生成的解决方案需对不同的GPU架构分别编译，编译时间过长（数小时），
+建议针对所用显卡进行配置（据称可达原时间六分之一）：
+找到如下两项
+ 
+ 
+ 
+
+ 
+ 
+清空CUDA_ARCH_PTX，将CUDA_ARCH_BIN中仅保留所需GPU架构，
+确定所需架构，请查询https://developer.nvidia.com/cuda-gpus重新configure。（建议使用以上方法先编译一边，确定没有错误，再为所有架构重新编译，花了四天的时间得到的教训）
+ 
+ 
+ 
+ 
+
+
+
+ 
+
+ 
+ 
+以上是转载的内容，这里要说几个需要注意的地方：
+ 
+ 
+1.本文中采用的是Cmake2.8.8版本，我用过2.8.12就会出现过很多本文中未提到的错误；
+ 
+2.上文中提到的CUDA_BUILD_CBUIN”、“CUDA_VERBOSE_BUILD（好像是这些），有些其实在Cmake配置和生成的过程中是找不到的，不过这并不影响结果，可以忽略；
+ 
+3.关于tbb路径下x86和x64版本lib的选择问题：如果你的vs是32位的就选择x86的库，否则选x64的库；
+ 
+4.将编译好的头文件、库等加载到程序中时，注意要使用编译的Release版本（形如："opencv_gpu243.lib"，243后没有d的就是Release版本，有的就是Debug版本），否则会产生“应用程序无法正常启动0xc000007b”的错误
+ 
+ 
+测试代码：
+ 
+<span style="font-size:18px;">// first.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "opencv2/opencv.hpp"
+#include "opencv2/gpu/gpu.hpp"
+
+#pragma comment(lib,"opencv_gpu2410.lib")
+#pragma comment(lib,"opencv_core2410.lib")
+
+using namespace std; 
+using namespace cv; 
+using namespace cv::gpu;
+int main()
+{
+	int i;
+	try
+	{
+		cout << getCudaEnabledDeviceCount();
+	}
+	catch(const cv::Exception& ex)
+	{
+		cout << "Error:" << ex.what() <<endl;
+	}
+	system("PAUSE");
+	return 0;
+}
+</span>
+ 
+ 
+ 
+ 
+ 
+ 
+实际上，最后配置好了之后，还是各种问题，我觉的直接调用编译好的opencv加上cuda的库编程效率不是很好，通用性也存在问题。后来觉的引起这个问题的原因是自己电脑上安装的东西太多了，opencv就装了3个版本，环境变量设置的太多了，引起很多问题。
+ 
+ 
+参考下面这个文章的第三种办法，后面再试试：
+http://www.cnblogs.com/dwdxdy/p/3528711.html
+
+

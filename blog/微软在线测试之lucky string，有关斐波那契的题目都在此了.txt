@@ -1,0 +1,63 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50812448				
+
+
+
+
+
+解决方案：
+
+int _tmain(int argc,_TCHAR* argv[])
+{
+    size_t fib[] = {1,2,3,5,8,13,21,34};
+    string str,tempstr;
+    cin >> str;
+    tempstr = str;
+    auto it = unique(tempstr.begin(),tempstr.end());
+    tempstr.erase(it,tempstr.end());    // 去重(已假定是有序的，如果无序则先排序)
+ 
+    for (auto itstr = str.begin(); itstr != str.end();)    // 遍历输入数据
+    {
+        string s(itstr,str.end());   
+        for (int i = 0; i < 8;i++)
+        {
+            if (fib[i] <= tempstr.size())    // 符合FIB的不同字符有多少，则输出多少次
+            {
+                auto singlechar = tempstr[i];
+                auto findchar = s.find(singlechar);
+                for (auto itchar = s.begin() + findchar; itchar != s.end()&&*itchar == singlechar;itchar++)
+                {    // 输出，相同字符连续输出
+                    if (*s.begin() == singlechar)    // 每次去掉第一个相同的字符
+                    {
+                        itstr++;
+                    }
+                    cout << string(s.begin(),itchar+1) << endl;
+                }
+            }
+            else
+            {
+                tempstr.erase(tempstr.begin());    // 字典输出需要
+                break;
+            }
+        }
+    }
+ 
+ 
+    return 0;
+}
+
+
+
+讨论贴：
+http://bbs.csdn.net/topics/391023839
+
+后面碰见有关斐波那契数列的题目非常多，这块还有一个求期望的：
+http://bbs.csdn.net/topics/391822110
+正确答案：
+http://blog.csdn.net/u010476094/article/details/48110405
+这他妈的也太难算了吧
+
+
+

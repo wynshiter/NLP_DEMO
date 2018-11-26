@@ -1,0 +1,91 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/7898653				
+
+
+#include "stdafx.h"
+#include <windows.h>		// Windows的头文件
+#include<stdio.h>
+//#include <gl/glew.h>		// 包含最新的gl.h,glu.h库
+//#include <gl/glut.h>		// 包含OpenGL实用库
+#include <gl/glaux.h>							// GLaux库的头文件
+//#include<gl/GLU.h>
+
+
+
+
+#pragma comment(lib, "opengl32.lib") 
+#pragma comment(lib, "glu32.lib") 
+#pragma comment(lib, "glut32.lib") 
+#pragma comment(lib,"glaux.lib")//注意此处,此课的代码多添加了这个静态库的使用//详见帖子:http://topic.csdn.net/u/20120823/10/c38703fc-8f7e-4b12-8460-afb7014efdf8.html
+
+HGLRC           hRC=NULL;							// 窗口着色描述表句柄
+HDC             hDC=NULL;							// OpenGL渲染描述表句柄
+HWND            hWnd=NULL;							// 保存我们的窗口句柄
+HINSTANCE       hInstance;							// 保存程序的实例
+
+bool	keys[256];								// 保存键盘按键的数组
+bool	active=TRUE;								// 窗口的活动标志，缺省为TRUE
+bool	fullscreen=TRUE;							// 全屏标志缺省，缺省设定成全屏模式
+
+GLfloat		rtri;						// 用于三角形的角度
+GLfloat		rquad;						// 用于四边形的角度
+
+GLfloat		xrot;								// X 旋转量
+GLfloat		yrot;								// Y 旋转量
+GLfloat		zrot;								// Z 旋转量
+
+GLuint		texture[1];							// 存储一个纹理
+
+AUX_RGBImageRec *LoadBMP(char *Filename)					// 载入位图图象
+{
+	FILE *File=NULL;							// 文件句柄
+
+	if (!Filename)								// 确保文件名已提供
+	{
+		return NULL;							// 如果没提供，返回 NULL
+	}
+	File=fopen(Filename,"r");						// 尝试打开文件
+	if (File)								// 文件存在么?
+	{
+		fclose(File);							// 关闭句柄
+		return auxDIBImageLoad(Filename);				// 载入位图并返回指针
+	}
+	return NULL;								// 如果载入失败，返回 NULL
+}
+
+
+int LoadGLTextures()								// 载入位图(调用上面的代码)并转换成纹理
+{
+
+	int Status=FALSE;							// 状态指示器
+	AUX_RGBImageRec *TextureImage[1];					// 创建纹理的存储空间
+	memset(TextureImage,0,sizeof(void *)*1);				// 将指针设为 NULL
+	// 载入位图，检查有无错误，如果位图没找到则退出
+	if (TextureImage[0]=LoadBMP("shit.bmp"))
+	{
+		Status=TRUE;							// 将 Status 设为 TRUE
+		glGenTextures(1, &texture[0]);					// 创建纹理
+
+		// 使用来自位图数据生成 的典型纹理
+		glBindTexture(GL_TEXTURE_2D, texture[0]);
+		// 生成纹理
+		glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage[0]->sizeX, TextureImage[0]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[0]->data);
+
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	// 线形滤波
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	// 线形滤波
+	}
+	if (TextureImage[0])							// 纹理是否存在
+	{
+		if (TextureImage[0]->data)					// 纹理图像是否存在
+		{
+			free(TextureImage[0]->data);				// 释放纹理图像占用的内存
+		}
+
+		free(TextureImage[0]);						// 释放图像结构
+	}
+	return Status;								// 返回 Status
+}
+ 
+

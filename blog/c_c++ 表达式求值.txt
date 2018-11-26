@@ -1,0 +1,472 @@
+content
+
+
+
+表达式求值
+[问题描述]
+一个算术表达式是由操作数(operand)、运算符(operator)和界限符(delimiter)组成的。假设操作数是正整数，运算符只含加减乘除等四种运算符，界限符有左右括号和表达式起始、结束符“#”，如：#（7+15）*（23-28/4）#。引入表达式起始、结束符是为了方便。编程利用“算符优先法”求算术表达式的值。
+[基本要求]
+（1） 从键盘读入一个合法的算术表达式，输出正确的结果。
+（2） 显示输入序列和栈的变化过程。
+[选作内容]
+（1） 扩充运算符集合。
+（2） 引入变量操作数。
+（3） 操作数类型扩充到实数。
+ 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+#include <conio.h>
+
+#define TRUE 1
+#define FALSE 0
+#define Stack_Size 50
+
+char ops[7]={'+','-','*','/','(',')','#'};  /*运算符数组*/
+
+int  cmp[7][7]={{2,2,1,1,1,2,2},    /*用来进行比较运算符优先级的矩阵,3代表'=',2代表'>',1代表'<',0代表不可比*/
+                {2,2,1,1,1,2,2},
+                {2,2,2,2,1,2,2},
+                {2,2,2,2,1,2,2},
+                {1,1,1,1,1,3,0},
+                {2,2,2,2,0,2,2},
+                {1,1,1,1,1,0,3}};
+
+typedef struct
+{ 
+	char elem[Stack_Size];
+	int top;
+}SeqStack;     /*运算符栈的定义*/
+
+typedef struct
+{
+	int elem[Stack_Size];
+	int top;
+}nSeqStack;   /* 运算数栈的定义*/
+
+
+void InitStack(SeqStack *S)   /*初始化运算符栈*/
+{
+	S->top =-1;
+}
+
+void InitStackn(nSeqStack *S)   /*初始化运算数栈*/
+{
+	S->top =-1;
+}
+
+int IsEmpty(SeqStack *S)    /*判断栈S为空栈时返回值为真，反之为假*/
+{
+	return(S->top==-1?TRUE:FALSE);
+}
+
+int IsEmptyn(nSeqStack *S)    /*判断栈S为空栈时返回值为真，反之为假*/
+{
+	return(S->top==-1?TRUE:FALSE);
+}
+
+/*判栈满*/
+int IsFull(SeqStack *S)	    /*判断栈S为满栈时返回值为真，反之为假*/
+{
+	return(S->top==Stack_Size-1?TRUE:FALSE);
+}
+
+int IsFulln(nSeqStack *S)	    /*判断栈S为满栈时返回值为真，反之为假*/
+{
+	return(S->top==Stack_Size-1?TRUE:FALSE);
+}
+
+int Push(SeqStack *S, char x)   /*运算符栈入栈函数*/
+{
+	if (S->top==Stack_Size-1)
+	{
+		printf("Stack is full!\n");
+		return FALSE;
+	}
+	else
+	{
+		S->top++;
+		S->elem[S->top]=x;
+		return TRUE;
+	}
+}
+
+int Pushn(nSeqStack *S, int x)   /*运算数栈入栈函数*/
+{
+	if (S->top==Stack_Size-1)
+	{
+		printf("Stack is full!\n");
+		return FALSE;
+	}
+	else
+	{
+		S->top++;
+		S->elem[S->top]=x;
+		return TRUE;
+	}
+}
+ 
+int Pop(SeqStack *S, char *x)    /*运算符栈出栈函数*/
+{
+	if (S->top==-1)
+	{
+		printf("运算符栈空!\n");
+		return FALSE;
+	}
+	else
+	{
+		*x=S->elem[S->top];
+		S->top--;
+		return TRUE;
+	}
+}
+ 
+int Popn(nSeqStack *S, int *x)    /*运算数栈出栈函数*/
+{
+	if (S->top==-1)
+	{
+		printf("运算符栈空!\n");
+		return FALSE;
+	}
+	else
+	{
+		*x=S->elem[S->top];
+		S->top--;
+		return TRUE;
+	}
+}
+
+char GetTop(SeqStack *S)    /*运算符栈取栈顶元素函数*/     
+{
+	if (S->top ==-1)
+	{
+		printf("运算符栈为空!\n");
+		return FALSE;
+	}
+	else
+	{
+		return (S->elem[S->top]);
+	}
+}
+
+int GetTopn(nSeqStack *S)    /*运算数栈取栈顶元素函数*/     
+{
+	if (S->top ==-1)
+	{
+		printf("运算符栈为空!\n");
+		return FALSE;
+	}
+	else
+	{
+		return (S->elem[S->top]);
+	}
+}
+
+
+int Isoperator(char ch)        /*判断输入字符是否为运算符函数,是返回TRUE,不是返回FALSE*/
+{
+	int i;
+	for (i=0;i<7;i++)
+	{
+		if(ch==ops[i])
+			return TRUE;
+	}
+	return FALSE;
+}
+
+/*
+int isvariable(char ch)
+{ if (ch>='a'&&ch<='z')
+      return true;
+   else 
+	   return false;
+}*/
+
+
+char Compare(char ch1, char ch2)   /*比较运算符优先级函数*/
+{
+	int i,m,n;
+	char pri;
+	int priority;
+	for(i=0;i<7;i++)              /*找到相比较的两个运算符在比较矩阵里的相对位置*/
+	{
+		if(ch1==ops[i])	
+			m=i;
+		if (ch2==ops[i])
+			n=i;
+	}
+
+	priority = cmp[m][n];
+	switch(priority)
+	{
+	case 1:
+		pri='<';
+		break;
+	case 2:
+		pri='>';
+		break;
+	case 3:
+		pri='=';
+		break;
+	case 0:
+		pri='$';
+		printf("表达式错误!\n");
+		break;
+	}
+	return pri;
+}
+	
+int Execute(int a, char op, int b)    /*运算函数*/
+{
+	int result;
+	switch(op)
+	{
+	case '+':
+		result=a+b;
+		break;
+	case '-':
+		result=a-b;
+		break;
+	case '*':
+		result=a*b;
+		break;
+	case '/':
+		result=a/b;
+		break;
+	}
+    return result;
+}
+
+int ExpEvaluation() 
+/*读入一个简单算术表达式并计算其值。optr和operand分别为运算符栈和运算数栈，OPS为运算符集合*/
+{
+	int a,b,v,temp;
+	char ch,op;
+	char *str;
+	int i=0;
+	
+	SeqStack optr;
+	nSeqStack operand;
+
+	InitStack(&optr);
+	InitStackn(&operand);
+	Push(&optr,'#');
+	printf("请输入表达式(以#结束):\n");            /*表达式输入*/
+	str =(char *)malloc(50*sizeof(char));
+	gets(str);
+
+	ch=str[i];
+	i++;
+	while(ch!='#'||GetTop(&optr)!='#')
+	{ 
+		if(!Isoperator(ch))
+		{
+			temp=ch-'0';    /*将字符转换为十进制数*/
+			ch=str[i];
+			i++;
+			while(!Isoperator(ch))
+			{
+				temp=temp*10 + ch-'0'; /*将逐个读入运算数的各位转化为十进制数*/
+				ch=str[i];
+				i++;
+			}
+			Pushn(&operand,temp);
+		}
+		else
+		{
+			switch(Compare(GetTop(&optr),ch))
+			{
+			case '<':
+				Push(&optr,ch); 
+				ch=str[i];
+				i++;
+				break;
+			case '=':
+				Pop(&optr,&op);
+				ch=str[i];
+				i++;
+				break;
+			case '>':
+				Pop(&optr,&op);
+				Popn(&operand,&b);
+				Popn(&operand,&a);
+				v=Execute(a,op,b);  /* 对a和b进行op运算 */
+				Pushn(&operand,v);
+				break;
+			}
+		}		
+	}
+	v=GetTopn(&operand);
+	return v;
+}
+
+void main()                               /*主函数*/
+{
+	int result;
+	result=ExpEvaluation();
+	printf("\n表达式结果是%d\n",result);
+}	
+
+
+
+
+
+
+
+
+ 
+ 
+下面这个是在网上找的：
+用 C++ 实现的加、减、乘、除表达式计算
+
+前些日子面试一个开发工作，考官出了这么一笔试题目，要我写出实现过程， 思量半天，终于
+用 C++ 完成，现将代码贴出，与诸同道共分享。
+
+// 头文件 Calc.h
+#ifndef __CALC_H__
+#define __CALC_H__
+#include <stack>
+#define ascii_int(x) (x >= 0x30 && x <= 0x39) ? (x - 0x30) : (x)
+const int GREATER =  1;
+const int EQUAL   =  0;
+const int LESS    = -1;
+class Calculate {
+public:
+  int  evaluteExpr(char *exp);
+private:
+  int  getLevel(char ch);
+  bool isOperator(char ch);
+  int  compareOpteratorLevel(char inputChar, char optrStackTop);
+  int  calc(int num1, int num2, char op);
+  void evaluate(char ch);
+private:
+  std::stack<int>  _opnd_stack;
+  std::stack<char> _optr_stack;
+  static char _optr[];
+  static int  _level[];
+};
+#endif
+
+
+// 头文件的实现代码 Calc.cxx
+#include "Calc.h"
+char Calculate::_optr[] = {'#', '(', '+', '-', '*', '/', ')'};
+int Calculate::_level[] = { 0,   1,   2,   2,   3,   3,   4 };
+// Get current operator level for calculating
+int Calculate::getLevel(char ch) {
+  for (int i = 0; *(_optr+i) != '\0'; ++i) 
+    if (*(_optr+i) == ch) 
+      return *(_level+i);
+}
+// Calculate the operands
+int Calculate::calc(int num1, int num2, char op) {
+  switch (op) 
+    {
+    case '+':
+      return num1 + num2;
+    case '-':
+      return num1 - num2;
+    case '*':
+      return num1 * num2;
+    case '/':
+      return num1 / num2;
+    }
+}
+// judge inputing character is operator or not
+bool Calculate::isOperator(char ch) {
+  for (char *p = _optr; *p != '\0'; ++p)
+    if (*p == ch) 
+      return true;
+  return false;
+}
+// Compare level of input operator and the top operator of operator stack
+int Calculate::compareOpteratorLevel(char inputChar, char optrStackTop) {
+//   if (inputChar == '(' && optrStackTop == ')') 
+//     return EQUAL;
+//   else 
+  if (inputChar == '(')
+    return GREATER;
+  if (inputChar == ')' && optrStackTop == '(') 
+    return EQUAL;
+  else if (inputChar == ')') 
+    return LESS;
+  if (inputChar == '#' && optrStackTop == '#') 
+    return EQUAL;
+//   else if (inputChar == '#')
+//     return LESS;
+  return (getLevel(inputChar) > getLevel(optrStackTop)) ? GREATER : LESS;
+}
+// Evaluate value while inputing operators
+void Calculate::evaluate(char ch) {
+  char op;
+  int num, result;
+  if (!isOperator(ch)) {
+    _opnd_stack.push(ascii_int(ch));
+    return ;
+  }
+  switch (compareOpteratorLevel(ch, _optr_stack.top())) 
+    {
+    case GREATER :
+      _optr_stack.push(ch);
+      break;
+    case EQUAL :
+      _optr_stack.pop();
+      break;
+    case LESS :
+      num = _opnd_stack.top();
+      _opnd_stack.pop();
+      result = _opnd_stack.top();
+      _opnd_stack.pop();
+      op = _optr_stack.top();
+      _optr_stack.pop();
+      result = calc(result, num, op);
+      _opnd_stack.push(result);
+      evaluate(ch);
+      break;
+    }
+}
+// Evaluate user specified expression
+int Calculate::evaluteExpr(char *exp) {
+  _optr_stack.push('#');
+  for (char *p =exp; *p != '\0'; ++p )
+    evaluate(*p);
+  int result = _opnd_stack.top();
+  _opnd_stack.pop();
+  return result;
+}
+
+
+// 测试代码 calc_test.cxx
+#include <iostream>
+#include "Calc.h"
+using namespace std;
+int main(void) {
+  Calculate *calc = new Calculate();
+  cout << "1+3*(4+7) = " 
+       << calc->evaluteExpr("1+3*(4+7)#") 
+       << endl;
+  cout << "((1+2)) = " 
+       << calc->evaluteExpr("((1+2))#") 
+       << endl;
+  cout << "3*8+9/7-5-9+(1-9)/4 = " 
+       << calc->evaluteExpr("3*8+9/7-5-9+(1-9)/4#") 
+       << endl;
+  cout << "(6-7)*(5+9) = " 
+       << calc->evaluteExpr("(6-7)*(5+9)#") 
+       << endl;
+  cout << "0*8+0/6-9+(7-1) = " 
+       << calc->evaluteExpr("0*8+0/6-9+(7-1)#") 
+       << endl;
+  delete calc;
+}
+
+用 MinGW/G++ 3.4.5 编译如下: 
+  g++  -o test.exe  Calc.cxx  Calc_test.cxx
+
+作为一个演示算法够了， 但代码还是有一些缺点:
+   (1) 只能处理一位数的加、减、乘、除表达式计算(可带括号)
+
+ 
+
+

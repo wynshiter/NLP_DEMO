@@ -1,0 +1,305 @@
+content
+
+
+
+Surf(Speed Up Robust Feature)Surf算法的原理                                                                          1.构建Hessian矩阵构造高斯金字塔尺度空间其实surf构造的金字塔图像与sift有很大不同，就是因为这些不同才加快了其检测的速度。Sift采用的是DOG图像，而surf采用的是Hessian矩阵行列式近似值图像。Hessian矩阵是Surf算法的核心，为了方便运算，假设函数f(z，y)，Hessian矩阵H是由函数，偏导数组成。首先来看看图像中某个像素点的Hessian矩阵，如下：即每一个像素点都可以求出一个Hessian矩阵。H矩阵判别式为：判别式的值是H矩阵的特征值，可以利用判定结果的符号将所有点分类，根据判别式取值正负，来判别该点是或不是极值点。在SURF算法中，用图像像素l(x，y)即为函数值f(x，y)，选用二阶标准高斯函数作为滤波器，通过特定核间的卷积计算二阶偏导数，这样便能计算出H矩阵的三个矩阵元素L_xx,L_xy,L_yy 从而计算出H矩阵：但是由于我们的特征点需要具备尺度无关性，所以在进行Hessian矩阵构造前，需要对其进行高斯滤波。这样，经过滤波后在进行Hessian的计算，其公式如下：L(x,t)是一幅图像在不同解析度下的表示，可以利用高斯核G(t)与图像函数 I(x) 在点x的卷积来实现，其中高斯核G(t)：g(x)为高斯函数，t为高斯方差。通过这种方法可以为图像中每个像素计算出其H行列式的决定值，并用这个值来判别特征点。为方便应用，Herbert Bay提出用近似值现代替L(x,t)。为平衡准确值与近似值间的误差引入权值叫，权值随尺度变化，则H矩阵判别式可表示为：其中0.9是作者给出的一个经验值，其实它是有一套理论计算的，具体去看surf的英文论文。由于求Hessian时要先高斯平滑，然后求二阶导数，这在离散的像素点是用模板卷积形成的，这2中操作合在一起用一个模板代替就可以了，比如说y方向上的模板如下：该图的左边即用高斯平滑然后在y方向上求二阶导数的模板，为了加快运算用了近似处理，其处理结果如右图所示，这样就简化了很多。并且右图可以采用积分图来运算，大大的加快了速度，关于积分图的介绍，可以去查阅相关的资料。同理，x和y方向的二阶混合偏导模板如下所示：上面讲的这么多只是得到了一张近似hessian行列式图，这类似sift中的DOG图，但是在金字塔图像中分为很多层，每一层叫做一个octave，每一个octave中又有几张尺度不同的图片。在sift算法中，同一个octave层中的图片尺寸(即大小)相同，但是尺度(即模糊程度)不同，而不同的octave层中的图片尺寸大小也不相同，因为它是由上一层图片降采样得到的。在进行高斯模糊时，sift的高斯模板大小是始终不变的，只是在不同的octave之间改变图片的大小。而在surf中，图片的大小是一直不变的，不同的octave层得到的待检测图片是改变高斯模糊尺寸大小得到的，当然了，同一个octave中个的图片用到的高斯模板尺度也不同。算法允许尺度空间多层图像同时被处理，不需对图像进行二次抽样，从而提高算法性能。左图是传统方式建立一个如图所示的金字塔结构，图像的寸是变化的，并且运 算会反复使用高斯函数对子层进行平滑处理，右图说明Surf算法使原始图像保持不变而只改变滤波器大小。Surf采用这种方法节省了降采样过程，其处理速度自然也就提上去了。其金字塔图像如下所示：2. 利用非极大值抑制初步确定特征点        此步骤和sift类似，将经过hessian矩阵处理过的每个像素点与其3维领域的26个点进行大小比较，如果它是这26个点中的最大值或者最小值，则保留下来，当做初步的特征点。检测过程中使用与该尺度层图像解析度相对应大小的滤波器进行检测，以3×3的滤波器为例，该尺度层图像中9个像素点之一图2检测特征点与自身尺度层中其余8个点和在其之上及之下的两个尺度层9个点进行比较，共26个点，图2中标记‘x’的像素点的特征值若大于周围像素则可确定该点为该区域的特征点。3. 精确定位极值点         这里也和sift算法中的类似，采用3维线性插值法得到亚像素级的特征点，同时也去掉那些值小于一定阈值的点，增加极值使检测到的特征点数量减少，最终只有几个特征最强点会被检测出来。4. 选取特征点的主方向。        这一步与sift也大有不同。Sift选取特征点主方向是采用在特征点领域内统计其梯度直方图，取直方图bin值最大的以及超过最大bin值80%的那些方向做为特征点的主方向。       而在surf中，不统计其梯度直方图，而是统计特征点领域内的harr小波特征。即在特征点的领域(比如说，半径为6s的圆内，s为该点所在的尺度)内，统计60度扇形内所有点的水平haar小波特征和垂直haar小波特征总和，haar小波的尺寸变长为4s，这样一个扇形得到了一个值。然后60度扇形以一定间隔进行旋转，最后将最大值那个扇形的方向作为该特征点的主方向。该过程的示意图如下：5. 构造surf特征点描述算子        在sift中，是在特征点周围取16*16的邻域，并把该领域化为4*4个的小区域，每个小区域统计8个方向梯度，最后得到4*4*8=128维的向量，该向量作为该点的sift描述子。在surf中，也是在特征点周围取一个正方形框，框的边长为20s(s是所检测到该特征点所在的尺度)。该框带方向，方向当然就是第4步检测出来的主方向了。然后把该框分为16个子区域，每个子区域统计25个像素的水平方向和垂直方向的haar小波特征，这里的水平和垂直方向都是相对主方向而言的。该haar小波特征为水平方向值之和，水平方向绝对值之和，垂直方向之和，垂直方向绝对值之和。该过程的示意图如下所示：这样每个小区域就有4个值，所以每个特征点就是16*4=64维的向量，相比sift而言，少了一半，这在特征匹配过程中会大大加快匹配速度。6.结束语Surf采用Henssian矩阵获取图像局部最值还是十分稳定的，但是在求主方向阶段太过于依赖局部区域像素的梯度方向，有可能使得找到的主方向不准确，后面的特征向量提取以及匹配都严重依赖于主方向，即使不大偏差角度也可以造成后面特征匹配的放大误差，从而匹配不成功；另外图像金字塔的层取 得不足够紧密也会使得尺度有误差，后面的特征向量提取同样依赖相应的尺度，发明者在这个问题上的折中解决方法是取适量的层然后进行插值。Sift是一种只 利用到灰度性质的算法，忽略了色彩信息，后面又出现了几种据说比Surf更稳定的描述器其中一些利用到了色彩信息，让我们拭目以待吧。代码：                                                                                                            来源：OpenCV/sample/c中的find_obj.cpp代码需仔细注意：1.定位部分：通过透视变换，画出了目标在图像中的位置，但是这么做会浪费很多时间，可以改进：2.flann寻找最近的临近Keypoints：首先，利用图像，构建多维查找树，然后，利用Knn算法找到最近的Keypoints (KNN算法：http://blog.csdn.net/sangni007/article/details/7482890）    //Constructs a nearest neighbor search index for a given dataset
+    //利用m_image构造 a set of randomized kd-trees 一系列随机多维检索树;
+    cv::flann::Index flann_index(m_image, cv::flann::KDTreeIndexParams(4));  // using 4 randomized kdtrees
+    //利用Knn近邻算法检索m_object；结果存入 m_indices, m_dists；
+    flann_index.knnSearch(m_object, m_indices, m_dists, 2, cv::flann::SearchParams(64) ); // maximum number of leafs checkedflann算法有很多功能，文档：http://opencv.itseez.com/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html?highlight=flann#fast-approximate-nearest-neighbor-search/*
+ * A Demo to OpenCV Implementation of SURF
+ * Further Information Refer to "SURF: Speed-Up Robust Feature"
+ * Author: Liu Liu
+ * liuliu.1987+opencv@gmail.com
+ */
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/imgproc/imgproc_c.h"#include <iostream>
+#include <vector>
+#include <stdio.h>using namespace std;
+void help()
+{
+    printf(
+        "This program demonstrated the use of the SURF Detector and Descriptor using\n"
+        "either FLANN (fast approx nearst neighbor classification) or brute force matching\n"
+        "on planar objects.\n"
+        "Usage:\n"
+        "./find_obj <object_filename> <scene_filename>, default is box.png  and box_in_scene.png\n\n");
+    return;
+}// define whether to use approximate nearest-neighbor search
+#define USE_FLANN
+IplImage* image = 0;double compareSURFDescriptors( const float* d1, const float* d2, double best, int length )
+{
+    double total_cost = 0;
+    assert( length % 4 == 0 );
+    for( int i = 0; i < length; i += 4 )
+    {
+        double t0 = d1[i  ] - d2[i  ];
+        double t1 = d1[i+1] - d2[i+1];
+        double t2 = d1[i+2] - d2[i+2];
+        double t3 = d1[i+3] - d2[i+3];
+        total_cost += t0*t0 + t1*t1 + t2*t2 + t3*t3;
+        if( total_cost > best )
+            break;
+    }
+    return total_cost;
+}
+int naiveNearestNeighbor( const float* vec, int laplacian,
+                      const CvSeq* model_keypoints,
+                      const CvSeq* model_descriptors )
+{
+    int length = (int)(model_descriptors->elem_size/sizeof(float));
+    int i, neighbor = -1;
+    double d, dist1 = 1e6, dist2 = 1e6;
+    CvSeqReader reader, kreader;
+    cvStartReadSeq( model_keypoints, &kreader, 0 );
+    cvStartReadSeq( model_descriptors, &reader, 0 );    for( i = 0; i < model_descriptors->total; i++ )
+    {
+        const CvSURFPoint* kp = (const CvSURFPoint*)kreader.ptr;
+        const float* mvec = (const float*)reader.ptr;
+     CV_NEXT_SEQ_ELEM( kreader.seq->elem_size, kreader );
+        CV_NEXT_SEQ_ELEM( reader.seq->elem_size, reader );
+        if( laplacian != kp->laplacian )
+            continue;
+        d = compareSURFDescriptors( vec, mvec, dist2, length );
+        if( d < dist1 )
+        {
+            dist2 = dist1;
+            dist1 = d;
+            neighbor = i;
+        }
+        else if ( d < dist2 )
+            dist2 = d;
+    }
+    if ( dist1 < 0.6*dist2 )
+        return neighbor;
+    return -1;
+}//用于找到两幅图像之间匹配的点对，并把匹配的点对存储在 ptpairs 向量中，其中物体(object)图像的特征点
+//及其相应的描述器（局部特征）分别存储在 objectKeypoints 和 objectDescriptors，场景(image)图像的特
+//征点及其相应的描述器（局部特征）分别存储在 imageKeypoints和 imageDescriptors
+void findPairs( const CvSeq* objectKeypoints, const CvSeq* objectDescriptors,
+           const CvSeq* imageKeypoints, const CvSeq* imageDescriptors, vector<int>& ptpairs )
+{
+    int i;
+    CvSeqReader reader, kreader;
+    cvStartReadSeq( objectKeypoints, &kreader );
+    cvStartReadSeq( objectDescriptors, &reader );
+    ptpairs.clear();    for( i = 0; i < objectDescriptors->total; i++ )
+    {
+        const CvSURFPoint* kp = (const CvSURFPoint*)kreader.ptr;
+        const float* descriptor = (const float*)reader.ptr;
+        CV_NEXT_SEQ_ELEM( kreader.seq->elem_size, kreader );
+        CV_NEXT_SEQ_ELEM( reader.seq->elem_size, reader );
+        int nearest_neighbor = naiveNearestNeighbor( descriptor, kp->laplacian, imageKeypoints, imageDescriptors );
+        if( nearest_neighbor >= 0 )
+        {
+            ptpairs.push_back(i);
+            ptpairs.push_back(nearest_neighbor);
+        }
+    }
+}//Fast Library for Approximate Nearest Neighbors（FLANN）
+void flannFindPairs( const CvSeq*, const CvSeq* objectDescriptors,
+           const CvSeq*, const CvSeq* imageDescriptors, vector<int>& ptpairs )
+{
+ int length = (int)(objectDescriptors->elem_size/sizeof(float));    cv::Mat m_object(objectDescriptors->total, length, CV_32F);
+ cv::Mat m_image(imageDescriptors->total, length, CV_32F);
+ // copy descriptors
+    CvSeqReader obj_reader;
+ float* obj_ptr = m_object.ptr<float>(0);
+    cvStartReadSeq( objectDescriptors, &obj_reader );
+ //objectDescriptors to m_object 
+    for(int i = 0; i < objectDescriptors->total; i++ )
+    {
+        const float* descriptor = (const float*)obj_reader.ptr;
+        CV_NEXT_SEQ_ELEM( obj_reader.seq->elem_size, obj_reader );
+        memcpy(obj_ptr, descriptor, length*sizeof(float));
+        obj_ptr += length;
+    }
+ //imageDescriptors to m_image
+    CvSeqReader img_reader;
+ float* img_ptr = m_image.ptr<float>(0);
+    cvStartReadSeq( imageDescriptors, &img_reader );
+    for(int i = 0; i < imageDescriptors->total; i++ )
+    {
+        const float* descriptor = (const float*)img_reader.ptr;
+        CV_NEXT_SEQ_ELEM( img_reader.seq->elem_size, img_reader );
+        memcpy(img_ptr, descriptor, length*sizeof(float));
+        img_ptr += length;
+    }    // find nearest neighbors using FLANN
+    cv::Mat m_indices(objectDescriptors->total, 2, CV_32S);
+    cv::Mat m_dists(objectDescriptors->total, 2, CV_32F);
+ //Constructs a nearest neighbor search index for a given dataset
+ //利用m_image构造 a set of randomized kd-trees 一系列随机多维检索树;
+    cv::flann::Index flann_index(m_image, cv::flann::KDTreeIndexParams(4));  // using 4 randomized kdtrees
+ //利用Knn近邻算法检索m_object；结果存入 m_indices, m_dists；
+    flann_index.knnSearch(m_object, m_indices, m_dists, 2, cv::flann::SearchParams(64) ); // maximum number of leafs checked    int* indices_ptr = m_indices.ptr<int>(0);
+    float* dists_ptr = m_dists.ptr<float>(0);
+    for (int i=0;i<m_indices.rows;++i) 
+ {
+     if (dists_ptr[2*i]<0.6*dists_ptr[2*i+1])
+  {
+      ptpairs.push_back(i);
+      ptpairs.push_back(indices_ptr[2*i]);
+     }
+    }
+}//用于寻找物体(object)在场景(image)中的位置,位置信息保存在参数dst_corners中，参数src_corners由物
+//体(object的width几height等决定，其他部分参数如上findPairs
+/* a rough implementation for object location */
+int locatePlanarObject( const CvSeq* objectKeypoints, const CvSeq* objectDescriptors,
+ const CvSeq* imageKeypoints, const CvSeq* imageDescriptors,
+ const CvPoint src_corners[4], CvPoint dst_corners[4] )
+{
+    double h[9];
+    CvMat _h = cvMat(3, 3, CV_64F, h);
+    vector<int> ptpairs;
+    vector<CvPoint2D32f> pt1, pt2;
+    CvMat _pt1, _pt2;
+    int i, n;#ifdef USE_FLANN
+    flannFindPairs( objectKeypoints, objectDescriptors, imageKeypoints, imageDescriptors, ptpairs );
+#else
+    findPairs( objectKeypoints, objectDescriptors, imageKeypoints, imageDescriptors, ptpairs );
+#endif    n = (int)(ptpairs.size()/2);
+    if( n < 4 )
+        return 0;    pt1.resize(n);
+    pt2.resize(n);
+    for( i = 0; i < n; i++ )
+    {
+        pt1[i] = ((CvSURFPoint*)cvGetSeqElem(objectKeypoints,ptpairs[i*2]))->pt;
+        pt2[i] = ((CvSURFPoint*)cvGetSeqElem(imageKeypoints,ptpairs[i*2+1]))->pt;
+    }    _pt1 = cvMat(1, n, CV_32FC2, &pt1[0] );
+    _pt2 = cvMat(1, n, CV_32FC2, &pt2[0] );
+    if( !cvFindHomography( &_pt1, &_pt2, &_h, CV_RANSAC, 5 ))//计算两个平面之间的透视变换
+        return 0;    for( i = 0; i < 4; i++ )
+    {
+        double x = src_corners[i].x, y = src_corners[i].y;
+        double Z = 1./(h[6]*x + h[7]*y + h[8]);
+        double X = (h[0]*x + h[1]*y + h[2])*Z;
+        double Y = (h[3]*x + h[4]*y + h[5])*Z;
+        dst_corners[i] = cvPoint(cvRound(X), cvRound(Y));
+    }    return 1;
+}
+
+int main(int argc, char** argv)
+{
+ //物体(object)和场景(scene)的图像向来源
+    const char* object_filename = argc == 3 ? argv[1] : "D:/src.jpg";
+    const char* scene_filename = argc == 3 ? argv[2] : "D:/Demo.jpg";    help();    IplImage* object = cvLoadImage( object_filename, CV_LOAD_IMAGE_GRAYSCALE );
+    IplImage* image = cvLoadImage( scene_filename, CV_LOAD_IMAGE_GRAYSCALE );
+    if( !object || !image )
+    {
+        fprintf( stderr, "Can not load %s and/or %s\n",
+            object_filename, scene_filename );
+        exit(-1);
+    }
+ //内存存储器
+    CvMemStorage* storage = cvCreateMemStorage(0);    cvNamedWindow("Object", 1);
+    cvNamedWindow("Object Correspond", 1);    static CvScalar colors[] = 
+    {
+        {{0,0,255}},
+        {{0,128,255}},
+        {{0,255,255}},
+        {{0,255,0}},
+        {{255,128,0}},
+        {{255,255,0}},
+        {{255,0,0}},
+        {{255,0,255}},
+        {{255,255,255}}
+    };
+  
+    IplImage* object_color = cvCreateImage(cvGetSize(object), 8, 3);
+    cvCvtColor( object, object_color, CV_GRAY2BGR );    CvSeq* objectKeypoints = 0, *objectDescriptors = 0;
+    CvSeq* imageKeypoints = 0, *imageDescriptors = 0;
+    int i;
+ /*
+ CvSURFParams params = cvSURFParams(500, 1);//SURF参数设置：阈值500，生成128维描述符
+ cvSURFParams 函数原型如下：
+ CvSURFParams cvSURFParams(double threshold, int extended)
+ {
+  CvSURFParams params;
+  params.hessianThreshold = threshold; // 特征点选取的 hessian 阈值
+  params.extended = extended; // 是否扩展，1 - 生成128维描述符，0 - 64维描述符
+  params.nOctaves = 4; 
+  params.nOctaveLayers = 2;
+  return params;
+ }
+ */
+ CvSURFParams params = cvSURFParams(500, 1);    double tt = (double)cvGetTickCount();//计时
+ /*
+ 提取图像中的特征点，函数原型：
+ CVAPI(void) cvExtractSURF( const CvArr* img, const CvArr* mask,
+ CvSeq** keypoints, CvSeq** descriptors,
+ CvMemStorage* storage, CvSURFParams params, int useProvidedKeyPts CV_DEFAULT(0) );
+ 第3、4个参数返回结果：特征点和特征点描述符，数据类型是指针的指针，
+ */
+    cvExtractSURF( object, 0, &objectKeypoints, &objectDescriptors, storage, params );
+    printf("Object Descriptors: %d\n", objectDescriptors->total);    cvExtractSURF( image, 0, &imageKeypoints, &imageDescriptors, storage, params );
+    printf("Image Descriptors: %d\n", imageDescriptors->total);
+    tt = (double)cvGetTickCount() - tt;    printf( "Extraction time = %gms\n", tt/(cvGetTickFrequency()*1000.));
+    CvPoint src_corners[4] = {{0,0}, {object->width,0}, {object->width, object->height}, {0, object->height}};
+    //定义感兴趣的区域
+ CvPoint dst_corners[4];
+    IplImage* correspond = cvCreateImage( cvSize(image->width, object->height+image->height), 8, 1 );
+ //设置感兴趣区域
+ //形成一大一小两幅图显示在同一窗口
+    cvSetImageROI( correspond, cvRect( 0, 0, object->width, object->height ) );
+    cvCopy( object, correspond );
+    cvSetImageROI( correspond, cvRect( 0, object->height, correspond->width, correspond->height ) );
+    cvCopy( image, correspond );
+    cvResetImageROI( correspond );#ifdef USE_FLANN
+    printf("Using approximate nearest neighbor search\n");
+#endif
+ //寻找物体(object)在场景(image)中的位置，并将信息保存（矩形框）
+    if( locatePlanarObject( objectKeypoints, objectDescriptors, imageKeypoints,
+        imageDescriptors, src_corners, dst_corners ))
+    {
+        for( i = 0; i < 4; i++ )
+        {
+            CvPoint r1 = dst_corners[i%4];
+            CvPoint r2 = dst_corners[(i+1)%4];
+   cvLine( correspond, cvPoint(r1.x, r1.y+object->height ),
+    cvPoint(r2.x, r2.y+object->height ), colors[8] );
+        }
+    }
+ //定义并保存物体(object)在场景(image)图形之间的匹配点对，并将其存储在向量 ptpairs 中，之后可以对
+ //ptpairs 进行操作
+    vector<int> ptpairs;
+#ifdef USE_FLANN
+    flannFindPairs( objectKeypoints, objectDescriptors, imageKeypoints, imageDescriptors, ptpairs );
+#else
+    findPairs( objectKeypoints, objectDescriptors, imageKeypoints, imageDescriptors, ptpairs );
+#endif
+ //显示匹配结果（直线连接）
+    for( i = 0; i < (int)ptpairs.size(); i += 2 )
+    {
+        CvSURFPoint* r1 = (CvSURFPoint*)cvGetSeqElem( objectKeypoints, ptpairs[i] );
+        CvSURFPoint* r2 = (CvSURFPoint*)cvGetSeqElem( imageKeypoints, ptpairs[i+1] );
+        cvLine( correspond, cvPointFrom32f(r1->pt),
+            cvPoint(cvRound(r2->pt.x), cvRound(r2->pt.y+object->height)), colors[8] );
+    }    cvShowImage( "Object Correspond", correspond );
+ //显示物体(object)的所有特征点
+    for( i = 0; i < objectKeypoints->total; i++ )
+    {
+        CvSURFPoint* r = (CvSURFPoint*)cvGetSeqElem( objectKeypoints, i );
+        CvPoint center;
+        int radius;
+        center.x = cvRound(r->pt.x);
+        center.y = cvRound(r->pt.y);
+        radius = cvRound(r->size*1.2/9.*2);
+        cvCircle( object_color, center, radius, colors[0], 1, 8, 0 );
+    }
+    cvShowImage( "Object", object_color );    cvWaitKey(0); //释放窗口所占用的内存
+    cvDestroyWindow("Object");
+    cvDestroyWindow("Object Correspond");    return 0;
+}
+    opencv小试SURF算法：#include "opencv2/opencv.hpp"   int main(){     cv::Mat  image, image1 = cv::imread ("test.jpg");
+    //灰度变换
+    cv::cvtColor (image1,image,CV_BGR2GRAY);  std::vector<cv::KeyPoint> keypoints;  cv::SurfFeatureDetector surf(2500);  surf.detect (image,keypoints);  cv::drawKeypoints (image,keypoints,image,cv::Scalar::all (255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+    cv::namedWindow ("surf");
+    cv::imshow ("surf",image);
+    cv::waitKey (0);
+    return 0;
+}测试结果：标记圈的半径长短和特征点所在尺度有关，那条半径是特征点的方向。    SIFT算法的教程、源码及应用软件 1、ubc:DAVID LOWE---SIFT算法的创始人，两篇巨经典 http://www.cs.ubc.ca/~lowe/ 2、cmu:YanKe---PCASIFT,总结的SIFT方面的文章 http://www.andrew.cmu.edu/user/yke/ 3、ubc:M.BROWN---SIFT算法用于图像拼接的经典应用autopano-sift，包括一个SIFTLIB库 http://www.cs.ubc.ca/~mbrown/autostitch/autostitch.html http://www.cs.ubc.ca/~mbrown/panorama/panorama.html 4、toronto:Jepson---Matlab SIFT tutorial, 超级超级超级经典~ http://www.cs.toronto.edu/~jepson/csc2503/ 5、ucla:Vedaldi---加州大学一个博士生编的Matlab SIFT tutorial http://www.cs.ucla.edu/~vedaldi/ 6.http://en.wikipedia.org/wiki/Scale-inva ... _transform 7. 大牛整理的计算机视觉分类 http://www.cs.ubc.ca/~lowe/vision.html 8. http://note.sonots.com/SciSoftware/SIFT.html 9.提到了计算变换矩阵的RANSAC法 http://web.engr.oregonstate.edu/~hess/index.html 10. 仿射不变特征点检测，提到了性能评价的方法 http://www.robots.ox.ac.uk/~vgg/research/affine/ 11. 一个日本人，挺牛的 http://note.sonots.com/ 12. PCA-SIFT http://www.cs.cmu.edu/~yke/pcasift/ 13 opencv sift http://web.engr.oregonstate.edu/~hess/index.html 14 matlab sift http://www.vlfeat.org/~vedaldi/code/sift.html http://www.vlfeat.org/overview/sift.html 15 Improve Scale Invariant Feature Transform (SIFT) 斯坦福 http://robots.stanford.edu/cs223b04/project9.html 16 Known implementations of SIFT    mit http://people.csail.mit.edu/albert/ladypack/wiki/index.php/Known_implementations_of_SIFT    三、尺度不变的SURF特征surf特征是类似于SIFT特征的一种尺度不变的特征点，它的优点在于比SIFT效率要高，在实际运算中可以达到实时性的要求，关于SURF的原理这里就不过多的介绍，网络上这类的文章很多。类似于FAST特征点的求法，SURF也可以使用通用接口求得，而SURF特征的类为SurfFeatureDetector，类似的SIFT特征点的检测类为SiftFeatureDetector。 #include <opencv2/core/core.hpp>#include <opencv2/highgui/highgui.hpp>#include <opencv2/nonfree/features2d.hpp>usingnamespacecv;intmain(){Mat image=imread("../buliding.png");vector<KeyPoint> keypoints;SurfFeatureDetector surf(2500.);surf.detect(image,keypoints);drawKeypoints(image,keypoints,image,Scalar(255,0,0),DrawMatchesFlags::DRAW_RICH_KEYPOINTS);namedWindow("result");imshow("result",image);waitKey();return0;}这里有一个值得说明的问题是：OpenCV2.4版本后好像把SurfFeatureDetector这个类的定义移到了头文件nonfree/features2d.hpp中，所以头文件中要加入该文件，并且要把opencv_nonfree24xd.lib加入属性表的链接器熟悉的输入中，其中x换成你当前opencv的版本号。最终的显示效果如下：四、SURF特征的描述在图像配准中，特征点的描述往往不是位置这么简单，而是使用了一个N维向量来描述一个特征点，这些描述子之间可以通过定义距离公式来比较相近程度。SurfDescriptorExtractor 是一个提取SURF特征点以及其描述的类。下面是一个宽景图像的拼接配准的例子： #include<opencv2/core/core.hpp>#include<opencv2/highgui/highgui.hpp>#include<opencv2/nonfree/features2d.hpp>#include<opencv2/legacy/legacy.hpp>using namespacecv;intmain(){Mat image1=imread("../b1.png");Mat image2=imread("../b2.png");// 检测surf特征点vector<KeyPoint> keypoints1,keypoints2;    SurfFeatureDetector detector(400);detector.detect(image1, keypoints1);detector.detect(image2, keypoints2);// 描述surf特征点SurfDescriptorExtractor surfDesc;Mat descriptros1,descriptros2;surfDesc.compute(image1,keypoints1,descriptros1);surfDesc.compute(image2,keypoints2,descriptros2);// 计算匹配点数BruteForceMatcher<L2<float>>matcher;vector<DMatch> matches;matcher.match(descriptros1,descriptros2,matches);std::nth_element(matches.begin(),matches.begin()+24,matches.end());matches.erase(matches.begin()+25,matches.end());// 画出匹配图Mat imageMatches;drawMatches(image1,keypoints1,image2,keypoints2,matches,imageMatches,Scalar(255,0,0));namedWindow("image2");imshow("image2",image2);waitKey();return0;}程序中我们选择了25个配准点，得到最后的匹配如下：参考：http://blog.csdn.net/yangtrees/article/details/7482960/ 
+

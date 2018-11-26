@@ -1,0 +1,53 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/16868249				
+
+
+大体上要注意一下几点内容:
+1.vc++目录的选择上，库目录选择为opencv目录中的staticlib目录
+ 
+2.在链接-》输入-》附加依赖库，中添加，相应的staticlib库目录中的所有条目
+ 
+我使用的是opencv2.4.4包括一下内容：
+ 
+IlmImf.lib
+libjasper.lib
+libjpeg.lib
+libpng.lib
+libtiff.lib
+opencv_calib3d244.lib
+opencv_contrib244.lib
+opencv_core244.lib
+opencv_features2d244.lib
+opencv_flann244.lib
+opencv_gpu244.lib
+opencv_haartraining_engine.lib
+opencv_highgui244.lib
+opencv_imgproc244.lib
+opencv_legacy244.lib
+opencv_ml244.lib
+opencv_nonfree244.lib
+opencv_objdetect244.lib
+opencv_photo244.lib
+opencv_stitching244.lib
+ opencv_ts244.lib
+opencv_video244.lib
+opencv_videostab244.lib
+Zlib.lib
+
+ 
+可能还需要给代码上添加以下内容：
+#pragma   comment(lib,   "vfw32.lib ")
+#pragma comment (lib , "comctl32.lib")
+ 
+3.在c/c++ --》代码生成--》运行库，选择，多线程/MT，即为静态库编译
+ 
+参照上面的方法，对下面的教程，在vs2010中，编译出了release版本的程序
+大概为3.22M大小，在不使用opencv其他dll 的库的情况下，可以直接在win32、64系统上使用
+ 
+http://wiki.opencv.org.cn/index.php/%E4%BA%BA%E8%84%B8%E6%A3%80%E6%B5%8B
+ 
+ 4.最后需要注意的是，如果实在还是有问题，还有杀手锏，就是所有静态lib直接copy到相应的目录下面，完后编译链接，windows有时候就是找不到。。。！！！
+
+

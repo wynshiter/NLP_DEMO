@@ -1,0 +1,97 @@
+content
+
+
+
+ 
+ 
+ 
+ 
+#include <cv.h>
+#include <highgui.h>
+#include <iostream>
+
+
+#define MAX_CLUSTERS (8)
+
+using namespace std;
+
+int main( int argc, char **argv)
+{
+IplImage *imgA = cvLoadImage( "1.jpg", CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+if(imgA ==NULL)
+{
+cout<<"Can't Load Image ." << endl;
+exit(0);
+}
+
+cvNamedWindow("window",CV_WINDOW_AUTOSIZE);
+cvShowImage("window",imgA);//加载原图
+
+unsigned long int size;
+size = imgA->width * imgA->height;//取得图片大小
+
+CvMat *clusters;//分类后的矩阵
+clusters = cvCreateMat (size, 1, CV_32SC1);//32位1通道的矩阵
+CvMat *points;//分类前的样例浮点矩阵
+points = cvCreateMat (size, 1, CV_32FC3); //32位3通道的矩阵
+
+unsigned long int i; 
+for (i = 0; i < size; i++) 
+{
+points->data.fl[i*3] = (unsigned char) imgA->imageData[i*3];
+points->data.fl[i*3 + 1] = (unsigned char) imgA->imageData[i*3 + 1];
+points->data.fl[i*3 + 2] = (unsigned char) imgA->imageData[i*3 + 2]; 
+} //得到三通道图像的数据
+
+cvKMeans2 (points, MAX_CLUSTERS, clusters,
+cvTermCriteria (CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 10, 1.0));
+//拆分为8类聚合，最大迭代次数是10，精度是1.0
+
+CvMat *color = cvCreateMat (MAX_CLUSTERS, 1, CV_32FC3);//8行1列的三通道浮点矩阵
+CvMat *count = cvCreateMat (MAX_CLUSTERS, 1, CV_32SC1);//8行1列的单通道整数矩阵，用作计数
+cvSetZero (color);
+cvSetZero (count);
+
+for (i = 0; i < size; i++)
+{
+int idx = clusters->data.i[i];
+int j = ++count->data.i[idx];
+color->data.fl[idx * 3 ] = color->data.fl[idx * 3 ] * (j - 1) / j + points->data.fl[i * 3 ] / j;
+color->data.fl[idx * 3 + 1] = color->data.fl[idx * 3 + 1] * (j - 1) / j + points->data.fl[i * 3 + 1] / j;
+color->data.fl[idx * 3 + 2] = color->data.fl[idx * 3 + 2] * (j - 1) / j + points->data.fl[i * 3 + 2] / j;
+}
+
+//把处理过的数据打回imgA
+for (i = 0; i < size; i++)
+{
+int idx = clusters->data.i[i];
+imgA->imageData[i * 3 ] = (char) color->data.fl[idx * 3 ];
+imgA->imageData[i * 3 + 1] = (char) color->data.fl[idx * 3 + 1];
+imgA->imageData[i * 3 + 2] = (char) color->data.fl[idx * 3 + 2];
+}
+
+
+cvNamedWindow("window2",CV_WINDOW_AUTOSIZE);
+
+cvShowImage("window2",imgA);
+
+cvWaitKey(0);
+
+cvReleaseImage( &imgA );
+
+cvDestroyWindow("window");
+cvDestroyWindow("window2");
+return 0;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+作者：gnuhpc
+出处：http://www.cnblogs.com/gnuhpc/
+
+

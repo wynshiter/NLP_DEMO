@@ -1,0 +1,41 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/40589301				
+
+
+之前的一个学习一直在看图像分割的部分内容，基于交互的图像分割基本都是用图割的算法，全自动的图割算法也有最小生成树的改进算法。
+现在想写点东西，从算法 的最本质问题，图论中的网络流问题开始，做个总结，也算是对知识的一个回顾。
+ 
+网络最大流，增广路，残留网络，最小割这几个基本概念是构成最大流最小割定理的基本概念。而该定理是网络流理论的基础。
+ 
+我们还有一下几个问题需要搞清楚：
+1.最本质问题就是使用图割算法解决具体问题时候，是怎样构建图的，节点对应什么，边的权值对应什么。
+ 
+2.为什么说图割算法能够达到能量最小化。
+ 
+3.怎么引入能量这个概念的。
+ 
+几种最大流算法的时间复杂度：
+
+ 
+Algorithm
+Principle
+Complexity
+Ford--Fulkerson, 1956
+Finding flow augmenting paths
+O(nm2)
+Dinic, 1970
+Shortest augmenting paths in one step
+O(n2m)
+in a dense graph:
+O(n3)
+in a sparse graph:
+O(nm log(n))
+Goldberg--Tarjan, 1985
+Pushing a pre-flow
+O(nm log(n2/m))
+
+ 
+
+

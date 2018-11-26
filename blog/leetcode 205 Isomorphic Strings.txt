@@ -1,0 +1,105 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45394435				
+
+
+
+Given two strings s and t, determine if they are isomorphic.
+Two strings are isomorphic if the characters in s can be replaced to get t.
+All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character but a character may map to itself.
+For example, 
+ Given “egg”, “add”, return true.
+Given “foo”, “bar”, return false.
+Given “paper”, “title”, return true.
+Note: 
+ You may assume both s and t have the same length.
+
+我的解决方案：
+// isIsomorphic.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+
+
+#include<map>
+#include<string>
+#include<iostream>
+#include<unordered_map>
+
+using namespace std;
+
+
+
+bool isIsomorphic(string s, string t) 
+{
+    if(s.length()!=t.length())return false;
+
+    int s_length = s.length();
+    int t_length = t.length();
+    unordered_map<char,char> stemp;
+    unordered_map<char,char> ttemp;
+
+    for(int i = 0;i <  s_length; i++)
+    {
+        if(stemp.find(s[i]) == stemp.end() && ttemp.find(t[i]) == ttemp.end())
+        {
+            stemp[s[i]] = t[i];
+            ttemp[t[i]] = s[i];
+        }
+        else
+        {
+            if(stemp.find(s[i]) == stemp.end() && ttemp[t[i]]!=s[i])
+            { 
+                return false; 
+            }
+            else if(ttemp.find(t[i])==ttemp.end() && stemp[s[i]]!=t[i])
+            {
+                return false; 
+            }
+            else if(stemp[s[i]] != t[i] && ttemp[t[i]] != s[i])
+            { 
+                return false; 
+            }
+
+        }
+    }
+}
+//
+//pair<map<char,int>::iterator,bool> Insert_Pair;
+//Insert_Pair = mapString.insert(map<char,int>::value_type(s[i],(int)(s[i] - t[i])));
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+    string s = "ab";
+    string t = "aa";
+
+    isIsomorphic(s,t);
+    return 0;
+}
+
+
+unordered_map 简介： 
+http://blog.csdn.net/gamecreating/article/details/7698719 
+http://blog.csdn.net/orzlzro/article/details/7099231 
+http://blog.csdn.net/sws9999/article/details/3081478
+unordered_map，它与map的区别就是map是按照operator<比较判断元素是否相同，以及比较元素的大小，然后选择合适的位置插入到树中。所以，如果对map进行遍历（中序遍历）的话，输出的结果是有序的。顺序就是按照operator< 定义的大小排序。而unordered_map是计算元素的Hash值，根据Hash值判断元素是否相同。所以，对unordered_map进行遍历，结果是无序的。而hash则是把数据的存储和查找消耗的时间大大降低；而代价仅仅是消耗比较多的内存。虽然在当前可利用内存越来越多的情况下，用空间换时间的做法是值得的。 
+用法的区别就是map的key需要定义operator<。而unordered_map需要定义hash_value函数并且重载operator==。对于自定义的类型做key，就需要自己重载operator< 或者hash_value()了。
+python 的解决方案：
+def isIsomorphic(self, s, t):
+    if len(s) != len(t):
+        return False
+    def halfIsom(s, t):
+        res = {}
+        for i in xrange(len(s)):
+            if s[i] not in res:
+                res[s[i]] = t[i]
+            elif res[s[i]] != t[i]:
+                return False
+        return True
+    return halfIsom(s, t) and halfIsom(t, s)
+ 
+
+

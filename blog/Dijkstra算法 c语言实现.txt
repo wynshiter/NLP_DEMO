@@ -1,0 +1,265 @@
+content
+
+
+
+ Dijkstra(迪杰斯特拉)算法是典型的最短路径路由算法，用于计算一个节点到其他所有节点的最短路径。主要特点是以起始点为中心向外层层扩展，直到扩展到终点为止。Dijkstra算法能得出最短路径的最优解，但由于它遍历计算的节点很多，所以效率低。
+　　Dijkstra算法是很有代表性的最短路算法，在很多专业课程中都作为基本内容有详细的介绍，如数据结构，图论，运筹学等等。
+其基本思想是，设置顶点集合S并不断地作贪心选择来扩充这个集合。一个顶点属于集合S当且仅当从源到该顶点的最短路径长度已知。
+初始时，S中仅含有源。设u是G的某一个顶点，把从源到u且中间只经过S中顶点的路称为从源到u的特殊路径，并用数组dist记录当前每个顶点所对应的最短特殊路径长度。Dijkstra算法每次从V-S中取出具有最短特殊路长度的顶点u，将u添加到S中，同时对数组dist作必要的修改。一旦S包含了所有V中顶点，dist就记录了从源到所有其它顶点之间的最短路径长度。
+例如，对下图中的有向图，应用Dijkstra算法计算从源顶点1到其它顶点间最短路径的过程列在下表中。
+ 
+ 
+
+
+Dijkstra算法的迭代过程：
+ 
+ 
+
+ 
+ 
+ 
+ 
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+
+#define X 10000
+#define VertexNum  7  //实际上共有六个顶点（1---6）
+#define EdgeNum  9
+
+int Graph[VertexNum][VertexNum] =
+//0  1  2  3  4  5  6
+{ X, X, X, X, X, X, X,  //0
+  X, X, 6, 3, X, X, X,  //1
+  X, X, X, X, 5, X, X,  //2
+  X, X, 2, X, 3, 4, X,  //3
+  X, X, X, X, X, X, 3,  //4
+  X, X, X, X, 2, X, 5,  //5
+  X, X, X, X, X, X, X   //6
+};
+
+int Visited[VertexNum];
+int path[VertexNum];
+int Distance[VertexNum];
+
+void Dijkstra(int Begin)
+{
+  int MinEdge, Vertex, i,j, Edges;
+  Edges = 1;
+  Visited[Begin] = 1;
+  for (i = 1; i<VertexNum; i++) Distance[i] = Graph[Begin][i];
+
+  Distance[Begin] = 0;
+  printf("     1  2  3  4  5  6\\n");
+  printf("-----------------------------------\\n");
+  printf("s:%d", Edges);
+  for( i=1; i<VertexNum; i++)
+  if (Distance[i] == X) printf("  *"); else printf("%3d",Distance[i]);
+  printf("\\n");
+  while( Edges<VertexNum-1)
+  {
+    Edges++; MinEdge = X;
+    for(j=1; j<VertexNum; j++)
+    if (Visited[j]==0 && MinEdge > Distance[j] )
+    {
+ Vertex = j; MinEdge = Distance[j];
+    }
+    Visited[Vertex] = 1;
+    printf("s:%d",Edges);
+    for(j=1; j<VertexNum; j++)
+    {
+      if (Visited[j] == 0 && Distance[Vertex] + Graph[Vertex][j] <Distance[j])
+      {   Distance[j] = Distance[Vertex] + Graph[Vertex][j];
+   path[j] = Vertex;
+      }
+      //printf("%6d",Distance[j]);
+       if (Distance[j] == X) printf("  *"); else printf("%3d",Distance[j]);
+    }
+    printf("\\n");
+  }
+}
+
+void main()
+{
+  
+  int i;
+  int k;
+ // clrscr();
+  for(i=0; i<VertexNum; i++) { Visited[i] = 0;  path[i] = 1;}
+  Dijkstra(1);
+  printf("\\n\\nAll Path-------------------------\\n");
+
+
+  for(i=2; i<VertexNum; i++) //printf("%5d",Visited[i]);
+  {
+     printf("[%d] ",Distance[i]);
+     k = i;
+     do
+     {
+       printf("%d<--",k);
+       k  = path[k];
+     } while (k!=1);
+     printf("1 \\n");
+  }
+}
+
+
+以上代码参考了数据结构课本
+ 
+ 
+下面的是网上的代码：
+以下是具体的实现(C/C++):
+/***************************************
+* About:    有向图的Dijkstra算法实现
+* Author:   Tanky Woo
+* Blog:     www.WuTianQi.com
+***************************************/
+ 
+#include <iostream>
+using namespace std;
+ 
+const int maxnum = 100;
+const int maxint = 999999;
+ 
+ 
+void Dijkstra(int n, int v, int *dist, int *prev, int c[maxnum][maxnum])
+{
+    bool s[maxnum];    // 判断是否已存入该点到S集合中
+    for(int i=1; i<=n; ++i)
+    {
+        dist[i] = c[v][i];
+        s[i] = 0;     // 初始都未用过该点
+        if(dist[i] == maxint)
+            prev[i] = 0;
+        else
+            prev[i] = v;
+    }
+    dist[v] = 0;
+    s[v] = 1;
+ 
+    // 依次将未放入S集合的结点中，取dist[]最小值的结点，放入结合S中
+    // 一旦S包含了所有V中顶点，dist就记录了从源点到所有其他顶点之间的最短路径长度
+    for(int i=2; i<=n; ++i)
+    {
+        int tmp = maxint;
+        int u = v;
+        // 找出当前未使用的点j的dist[j]最小值
+        for(int j=1; j<=n; ++j)
+            if((!s[j]) && dist[j]<tmp)
+            {
+                u = j;              // u保存当前邻接点中距离最小的点的号码
+                tmp = dist[j];
+            }
+        s[u] = 1;    // 表示u点已存入S集合中
+ 
+        // 更新dist
+        for(int j=1; j<=n; ++j)
+            if((!s[j]) && c[u][j]<maxint)
+            {
+                int newdist = dist[u] + c[u][j];
+                if(newdist < dist[j])
+                {
+                    dist[j] = newdist;
+                    prev[j] = u;
+                }
+            }
+    }
+}
+ 
+void searchPath(int *prev,int v, int u)
+{
+    int que[maxnum];
+    int tot = 1;
+    que[tot] = u;
+    tot++;
+    int tmp = prev[u];
+    while(tmp != v)
+    {
+        que[tot] = tmp;
+        tot++;
+        tmp = prev[tmp];
+    }
+    que[tot] = v;
+    for(int i=tot; i>=1; --i)
+        if(i != 1)
+            cout << que[i] << " -> ";
+        else
+            cout << que[i] << endl;
+}
+ 
+int main()
+{
+    freopen("input.txt", "r", stdin);
+    // 各数组都从下标1开始
+    int dist[maxnum];     // 表示当前点到源点的最短路径长度
+    int prev[maxnum];     // 记录当前点的前一个结点
+    int c[maxnum][maxnum];   // 记录图的两点间路径长度
+    int n, line;             // 图的结点数和路径数
+ 
+    // 输入结点数
+    cin >> n;
+    // 输入路径数
+    cin >> line;
+    int p, q, len;          // 输入p, q两点及其路径长度
+ 
+    // 初始化c[][]为maxint
+    for(int i=1; i<=n; ++i)
+        for(int j=1; j<=n; ++j)
+            c[i][j] = maxint;
+ 
+    for(int i=1; i<=line; ++i)  
+    {
+        cin >> p >> q >> len;
+        if(len < c[p][q])       // 有重边
+        {
+            c[p][q] = len;      // p指向q
+            c[q][p] = len;      // q指向p，这样表示无向图
+        }
+    }
+ 
+    for(int i=1; i<=n; ++i)
+        dist[i] = maxint;
+    for(int i=1; i<=n; ++i)
+    {
+        for(int j=1; j<=n; ++j)
+            printf("%8d", c[i][j]);
+        printf("\n");
+    }
+ 
+    Dijkstra(n, 1, dist, prev, c);
+ 
+    // 最短路径长度
+    cout << "源点到最后一个顶点的最短路径长度: " << dist[n] << endl;
+ 
+    // 路径
+    cout << "源点到最后一个顶点的路径为: ";
+    searchPath(prev, 1, n);
+}
+输入数据:
+5
+7
+1 2 10
+1 4 30
+1 5 100
+2 3 50
+3 5 10
+4 3 20
+4 5 60
+输出数据:
+999999 10 999999 30 100
+10 999999 50 999999 999999
+999999 50 999999 20 10
+30 999999 20 999999 60
+100 999999 10 60 999999
+源点到最后一个顶点的最短路径长度: 60
+源点到最后一个顶点的路径为: 1 -> 4 -> 3 -> 5
+最后给出两道题目练手，都是直接套用模版就OK的：
+1.HDOJ 1874 畅通工程续
+http://www.wutianqi.com/?p=1894
+2.HDOJ 2544 最短路
+http://www.wutianqi.com/?p=1892
+
+
+ 
+
+

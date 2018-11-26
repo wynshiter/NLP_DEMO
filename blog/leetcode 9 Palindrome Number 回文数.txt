@@ -1,0 +1,70 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46673765				
+
+
+
+Determine whether an integer is a palindrome. Do this without extra space.
+click to show spoilers.
+Some hints:  
+Could negative integers be palindromes? (ie, -1)
+If you are thinking of converting the integer to string, note the restriction of using extra space.
+You could also try reversing an integer. However, if you have solved the problem “Reverse Integer”, you know that the reversed integer might overflow. How would you handle such case?
+There is a more generic way of solving this problem.
+非常简洁的c++解决方案： 
+对于回文数只比较一半
+public boolean isPalindrome1(int x) {
+    if (x == 0) return true;
+    // in leetcode, negative numbers and numbers with ending zeros
+    // are not palindrome
+    if (x < 0 || x % 10 == 0)
+        return false;
+
+    // reverse half of the number
+    // the exit condition is y >= x
+    // so that overflow is avoided.
+    int y = 0;
+    while (y < x) {
+        y = y * 10 + (x % 10);
+        if (x == y)  // to check numbers with odd digits
+            return true;
+        x /= 10;
+    }
+    return x == y; // to check numbers with even digits
+}
+
+python这个解法应该是前后分别对比：
+
+class Solution:
+    # @param x, an integer
+    # @return a boolean
+    def isPalindrome(self, x):
+        if x < 0:
+            return False
+
+        ranger = 1
+        while x / ranger >= 10:
+            ranger *= 10
+
+        while x:
+            left = x / ranger
+            right = x % 10
+            if left != right:
+                return False
+
+            x = (x % ranger) / 10
+            ranger /= 100
+
+        return True
+
+
+python字符串的解法：
+class Solution:
+    # @param {integer} x
+    # @return {boolean}
+    def isPalindrome(self, x):
+        return str(x)==str(x)[::-1]
+ 
+
+

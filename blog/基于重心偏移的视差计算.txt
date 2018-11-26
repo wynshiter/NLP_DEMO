@@ -1,0 +1,189 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50240785				
+
+
+
+
+    视差的计算，主要要计算待匹配图像对应像素的水平偏移，那么针对一个物体而言，其在场景中的视差大体上应该是平滑的，所以可以直接针对分割出的物体计算重心的水平偏移从而得到视差值，我做了一个小实验，感觉效果还行，下面是代码和实验结果，希望各位有什么想法大家交流。
+
+    有一个问题就是，我这个视差计算出来是这个台灯是221的灰度，标准的是224的灰度。
+我的流程是算出横向偏移x，视差 = x * （视差最大层级/255）,这个tusukuba图像的视差层级是15，所以算出来是221
+
+效果：
+
+
+
+groundtruth：
+
+代码：用opencv1写的，有兴趣的哥们把他改成opencv新版的吧
+
+// FindGravity.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+#include "cv.h" 
+#include "highgui.h" 
+
+
+
+
+#include <opencv2/core/core.hpp>  
+#include <opencv2/highgui/highgui.hpp>
+
+
+#pragma comment(lib,"opencv_core2410d.lib")                
+#pragma comment(lib,"opencv_highgui2410d.lib")                
+#pragma comment(lib,"opencv_imgproc2410d.lib")   
+
+using namespace std;
+using namespace cv;
+
+
+void FindGravity()
+{
+	
+}
+/** 计算二值图像的重心
+* @param[in] src  输入的待处理图像
+* @param[out] center 重心坐标
+* @retval 0  操作成功
+* @retval -1 操作失败
+* @note 输入图像是二值化图像
+* @note xc=M10/M00, yc=M01/M00, 其中 Mx_order,y_order=SUMx,y(I(x,y)*x^x_order*y^y_order)
+ */
+ static int aoiGravityCenter(IplImage *src, CvPoint ¢er)
+ {
+  //if(!src)
+  // return GRAVITYCENTER__SRC_IS_NULL;
+  double m00, m10, m01;
+  CvMoments moment;
+  cvMoments( src, &moment, 1);
+  m00 = cvGetSpatialMoment( &moment, 0, 0 );
+  if( m00 == 0) 
+   return 1;
+  m10 = cvGetSpatialMoment( &moment, 1, 0 );
+  m01 = cvGetSpatialMoment( &moment, 0, 1 );
+  center.x = (int) (m10/m00);
+  center.y = (int) (m01/m00);
+  return 0;
+ } 
+
+ IplImage* binary_image(IplImage* src)
+ {
+	 
+
+		// cvThreshold( src, src, 100, 255, CV_THRESH_BINARY );//100 is the thredhold 
+		 IplImage* one_channel = cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,0);
+		
+		 for(int y = 0;y < src->height;y++)
+		 {
+			 char *ptr= src->imageData + y * src->widthStep;
+			 char *p_one_channel = one_channel->imageData + y * one_channel->widthStep;
+			 for(int x = 0;x < src->width;x++)
+			 {
+				 int temp = ptr[3*x];
+				 if (temp != 0)//不是黑色也就是说不是背景
+				 {
+					 p_one_channel[x] = 255;//设置为白色
+				 }
+				 else
+				 {
+					 p_one_channel[x] = 0;
+
+				 }
+				 //ptr[3*x]=
+				 //ptr[3*x+1]=
+				 //ptr[3*x+2]=; 
+			 }
+		 }
+		 return one_channel;
+
+
+ }
+
+ void showDisparity(int max,int weiyi,IplImage* src)
+ {
+	int danwei = 255/max;
+	int gray_pixel = weiyi*danwei;
+	cout<<gray_pixel<<endl;
+
+
+	IplImage* one_channel = cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,0);
+
+	for(int y = 0;y < src->height;y++)
+	{
+		char *ptr= src->imageData + y * src->widthStep;
+		char *p_one_channel = one_channel->imageData + y * one_channel->widthStep;
+		for(int x = 0;x < src->width;x++)
+		{
+			int temp = ptr[x];
+			if (temp != 0)//不是黑色也就是说不是背景
+			{
+				p_one_channel[x] = gray_pixel;//设置为视差
+			}
+			else
+			{
+				p_one_channel[x] = 0;
+
+			}
+			//ptr[3*x]=
+			//ptr[3*x+1]=
+			//ptr[3*x+2]=; 
+		}
+	}
+	
+	cvNamedWindow( "disparity", 1 ); 
+	cvShowImage( "disparity", one_channel );
+ }
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	string str_name_left = "lamp_left.bmp";
+	string str_name_right = "lamp_right.bmp";
+
+	IplImage* src_left;
+	IplImage* src_right; 
+	IplImage* draw = cvLoadImage(str_name_left.c_str(),1);//绘制重心的图像
+	
+	if ((src_left = cvLoadImage(str_name_left.c_str(),1))!=0)
+	{
+		//src = binary_image(src);
+		cvNamedWindow( "binary image left", 1 ); 
+		cvShowImage( "binary image left", binary_image(src_left) );
+
+		src_right = cvLoadImage(str_name_right.c_str(),1);
+		cvNamedWindow( "binary image right", 1 ); 
+		cvShowImage( "binary image right", binary_image(src_right) );
+	}
+
+	CvPoint xy_left;
+	aoiGravityCenter(binary_image(src_left),xy_left);
+	cout<<"left image gravity center: "<<endl<<xy_left.x<<endl;
+	cout<<xy_left.y<<endl;
+
+	CvPoint xy_right;
+	aoiGravityCenter(binary_image(src_right),xy_right);
+	cout<<"right image gravity center: "<<endl<<xy_right.x<<endl;
+	cout<<xy_right.y<<endl;
+
+
+	cvCircle(draw,cvPoint(xy_left.x,xy_left.y),3,CV_RGB(0,0,255),5);
+
+	cvNamedWindow( "重心", 1 ); 
+	cvShowImage( "重心", draw ); 
+
+	int weiyi = ( xy_left.x - xy_right.x);
+	showDisparity(15,weiyi,binary_image(src_left));
+	cvWaitKey(0);
+	return 0;
+}
+
+
+
+
+
+

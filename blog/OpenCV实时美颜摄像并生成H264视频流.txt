@@ -1,0 +1,298 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50806051				
+
+
+        为什么美颜摄像这么简单的功能，OpenCV这个开源项目网上很少有代码呢？对于在windows平台下，生成h264视频流也比价麻烦，没有现成的api可以使用，需要借助MinGw编译libx264，或者ffmpeg才能使用。
+最近有个小需求，要推送直播视频流，我在网上查了一下有live555或者用librtmp来推送，但是前者还需要修改源代码，也挺麻烦的，现在先做到了下面几个步骤：
+1.OpenCV捕捉摄像头的图像
+2.进行识别需要美颜的部分（人脸识别，肤色识别）
+3.进行美颜（提升亮度，直方图均衡，滤波）
+4.生成YUV视频
+5.生成h264
+
+现在用librtmp时候，出现了
+ERROR:RTMP_Connect0,failed to connect socket,10061(unknow error)
+不知道是咋回事了，怀疑是1935端口被禁，但是一时半会儿不知道咋弄。
+
+主要功能代码：
+
+
+/** Global variables */
+//-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
+string face_cascade_name = "haarcascade_frontalface_alt.xml";
+
+CascadeClassifier face_cascade;
+CascadeClassifier eyes_cascade;
+string window_name_onlyface = "Capture - only Face";
+string window_name_face = "Capture - Face ";
+
+
+/**
+* @function detectAndDisplay
+*/
+void detectAndenhance( Mat &frame )
+{
+	std::vector<Rect> faces;
+	Mat frame_gray;
+	Mat hatAlpha;
+
+	//hatAlpha = imread("2.png",-1);//圣诞帽的图片
+
+	cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
+	//equalizeHist( frame_gray, frame_gray );
+	//-- Detect faces
+	face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+
+	for( size_t i = 0; i < faces.size(); i++ )
+	{
+		Rect face(faces[i].x,faces[i].y,faces[i].x + faces[i].width,faces[i].y + faces[i].height);
+		cvSetImageROI(&IplImage(frame),face);
+
+		
+
+		// Do the porcess
+		blur(frame,frame,Size(7,7),Point(-1,-1));
+		//////////////////////////////////////////////
+		cvResetImageROI( &IplImage(frame) );
+		Point center( faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
+		ellipse( frame, center, Size( faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar( 255, 0, 255 ), 2, 8, 0 );
+
+		// line(frame,Point(faces[i].x,faces[i].y),center,Scalar(255,0,0),5);
+
+		Mat faceROI = frame_gray( faces[i] );
+		std::vector<Rect> eyes;
+
+		imshow( window_name_onlyface, faceROI );
+		
+	}
+	//-- Show what you got
+	imshow( window_name_face, frame );
+	//imwrite("merry christmas.jpg",frame);
+}
+
+/** @函数 detectAndDisplay */
+void detectAndDisplay( Mat frame )
+{
+	std::vector<Rect> faces;
+	Mat frame_gray;
+
+	cvtColor( frame, frame_gray, CV_BGR2GRAY );
+	equalizeHist( frame_gray, frame_gray );
+
+	//-- 多尺寸检测人脸
+	face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+
+	for( int i = 0; i < faces.size(); i++ )
+	{
+		Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+		ellipse( frame, center, Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar( 255, 0, 255 ), 4, 8, 0 );
+
+		Mat faceROI = frame_gray( faces[i] );
+		std::vector<Rect> eyes;
+
+		//-- 在每张人脸上检测双眼
+		eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+
+		for( int j = 0; j < eyes.size(); j++ )
+		{
+			Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
+			int radius = cvRound( (eyes[j].width + eyes[i].height)*0.25 );
+			circle( frame, center, radius, Scalar( 255, 0, 0 ), 4, 8, 0 );
+		}
+	}
+	//-- 显示结果图像
+	imshow( window_name_face, frame );
+}
+
+
+
+// add by shiter 2016/3/3
+
+Mat equalizeChannelHist(const Mat & inputImage)  
+{  
+	if( inputImage.channels() >= 3 )  
+	{  
+		vector<Mat> channels;  
+		split(inputImage, channels);  
+
+		Mat B,G,R;  
+
+		equalizeHist( channels[0], B );  
+		equalizeHist( channels[1], G );  
+		equalizeHist( channels[2], R );  
+
+		vector<Mat> combined;  
+		combined.push_back(B);  
+		combined.push_back(G);  
+		combined.push_back(R);  
+
+		Mat result;  
+		merge(combined, result);  
+
+		return result;  
+	}
+	else{return inputImage;}
+
+	return inputImage;  
+}  
+
+
+Mat equalizeIntensityHist(const Mat & inputImage)  
+{  
+	if(inputImage.channels() >= 3)  
+	{  
+		Mat ycrcb;  
+
+		cvtColor(inputImage, ycrcb, COLOR_BGR2YCrCb);  
+
+		vector<Mat> channels;  
+		split(ycrcb, channels);  
+
+		equalizeHist(channels[0], channels[0]);  
+
+		Mat result;  
+		merge(channels,ycrcb);  
+
+		cvtColor(ycrcb, result, COLOR_YCrCb2BGR);  
+
+		return result;  
+	}  
+
+	return Mat();  
+}  
+
+
+
+//皮肤检测,并针对皮肤进行增强，模糊
+void MySkinEnhance(Mat &frame)
+{
+	Mat input_image =frame;  
+	Mat output_mask;  
+	Mat output_image;  
+	Mat mask;  
+	//肤色椭圆  
+	/*椭圆皮肤模型*/  
+	Mat skinCrCbHist = Mat::zeros(Size(256, 256), CV_8UC1);  
+	ellipse(skinCrCbHist, Point(113, 155.6), Size(23.4, 15.2), 43.0, 0.0, 360.0, Scalar(255, 255, 255), -1);  
+
+	Mat element = getStructuringElement(MORPH_RECT, Size(3, 3), Point(-1, -1) );  
+
+	if(input_image.empty())  
+		return ;  
+
+	Mat ycrcb_image;  
+	output_mask = Mat::zeros(input_image.size(), CV_8UC1);  
+	cvtColor(input_image, ycrcb_image, CV_BGR2YCrCb); //首先转换成到YCrCb空间  
+
+	for(int i = 0; i < input_image.rows; i++) //利用椭圆皮肤模型进行皮肤检测  
+	{  
+		uchar* p = (uchar*)output_mask.ptr<uchar>(i);  
+		Vec3b* ycrcb = (Vec3b*)ycrcb_image.ptr<Vec3b>(i);  
+		for(int j = 0; j < input_image.cols; j++)  
+		{  
+			if(skinCrCbHist.at<uchar>(ycrcb[j][1], ycrcb[j][2]) > 0)  
+				p[j] = 255;  
+		}  
+	}     
+
+	//morphologyEx(output_mask,output_mask,MORPH_CLOSE,element);  
+
+	 //output_mask.setTo(0);  
+		
+		dilate(output_mask,output_mask,Mat(32,32,CV_8U),Point(-1,-1),2);
+		//imwrite("dilate.jpg",dst);
+	// output_image.setTo(0);  
+		input_image.copyTo(output_image, output_mask);  
+		
+		Mat enhance = output_image;
+		medianBlur(output_image,enhance,11);
+		//blur(enhance,enhance,Size(4,4),Point(-1,-1),4);
+		imshow("blur face",enhance);
+		for(int i = 0; i < output_image.rows; i++) //
+		{  
+			uchar* p = (uchar*)output_mask.ptr<uchar>(i);  
+
+			for(int j = 0; j < output_image.cols; j++)  
+			{  
+				if((enhance.at<Vec3b>(i,j)[0] < 50) && (enhance.at<Vec3b>(i,j)[1] < 50)&& (enhance.at<Vec3b>(i,j)[2] < 50) ) 
+				{
+					//不是纯黑的
+					
+					
+				}
+				else
+				{
+
+					frame.at<Vec3b>(i,j)[0] =  enhance.at<Vec3b>(i,j)[0];
+
+					frame.at<Vec3b>(i,j)[1] = enhance.at<Vec3b>(i,j)[1];
+					frame.at<Vec3b>(i,j)[2] = enhance.at<Vec3b>(i,j)[2];
+				}
+			}  
+		}     
+		// 图像融合
+		//addWeighted(input_image, 0.95, enhance, 0.05, 0.0, input_image);  
+		imshow("ouput image",frame);
+
+}
+
+
+//提高亮度对比度
+void highlight(Mat &frame)
+{
+	Mat src,dst;  
+	double alpha =1.5;  
+	double beta = 20;  
+
+	src = frame; 
+	if(!src.data)  
+	{  
+		cout<<"Failed to load image!"<<endl;  
+		return ;  
+	}  
+
+
+
+	//dst = Mat::zeros(src.size(),src.type());  
+	for (int i = 0;i<src.rows;++i) 
+	{
+		//uchar* inData=src.ptr<uchar>(i);
+		
+		for(int j= 0;j<src.cols;++j) 
+		{
+			 
+				/*src.at<Vec3b>(i,j)[0] = saturate_cast<uchar>(src.at<Vec3b>(i,j)[0]*alpha+beta); 
+				src.at<Vec3b>(i,j)[1] = saturate_cast<uchar>(src.at<Vec3b>(i,j)[1]*alpha+beta); 
+				src.at<Vec3b>(i,j)[2] = saturate_cast<uchar>(src.at<Vec3b>(i,j)[2]*alpha+beta); */
+				//上面的效率低，下面的有越界
+				src.at<Vec3b>(i,j)[0] = (src.at<Vec3b>(i,j)[0]*alpha+beta); 
+				src.at<Vec3b>(i,j)[1] = (src.at<Vec3b>(i,j)[1]*alpha+beta); 
+				src.at<Vec3b>(i,j)[2] = (src.at<Vec3b>(i,j)[2]*alpha+beta);
+			
+		}
+	}
+
+	namedWindow("Handled Image");  
+	imshow("Handled Image",src);  
+	//waitKey();  
+}
+
+
+实现效果：实时实现的话我只加了肤色检测和简单的滤波，具体美化还需要进一步调试
+参数和算法 的组合可以在代码中调整参数实现，可以把膨胀的参数调大一点这个整个人脸就差不多可以经过肤色检测全部搞出来。
+完整工程代码：http://download.csdn.net/detail/wangyaninglm/9453146
+
+
+参考文献：
+
+肤色检测：http://blog.csdn.net/yangtrees/article/details/8269984
+人像优化：http://blog.csdn.net/u011630458/article/details/46275469
+肤色检测：http://blog.csdn.net/wj080211140/article/details/23384927
+改变对比读：http://blog.csdn.net/ubunfans/article/details/24373811
+
+直接推送直播流：http://blog.csdn.net/wangyaninglm/article/details/51056101
+
+
+

@@ -1,0 +1,74 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46687215				
+
+
+
+
+
+编辑部的主页：好像没啥用
+http://shop.oreilly.com/product/0636920022923.do
+
+
+每章的代码，github上面的：中文版
+https://github.com/willard-yuan/pcv-book-code
+
+github上面，英文版：
+https://github.com/jesolem/PCV
+
+项目主页：
+http://programmingcomputervision.com
+
+中文在线的书：
+http://www.ituring.com.cn/tupubarticle/2024?utm_source=tuicool
+
+
+然后下载安装
+python（x,y）下载地址：https://code.google.com/p/pythonxy/
+PIL windows下安装地址：http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe
+
+安装好了以后，点击自动的编辑器：
+
+
+
+
+
+新建工程，插入代码：
+
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun 29 21:36:11 2015
+
+@author: season
+"""
+
+from PIL import Image;
+from pylab import *;
+
+im = array(Image.open('lena.jpg'))
+
+imshow(im)
+
+x = [100, 100, 400, 400]
+y = [200, 500, 200, 500]
+plot(x, y, 'r*')
+
+plot(x[:2], y[:2])
+
+#axis('off')
+
+title('Plotting: "empire.jpg"')
+show()
+
+
+
+这个编辑器着实不错，可以下断点，单步调试啥的，完全满足日常需要，python又降低了进行计算机视觉相关研究的门槛啊
+效果：
+
+
+
+﻿﻿
+﻿﻿
+
+

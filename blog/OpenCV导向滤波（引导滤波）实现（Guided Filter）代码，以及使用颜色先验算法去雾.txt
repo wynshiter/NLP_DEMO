@@ -1,0 +1,1234 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/44838545				
+
+
+ 论文下载地址：http://research.microsoft.com/en-us/um/people/jiansun/papers/GuidedFilter_ECCV10.pdf
+本文主要介绍导向滤波，但是在网上看这算法还能去雾，不知道是具体是怎么利用导向滤波实现去雾的，希望过来人指点迷津，这块主要是重写了导向滤波应用于彩色图像的部分代码，希望与大家共同交流。
+ 
+论文主要如下：
+Kaiming He, Jian Sun, Xiaoou Tang. Single Image Haze Removal Using Dark Channel Prior
+大致内容是提出了一个叫做暗原色先验的东西来对有雾图像进行处理，十分巧妙，有兴趣者可以看看。这里使用OpenCV实现文中的去雾算法，然而论文提到的soft matting未在本程序中实现。
+ 
+原理如下：
+ 
+
+ 
+ 
+滤波效果：
+ 
+单通道效果：
+
+ 方法1效果：
+ 
+
+ 
+ 
+ 
+方法2效果：
+
+ 
+ 
+效果----为何要滤波：
+ 
+
+ 
+ 
+guied filter滤波代码：使用了两种方法，代码来源后面参考文献中。我做了一些修改和比对工作。
+ 
+ 
+// Guided Filter.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "opencv2/core/core.hpp"  
+#include "opencv2/highgui/highgui.hpp"  
+#include "opencv2/imgproc/imgproc.hpp"  
+  
+#pragma comment(lib,"opencv_core2410d.lib")                    
+#pragma comment(lib,"opencv_highgui2410d.lib")                    
+#pragma comment(lib,"opencv_imgproc2410d.lib")    
+
+using namespace std;
+using namespace cv;
+
+Mat getimage(Mat &a)
+{
+	int hei  =a.rows;
+	int wid = a.cols;
+	Mat I(hei, wid, CV_64FC1);
+	//convert image depth to CV_64F
+	a.convertTo(I, CV_64FC1,1.0/255.0);
+	//normalize the pixel to 0~1
+	/*
+	for( int i = 0; i< hei; i++){
+		double *p = I.ptr<double>(i);
+		for( int j = 0; j< wid; j++){
+			p[j] = p[j]/255.0; 	
+		}
+	}
+	*/
+	return I;
+}
+
+Mat cumsum(Mat &imSrc, int rc)
+{
+	if(!imSrc.data)
+	{
+		cout << "no data input!\n" << endl;
+	}
+	int hei = imSrc.rows;
+	int wid = imSrc.cols;
+	Mat imCum = imSrc.clone();
+	if( rc == 1)
+	{
+		for( int i =1;i < hei; i++)
+		{
+			for( int j = 0; j< wid; j++)
+			{
+				imCum.at<double>(i,j) += imCum.at<double>(i-1,j);
+			}
+		}
+	}
+
+	if( rc == 2)
+	{
+		for( int i =0;i < hei; i++)
+		{
+			for( int j = 1; j< wid; j++)
+			{
+				imCum.at<double>(i,j) += imCum.at<double>(i,j-1);
+			}
+		}
+	}
+	return imCum;
+}
+
+Mat boxfilter(Mat &imSrc, int r)
+{
+	int hei = imSrc.rows;
+	int wid = imSrc.cols;
+	Mat imDst = Mat::zeros( hei, wid, CV_64FC1);
+	//imCum = cumsum(imSrc, 1);
+	Mat imCum = cumsum(imSrc,1);
+	//imDst(1:r+1, :) = imCum(1+r:2*r+1, :);
+	for( int i = 0; i<r+1; i++)
+	{
+		for( int j=0; j<wid; j++ )
+		{
+			imDst.at<double>(i,j) = imCum.at<double>(i+r,j);
+		}
+	}
+	//imDst(r+2:hei-r, :) = imCum(2*r+2:hei, :) - imCum(1:hei-2*r-1, :);
+	for( int i =r+1; i<hei-r;i++)
+	{
+		for( int j = 0; j<wid;j++)
+		{
+			imDst.at<double>(i,j) = imCum.at<double>(i+r,j)-imCum.at<double>(i-r-1,j);
+		}
+	}
+	//imDst(hei-r+1:hei, :) = repmat(imCum(hei, :), [r, 1]) - imCum(hei-2*r:hei-r-1, :);
+	for( int i = hei-r; i< hei; i++)
+	{
+		for( int j = 0; j< wid; j++)
+		{
+			imDst.at<double>(i,j) = imCum.at<double>(hei-1,j)-imCum.at<double>(i-r-1,j);
+		}
+	}
+	imCum = cumsum(imDst, 2);
+	//imDst(:, 1:r+1) = imCum(:, 1+r:2*r+1);
+	for( int i = 0; i<hei; i++)
+	{
+		for( int j=0; j<r+1; j++ )
+		{
+			imDst.at<double>(i,j) = imCum.at<double>(i,j+r);
+		}
+	}
+	//imDst(:, r+2:wid-r) = imCum(:, 2*r+2:wid) - imCum(:, 1:wid-2*r-1);
+	for( int i =0 ; i<hei;i++)
+	{
+		for( int j = r+1; j<wid-r ;j++ )
+		{
+			imDst.at<double>(i,j) = imCum.at<double>(i,j+r)-imCum.at<double>(i,j-r-1);
+		}
+	}
+	//imDst(:, wid-r+1:wid) = repmat(imCum(:, wid), [1, r]) - imCum(:, wid-2*r:wid-r-1);
+	for( int i = 0; i< hei; i++)
+	{
+		for( int j = wid-r; j<wid; j++)
+		{
+			imDst.at<double>(i,j) = imCum.at<double>(i,wid-1)-imCum.at<double>(i,j-r-1);
+		}
+	}
+	return imDst;
+}
+
+Mat guidedfilter( Mat &I, Mat &p, int r, double eps ) 
+{
+	int hei = I.rows;
+	int wid = I.cols;
+	//N = boxfilter(ones(hei, wid), r);
+	Mat one = Mat::ones(hei, wid, CV_64FC1);
+	Mat N = boxfilter(one, r);
+
+	//mean_I = boxfilter(I, r) ./ N;
+	Mat mean_I(hei, wid, CV_64FC1);
+	divide(boxfilter(I, r), N, mean_I);
+
+	//mean_p = boxfilter(p, r) ./ N;
+	Mat mean_p(hei, wid, CV_64FC1);
+	divide(boxfilter(p, r), N, mean_p);
+
+	//mean_Ip = boxfilter(I.*p, r) ./ N;
+	Mat mul_Ip(hei, wid, CV_64FC1);
+	Mat mean_Ip(hei, wid, CV_64FC1);
+	multiply(I,p,mul_Ip);
+	divide(boxfilter(mul_Ip, r), N, mean_Ip);
+
+	//cov_Ip = mean_Ip - mean_I .* mean_p
+	//this is the covariance of (I, p) in each local patch.
+	Mat mul_mean_Ip(hei, wid, CV_64FC1);
+	Mat cov_Ip(hei, wid, CV_64FC1);
+	multiply(mean_I, mean_p, mul_mean_Ip);
+	subtract(mean_Ip, mul_mean_Ip, cov_Ip);
+
+	//mean_II = boxfilter(I.*I, r) ./ N;
+	Mat mul_II(hei, wid, CV_64FC1);
+	Mat mean_II(hei, wid, CV_64FC1);
+	multiply(I, I, mul_II);
+	divide(boxfilter(mul_II, r), N, mean_II);
+
+	//var_I = mean_II - mean_I .* mean_I;
+	Mat mul_mean_II(hei, wid, CV_64FC1);
+	Mat var_I(hei, wid, CV_64FC1);
+	multiply(mean_I, mean_I, mul_mean_II);
+	subtract(mean_II, mul_mean_II, var_I);
+
+	//a = cov_Ip ./ (var_I + eps);
+	Mat a(hei, wid, CV_64FC1);
+	for( int i = 0; i< hei; i++){
+		double *p = var_I.ptr<double>(i);
+		for( int j = 0; j< wid; j++){
+			p[j] = p[j] +eps; 	
+		}
+	}
+	divide(cov_Ip, var_I, a);
+
+	//b = mean_p - a .* mean_I;
+	Mat a_mean_I(hei ,wid, CV_64FC1);
+	Mat b(hei ,wid, CV_64FC1);
+	multiply(a, mean_I, a_mean_I);
+	subtract(mean_p, a_mean_I, b);
+
+	//mean_a = boxfilter(a, r) ./ N;
+	Mat mean_a(hei, wid, CV_64FC1);
+	divide(boxfilter(a, r), N, mean_a);
+	//mean_b = boxfilter(b, r) ./ N;
+	Mat mean_b(hei, wid, CV_64FC1);
+	divide(boxfilter(b, r), N, mean_b);
+
+	//q = mean_a .* I + mean_b;
+	Mat mean_a_I(hei, wid, CV_64FC1);
+	Mat q(hei, wid, CV_64FC1);
+	multiply(mean_a, I, mean_a_I);
+	add(mean_a_I, mean_b, q);
+
+	return q;
+}
+
+/*****************
+
+http://research.microsoft.com/en-us/um/people/kahe/eccv10/
+推酷上的一篇文章：
+http://www.tuicool.com/articles/Mv2iiu
+
+************************/
+cv::Mat guidedFilter2(cv::Mat I, cv::Mat p, int r, double eps)
+{
+  /*
+  % GUIDEDFILTER   O(1) time implementation of guided filter.
+  %
+  %   - guidance image: I (should be a gray-scale/single channel image)
+  %   - filtering input image: p (should be a gray-scale/single channel image)
+  %   - local window radius: r
+  %   - regularization parameter: eps
+  */
+ 
+  cv::Mat _I;
+  I.convertTo(_I, CV_64FC1);
+  I = _I;
+ 
+  cv::Mat _p;
+  p.convertTo(_p, CV_64FC1);
+  p = _p;
+ 
+  //[hei, wid] = size(I);
+  int hei = I.rows;
+  int wid = I.cols;
+ 
+  //N = boxfilter(ones(hei, wid), r); % the size of each local patch; N=(2r+1)^2 except for boundary pixels.
+  cv::Mat N;
+  cv::boxFilter(cv::Mat::ones(hei, wid, I.type()), N, CV_64FC1, cv::Size(r, r));
+ 
+  //mean_I = boxfilter(I, r) ./ N;
+  cv::Mat mean_I;
+  cv::boxFilter(I, mean_I, CV_64FC1, cv::Size(r, r));
+  
+  //mean_p = boxfilter(p, r) ./ N;
+  cv::Mat mean_p;
+  cv::boxFilter(p, mean_p, CV_64FC1, cv::Size(r, r));
+ 
+  //mean_Ip = boxfilter(I.*p, r) ./ N;
+  cv::Mat mean_Ip;
+  cv::boxFilter(I.mul(p), mean_Ip, CV_64FC1, cv::Size(r, r));
+ 
+  //cov_Ip = mean_Ip - mean_I .* mean_p; % this is the covariance of (I, p) in each local patch.
+  cv::Mat cov_Ip = mean_Ip - mean_I.mul(mean_p);
+ 
+  //mean_II = boxfilter(I.*I, r) ./ N;
+  cv::Mat mean_II;
+  cv::boxFilter(I.mul(I), mean_II, CV_64FC1, cv::Size(r, r));
+ 
+  //var_I = mean_II - mean_I .* mean_I;
+  cv::Mat var_I = mean_II - mean_I.mul(mean_I);
+ 
+  //a = cov_Ip ./ (var_I + eps); % Eqn. (5) in the paper;	
+  cv::Mat a = cov_Ip/(var_I + eps);
+ 
+  //b = mean_p - a .* mean_I; % Eqn. (6) in the paper;
+  cv::Mat b = mean_p - a.mul(mean_I);
+ 
+  //mean_a = boxfilter(a, r) ./ N;
+  cv::Mat mean_a;
+  cv::boxFilter(a, mean_a, CV_64FC1, cv::Size(r, r));
+  mean_a = mean_a/N;
+ 
+  //mean_b = boxfilter(b, r) ./ N;
+  cv::Mat mean_b;
+  cv::boxFilter(b, mean_b, CV_64FC1, cv::Size(r, r));
+  mean_b = mean_b/N;
+ 
+  //q = mean_a .* I + mean_b; % Eqn. (8) in the paper;
+  cv::Mat q = mean_a.mul(I) + mean_b;
+ 
+  return q;
+}
+
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	int r = 4;
+	double eps = 0.01;
+
+	string image_name ;
+	cout<<"input name:"<<endl;
+	cin>>image_name;
+
+		
+	/*
+	CV_LOAD_IMAGE_ANYDEPTH - If set, return 16-bit/32-bit image when the input has the corresponding depth, 
+	otherwise convert it to 8-bit.
+	CV_LOAD_IMAGE_COLOR - If set, always convert image to the color one
+	CV_LOAD_IMAGE_GRAYSCALE - If set, always convert image to the grayscale one
+	>0 Return a 3-channel color image.
+
+Note:
+
+	In the current implementation the alpha channel, if any, is stripped from the output image.
+	Use negative value if you need the alpha channel.
+
+	=0 Return a grayscale image.
+	<0 Return the loaded image as is (with alpha channel).
+*/
+
+
+	Mat image_src = imread(image_name,CV_LOAD_IMAGE_COLOR);
+	Mat image_gray(image_src.size(),CV_8UC1);
+
+	cvtColor(image_src,image_gray,CV_BGR2GRAY);
+
+	vector<Mat> bgr_src,bgr_dst;
+	split(image_src,bgr_src);//分解每个通道
+
+	Mat dst_color;
+	
+	double time;
+	time = (double)getTickCount();
+	for(int i=0;i<3;i++)  
+	{  
+		Mat I = getimage(bgr_src[i]);
+		Mat p = I.clone();
+		
+		Mat q = guidedfilter(I, p, r, eps);
+		//string number ;
+		//sprintf((char *)number.c_str(),"%d",i);
+		//imshow(number,q);
+
+		//imshow("方法1：", q);
+		bgr_dst.push_back(q);
+		//cv::merge(q,dst_color);
+		
+	}  
+	merge(bgr_dst,dst_color);
+
+	//imwrite("filtered.bmp", q*255);
+	time = 1000*((double)getTickCount() - time)/getTickFrequency();  
+
+	cout <<endl<<"Time of guided filter for  runs: " << time << " milliseconds."<< endl; 
+
+	imshow("原图像的灰度图", image_gray);
+	imshow("方法1：", dst_color);
+	imwrite("result.jpg",dst_color*255);
+	
+	double time2 = 0;
+	time2 = (double)getTickCount();
+
+	Mat I = getimage(image_gray);
+	Mat p = I.clone();
+	//int r = 8;
+	//double eps = 0.04;
+	
+	//Mat q = guidedfilter(I, p, r, eps);
+
+	//imwrite("filtered.bmp", q*255);
+	//*/
+
+	/*imshow("原图像的灰度图", image_gray);
+	imshow("方法1：", q);*/
+
+	imshow("方法2：",guidedFilter2(I, p, r, eps));
+	time2 = 1000*((double)getTickCount() - time2)/getTickFrequency();  
+
+	cout <<endl<<"Time of guided filter2 for  runs: " << time2 << " milliseconds."<< endl; 
+	waitKey(0);
+
+
+	return 0;
+}
+
+
+
+ 
+ 
+下面的代码还没有真正的调试，只是找到了，先放在这里，后面有空再看看研究一下。 
+ 
+去雾代码1：
+ 
+
+ 
+
+#include<iostream.h>
+
+#include<cv.h>
+
+#include<highgui.h>
+
+char tbarname1[] = "调节block";
+
+//定义两个滑动条,用于调节参数
+
+char tbarname2[] = "调节w";
+
+//w是为了保留一部分的雾
+
+int block=5;
+
+int w1=80;
+
+double w;
+
+IplImage *src=NULL;
+
+IplImage *dst=NULL;
+
+ 
+
+//定义去雾函数如下
+
+IplImage *quw(IplImage *src,int block,double w)
+
+{
+
+//图像分别有三个颜色通道
+
+         IplImage *dst1=NULL;
+
+         IplImage *dst2=NULL;
+
+         IplImage *dst3=NULL;
+
+         IplImage *imgroi1;
+
+         //dst1的ROI
+
+         IplImage *imgroi2;
+
+         //dst2的ROI
+
+         IplImage *imgroi3;
+
+         //dst3的ROI
+
+         IplImage *roidark;
+
+         //dark channel的ROI
+
+         IplImage *dark_channel=NULL;
+
+         //暗原色先验的指针
+
+         IplImage *toushelv=NULL;
+
+         //透射率
+
+ 
+
+//去雾算法运算后的三个通道
+
+         IplImage *j1=NULL;
+
+         IplImage *j2=NULL;
+
+         IplImage *j3=NULL;
+
+//去雾后的图像,三通道合并成
+
+         IplImage *dst=NULL;
+
+//源图像ROI位置以及大小
+
+         CvRect ROI_rect;
+
+ 
+
+//分离的三个通道
+
+         dst1=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+         dst2=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+         dst3=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+ 
+
+//为各个ROI分配内存
+
+         imgroi1=cvCreateImage(cvSize(block,block),IPL_DEPTH_8U,1);
+
+         imgroi2=cvCreateImage(cvSize(block,block),IPL_DEPTH_8U,1);
+
+         imgroi3=cvCreateImage(cvSize(block,block),IPL_DEPTH_8U,1);
+
+         roidark=cvCreateImage(cvSize(block,block),IPL_DEPTH_8U,1);
+
+ 
+
+//为j1 j2 j3分配大小
+
+         j1=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+         j2=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+         j3=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+ 
+
+//为暗原色先验指针分配大小
+
+         dark_channel=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+//为透射率指针分配大小
+
+         toushelv=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,1);
+
+//dst分配大小
+
+         dst=cvCreateImage(cvSize(src->width,src->height),IPL_DEPTH_8U,3);
+
+//将原彩色图像分离成三通道
+
+         cvSplit(src,dst1,dst2,dst3,NULL);
+
+//求暗原色
+
+         ROI_rect.width=block;
+
+         ROI_rect.height=block;
+
+         ROI_rect.x=0;
+
+         ROI_rect.y=0;
+
+ 
+
+ 
+
+         int i;
+
+         int j;
+
+         double min1=0;
+
+         double max1=0;
+
+         double min2=0;
+
+         double max2=0;
+
+         double min3=0;
+
+         double max3=0;
+
+         double min=0;
+
+         CvScalar value;
+
+         for(i=0;i<src->width/block;i++)
+
+         {        for(j=0;j<src->height/block;j++)
+
+                   {
+
+                            //分别计算三个通道内ROI的最小值
+
+                            cvSetImageROI(dst1,ROI_rect);
+
+                            cvCopy(dst1,imgroi1,NULL);
+
+                            cvMinMaxLoc(imgroi1,&min1,&max1,NULL,NULL);
+
+                            cvSetImageROI(dst2,ROI_rect);
+
+                            cvCopy(dst2,imgroi2,NULL);
+
+                            cvMinMaxLoc(imgroi2,&min2,&max2,NULL,NULL);
+
+                            cvSetImageROI(dst3,ROI_rect);
+
+                            cvCopy(dst3,imgroi3,NULL);
+
+                            cvMinMaxLoc(imgroi3,&min3,&max3,NULL,NULL);
+
+                            //求三个通道内最小值的最小值
+
+                            if(min1<min2)
+
+                                     min=min1;
+
+                            else
+
+                                     min=min2;
+
+                            if(min>min3)
+
+                                     min=min3;//min为这个ROI中暗原色
+
+                            value=cvScalar(min,min,min,min);//min放在value中
+
+                            //min赋予dark_channel中相应的ROI
+
+                            cvSetImageROI(dark_channel,ROI_rect);
+
+                            cvSet(roidark,value,NULL);
+
+                            cvCopy(roidark,dark_channel,NULL);
+
+                            //释放各个ROI
+
+                            cvResetImageROI(dst1);
+
+                            cvResetImageROI(dst2);
+
+                            cvResetImageROI(dst3);
+
+                            cvResetImageROI(dark_channel);
+
+                            //转入下一个ROI
+
+                            ROI_rect.x=block*i;
+
+                            ROI_rect.y=block*j;
+
+                   }
+
+         }
+
+         //保存暗原色先验的图像
+
+         cvSaveImage("f:/dark_channel_prior.jpg",dark_channel);
+
+//利用得到的暗原色先验dark_channel_prior.jpg求大气光强
+
+         double min_dark;
+
+         double max_dark;
+
+         CvPoint min_loc;
+
+         CvPoint max_loc;//max_loc是暗原色先验最亮一小块的原坐标
+
+         cvMinMaxLoc(dark_channel,&min_dark,&max_dark,&min_loc,&max_loc,NULL);
+
+         cout<<max_loc.x<<" "<<max_loc.y<<endl;
+
+         ROI_rect.x=max_loc.x;
+
+         ROI_rect.y=max_loc.y;
+
+         double A_dst1;//定义大气光成分的估计值
+
+         double dst1_min;
+
+         double A_dst2;
+
+         double dst2_min;
+
+         double A_dst3;
+
+         double dst3_min;
+
+         cvSetImageROI(dst1,ROI_rect);
+
+//按照论文方法求大气光强估计值
+
+         cvCopy(dst1,imgroi1,NULL);
+
+         cvMinMaxLoc(imgroi1,&dst1_min,&A_dst1,NULL,NULL);
+
+         cvSetImageROI(dst2,ROI_rect);
+
+         cvCopy(dst2,imgroi2,NULL);
+
+         cvMinMaxLoc(imgroi2,&dst2_min,&A_dst2,NULL,NULL);
+
+         cvSetImageROI(dst3,ROI_rect);
+
+         cvCopy(dst3,imgroi3,NULL);
+
+         cvMinMaxLoc(imgroi3,&dst3_min,&A_dst3,NULL,NULL);
+
+         cout<<A_dst1<<" "<<A_dst2<<" "<<A_dst3<<endl;//这三值为大气光强度估计值
+
+//求透射率
+
+         int k;
+
+         int l;
+
+         CvScalar m;
+
+         CvScalar n;//暗原色先验各元素值
+
+ 
+
+         for(k=0;k<src->height;k++)
+
+         {
+
+                   for(l=0;l<src->width;l++)
+
+                   {
+
+                            m=cvGet2D(dark_channel,k,l);
+
+                            n=cvScalar(255-w*m.val[0]);
+
+                            //w目的是保留一部分的雾,使图像看起来真实些
+
+                            cvSet2D(toushelv,k,l,n);
+
+                   }
+
+         }
+
+         cvSaveImage("f:/toushelv.jpg",toushelv);
+
+ 
+
+//求无雾图像
+
+         int p,q;
+
+         double tx;
+
+         double jj1,jj2,jj3;
+
+         CvScalar ix,jx;
+
+         for(p=0;p<src->height;p++)
+
+         {
+
+                   for(q=0;q<src->width;q++)
+
+                   {
+
+                            tx=cvGetReal2D(toushelv,p,q);
+
+                            tx=tx/255;
+
+                            if(tx<0.1)
+
+                                     tx=0.1;
+
+                            ix=cvGet2D(src,p,q);
+
+                            jj1=(ix.val[0]-A_dst1)/tx+A_dst1;//根据雾产生模型运算,还原出无雾图像
+
+                            jj2=(ix.val[1]-A_dst2)/tx+A_dst2;
+
+                            jj3=(ix.val[2]-A_dst3)/tx+A_dst3;
+
+                            jx=cvScalar(jj1,jj2,jj3,0.0);
+
+                            cvSet2D(dst,p,q,jx);
+
+                   }
+
+         }
+
+         cvSaveImage("f:/removed_haze.jpg",dst);
+
+ 
+
+//释放指针
+
+         cvReleaseImage(&dst1);
+
+         cvReleaseImage(&dst2);
+
+         cvReleaseImage(&dst3);
+
+         cvReleaseImage(&imgroi1);
+
+         cvReleaseImage(&imgroi2);
+
+         cvReleaseImage(&imgroi3);
+
+         cvReleaseImage(&roidark);
+
+         cvReleaseImage(&dark_channel);
+
+         cvReleaseImage(&toushelv);
+
+         cvReleaseImage(&j1);
+
+         cvReleaseImage(&j2);
+
+         cvReleaseImage(&j3);
+
+         return dst;
+
+}
+
+ 
+
+void on_trackbar1(int h)
+
+{
+
+         dst=quw(src,block,w);
+
+         cvShowImage("目的图像",dst);
+
+//      cvWaitKey(0);
+
+}
+
+void on_trackbar2(int h)
+
+{
+
+ 
+
+         w=(double)w1/100;
+
+         dst=quw(src,block,w);
+
+         cvShowImage("目的图像",dst);
+
+//      cvWaitKey(0);
+
+}
+
+//主函数如下
+
+void main()
+
+{
+
+         //打开图像
+
+         src=cvLoadImage("8.jpg",-1);
+
+         //创造窗口
+
+         cvNamedWindow("有雾图像",CV_WINDOW_AUTOSIZE);
+
+         cvShowImage("有雾图像",src);
+
+         cvNamedWindow("目的图像",CV_WINDOW_AUTOSIZE);
+
+         cvCreateTrackbar(tbarname1, "目的图像", &block, 15, on_trackbar1);
+
+         cvCreateTrackbar(tbarname2, "目的图像", &w1, 100, on_trackbar2);
+
+         cvWaitKey(0);
+
+         cvReleaseImage(&src);
+
+         cvReleaseImage(&dst);
+
+}
+
+
+ 
+去雾matlab代码：
+<span style="font-size:24px;">　　function q = guidedfilter(I, p, r, eps)
+　　%   GUIDEDFILTER   O(1) time implementation of guided filter.
+　　%
+　　%   - guidance image: I (should be a gray-scale/single channel image)
+　　%   - filtering input image: p (should be a gray-scale/single channel image)
+　　%   - local window radius: r
+　　%   - regularization parameter: eps
+
+　　[hei, wid] = size(I);
+　　N = boxfilter(ones(hei, wid), r); % the size of each local patch; N=(2r+1)^2 except for boundary pixels.
+
+　　% imwrite(uint8(N), 'N.jpg');
+　　% figure,imshow(N,[]),title('N');
+　　
+
+　　mean_I = boxfilter(I, r) ./ N;
+　　mean_p = boxfilter(p, r) ./ N;
+　　mean_Ip = boxfilter(I.*p, r) ./ N;
+　　cov_Ip = mean_Ip - mean_I .* mean_p; % this is the covariance of (I, p) in each local patch.
+
+　　mean_II = boxfilter(I.*I, r) ./ N;
+　　var_I = mean_II - mean_I .* mean_I;
+
+　　a = cov_Ip ./ (var_I + eps); % Eqn. (5) in the paper;
+　　b = mean_p - a .* mean_I; % Eqn. (6) in the paper;
+
+　　mean_a = boxfilter(a, r) ./ N;
+　　mean_b = boxfilter(b, r) ./ N;
+
+　　q = mean_a .* I + mean_b; % Eqn. (8) in the paper;
+　　end</span>
+去雾代码2：
+ 
+#include "stdafx.h"
+#include <opencv2\opencv.hpp> 
+#include "cv.h"
+#include <cxcore.h>
+#include "highgui.h"
+#include <windows.h>
+#include <math.h>
+using namespace cv;
+using namespace std; 
+
+//求三个通道中最小值的最小值时调用的函数
+double min(double b,double g, double r)
+{
+	double result = b;
+	if(result>g)
+		result = g;
+	if(result>r)
+		result = r;
+	return result;
+};
+double max(double a,double b)
+{
+	double MAX;
+	if (a<b)
+		MAX = b;
+	else
+		MAX = a;
+	return MAX;
+};
+double min2(double a,double b)//比较两个数值中的最小值并返回
+{
+	double MIN;
+	if (a<b)
+		MIN = a;
+	else
+		MIN = b;
+	return MIN;
+};
+//这个函数相当于darkchannel的功能，但在padarray时。使用的是将边缘像素复制的方法，不是matlab的将边缘处镜像复制,计算出darkchannel后有计算了最大值A
+double doDarkChannel(IplImage* in,int patchsize)
+{
+	
+	int height,width,step,channels;//图像的宽，高，等信息，height，width是输入图像的尺寸，也是输出图像的尺寸，step是输出图像jout的（j对应matlab代码中的darkchannel的输出图像J）
+	int i,j,k;//用于循环的变量
+	uchar *data2;//输出的结果图像的指针
+	height = in->height;//获取输入图像的宽高等信息
+	width = in->width;
+	int patch = patchsize/2;//图像要延拓的边缘的宽度
+	IplImage* mout=cvCreateImage(cvSize(in->width+patchsize,in->height+patchsize),in->depth,in->nChannels);   //存放图像被镜像延拓后图像的空图像
+	cvCopyMakeBorder(in,mout,cvPoint(patch,patch),IPL_BORDER_REPLICATE);//这个函数相当于padarray，mout中存放padarrry后的图像
+	IplImage* jout = cvCreateImage(cvSize(in->width,in->height),in->depth,1);//darkchannel 的输出结果，J
+	
+	step = jout->widthStep/sizeof(uchar);//step是单通道输出图像jout的widthstep
+	data2 = (uchar *)jout->imageData;//指向输出图像的数据头
+
+	for(i=0;i<height;i++)
+		{
+       for(j=0;j<width;j++)   
+          { 
+				cvSetImageROI(mout, cvRect(j, i, patchsize, patchsize));//操作输入图像的（i，j）点处patchsize大小的图像块
+				IplImage*  patch_out=cvCreateImage(cvSize(patchsize,patchsize),in->depth,in->nChannels);//存储三通道图像块的临时内存区，循环体里用到的内存区域再循环体里申请，在循环体里释放
+				cvCopy(mout,patch_out);//将patchsize大小的图像块存入临时图像块patch_out
+				cvResetImageROI(mout); //释放mout
+
+				//以下内容是利用cnMinMaxloc分别计算三个通道中的最小值
+				double MinValue;
+				double MaxValue;
+				double B_Min,G_Min,R_Min;
+				CvPoint MinLocation;
+				CvPoint MaxLocation;
+				cvSetImageCOI(patch_out,1);
+				cvMinMaxLoc(patch_out,& MinValue,& MaxValue,& MinLocation,& MaxLocation);
+				B_Min = MinValue;
+				cvSetImageCOI(patch_out,2);
+				cvMinMaxLoc(patch_out,& MinValue,& MaxValue,& MinLocation,& MaxLocation);
+				G_Min = MinValue;
+				cvSetImageCOI(patch_out,3);
+				cvMinMaxLoc(patch_out,& MinValue,& MaxValue,& MinLocation,& MaxLocation);
+				R_Min = MinValue;
+				int dark_point = (int)min(B_Min,G_Min,R_Min);
+				//三个通道的最小值都已经被分别提取出来了
+				data2[i*step+j] = dark_point;//step 是jout的step，是单通道的
+				cvReleaseImage(&patch_out);				
+			};
+	};
+	double MinValue;
+	double MaxValue;
+	double B_Min,G_Min,R_Min;
+	CvPoint MinLocation;
+	CvPoint MaxLocation;
+	cvSetImageCOI(jout,1);
+	cvMinMaxLoc(jout,& MinValue,& MaxValue,& MinLocation,& MaxLocation);
+	cvReleaseImage(&mout);
+	cout<<"计算暗通道函数运行成功"<<"\n";
+	return MaxValue;
+
+};
+//该函数的作用相当于matlab代码中求取三个通道中最小值，然后以最小值组成一幅灰度图
+IplImage* doMinChannel(IplImage* in)
+{
+	IplImage* b = cvCreateImage(cvSize(in->width,in->height),in->depth,1);
+	IplImage* g = cvCreateImage(cvSize(in->width,in->height),in->depth,1);
+	IplImage* r = cvCreateImage(cvSize(in->width,in->height),in->depth,1);//创建保存读入图像三个通道的的内存区域
+	IplImage* w = cvCreateImage(cvSize(in->width,in->height),in->depth,1);//创建保存输出图像的内存区域（三个通道中最小值组成的一幅灰度图）
+	cvSetImageCOI(in,1);
+	cvCopy(in,b);
+	cvSetImageCOI(in,2);
+	cvCopy(in,g);
+	cvSetImageCOI(in,3);
+	cvCopy(in,r);//将三个通道的的值分别存入r，g，b三块内存区域中
+
+	//cvSplit(src,dst1,dst2,dst3,NULL);
+
+	int height = in->height;//获取输入图像的宽高等信息
+	int width = in->width;
+	int i,j,k;//用于循环的变量
+	uchar *data_w;
+	uchar *data_b;
+	uchar *data_g;
+	uchar *data_r;
+	int step = b->widthStep/sizeof(uchar);
+	data_w = (uchar *)w->imageData;//指向输出图像的数据头
+	data_b = (uchar *)b->imageData;//指向输出图像的数据头
+	data_g = (uchar *)g->imageData;//指向输出图像的数据头
+	data_r = (uchar *)r->imageData;//指向输出图像的数据头
+	for(i=0;i<height;i++)
+		{
+       for(j=0;j<width;j++)   
+          { 
+			  double b,g,r;
+			  int MIN;//b,g,r三个通道的最小值
+			  b = data_b[i*step+j];
+			  g = data_g[i*step+j];
+			  r = data_r[i*step+j];
+			  MIN = (int)min(b,g,r);
+			  data_w[i*step+j] = MIN;
+		  };
+		};
+	cout<<"计算三个通道最小值并组成一幅新灰度图的函数运行成功"<<"\n";//表示该函数运行成功
+	return w;
+}	;
+IplImage* doCalculateV(IplImage* w,IplImage* diff,IplImage* smooth)
+{
+    IplImage* b = cvCreateImage(cvSize(w->width,w->height),w->depth,1);
+	IplImage* v = cvCreateImage(cvSize(w->width,w->height),w->depth,1);
+	int height = w->height;//获取输入图像的宽高等信息
+	int width = w->width;
+	int i,j,k;//用于循环的变量
+	uchar *data_w;
+	uchar *data_diff;
+	uchar *data_v;
+	uchar *data_b;
+	uchar *data_smooth;
+	int step = w->widthStep/sizeof(uchar);
+	data_w = (uchar *)w->imageData;//指向输出图像的数据头
+	data_diff = (uchar *)diff->imageData;//指向输出图像的数据头
+	data_v = (uchar *)v->imageData;//指向输出图像的数据头
+	data_b = (uchar *)b->imageData;//指向输出图像的数据头
+	data_smooth = (uchar *)smooth->imageData;
+	for(i=0;i<height;i++)
+		{
+       for(j=0;j<width;j++)   
+          { 
+			  double W;
+			  double DIFF;
+			  double B;
+			  double SMOOTH;
+			  double p = 0.78;//p = 0.78
+			  double MIN,MAX;
+			  W = data_w[i*step+j];
+			  DIFF = data_diff[i*step+j];
+			  SMOOTH = data_smooth[i*step+j];
+			  B = W-DIFF;
+			  MIN = min2(B,SMOOTH);
+			  MAX = max(MIN,0);
+			  data_v[i*step+j] = p*MAX;
+		  };
+		};
+	cout<<"计算v函数运行成功"<<"\n";//表示该函数运行成功
+	return v;
+};
+//计算最终的去雾图像的函数
+IplImage* doFinally(IplImage* in,IplImage* v,double A)
+{
+	IplImage* b = cvCreateImage(cvSize(in->width,in->height),in->depth,1);
+	IplImage* g = cvCreateImage(cvSize(in->width,in->height),in->depth,1);
+	IplImage* r = cvCreateImage(cvSize(in->width,in->height),in->depth,1);
+	IplImage* result = cvCreateImage(cvSize(in->width,in->height),in->depth,3);//创建存储输出图像的内存区域
+	int height = in->height;//获取输入图像的宽高等信息
+	int width = in->width;
+	int i,j;//用于循环的变量
+	cvSetImageCOI(in,1);
+	cvCopy(in,b);
+	cvSetImageCOI(in,2);
+	cvCopy(in,g);
+	cvSetImageCOI(in,3);
+	cvCopy(in,r);//将三个通道的的值分别存入r，g，b三块内存区域中
+	//cvSplit(in,b,g,r,NULL);//将图像拆分为三个通道
+	uchar *data_b;
+	uchar *data_g;
+	uchar *data_r;
+	uchar *data_v;
+	int step = b->widthStep/sizeof(uchar);
+	//data_w = (uchar *)w->imageData;//指向输出图像的数据头
+	data_b = (uchar *)b->imageData;//指向蓝色通道的数据头
+	data_g = (uchar *)g->imageData;//指向绿色通道的数据头
+	data_r = (uchar *)r->imageData;//指向红色通道的数据头
+	data_v = (uchar *)v->imageData;
+	//计算蓝色通道的去雾结果
+	for(i=0;i<height;i++)
+		{
+       for(j=0;j<width;j++)   
+          { 
+			  double B,G,R,V,VAB,VAG,VAR;
+			  V = data_v[i*step+j];
+			  B = data_b[i*step+j];
+			  VAB = fabs(B-V)/(fabs(1-V/A));   //会有一些值大于256，需要进行归一化
+			  if(VAB>255)
+				  VAB = 255;
+			  else
+				  VAB = VAB;
+			  data_b[i*step+j] = VAB;
+			  G = data_g[i*step+j];
+			  VAG = fabs(G-V)/(fabs(1-V/A));
+			  if(VAG>255)
+				  VAG = 255;
+			  else
+				  VAG = VAG;
+			  data_g[i*step+j] = VAG;
+			  R = data_r[i*step+j];
+			  VAR = fabs(R-V)/(fabs(1-V/A));
+			  if(VAR>255)
+				  VAR = 255;
+			  else
+				  VAR = VAR;
+			  data_r[i*step+j] = VAR;
+		  };
+		};
+	cvMerge(b,g,r,NULL,result);//这个函数可能也有问题~
+	cout<<"最终去雾算法运行成功"<<"\n";//表示该函数运行成功
+	return result;
+
+}
+
+int main(int argc, char** argv)
+{ 
+	cvNamedWindow("Source Image");
+	cvNamedWindow("Result Image");
+	IplImage* image = cvLoadImage("D:/4.bmp",1);  //input a image，0表示以灰度图形式读入图像，-1表示以图像自身真实通道数读入图像，1表示以三通道读入图像
+													//此处可改成自己的图片路径
+	cvShowImage("Source Image",image);//显示源图像
+	int patchsize = 20;
+	//IplImage* out = doDarkChannel(image,patchsize);//不能直接将返回的图像数据赋给一个未指定大小的指针，
+	IplImage* out = cvCreateImage(cvSize(image->width,image->height),image->depth,3);//创建存储输出图像的内存区域
+	IplImage* w = cvCreateImage(cvSize(image->width,image->height),image->depth,1);//创建存储输出图像的内存区域
+	//cvCopy(doDarkChannel(image,patchsize),out);//将patchsize大小的图像块存入临时图像块patch_out
+	IplImage* smooth = cvCreateImage(cvSize(image->width,image->height),image->depth,1);//创建存储输出图像的内存区域
+	IplImage* diff = cvCreateImage(cvSize(image->width,image->height),image->depth,1);//存储w与I_smooth差值绝对值的的内存区域
+	IplImage* v = cvCreateImage(cvSize(image->width,image->height),image->depth,1);//存储w与I_smooth差值绝对值的的内存区域
+	int A_MAX = doDarkChannel(image,patchsize);//求取暗通道的最大值，A_MAX相当于Matlab中的A，传入doFinally
+	cvCopy(doMinChannel(image),w);//计算三个通道的最小值并以最小值组成一副灰度图，进行下一步高斯平滑
+	//w计算没问题
+
+	cvSaveImage("D://result//w.bmp",w);
+
+	cvSmooth(w,smooth,CV_GAUSSIAN,39,39,4.5,4.5);//39x39;不使用相关而使用卷积进行计算，将边界点复制得到拓展边界
+	
+	cvSaveImage("D://result//smooth.bmp",smooth);
+
+	cvAbsDiff(smooth,w,diff);
+	//diff有问题，应该是由于smooth导致的
+	cvSaveImage("D://result//diff.bmp",diff);
+
+	cvCopy(doCalculateV(w,diff,smooth),v);//计算v，v的含义从matlab代码中可找到，v传入doFinally进行最终的结果计算
+	//v有问题；由于smooth有问题，w没问题，diff有问题，导致v有问题
+	cvSaveImage("D://result//v.bmp",v);
+	cvCopy(doFinally(image,v,A_MAX),out);//计算最终的去雾结果的函数的调用
+	//cvSaveImage("D://v.bmp",v);//测试能否顺利产生图像v的代码
+	cout<<"A_MAX="<<A_MAX<<"\n";
+
+	cvSaveImage("D://result//finally.bmp",out);
+
+	cvShowImage("Result Image",out);//imshow the result
+	cvWaitKey(0);
+	cvReleaseImage(&image);//release the storage space
+	cvReleaseImage(&out);//release the storage space
+	cvReleaseImage(&w);//release the storage space
+	cvReleaseImage(&smooth);//release the storage space
+	cvReleaseImage(&diff);//release the storage space
+	cvReleaseImage(&v);//release the storage space
+	cvDestroyWindow("Source Image");  
+	cvDestroyWindow("Result Image");
+	//system("pause"); //避免一闪而过
+	return 0;
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+参考文献：
+http://www.tuicool.com/articles/Mv2iiu
+http://blog.csdn.net/holybang/article/details/28093305
+http://www.tuicool.com/articles/MJZr2e
+http://blog.sina.com.cn/s/blog_4d8730df0100m8lz.html
+ 
+ 
+
+

@@ -1,0 +1,114 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/62472413				
+
+
+
+Sqoop是一个用来将hadoop和关系型数据库中的数据相互转移的工具，可以将一个关系型数据库(例如：mysql,oracle,等)中的数据导入到hadoop的HDFS中，也可以将HDFS的数据导入到关系型数据库中。
+
+1.简介
+首先切换到到hadoop用户：su - hadoop
+温馨提示：oracle的所有表名列名都要大写！！！ 
+下面的代码，在命令行输入的时候，可能要写成一行
+比如第一条需要写成：
+sqoop export --table Oracle_table_name --connect jdbc:oracle:thin:@ip:1521:数据库名 --username 用户名 --password 密码 --export-dir hdfs:/user/hive/warehouse/XXX --columns COLUMN1,2,3 --input-fields-terminated-by '\001' --input-lines-terminated-by '\n'
+1.导hive表到Oracle
+sqoop export 
+--table Oracle_table_name 
+--connect jdbc:oracle:thin:@ip:1521:数据库名 
+--username 用户名
+--password 密码
+--export-dir hdfs:/user/hive/warehouse/XXX
+--columns COLUMN1,2,3, 
+--input-fields-terminated-by '\001'  #或者其他分隔符，比如逗号等
+--input-lines-terminated-by '\n'
+注意：导hive表是“\001”
+–解释:
+sqoop export  
+–table Oracle_table_name（// 数据库Oracle的表名）
+–connect jdbc:oracle:thin:@ip:1521:数据库名  
+（//数据库的地址，其中1521为端口号，默认都为1521，ibd为数据库实例名）
+–username用户名（//数据库用户名） 
+–password用户名（//数据库密码）
+–export-dir hdfs:/user/hive/warehouse/XXX 
+（//hdfs上Hive表的绝对路径） 
+–columns column1, column2… 
+ (//数据库表的所有列名)
+–input-fields-terminated-by ‘\001’（列分隔符） 
+–input-lines-terminated-by ‘\n’ （行分隔符）
+2. 查询数据导入到Oracle的数据是否成功
+sqoop eval 
+--connect jdbc:oracle:thin:@YOUR-IP-ADDRESS:1521:database-name
+--username XXX
+--password XXX
+--query "select * from table_name"
+3.导Oracle表到hive表
+sqoop import 
+--connect jdbc:oracle:thin:@YOUR-IP-ADDRESS:1521:database-name
+--username xxx
+--password xxx
+--table TABLE_NAME
+--columns COLUMN1,2,3...
+--hive-import  
+--hive-table  hive_table_name
+-m 1
+—解释: 
+TABLE_NAME为oracle表名(切忌：Oracle个表名在命令中必须是大写，不然会报错) 
+hive_test为hive表名（hive中的这个表可以不用提前建，只用给表名即可，导成功后列名和Oracle表的列名相同）
+4. 连接oracle数据库，列出数据库中的表
+sqoop list-tables 
+--connect jdbc:oracle:thin:@YOUR-IP-ADDRESS:1521:database-name
+--username xxx
+--password xxx
+5.从数据库导出表的数据到HDFS文件(这个比较实用)
+sqoop import 
+--connect jdbc:oracle:thin:@YOUR-IP-ADDRESS:1521:database-name
+--username xxx
+--password xxx
+--table DD
+--m 1 
+--target-dir /home/dpt 
+解释： 
+DD为oracle表名(切忌：Oracle表名在命令中必须是大写，不然会报错)； 
+/home/dpt为目的目录，如果没有这个目录则会在hdfs上自动创建这个目录. 
+导成功后可以用命令查看：
+hadoop fs -text /home/dpt/part-m-00000
+6.分区表的导入
+通过sqoop将hive中的表导入到oracle中
+sqoop export 
+--table t_amap_all 
+--connect jdbc:oracle:thin:@YOUR-IP-ADDRESS:1521:database-name
+--username xxx
+--password xxx
+--export-dir  hdfs://user/hive/warehouse/ 
+--columns 1,2,3... 
+--input-fields-terminated-by '\t' 
+--input-lines-terminated-by '\n';
+导入分区表需要指定到具体分区目录，不然会找不到数据，在oracle表中能指定分区这个字段！ 
+分隔符要遵循hive表的具体分隔符
+导致任务失败有可能是表名不一致，字段不一致，oracle中的字段大小不够
+
+2.可能遇到的问题
+
+连接oracle数据库，列出数据库中的表时
+
+sqoop list-tables 
+--connect jdbc:oracle:thin:@YOUR-IP-ADDRESS:1521:database-name
+--username xxx
+--password xxx
+报错： 
+16/01/28 09:27:15 ERROR sqoop.Sqoop: Got exception running Sqoop: java.lang.RuntimeException: Could not load db driver class: oracle.jdbc.OracleDriver 
+则  
+1)发现sqoop的安装目录 /usr/lib/sqoop/lib中缺ojdbc驱动包,然后将驱动包（ojdbc6-11.2.0.1.0.jar）复制到your-ip的sqoop安装目录就可以了： 
+scp  ./ojdbc6-11.2.0.1.0.jar  root@your-ip:/usr/lib/sqoop/lib
+
+参考链接
+1.下载链接： 
+https://github.com/apache/sqoop 
+2.官方文档： 
+http://sqoop.apache.org/docs/1.4.6/SqoopUserGuide.html#_introduction 
+3.官网： 
+http://sqoop.apache.org/ 
+
+

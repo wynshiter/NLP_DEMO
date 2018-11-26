@@ -1,0 +1,49 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/70666991				
+
+
+
+作者：郭少雷
+搞android搞了几年也没搞出个啥牛逼app出来，眼看时下最火的app微信如此火热，实在想搞搞它，索性就想着给它加点东西进去。
+以下内容纯属本人个人爱好，仅限个人学习android用途以及对android的深入了解。
+首先我们得想一想加点什么东西在微信里面，这里简单做个体验，加一个推送sdk至微信最新(6.5.7)apk包中，并由服务端控制向其推送消息。以下步骤依次讲解加入流程
+
+
+1.申请推送平台
+这里以个推为例并下载Getui_SDK；新建一Android Studio工程，包名同微信包名保持一致(com.tencent.mm)，新建一PushActivity用于获取启动个推SDK的smali代码片段。依据个推sdk创建相应DemoIntentService和DemoPushService；
+
+
+2.获取资源文件
+生成工程apk后使用ApkTool反编译生成好的apk后得到以下smali代码及资源文件。反编译apk文件 
+命令：
+    apktool d <file.apk> <dir>
+ 得到所有资源及代码文件。 
+
+
+进入smali目录获取到PushActivity.smali中启动个推代码片段：
+
+
+3.反编译
+使用ApkTool反编译微信apk得到微信资源及smali代码：
+
+
+4.定位onCreate方法
+查看微信资源AndroidManifext.xml中启动Launcher的Activity为LauncherUI，打开LauncherUI.smali文件并找到onCreate方法：
+
+在该方法最后加入启动个推smali代码，并将PushActivity改为Launcher所在位置后保存：
+
+
+5.加入个推服务
+保存个推用到的资源文件到微信目录后修改微信AndroidManifest.xml加入个推服务：
+
+
+6.回编apk文件
+命令：
+apktool b <dir>
+使用apk回编命令对微信资源目录进行回编后得到新的微信apk；安装启动后即可由个推服务端对客户端进行Push消息推送。
+
+ 
+
+

@@ -1,0 +1,43 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50157271				
+
+
+《Effective large scale stereo matching》
+In this paper we propose a novel approach to binocular stereo for fast matching of high-resolution images. Our approach builds a prior on the disparities by forming a triangulation on a set of support points which can be robustly
+ matched, reducing the matching ambiguities of the remaining points. This allows for efficient exploitation of the disparity search space, yielding accurate dense reconstruction without the need for global optimization.
+
+
+       该文章发表在2010年的accv上面，看了一下公式和代码都异常复杂，主要思想就是通过待匹配图像上的特征点作为匹配的支撑点，在支撑点上做三角剖分，对视差在进行插值计算，但是效果一般，适用于实时性要求高的场合。
+
+       整个工程都用OpenCV和openmp 完成，代码异常复杂，但是整体上非常吻合工程师的代码风格，可以学习一下，但是改进难度比较大。
+
+效果：明显看出效果和普通的全局优化算法还是有一定的差距。
+
+
+
+
+
+
+
+文章下载链接：
+http://www.cvlibs.net/software/libelas/
+http://www.cvlibs.net/publications/Geiger2010ACCV.pdf
+
+
+
+
+
+代码下载链接：
+http://www.cvlibs.net/download.php?file=libelas.zip
+
+openmp版本：运行时间非常短大概0.1s左右完全满足实时性要求。
+
+http://www.cvlibs.net/download.php?file=libelas_omp.zip
+
+我调试好的工程：
+http://download.csdn.net/detail/wangyaninglm/9321831
+﻿﻿
+
+

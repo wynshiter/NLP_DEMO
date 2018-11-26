@@ -1,0 +1,27 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/7314001				
+
+
+                
+ 
+2012-3-2
+linux用户管理
+用户信息文件：/etc/passwd
+密码文件:/etc/shadow
+用户组文件:/etc/group
+用户组密码文件:/etc/gshadow
+用户配置文件: /etc/login.defs  etc/default/useradd
+新用户信息文件:/etc/ske 1
+登陆信息:/etc/motd
+
+linux用户分为三种:
+超级用户:(root,UID =0)
+普通用户:(UID:500-60000)
+伪用户:(UID 1-499)
+
+echo "123456" |md5sum ---产生123456的md5 加密密码
+man 5 shadow 查看/etc/shadow中shadow的帮助,
+ 
+

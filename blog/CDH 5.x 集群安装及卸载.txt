@@ -1,0 +1,106 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/53141857				
+
+
+
+上次写了CDH安装测试总结，由于那个博客篇幅略长， 但是主要集中在第二章，所以单独把CDH安装、卸载这块的内容拉出来在一篇记录一下。
+一．搭建远程yum源
+1.启动http服务：
+
+service httpd start
+
+2.挂载镜像文件rhel6.6.iso到/var/www/html下的任意文件夹
+
+mount -o loop /RHEL-6.6Server.iso /var/www/html/rhel66
+
+3.cd 到/etc/yum.repos.d 目录下，先把已有的repo做备份，并建立以”.repo”结尾的文件，这里我建立的是rhel66.repo，内容如下：
+
+[rhel66] 
+  name=rhel66 
+  baseurl=http://serverIP/rhel66 
+  enabled=1 
+  gpgcheck = 0 
+  #gpgkey = http://yourIP/rhel65/RPM-GPG-KEY-redhat-release
+
+4.配置完成后用命令：
+
+yum clean all 进行刷新 
+  yum makecache
+
+5.输入yum install httpd，打开浏览器，输入ip/rhel66 验证是否成功
+二．准备CDH安装包
+1.开启apache服务：
+
+service httpd start
+
+2.将已有的cloudera安装包和文件
+
+CDH-5.8.0-1.cdh5.8.0.p0.42-el6.parcel， 
+  CDH-5.8.0-1.cdh5.8.0.p0.42-el6.parcel.sha1， 
+  manifest.json移到/var/www/html目录下，权限均为777，用户为root。
+
+三. 安装cloudera
+
+将cloudera-manager-installer.bin文件修改成可执行权限，在/var/www/html里执行cloudera-manager-installer.bin文件，开始安装
+登录网址： ip:7180，用户，密码为admin
+填写主机名 
+
+集群存储库，使用parcel,选择更多选项，将其中https改为http，多余url删除，只保留第一个，{latest_support}删除  
+ 
+
+选择自定义存储库，将示例的网址复制粘贴，把https改为http 
+
+点击安装Oracle Java SE开发工具包(JDK)，点击继续按钮
+
+输入所有主机的root密码，确定后点击继续
+
+自定义选择安装的服务
+
+安装其他内容，不详细的请参考上一篇： 
+CDH安装测试总结
+四．卸载CDH
+CDH5.X，完全卸载步骤步骤如下：
+1.关闭集群中的所有服务。
+通过clouder manger 主页关闭集群。
+2.卸载
+
+[root@master ~]# /usr/share/cmf/uninstall-cloudera-manager.sh 
+[root@slave1 ~]# service cloudera-scm-agent stop 
+  [root@slave1 ~]# service cloudera-scm-agent stop
+
+以下都是所有要卸载的集群均要执行清除工作：
+
+[root@master ~]# umount /var/run/cloudera-scm-agent/process 
+  [root@slave1 ~]# umount /var/run/cloudera-scm-agent/process 
+  [root@slave2 ~]# umount /var/run/cloudera-scm-agent/process
+[root@master ~]# rm -rf /usr/share/cmf /var/lib/cloudera* /var/cache/yum/x86_64/6/cloudera* /var/log/cloudera* /var/run/cloudera*  /etc/cloudera* 
+
+3.卸载安装包：
+
+[root@slave1 ~]# rpm -qa | grep cloudera
+[root@slave2 ~]# for f in `rpm -qa | grep cloudera `  ; do rpm -e ${f} ; done     
+
+（如果有保存，在执行一遍）
+4.清除安装文件
+shell 脚本如下：这一行很长，请复制全 
+ 
+ rm -rf /var/lib/hadoop-* /var/lib/impala /var/lib/solr /var/lib/zookeeper /var/lib/hue /var/lib/oozie  /var/lib/pgsql  /var/lib/sqoop2  /data/dfs/  /data/impala/ /data/yarn/  /dfs/ /impala/ /yarn/  /var/run/hadoop-*/ /var/run/hdfs-*/ /usr/bin/hadoop* /usr/bin/zookeeper* /usr/bin/hbase* /usr/bin/hive* /usr/bin/hdfs /usr/bin/mapred /usr/bin/yarn /usr/bin/sqoop* /usr/bin/oozie /etc/hadoop* /etc/zookeeper* /etc/hive* /etc/hue /etc/impala /etc/sqoop* /etc/oozie /etc/hbase* /etc/hcatalog  
+
+//只删除hadoop系列的，不要删除其他软件的，否则其他软件的版本控制会被破坏
+
+[root@master alternatives]# rm -rf ` find /var/lib/alternatives/* ! -name “mta” ! -name “print” ! -name “zlibrary-ui”  -mtime -3` 
+[root@master alternatives]# rm -rf /etc/alternatives/* 
+
+5.杀死相关进程
+
+for u in hdfs mapred cloudera-scm hbase hue zookeeper oozie hive impala flume; do sudo kill $(ps -u $u -o pid=); done
+
+6.删除parcel包分发文件和解压文件
+
+rm -rf /opt/cloudera/parcel-cache /opt/cloudera/parcels
+
+到此卸载完毕。 
+
+

@@ -1,0 +1,132 @@
+content
+
+
+
+ 
+
+ 
+#include<windows.h>
+#include<stdio.h>
+#include<stdlib.h>
+
+#pragma comment(lib,"ws2_32.lib")
+
+#define PORT 6666
+#define IPADDR "127.0.0.1"
+#define BACKLOG 20
+
+int main(void)
+{
+
+	WSADATA wsadata;
+	WSAStartup(MAKEWORD(2,0),&wsadata);
+	SOCKET sock_trans=socket(AF_INET,SOCK_STREAM,0);
+
+	if (sock_trans<0)
+	{
+
+	perror("socket");
+	exit(1);
+
+	}
+
+	SOCKADDR_IN saddr;
+	saddr.sin_family=AF_INET;
+	saddr.sin_port=htons(PORT);
+	saddr.sin_addr.S_un.S_addr=inet_addr(IPADDR);
+
+	int sadlen=sizeof(saddr);
+
+	FILE* fp=NULL;
+	fp=fopen("e://test.txt","w+");
+	if(fp==NULL)
+	{
+
+	perror("open file:");
+	exit(4);
+	}
+
+	if (bind(sock_trans,(SOCKADDR*)(&saddr),sadlen)==SOCKET_ERROR)
+	{
+
+	perror("bind:");
+	exit(2);
+
+	}
+	else printf ("bind port ok!\n");
+
+	//int vlisten=50;
+
+	if (listen(sock_trans,20)==SOCKET_ERROR)
+
+	{
+	perror("listen");
+	exit(3);
+	}
+
+	else
+	printf ("now listenning.....\n");
+
+	//printf ("%d",listen(sock_trans,20));
+
+	int saddrlen=sizeof(saddr);
+
+	SOCKET newsock=accept(sock_trans,(SOCKADDR*)&saddr,&saddrlen);
+
+	printf ("catch file now....");
+	char buf[1024]={0};
+	ZeroMemory(buf,1024);
+
+	int relen=0;
+
+	//测试程序的酱油语句，无视之。
+
+	//recv(newsock,buf,50,0);
+
+	// printf ("%s",buf);
+
+	// printf ("\nif put this line ,the program is error!");
+
+	Sleep(3000);
+
+	while(1)
+
+	{
+
+	relen=recv(newsock,buf,1024,0);
+
+	fwrite(buf,1,relen,fp);
+	printf("接受了一次！\n");
+
+
+	fflush(fp);
+
+	//ZeroMemory(buf,50);
+
+	if (relen==0)
+
+	{
+
+	break;
+
+	}
+	printf("接受了%d次！\n",relen);
+
+	}
+
+	fclose(fp);
+
+	closesocket(newsock);
+	closesocket(sock_trans);
+	WSACleanup();
+
+	system("pause")
+
+	return 0;
+
+}
+
+
+
+
+

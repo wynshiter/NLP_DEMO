@@ -1,0 +1,329 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/41153905				
+
+
+ 
+ 
+ 代码有参考跟整合：没有一一列出出处
+ 
+// split_rgb.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <vector>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <cv.h>
+#include <highgui.h>
+
+using namespace std;
+using namespace cv;
+
+#pragma comment(lib,"opencv_highgui244d.lib")
+#pragma comment(lib,"opencv_core244d.lib")
+#pragma comment(lib,"opencv_imgproc244d.lib")
+
+void split_image(const char* image_name)
+{
+	Mat image_src = imread(image_name);
+	Mat image_dst;
+	vector<Mat> bgr;
+
+	//颜色通道分离
+	//输入图像
+	//分离后各通道
+	split(image_src,bgr);
+
+	//颜色通道合成
+	//输入各通道
+	//输入图像
+	merge(bgr,image_dst);
+	
+
+	//用彩色图像形象的表示一下,除了原通道保留，其余两通道置0
+	Mat tmp(image_src.size(),CV_8U,Scalar(0));
+	vector<Mat> b,g,r;   //用来表示的彩色图像
+
+	for(int i=0;i<3;i++)
+	{
+		if(i==0)
+			b.push_back(bgr[0]);
+		else
+			b.push_back(tmp);
+
+		if(i==1)
+			g.push_back(bgr[1]);
+		else
+			g.push_back(tmp);
+
+		if(i==2)
+			r.push_back(bgr[2]);
+		else
+			r.push_back(tmp);
+	}
+	Mat image_b,image_g,image_r;
+	
+	merge(b,image_b);
+	merge(g,image_g);
+	merge(r,image_r);
+
+	namedWindow( "b", CV_WINDOW_AUTOSIZE );
+	namedWindow( "g", CV_WINDOW_AUTOSIZE );
+	namedWindow( "r", CV_WINDOW_AUTOSIZE );
+	namedWindow( "dst", CV_WINDOW_AUTOSIZE );
+	imshow("b",image_b);
+	
+	imshow("g",image_g);
+	
+	imshow("r",image_r);
+	
+	imshow("dst",image_dst);
+	moveWindow("dst", 1,1);
+	moveWindow("b",800,1);
+	moveWindow("g",1,500);
+	moveWindow("r",900,500);
+
+	//waitKey(1);
+	//waitKey(0);
+	
+
+}
+
+void split_image_gray(const char* image_name)
+{
+	Mat image_src = imread(image_name);
+	Mat image_dst;
+	vector<Mat> bgr;
+
+	//颜色通道分离
+	//输入图像
+	//分离后各通道
+	split(image_src,bgr);
+
+	//颜色通道合成
+	//输入各通道
+	//输入图像
+
+	imshow("B_channel",bgr[0]);
+	imshow("G_channel",bgr[1]);
+	imshow("R_channel",bgr[2]);
+	//waitKey(1);
+
+}
+
+//计算和绘制直方图（R,G,B）
+/* img 通道图像
+ * hist_img: 直方图的绘图图像
+ * pstrWndName: 绘图窗口
+ */
+void draw_histogram(IplImage* img,IplImage* hist_img,const char* pstrWndName)
+{
+
+	CvHistogram* hist = NULL;
+
+	int bin_count = 256;
+	float range[] = {0,255};
+	float* ranges[]={range};
+
+	hist = cvCreateHist(1,         //一维
+		&bin_count, //每一维上bin（直方柱）的个数， 此处为 256 【由上述两个参数，函数/就会创建一个1*256的矩阵】
+		CV_HIST_ARRAY,
+		ranges,
+		1);
+	cvClearHist(hist);   //防止初始化时有其它数据，先清理一下	
+
+	cvCalcHist(&img,hist,0,0);
+
+	//得到直方图的最值及标号
+	float min,max;
+	int min_idx,max_idx;
+	cvGetMinMaxHistValue(hist,&min,&max,&min_idx,&max_idx);
+
+	//cout<<"min: "<<min<<"  max:"<<max<<endl; 
+	if(max == 0) {cout<<"max =0 err!"<<endl;max = 100;}
+
+	//缩放直方图的大小，和图像相适应
+	cvScale(hist->bins,hist->bins,((double)hist_img->height)/max,0);
+
+	//设置所有的直方图的数值为255
+	cvSet(hist_img,cvScalarAll(255),0);
+
+	// 平均每个直放柱的宽度
+	int bin_w=cvRound((double)hist_img->width/bin_count);
+
+	//画直方图
+	for(int i=0;i<bin_count;i++)
+	{
+	   cvRectangle(hist_img,
+		cvPoint(i*bin_w,hist_img->height),  //左下角的点（i*bin_w，height）
+		cvPoint((i+1)*bin_w, hist_img->height-cvRound(cvGetReal1D(hist->bins,i))),//右上角的点((i+1)*bin_w,图像高度-直方柱的高度)
+		 cvScalarAll(0),
+		-1,
+		8,
+		0);
+	}
+
+	//显示直方图
+	cvShowImage(pstrWndName,hist_img);
+	cvWaitKey(1);
+}
+
+void historgram_channel(const char* image_name)
+{
+	IplImage* image_src = cvLoadImage(image_name,1);
+
+	//创建窗口
+	const char* pstrBHistWnd = "b plane";
+	const char* pstrGHistWnd = "g plane";
+	const char* pstrRHistWnd = "r plane";
+	cvNamedWindow(pstrBHistWnd,1);
+	cvNamedWindow(pstrGHistWnd,1);
+	cvNamedWindow(pstrRHistWnd,1);
+
+	//B G R 通道
+	CvSize img_size;img_size.width = image_src->width;img_size.height = image_src->height;
+	IplImage* b = cvCreateImage(img_size,8,1);
+	IplImage* g = cvCreateImage(img_size,8,1);
+	IplImage* r = cvCreateImage(img_size,8,1);
+	//分割BGR通道
+	cvSplit(image_src,b,g,r,0);
+
+	CvSize size;size.width = image_src->width;size.height = image_src->height;
+	IplImage* b_hist_img = cvCreateImage(size,8,1);
+	IplImage* g_hist_img = cvCreateImage(size,8,1);
+	IplImage* r_hist_img = cvCreateImage(size,8,1);
+
+	//绘制直方图
+	draw_histogram(b,b_hist_img,pstrBHistWnd); 
+	draw_histogram(g,g_hist_img,pstrGHistWnd); 
+	draw_histogram(r,r_hist_img,pstrRHistWnd); 
+	
+
+
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	char* image_name = "swan.jpg";
+	split_image(image_name);
+	split_image_gray(image_name);
+	historgram_channel(image_name);
+
+	waitKey(0);
+
+	
+
+	getchar();
+	return 0;
+}
+
+
+
+ 
+ 
+ 
+实现效果：
+ 
+ 
+ 
+ 
+彩色直方图：
+#include <cv.h>
+#include <highgui.h>
+#include <iostream>
+using namespace std;
+ 
+ 
+ 
+int main( int argc, char** argv )
+{
+	IplImage * src= cvLoadImage("F:\\test3.jpg");
+ 
+	IplImage* hsv = cvCreateImage( cvGetSize(src), 8, 3 );
+	IplImage* h_plane = cvCreateImage( cvGetSize(src), 8, 1 );
+	IplImage* s_plane = cvCreateImage( cvGetSize(src), 8, 1 );
+	IplImage* v_plane = cvCreateImage( cvGetSize(src), 8, 1 );
+	IplImage* planes[] = { h_plane, s_plane };
+ 
+	/** H 分量划分为16个等级，S分量划分为8个等级 */
+	int h_bins = 16, s_bins = 8;
+	int hist_size[] = {h_bins, s_bins};
+ 
+	/** H 分量的变化范围 */
+	float h_ranges[] = { 0, 180 }; 
+ 
+	/** S 分量的变化范围*/
+	float s_ranges[] = { 0, 255 };
+	float* ranges[] = { h_ranges, s_ranges };
+ 
+	/** 输入图像转换到HSV颜色空间 */
+	cvCvtColor( src, hsv, CV_BGR2HSV );
+	cvCvtPixToPlane( hsv, h_plane, s_plane, v_plane, 0 );
+ 
+	/** 创建直方图，二维, 每个维度上均分 */
+	CvHistogram * hist = cvCreateHist( 2, hist_size, CV_HIST_ARRAY, ranges, 1 );
+	/** 根据H,S两个平面数据统计直方图 */
+	cvCalcHist( planes, hist, 0, 0 );
+ 
+	/** 获取直方图统计的最大值，用于动态显示直方图 */
+	float max_value;
+	cvGetMinMaxHistValue( hist, 0, &max_value, 0, 0 );
+ 
+ 
+	/** 设置直方图显示图像 */
+	int height = 240;
+	int width = (h_bins*s_bins*6);
+	IplImage* hist_img = cvCreateImage( cvSize(width,height), 8, 3 );
+	cvZero( hist_img );
+ 
+	/** 用来进行HSV到RGB颜色转换的临时单位图像 */
+	IplImage * hsv_color = cvCreateImage(cvSize(1,1),8,3);
+	IplImage * rgb_color = cvCreateImage(cvSize(1,1),8,3);
+	int bin_w = width / (h_bins * s_bins);
+	for(int h = 0; h < h_bins; h++)
+	{
+		for(int s = 0; s < s_bins; s++)
+		{
+			int i = h*s_bins + s;
+			/** 获得直方图中的统计次数，计算显示在图像中的高度 */
+			float bin_val = cvQueryHistValue_2D( hist, h, s );
+			int intensity = cvRound(bin_val*height/max_value);
+ 
+			/** 获得当前直方图代表的颜色，转换成RGB用于绘制 */
+			cvSet2D(hsv_color,0,0,cvScalar(h*180.f / h_bins,s*255.f/s_bins,255,0));
+			cvCvtColor(hsv_color,rgb_color,CV_HSV2BGR);
+			CvScalar color = cvGet2D(rgb_color,0,0);
+ 
+			cvRectangle( hist_img, cvPoint(i*bin_w,height),
+				cvPoint((i+1)*bin_w,height - intensity),
+				color, -1, 8, 0 );
+		}
+	}
+ 
+	cvNamedWindow( "Source", 1 );
+	cvShowImage( "Source", src );
+ 
+	cvNamedWindow( "H-S Histogram", 1 );
+	cvShowImage( "H-S Histogram", hist_img );
+ 
+	cvWaitKey(0);
+}
+
+
+ 
+输入图像：
+ 
+
+ 
+输出直方图：
+ 
+ 
+
+
+

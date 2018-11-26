@@ -1,0 +1,323 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/40867319				
+
+
+ 
+ 
+写日志：
+class LogFile
+{
+public:
+  static LogFile &instance();
+  operator FILE *() const { return m_file; }
+private
+  LogFile(const char *filename)
+  {
+     m_file = fopen(filename, "a+");
+  }
+  ~LogFile()
+  {
+     fclose(m_file);
+  }
+  FILE *m_file;
+};
+
+LogFile &LogFile::instance()
+{
+   static LogFile log("AppLog.txt");
+   return log;
+}
+
+用的时候可以这么写：
+fwrite("abc", 1, 3, LogFile::instance());
+
+ 
+ 
+ 
+读取文件信息：
+ c语言实现如下功能 输入全部文件名（绝对路径加文件名）得到，文件名，扩展名，文件长度
+/* MAKEPATH.C */
+#include<string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#define LENGTH 200
+
+
+struct FILEHEAD
+{
+	char path_buffer[LENGTH];
+	char filename[LENGTH];
+	char ext[LENGTH];
+	unsigned int length;
+	
+};
+
+FILEHEAD file; 
+
+void getFileInformation(FILEHEAD file)
+{
+	memset(&file,0,sizeof(file)); 
+	
+	//_makepath( path_buffer, "c", "\\sample\\crt\\", "makepath", "c" );
+	printf( "Path created with : \n\n");
+	scanf("%s",file.path_buffer);
+	_splitpath( file.path_buffer, NULL, NULL, file.filename, file.ext );
+	
+	FILE *fp= NULL;
+	fp=fopen(file.path_buffer,"r");
+	if (NULL==fp)
+	{
+		printf("cannot open the %s \n",file.path_buffer);
+		exit(0);
+	}
+	
+	fseek(fp,0l,SEEK_END);
+	file.length=ftell(fp);
+	
+	fclose(fp);
+	fp = NULL; //需要指向空，否则会指向原打开文件地址
+	
+	
+	
+	printf( "Path extracted with _splitpath:\n" );
+	//printf( "  Drive: %s\n", drive );
+	//printf( "  Dir: %s\n", dir );
+	printf( "  Filename: %s\n", file.filename );
+	printf( "  Ext: %s\n", file.ext );
+	printf( "  length is btye: %ld btye\n", file.length );
+}
+
+int main( void )
+{
+	
+	getFileInformation(file);
+
+	system("pause");
+
+	return 0;
+}
+
+
+算法排序框架：
+ 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define TRUE 1
+#define FALSE 0
+#define MAX 10000
+
+typedef int KeyType;
+typedef int OtherType;
+
+typedef struct
+{
+	KeyType key;
+	OtherType other_data;
+}RecordType;
+
+
+// All kinds of seek.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include "headfile.h"
+#include "windows.h"
+#include  "conio.h "
+
+#include"WinBase.h"
+#include "Psapi.h"
+
+#pragma  once
+#pragma  message("Psapi.h --> Linking with Psapi.lib")
+#pragma  comment(lib,"Psapi.lib")
+
+
+int Data[MAX]={0};
+
+void produceData(int a[],int length)       //给数组生成数据，用于随即查找
+{
+	time_t t;
+	srand(time(&t));
+	for (int i=0;i<length;i++)
+	{
+		a[i]=rand()%length;
+	}
+
+
+}
+
+void printData(int a[],int length)		//打印数字，到控制台，每五个换一行
+{
+	for (int i=0;i<length;i++)
+	{
+		printf("%8d",a[i]);
+		if (0==i%5)
+		{
+			printf("\n");
+		}
+	}
+
+}
+
+double showMemoryInfo()   
+{   
+
+	double MemorySize;					//单位MB
+	HANDLE handle=GetCurrentProcess();   
+
+	PROCESS_MEMORY_COUNTERS pmc;   
+	GetProcessMemoryInfo(handle,&pmc,sizeof(pmc)); 
+	MemorySize=pmc.WorkingSetSize/1024;
+
+	printf("内存使用:  %8lf \n",MemorySize);	//WorkingSetSize The current working set size, in bytes.
+
+	return MemorySize;
+
+} 
+
+void writeRecordtime(unsigned rTime)//将程序结果运行时间写入文件
+{
+	FILE *fpRecord=NULL; 
+
+	char *s="your programm running time is:   ";
+	char *c="ms   ";
+
+	if((fpRecord=fopen("record.txt","wt+"))==NULL) 
+
+	{ 
+
+		printf("Cannot open file strike any key exit!"); 
+
+		getchar(); 
+
+		exit(1); 
+
+	} 
+
+	fprintf( fpRecord, "%s", s);
+	fprintf( fpRecord, "%d", rTime);
+	fprintf( fpRecord, "%s", c);
+
+	fprintf( fpRecord, "\n");
+	fprintf( fpRecord, "your programm use %fMB size of memory!!!", showMemoryInfo());
+
+
+
+	fclose(fpRecord); 
+
+
+}
+
+
+
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	produceData(Data,MAX);
+	printData(Data,MAX);
+
+	getchar();
+
+	return 0;
+}
+
+ 
+ 
+快速求积分办法：
+// Integral-romberg方法求积分.cpp : 定义控制台应用程序的入口点。
+//
+/*
+romberg方法求积分
+方法也称为逐次分半加速法。它是在梯形公式，simpson公式和newton-cotes公式之间的关系的基础上，
+构造出一种加速计算积分的方法。作为一种外推算法，它在不增加计算量的前提下提高了误差的精度。
+在等距基点的情况下，用计算机计算积分值通常都采用吧区间逐次分半的方法进行。
+这样，前一次分割得到的函数值在分半以后仍然可以被利用，并且易于编程。
+
+运行结果如下：
+输入：
+0 
+3．14159 
+输出：Romberg- -12．0703
+增加迭代次数或提高精度时，程序运行
+得到的结果几乎没有什么变化。可以看到，
+和Simpson方法运行的结果基本一致，但
+Romberg法速度更快、精度更高
+
+
+*/
+
+#include "stdafx.h"
+
+
+
+#include<iostream>
+#include<math.h>
+#define epsilon 0.00001
+#define COUNT 100
+using namespace std;
+
+double fun(double x)
+{
+	return x*x;
+}
+
+double Romberg(double a,double b)
+{
+	int m ,n;
+	double h,x,s,q,ep;
+	double p,*R =new double[COUNT];
+		
+			h=b-a;
+			R[0]= h*(fun(a)+ fun(b))/2.0;
+			m=1;
+			n=1;
+			ep=epsilon+1.0;
+			while ((ep >= epsilon)&& (m <COUNT))
+			{
+				p = 0.0;
+			{
+				for(int i=0;i<n;i++)
+				{
+					x = a+ (i+0.5)*h ;
+					p= p + fun(x);
+				}
+					p= (R[0]+ h*p)/2.0;
+					s = 1.0;
+					for(int k=1;k<=m;k++)
+					{
+						s = 4.0*s;
+						q= (s*p-R[k-1])/(s-1.0);
+							R[k-1]= p;
+							p =q;
+					}
+					p=fabs(q -R[m-1]);
+					m =m + 1;
+					R[m-1]= q;
+					n = n + n;
+					h = h/2.0;
+				}
+				return (q);
+			}
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	double a,b;
+	cout<<"Input a，b：a为下限，b为上限"<<endl;
+	cin>>a>>b;
+	cout<<"Romberg="<<Romberg(a,b)<<endl;
+	system("pause");
+	return 0;
+}
+
+
+ 
+ 
+
+

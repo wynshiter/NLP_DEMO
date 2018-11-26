@@ -1,0 +1,121 @@
+content
+
+
+
+// MultiThead.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include<windows.h>
+#include<iostream>
+using namespace std;
+
+DWORD WINAPI Fun1Proc(
+					  LPVOID lpParameter	//thread data
+
+					  );
+
+DWORD WINAPI Fun2Proc(
+					  LPVOID lpParameter	//thread data
+
+					  );
+int index=0;
+int tickets=100;
+HANDLE hMutex;
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HANDLE hThread1;
+	HANDLE hThread2;
+	hThread1=CreateThread(NULL,0,Fun1Proc,NULL,0,NULL);
+	hThread2=CreateThread(NULL,0,Fun2Proc,NULL,0,NULL);
+	CloseHandle(hThread1);
+	CloseHandle(hThread2);
+
+	//while(index++<=100)
+	//cout<<"main thread is running\n"<<endl;
+	//Sleep(100);
+	//getchar();
+	//hMutex=CreateMutex(NULL,FALSE,NULL);
+
+	hMutex=CreateMutex(NULL,TRUE,"tickets");
+	if(hMutex)//单例模式
+	{
+		if(ERROR_ALREADY_EXISTS==GetLastError())//看这个互斥对象是否已经创建出来了
+		{
+			cout<<"only instance can run!!!"<<endl;
+			return 0;
+		}
+	}
+
+	WaitForSingleObject(hMutex,INFINITE);
+	ReleaseMutex(hMutex);
+	ReleaseMutex(hMutex);
+    Sleep(4000);//主线程放弃了执行时间
+
+
+
+	system("pause");
+	return 0;
+}
+
+DWORD WINAPI Fun1Proc(
+	LPVOID lpParameter	//thread data
+
+					  )
+{
+	/*
+	while(index++<=100)
+	cout<<"thread1 is running"<<endl;
+	return 0;
+	
+	while(true)
+	{
+		WaitForSingleObject(hMutex,INFINITE);//有信号状态，
+		if(tickets>0)
+		{
+			cout<<"thread1 sell ticket :"<<tickets--<<endl;
+
+		}
+		else 
+			break;
+		ReleaseMutex(hMutex);//好像是可以自动释放的
+	}
+	*/
+
+	WaitForSingleObject(hMutex,INFINITE);
+	cout<<"thread1 is running"<<endl;
+	return 0;
+}
+DWORD WINAPI Fun2Proc(
+	LPVOID lpParameter	//thread data
+
+					  )
+{
+	/*
+	while(index++<=100)
+	cout<<"thread2 is running"<<endl;
+	return 0;
+	
+	while(true)
+	{
+		WaitForSingleObject(hMutex,INFINITE);
+		if(tickets>0)
+		{
+			cout<<"thread2 sell ticket :"<<tickets--<<endl;
+
+		}
+		else 
+			break;
+		ReleaseMutex(hMutex);
+	}
+	*/
+	WaitForSingleObject(hMutex,INFINITE);
+	cout<<"thread2 is running"<<endl;
+	return 0;
+}
+
+
+但是不知道，为啥，结果和孙鑫视频里的结果不一样。
+            
+

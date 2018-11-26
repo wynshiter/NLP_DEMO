@@ -1,0 +1,446 @@
+content
+
+
+
+经常需要使用excel，或者把有的数据用excel打开，程序可以生成cvs格式的文件，这样就可以excel打开并处理了，于是找了一个处理cvs的c++类跟大家分享
+代码出处找不到了：
+
+ 
+代码如下：
+ 
+StringParser.h
+#pragma once
+#include <process.h>
+#include <Windows.h>
+#include <map>
+#include <vector>
+#include <queue>
+#include <set>
+#include <string>
+#include <list>
+
+typedef char                    i8;
+typedef unsigned char           u8;
+typedef short                  i16;
+typedef unsigned short          u16;
+typedef long int                i32;
+typedef unsigned long           u32;
+
+
+
+namespace StringParser{
+
+
+
+
+
+
+
+//从分隔符中获得数据
+inline int GetParamFromString(std::string Str, std::vector<i32>& IntVec, char Delim = ',')
+{
+    char* p = strtok((char*)Str.c_str(), &Delim); 
+    while (p)
+    {
+        IntVec.push_back(atoi(p));
+        p = strtok(NULL, &Delim); 
+    }
+    return IntVec.size();
+}
+
+inline int GetParamFromString(std::string Str, std::vector<float>& FloatVec, char Delim = ',')
+{
+    char* p = strtok((char*)Str.c_str(), &Delim); 
+    while (p)
+    {
+        FloatVec.push_back(atof(p));
+        p = strtok(NULL, &Delim); 
+    }
+    return FloatVec.size();
+}
+
+inline int GetParamFromString(std::string Str, std::vector<u32>& uiIntVec, char Delim = ',')
+{
+    char* p = strtok((char*)Str.c_str(), &Delim); 
+    while (p)
+    {
+        uiIntVec.push_back(strtoul(p, NULL, 10));
+        p = strtok(NULL, &Delim); 
+    }
+    return uiIntVec.size();
+}
+
+inline int GetParamFromString(std::string Str, std::vector<std::string>& StringVec, char Delim = ',')
+{
+    char* p = strtok((char*)Str.c_str(), &Delim); 
+    while (p)
+    {
+        std::string buffer = p;
+        StringVec.push_back(buffer);
+        p = strtok(NULL, &Delim); 
+    }
+    return StringVec.size();
+}
+
+//以左右符号得到括号中的数据ex:[3.1415;0.125][1000;9999]
+template<typename T>
+int GetParamFromArea(std::string Str, std::vector<std::vector<T> >& IntVec, char left = '[', char right = ']', char Delim = ';')
+{
+    char* pTarget = (char*)Str.c_str();
+    for (;;)
+    {
+        char* pLeft = strchr(pTarget, left);
+        char* pRight = strchr(pTarget, right);
+        if (pLeft && pRight)
+        {
+            std::string strbuff;
+            strbuff.insert(0, ++pLeft, pRight-pLeft);
+
+            std::vector<T> Intbuff;
+            if (GetParamFromString(strbuff, Intbuff, Delim))
+            {
+                IntVec.push_back(Intbuff);
+            }
+            pTarget = ++pRight;
+        }
+        else
+        {
+            break;
+        }
+    }
+    return IntVec.size();
+}
+
+
+
+
+
+
+
+
+
+};
+
+CCSVOperator.h
+ 
+#pragma once
+#include "StringParser.h"
+
+
+
+class CCSVOperator
+{
+
+public:
+    CCSVOperator(){};
+    ~CCSVOperator(){};
+    CCSVOperator(const char* path);
+
+
+    bool LoadCSV(const char* path);
+    bool SaveCSV(const char* path = NULL);
+
+    bool GetInt(u32 uiLine, u32 uiRow, int& iValue);
+    bool GetFloat(u32 uiLine, u32 uiRow, float& fValue);
+    std::string* GetString(u32 uiLine, u32 uiRow);
+    bool SetNumber(u32 uiLine, u32 uiRow, int iValue);
+    bool SetNumber(u32 uiLine, u32 uiRow, float fValue);
+    bool SetString(u32 uiLine, u32 uiRow, const char* pStr);
+    std::map<u32, std::map<u32, std::string> >& GetCSVMap(){return m_StringKeyMap;}
+
+protected:
+    std::string m_CSVName;
+    std::map<u32, std::map<u32, std::string> > m_StringKeyMap;
+public:
+	int indexOfLines;	//行数
+	int indexOfColumn;	//列数,有可能出现列长不一样的情况
+
+};
+
+
+
+ 
+ 
+ 
+CSVOperator.cpp
+#include "CSVOperator.h"
+
+
+//////////////////////////////////////////////////////////////////////////
+//CSV operator
+
+CCSVOperator::CCSVOperator(const char* path)
+{
+    LoadCSV(path);
+}
+
+bool CCSVOperator::LoadCSV(const char* path)
+{
+	 indexOfLines = 0;	
+	 indexOfColumn = 0;
+    FILE* pfile = fopen(path, "r");
+    if (pfile)
+    {
+        fseek(pfile,0,SEEK_END);
+        u32 dwsize = ftell(pfile);
+        rewind(pfile);// 指针回到文件开头
+
+        char* filebuffer = new char[dwsize];
+        fread(filebuffer, 1, dwsize, pfile);
+
+        std::map<u32, std::string> StringMap;
+        char* pBegin = filebuffer;
+        char* pEnd = strchr(filebuffer, '\n');//查找换行首次出现的位置
+        u32 uiIndex = 1;
+        while (pEnd != NULL)
+        {
+            std::string strbuff;
+            strbuff.insert(0, pBegin, pEnd-pBegin);
+            if (!strbuff.empty())
+            {
+                StringMap[uiIndex] = strbuff;
+            }
+            pBegin = pEnd + 1;
+            pEnd = strchr(pEnd + 1, '\n');
+            ++uiIndex;
+        }
+
+		indexOfLines = uiIndex - 1;
+
+        delete[] filebuffer;
+
+        std::map<u32, std::string>::iterator iter = StringMap.begin();
+        for (; iter != StringMap.end(); ++iter)
+        {
+            std::vector<std::string> StringVec;
+            std::map<u32, std::string> l_StringMap;
+            StringParser::GetParamFromString(iter->second, StringVec);
+
+			if (indexOfColumn< StringVec.size())
+			{
+				indexOfColumn = StringVec.size();//保存最大的列数
+			}
+			
+            for (int i = 0; i < StringVec.size(); ++i)
+            {
+                l_StringMap[i+1] = StringVec.at(i);
+            }
+			
+            m_StringKeyMap[iter->first] = l_StringMap;
+        }
+        fclose(pfile);
+        m_CSVName = path;
+        return true;
+    }
+
+    return false;
+}
+
+
+bool CCSVOperator::GetInt(u32 uiLine, u32 uiRow, int& iValue)
+{
+    std::string* pKey = GetString(uiLine, uiRow);
+    if (pKey)
+    {
+        iValue = atoi(pKey->c_str());
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CCSVOperator::GetFloat(u32 uiLine, u32 uiRow, float& fValue)
+{
+    std::string* pKey = GetString(uiLine, uiRow);
+    if (pKey)
+    {
+        fValue = atof(pKey->c_str());
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+std::string* CCSVOperator::GetString(u32 uiLine, u32 uiRow)
+{
+    std::map<u32, std::map<u32, std::string> >::iterator iterLine = m_StringKeyMap.find(uiLine);
+    if (iterLine != m_StringKeyMap.end())
+    {
+        std::map<u32, std::string>& rStringMap = iterLine->second;
+        std::map<u32, std::string>::iterator iterRow = rStringMap.find(uiRow);
+        if (iterRow != rStringMap.end())
+        {
+            return &iterRow->second;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
+bool CCSVOperator::SetNumber(u32 uiLine, u32 uiRow, int iValue)
+{
+    std::string* pKey = GetString(uiLine, uiRow);
+    if (pKey)
+    {
+        char buffer[100];
+        memset(buffer, 0, sizeof(buffer));
+        sprintf(buffer, "%d", iValue);
+        pKey->clear();
+        *pKey = buffer;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CCSVOperator::SetNumber(u32 uiLine, u32 uiRow, float fValue)
+{
+    std::string* pKey = GetString(uiLine, uiRow);
+    if (pKey)
+    {
+        char buffer[100];
+        memset(buffer, 0, sizeof(buffer));
+        sprintf(buffer, "%d", fValue);
+        pKey->clear();
+        *pKey = buffer;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CCSVOperator::SetString(u32 uiLine, u32 uiRow, const char* pStr)
+{
+    std::string* pKey = GetString(uiLine, uiRow);
+    if (pKey)
+    {
+        pKey->clear();
+        *pKey = pStr;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool CCSVOperator::SaveCSV(const char* path)
+{
+    if (path != NULL)
+    {
+        m_CSVName = path;
+    }
+
+    FILE* pfile = fopen(m_CSVName.c_str(), "w");
+    if (pfile)
+    {
+        std::map<u32, std::map<u32, std::string> >::iterator iter = m_StringKeyMap.begin();
+        for (; iter != m_StringKeyMap.end(); ++iter)
+        {
+            std::map<u32, std::string>& rStringMap = iter->second;
+            std::map<u32, std::string>::iterator it = rStringMap.begin();
+            for (; it != rStringMap.end(); ++it)
+            {
+                std::string key = it->second;
+                key += ',';
+                fwrite(key.c_str(), 1, key.size(), pfile);
+            }
+            char Delim = '\n';
+            fwrite(&Delim, 1, 1, pfile);
+        }
+        fclose(pfile);
+    }
+    else
+    {
+        return false;
+    }
+
+    return true;
+}
+
+ 
+CVS_OP.CPP
+ 
+// CSV_OP.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include "CSVOperator.h"
+#include <iostream>
+using namespace std;
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+    CCSVOperator CSVOperator;
+    CSVOperator.LoadCSV("画图数据.csv");
+
+	cout<<"line:  "<<CSVOperator.indexOfLines<<endl;
+	cout<<"column:  "<<CSVOperator.indexOfColumn<<endl;
+
+    std::string* pString = CSVOperator.GetString(1,600);
+    if (pString)
+    {
+        std::cout<< pString->c_str() << '\n';
+    }
+
+    pString = CSVOperator.GetString(2,4);
+    if (pString)
+    {
+        std::cout<< pString->c_str() << '\n';
+    }
+
+	//std::string* pString = NULL;
+	int j = 0;
+	for (int i = 0,nColConut = CSVOperator.indexOfColumn;i < nColConut ; ++i)
+	{
+		if(pString = CSVOperator.GetString(1,i+1))
+		{
+			//m_listctrl.InsertColumn(j ,pString->c_str(), LVCFMT_CENTER, 50);  // 添加第1列，
+			//cout<<"\t"<<&pString;
+			cout<<"\t";
+			printf(pString->c_str());
+			++j;
+		}
+	}
+
+    
+//     int _int = 0;
+//     if (CSVOperator.GetInt(3,1,_int))
+//     {
+//         std::cout<< _int <<'\n';
+//     }
+// 
+     float _float = 0.0f;
+     if (CSVOperator.GetFloat(4,1, _float))
+    {
+        std::cout<< _float<<'\n';
+     }
+
+
+    system("pause");
+	return 0;
+}
+
+
+
+效果如下：
+ 
+
+ 
+
+

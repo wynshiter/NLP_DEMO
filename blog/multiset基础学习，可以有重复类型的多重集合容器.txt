@@ -1,0 +1,130 @@
+content
+
+
+
+#include <set>
+#include <iostream>
+using namespace std;
+
+struct Student
+{
+	char *name;
+	int year;
+	char *addr;
+};
+
+
+
+void find_test()
+{
+	multiset<int> ms;
+	ms.insert(10);
+	ms.insert(11);
+	ms.insert(12);
+	ms.insert(13);
+	ms.insert(14);
+	ms.insert(15);
+	ms.insert(16);
+	ms.insert(17);
+	ms.insert(18);
+	ms.insert(13);
+	ms.insert(19);
+
+	//find the element 13
+
+	int v = 19;
+	multiset<int>::iterator i_v = ms.find(v);
+
+	cout<<*i_v<<endl;
+	
+	//equal_range search the element 13
+	v = 13;
+	pair<multiset<int>::iterator , multiset<int>::iterator> p = ms.equal_range(v);
+
+	cout<<"大于等于"<<v<<"的第一个元素为（x>=k）为 "<<*p.first<<endl;
+	cout<<"大于"<<v<<"的第一个元素（x>k）为 "<<*p.second<<endl;
+
+
+	//打印重复键值元素13
+
+	multiset<int>::iterator i;
+	cout<<"键值为 "<< v <<"的所有元素为 ";
+	for (i = p.first; i!=p.second; i++)
+	{
+		cout<<*i<<' ';
+	}
+
+	cout<<endl;
+	cout<<endl;
+
+
+
+}
+
+
+//比较函数
+
+struct StudentLess
+{
+	bool operator()(const Student &s1, const Student &s2)const
+	{
+		return (s1.year) < (s2.year) ;
+	}
+};
+
+
+void other_multiset()
+{
+	Student stuArray[] = 
+	{
+		{" 李强", 21, "北京"},
+		{" 月月", 23, "西安"},
+		{" 大力", 21, "美国"},
+		{" 小二", 22, "南非"},
+		{" 小明", 23, "日本"},
+	};
+
+	//create a object of multiset
+	multiset<Student, StudentLess>ms(stuArray, stuArray+5, StudentLess());
+
+	//count
+	cout<<"学生人数： "<<ms.size()<<endl<<endl;
+	cout<<"年龄为21岁的学生人数"<<ms.count(stuArray[0])<<endl<<endl;
+
+	//print all
+	//multiset<Student>::iterator i, iend;//报错！！！
+	//<c++ STL开发技术导引>上的代码是这么写的，vs2010报错，和下面的迭代器类型不同
+	multiset<Student, StudentLess>::iterator i, iend;
+	iend=ms.end();
+
+	cout<<"姓名    " <<"年龄    "<<"地址    \n";
+	for (i=ms.begin(); i!=iend; i++)
+	{
+		cout<<(*i).name<<"    "<<(*i).year<<"    "<<(*i).addr<<"    "<<endl;
+	}
+
+	cout<<endl;
+}
+
+
+int main()
+{
+	find_test();
+	other_multiset();
+
+	getchar();
+
+	return 0;
+}
+ 
+ 
+结果：
+
+ 
+ 
+下面链接是当时出现的问题：
+http://bbs.csdn.net/topics/390724469?page=1#post-396890764
+
+ 
+
+

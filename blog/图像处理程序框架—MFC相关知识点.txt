@@ -1,0 +1,89 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/26344977				
+
+
+CDC：Windows使用与设备无关的图形设备环境(DC :Device Context) 进行显示 。
+MFC基础类库定义了设备环境对象类----CDC类。  CDC与CGdiObject的关系  说道CDC类就不能不提一下GdiObject---图形对象类。 在Windows应用程序中，设备环境与图形对象共同工作，协同完成绘图显示工作。就像画家绘画一样，设备环境好比是画家的画布，图形对象好比是画家的画笔。用画笔在画布上绘画，不同的画笔将画出不同的画来。选择合适的图形对象和绘图对象，才能按照要求完成绘图任务。  有关CDC类的继承
+  父类：从 CObject 直接继承而来。继承了CObject类的各种特性，如动态创建等等。  子类：CClientDC-------代表操作窗口的DC ，是比较常用的一个子类  CMetaFileDC ------响应Meta File的DC ，Meta File是一些GDI消息。  CPaintDC-------响应WM_PAINT消息的DC。  CWindowDC ------代表整个屏幕的DC
+  CDC类的数据成员  数据成员只有两个：  HDC m_hDC : CDC对象使用的输出设备上下文  HDC m_hAttribDC : CDC对象使用的属性设备上下文  二者在CDC对象创建时指向相同的设备上下文。
+
+ CDC类：定义设备环境对象类 
+CDC::BitBlt 从源设备环境拷贝一个位图到当前设备环境中
+BOOL BitBlt(int x,int y,int nWidth,int nHeight,CDC* pSrcDC,int xSrc,int ySrc,DWORD dwRop);参数：x，y为目的矩形的左上角坐标；nWidth，nHeight为目的矩形的宽度和高度；pSrcDC是指向源设备环境的指针；xSrc，ySrc源位图左上角的坐标；dwRop为光栅操作码。CDC::CreateCompatibleDC 创建一个与pDC指定的设备相兼容的内存设备环境
+virtual BOOL CreateCompatibleDC(CDC* pDC);参数：pDC 设备环境指针返回值：若成功，返回非0；否则返回0CDC::Detach 将设备环境从CDC对象中分离开来
+HDC Detach()返回值：分离的设备环境
+CDC::DrawEdge 绘制矩形边框或边框的一部分
+BOOL DrawEdge(LPRECT lpRect,UINT nEdge,UINT nFlags);参数lpRect指向矩形的RECT结构的指针；nEdge指定矩形内外边界的风格，必须是一个内边界标志和外边界标志的组合，取值为：BDR_RAISEDINNER：内边界凸出；BDR_SUNKENINNER：内边界凹下；BDR_RAISEDOUTER：外边界凸出；BDR_SUNKENOUTER：外边界凹下；nFlags指定边界的类型，取值为：BF_RECT：矩形的所有四边；BF_LEFT：矩形的左边；BF_BOTTOM：矩形的底边；BF_RIGHT：矩形的右边；BF_TOP：矩形的上边；BF_TOPLEFT：矩形的上边和左边；BF_TOPRIGHT：矩形的上边和右边；BF_BOTTOMLEFT：矩形的下边和左边；BF_BOTTOMRIGHT：矩形的下边和右边。返回值：若成功，返回非0；否则返回0。CDC::DrawFocusRect 画一个说明输入焦点的矩形
+void DrawFocusRect(LPCRECT lpRect);参数：lpRect 指向绘制矩形的逻辑坐标的RECT结构或CRect对象。 CDC::FillSolidRect 用指定单颜色填充矩形 void FillSolidRect(LPCRECT lpRect,COLORREF clr);void FillSolidRect(int x,int y,int cx,int cy,COLORREF clr);参数：lpRect指定要填充的矩形；clr填充的颜色x，y矩形的左上角坐标，cx、cy为矩形宽度和高度CDC::FromHandle 在给予一个设备环境句柄时返回一个CDC对象指针 static CDC* PASCAL FromHandle(HDC hDC);参数：hDC 设备环境句柄返回值：CDC对象指针CDC::PaintRgn 用当前画刷填充一个CRgn对象的区域 BOOL PaintRgn(CRgn* pRgn);参数：指向一个CRgn对象的指针返回值：若成功，返回非0；否则返回0CDC::Rectangle 用当前画笔画一个矩形，并用当前画刷填充为实心矩形 BOOL Rectangle(int x1,int y1,int x2,int y2);BOOL Rectangle(LPCRECT lpRect);参数：x1、y1为矩形左上角坐标，x2、y2为矩形右下角坐标lpRect为RECT结构或CRect对象返回值：若成功，返回非0；否则返回0CDC::RestoreDC 将设备环境恢复成先前的状态 virtual BOOL RestoreDC(int nSaveDC);参数：nSaveDC设备环境先前状态的整数标识返回值：若成功，返回非0；否则返回0CDC::RoundRect 用当前画笔画一个圆角矩形，并用当前画刷填充 BOOL RoundRect(int x1,int y1,int x2,int y2,int x3,int y3);BOOL RoundRect(LPCRECT lpRect,POINT point);参数：x1、y1为左上角坐标，x2、y2为右下角坐标，x3、y3为画圆角的椭圆的逻辑宽度和高度lpRect为RECT结构或CRect对象，point中的x、y为画圆角的椭圆的逻辑宽度和高度返回值：若成功，返回非0；否则返回0CDC::SaveDC 保存设备环境的当前状态 virtual int SaveDC();返回值：若成功，返回标识保存设备环境的整数；若错误返回0CDC::SelectStockObject 将一个预定义的库存对象装入设备环境 virtual CGdiObject* SelectStockObject(int nIndex);参数：nIndex库存对象的索引值，常用取值：BLACK_BRUSH 黑色画刷； DKGRAY_BRUSH 深灰色画刷；GRAY_BRUSH 灰色画刷； LTGRAY_BRUSH 浅灰色画刷；WHITE_BRUSH 白色画刷； HOLLOW_BRUSH 中空画刷；NULL_BRUSH 空画刷；BLACK_PEN 黑色画笔； WHITE_PEN 白色画笔；NULL_PEN 空画笔；SYSTEM_FONT 系统字体；返回值：被替换的CGdiObject对象的指针，若调用失败，返回NULL
+
+CDC::SetMapMode设置映射模式，映射模式定义了将逻辑单位转换为设备单位的单位量，并定义了X和Y的方向virtual int SetMapMode(int nMapMode);返回值：上一个映射模式。
+
+ CDC::SelectObject 将一个对象选入设备环境，替代同一类型的先前对象 CPen* SelectObject(CPen* pPen);CBrush* SelectObject(CBrush* pBrush);virtual CFont* SelectObject(CFont* pFont);CBitmap* SelectObject(CBitmap* pBitmap);int SelectObject(CRgn* pRgn);参数：要选入的新对象的指针返回值：先前的旧对象的指针
+
+ CDC::SetBkMode 设置背景模式 int SetBkMode(int nBkMode);参数：nBkMode为要设置的背景模式，取值可以为：OPAQUE 在绘制文本前用当前背景色填充背景，这是缺省的背景模式TRANSPARENT 绘制前不改变背景（即文字背景透明）返回值：先前的背景模式
+
+ CDC::MoveTo 设置画图的起点位置 CPoint MoveTo(int x,int y);CPoint MoveTo(POINT point);参数：x、y为新位置的坐标；point为新位置坐标返回值：先前位置的坐标
+
+ CDC::LineTo 从当前位置到指定点画直线 BOOL LineTo(int x,int y);BOOL LineTo(POINT point);参数：x、y为直线末端的坐标；point为直线末端的坐标返回值：若成功，返回非0；否则返回0该函数通常与MoveTo()函数合起来完成画线工作。 
+CDC::SetTextColor 设置文本颜色 virtual COLORREF SetTextColor(COLORREF crColor);参数：crColor指定文本颜色返回值：先前的文本颜色CDC::TextOut 用当前字体在指定位置写一字符串 virtual BOOL TextOut(int x,int y,LPCTSTR lpszString,int nCount);BOOL TextOut(int x,int y,const CString& str);参数：x，y文本左上角坐标；lpszString指示要输出的字符串；nCount为字符串中字节数；str为要输出的CString对象返回值：若成功，返回非0；否则返回0
+
+ CDC::SetBkColor 设置当前背景色 virtual COLORREF SetBkColor(COLORREF crColor);参数：crColor为新背景色返回值：先前背景色；若错误，返回值为0x80000000
+
+ CDC::GetTextExtent 使用当前字体计算一行文本的宽度和高度 CSize GetTextExtent(LPCTSTR lpszString,int nCount)const;CSize GetTextExtent(const CString& str)const;参数：lpszString指向一个字符串，nCount字符串中字符数str 一个字符串对象返回值：字符串文本的宽度和高度（以逻辑单位表示）CDC::GetTextMetrics 检取当前字体的规格 BOOL GetTextMetrics(LPTEXTMETRIC lpMetrics)const;参数：lpMetrics 指向用于接收字体规格的TEXTMETRIC结构返回值：若成功，返回非0；否则返回0
+
+ CDC::DrawText 在指定的矩形内绘制格式化的文本 virtual int DrawText(LPCTSTR lpszString,int nCount,LPRECT lpRect,UINT nFormat);int DrawText(const CString& str,LPRECT lpRect,UINT nFormat);参数：lpszString指示要输出的字符串；nCount为字符串中字节数；lpRect指示文本所在的矩形；str为要输出的CString对象；nFormat为格式化文本的方式，常用取值：DT_BOTTOM 文本底对齐，必须和DT_SINGLELINE联用；DT_CENTER 居中显示文本； DT_LEFT 文本左对齐；DT_RIGHT 文本右对齐； DT_TOP 正文与行顶部对齐（仅指单个行）；DT_NOCLIB 绘制时不加裁减；DT_SINGLELINE 单行显示；DT_VCENTER 指定在垂直方向上居中显示文本（仅只单个行）； DT_WORDBREAK 若单词超过矩形边界，行将在单词间断开返回值：若调用成功，返回文本的高度
+
+ 
+ 
+ OnInitialUpdate概括
+视图窗口完全建立后第一个被框架调用的函数。框架在第一次调用OnDraw前会调用OnInitialUpdate，因此OnInitialUpdate是设置滚动视图的逻辑尺寸和映射模式的最合适的地方。
+时间上，两者先后顺序不同，构造函数生成本类的对象，但没有产生窗口，OnCreate后窗口产生，
+然后才是视图的OnInitialUpDate，一般在这里对视图的显示做初始化。简单点,就是OnCreate只是产生VIEW的基本结构和变量而在OnInitialUpDate()中,主要初始化视图中控件等。对各个变量进行初始化操作。
+例子。我们要在视图中添加一个button和combobox控件则
+2OnCreate函数中写法如下编辑
+int CFormView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+if (CView::OnCreate(lpCreateStruct) == -1)
+return -1;
+// TODO: Add your specialized creation code here
+CRect rect(20,20,100,50);
+m_ctrlButton.Create("Button1",WS_CHILD|WS_VISIBLE,rect,this,NULL);
+//创建按扭控件
+CFont *pFont=CFont::FromHandle((HFONT)::GetStockObject(ANSI_VAR_FONT));
+CRect rect1(150,20,350,100);
+m_combobox.Create(WS_CHILD|WS_VISIBLE|CBS_SIMPLE|CBS_NOINTEGRALHEIGHT|WS_VSCROLL,rect1,this,NULL);
+return 0;
+}
+3OnInitialUpDate中写法编辑
+void CFormView::OnInitialUpdate()
+{
+CView::OnInitialUpdate();
+// TODO: Add your specialized code here and/or call the base class
+//初始化组合框控件
+m_combobox.AddString("Mondy");
+m_combobox.AddString("Tuesday");
+m_combobox.AddString("Wednesday");
+m_combobox.AddString("Thursday");
+m_combobox.AddString("Saturday");
+m_combobox.AddString("Sunday");
+}
+在MFC程序设计中，按照传统的设计，如果处理WM_PAINT消息，一般会派生一个OnPaint函数，映射到WM_PAINT消息上进行绘图处理。但是很多程序中并没有出现OnPaint，一个OnDraw函数做了更多的绘图操作。而在消息映射的列表中，也没有见到WM_PAINT到OnDraw的映射。
+实际上，OnDraw不是OnPaint的映射，出现OnDraw，是为了实现各种不同的设备上的绘图一致性。
+首先，读者需要明白的是，WM_PAINT消息是为了绘制屏幕而出现的，因此，在OnPaint中，我们只能存取屏幕DC，进行绘制，常见的代码是：
+void MyWnd::OnPaint()
+{
+CPaintDC dc(this);
+//draw code here
+}
+这里的CPaintDC的构造函数会自动调用BeginPaint，获得一个屏幕DC，并附加在dc对象上。当dc对象析构时，系统自动调用EndPaint并使invalidated rectangle变成validated状态，从而结束绘制。(注意，重复创建CPaintDC实例会失败也因为如此)
+如果我们在OnPaint中绘制，那么在打印机上绘制我们就需要再写一个OnPrint函数，重新绘制。这样，程序设计者就需要维护两套代码。为了简化操作，MFC框架把大部分绘制操作都放在OnDraw中，OnPaint和OnPrint只构造相应的DC，然后分别调用OnDraw.也就是说，OnDraw适用于所有的设备，而OnPaint只适用于屏幕。
+大家在设计过程中必须注意：OnDraw是被基类的OnPaint主动调用的，如果你继承了OnPaint，你应该要么调用基类的OnPaint(此前不得创建CPaintDC实例，也不得调用BeginPaint)，要么自己创建CPaintDC实例，并调用OnDraw.
+
+ 
+ MFC中OnDraw与OnPaint的区别 ：OnPaint是WM_PAINT消息的消息处理函数，在OnPaint中调用OnDraw，一般来说，用户自己的绘图代码应放在OnDraw中。 OnPaint()是CWnd的类成员，负责响应WM_PAINT消息。OnDraw()是CVIEW的成员函数，没有响应消息的功能.当视图变得无效时（包括大小的改变，移动，被遮盖等等），Windows发送WM_PAINT消息。该视图的OnPaint 处理函数通过创建CPaintDC类的DC对象来响应该消息并调用视图的OnDraw成员函数.OnPaint最后也要调用OnDraw,因此一般在OnDraw函数中进行绘制。The WM_PAINT message is sent when the UpdateWindow or RedrawWindow member function is called. 在OnPaint中，将调用BeginPaint，用来获得客户区的显示设备环境，并以此调用GDI函数执行绘图操作。在绘图操作完成后，将调用EndPaint以释放显示设备环境。而OnDraw在BeginPaint与EndPaint间被调用。 1) 在mfc结构里OnPaint是CWnd的成员函数. OnDraw是CView的成员函数. 2) OnPaint()调用OnDraw()，OnPrint也会调用OnDraw()，所以OnDraw()是显示和打印的共同操作。 OnPaint是WM_PAINT消息引发的重绘消息处理函数，在OnPaint中会调用OnDraw来进行绘图。OnPaint中首先构造一个CPaintDC类得实例，然后一这个实例为参数来调用虚函数OnPrepareDC来进行一些绘制前的一些处理，比设置映射模式，最后调用OnDraw。而OnDraw和OnPrepareDC不是消息处理函数。所以在不是因为重绘消息所引发的OnPaint导致OnDraw被调用时，比如在OnLButtonDown等消息处理函数中绘图时，要先自己调用OnPrepareDC。 至于CPaintDC和CClientDC根本是两回事情 CPaintDC是一个设备环境类，在OnPaint中作为参数传递给OnPrepareDC来作设备环境的设置。真正和CClientDC具有可比性的是CWindowDC，他们一个是描述客户区域，一个是描述整个屏幕。 如果是对CVIEW或从CVIEW类派生的窗口绘图时应该用OnDraw。 OnDraw()和OnPaint()有什么区别呢？ 首先：我们先要明确CView类派生自CWnd类。而OnPaint()是CWnd的类成员，同时负责响应WM_PAINT消息。OnDraw()是CVIEW的成员函数，并且没有响应消息的功能。这就是为什么你用VC成的程序代码时，在视图类只有OnDraw没有OnPaint的原因。而在基于对话框的程序中，只有OnPaint。 其次：我们在第《每天跟我学MFC》3的开始部分已经说到了。要想在屏幕上绘图或显示图形，首先需要建立设备环境DC。其实DC是一个数据结构，它包含输出设备（不单指你17寸的纯屏显示器，还包括打印机之类的输出设备）的绘图属性的描述。MFC提供了CPaintDC类和CWindwoDC类来实时的响应，而CPaintDC支持重画。当视图变得无效时（包括大小的改变，移动，被遮盖等等），Windows 将 WM_PAINT 消息发送给它。该视图的OnPaint 处理函数通过创建 CPaintDC 类的DC对象来响应该消息并调用视图的 OnDraw 成员函数。通常我们不必编写重写的 OnPaint 处理成员函数。 ///CView默认的标准的重画函数 
+void CView::OnPaint() //见VIEWCORE.CPP { CPaintDC dc(this); OnPrepareDC(&dc)； OnDraw(&dc); //调用了OnDraw } ///CView默认的标准的OnPrint函数 void CView::OnPrint(CDC* pDC, CPrintInfo*) { ASSERT_VALID(pDC); OnDraw(pDC); // Call Draw } 既然OnPaint最后也要调用OnDraw,因此我们一般会在OnDraw函数中进行绘制。下面是一个典型的程序。 ///视图中的绘图代码首先检索指向文档的指针，然后通过DC进行绘图调用。 void CMyView::OnDraw( CDC* pDC ) { CMyDoc* pDoc = GetDocument(); CString s = pDoc->GetData(); GetClientRect( &rect ); // Returns a CString CRect rect; pDC->SetTextAlign( TA_BASELINE | TA_CENTER ); pDC->TextOut( rect.right / 2, rect.bottom / 2, s, s.GetLength() ); } 最后：现在大家明白这哥俩之间的关系了吧。因此我们一般用OnPaint维护窗口的客户区（例如我们的窗口客户区加一个背景图片），用OnDraw维护视图的客户区（例如我们通过鼠标在视图中画图）。当然你也可以不按照上面规律来，只要达到目的并且没有问题，怎么干都成。补充：我们还可以利用Invalidate(),ValidateRgn(),ValidateRect()函数强制的重画窗口，具体的请参考MSDN吧。 OnDraw中可以绘制用户区域。OnPaint中只是当窗口无效时重绘不会保留CClientDC绘制的内容。 这两个函数有区别也有联系： 1、区别：OnDraw是一个纯虚函数，定义为virtual void OnDraw( CDC* pDC ) = 0;　而OnPaint是一个消息响应函数，它响应了WM＿PANIT消息，也是是窗口重绘消息。 2、联系：我们一般在视类中作图的时候，往往不直接响应WM＿PANIT消息，而是重载OnDraw纯虚函数，这是因为在CVIEW类中的WM＿PANIT消息响应函数中调用了OnDraw函数，如果在CMYVIEW类中响应了WM＿PAINT消息，不显式地调用OnDraw函数的话，是不会在窗口重绘的时候调用OnDraw函数的。 应用程序中几乎所有的绘图都在视图的 OnDraw 成员函数中发生，必须在视图类中重写该成员函数。（鼠标绘图是个特例，这在通过视图解释用户输入中讨论。） OnDraw 重写： 通过调用您提供的文档成员函数获取数据。 通过调用框架传递给 OnDraw 的设备上下文对象的成员函数来显示数据。 当文档的数据以某种方式更改后，必须重绘视图以反映该更改。默认的 OnUpdate 实现使视图的整个工作区无效。当视图变得无效时，Windows 将 WM_PAINT 消息发送给它。该视图的 OnPaint 处理函数通过创建 CPaintDC 类的设备上下文对象来响应该消息并调用视图的 OnDraw 成员函数。 当没有添加WM_PAINT消息处理时,窗口重绘时,由OnDraw来进行消息响应...当添加WM_PAINT消息处理时,窗口重绘时,WM_PAINT消息被投递,由OnPaint来进行消息响应.这时就不能隐式调用OnDraw了.必须显式调用( CDC *pDC=GetDC(); OnDraw(pDC); ).. 隐式调用:当由OnPaint来进行消息响应时,系统自动调用CView::OnDraw(&pDC). 想象一下，窗口显示的内容和打印的内容是差不多的，所以，一般情况下，统一由OnDraw来画。窗口前景需要刷新时，系统会会调用到OnPaint，而OnPaint一般情况下是对DC作一些初始化操作后，调用OnDraw()。 OnEraseBkGnd()，是窗口背景需要刷新时由系统调用的。明显的一个例子是设置窗口的背景颜色（你可以把这放在OnPaint中去做，但是会使产生闪烁的现象）。 至于怎么界定背景和前景，那要具体问题具体分析了，一般情况下，你还是很容易区别的吧。 的确，OnPaint()用来响应WM_PAINT消息，视类的OnPaint()内部根据是打印还是屏幕绘制分别以不同的参数调用OnDraw()虚函数。所以在OnDraw()里你可以区别对待打印和屏幕绘制。 其实，MFC在进行打印前后还做了很多工作，调用了很多虚函数，比如OnPreparePrint()等。 
+
+  
+

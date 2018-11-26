@@ -1,0 +1,148 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/38471445				
+
+
+vs2010的mfc在有些地方不太一样不容易注意到，今天在修改状态栏的时候，就碰见了问题，死活修改不了。
+参照下面的帖子：
+ 
+点击打开链接
+ 
+:
+ 
+使用VS2010更改MFC程序的状态栏
+2011-04-19 17:12 by 愤怒的青蛙, 
+783 阅读, 0 评论, 收藏, 
+编辑
+
+
+这两天试了不想再用恶心的VC6.0，改用VS2010试了一下，发现区别不大，但是在细节上，貌似VS2010可以使用原来的MFC类，但是似乎总是有问题，不太好用。今天就遇到一个问题，本来是最简单的在状态栏显示鼠标坐标，但是使用CStatusBar指针的的SetPaneText()方法时死活不对，总是报错，Google了半天貌似没有遇到这个问题的，当时我就哭了。。。，难道我的人品这么背，不甘心下，有看了一下CMainFrame代码，发现使用的竟然是CMFCStatusBar，难道这是原因？抱着试一试的想法，把CStatusBar换成CMFCStatusBar，运行一下，没问题了。看来有问题不要怕，多看看代码，问题自然解决。。。
+附上在状态栏添加鼠标坐标的过程：
+1.在String Table中添加一个新项，名字为IDS_MOUSE_POINT（具体什么名字可以随便起），将其Caption设为"X=0000,Y=0000"（不包括引号）
+2.在MainFrm.cpp中indicators声明处添加IDS_MOUSE_POINT,注意不要添加到第一行（如果添加后果我不太清楚），代码如下：
+
+
+
+?
+
+1
+2
+3
+4
+5
+6
+7
+8
+
+
+
+static
+UINT indicators[] =
+{
+    ID_SEPARATOR,          
+// 状态行指示器
+    ID_INDICATOR_CAPS,
+    ID_INDICATOR_NUM,
+    ID_INDICATOR_SCRL,
+    IDS_MOUSE_POINT,
+};
+
+
+
+
+
+3.使用Class Wizard添加WM_MOUSEMOVE的相应函数
+4.在相应函数中添加代码如下（注意由于我是基于MapX做二次开发，这是MapX的mousemove的相应函数，不过和windows的大同小异，可以参考使用）：
+
+
+
+
+?
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+
+
+
+void 
+CMy2008302590145View::MouseMoveMapMain(short
+Button, short
+Shift, float 
+X, float Y)
+{
+    // TODO: Add your message handler code here
+    double
+dX,dY;
+    m_MapX.ConvertCoord(&X, &Y, &dX, &dY, miScreenToMap);//将屏幕坐标换算为地理坐标
+ 
+//  CString strMousePos;
+//  strMousePos.Format(_T("X=%.4f,Y=%.4F"),dX,dY);
+ 
+    char* strMousePos;
+    strMousePos =
+new char[256];
+    sprintf(strMousePos,
+"X=%.4f,Y=%.4f", dX, dY);
+    CString outStr;
+    outStr = strMousePos;
+    int
+len = outStr.GetLength();
+ 
+    CMainFrame*   pFrame   =   (CMainFrame*)   AfxGetMainWnd();
+
+    CMFCStatusBar*   pStatusBar   =   (CMFCStatusBar*)   pFrame-> GetDescendantWindow(AFX_IDW_STATUS_BAR);
+ 
+    pStatusBar->SetPaneWidth(pStatusBar->CommandToIndex(IDS_MOUSE_POINT), len * 6);
+    pStatusBar->SetPaneText(pStatusBar->CommandToIndex(IDS_MOUSE_POINT), outStr,TRUE);
+ 
+}
+
+
+
+
+
+这样就完成了，代码比较简单，没写注释，不太明白的话可以查一下MSDN
+
+
+
+
+ 
+才知道问题原因。
+然后在view的消息响应函数中就可以修改了，注意注释的代码就是原来修改不成功的代码。
+	CString str;
+	str.Format("%f",end);
+	 //CMainFrame *pFrame=(CMainFrame*)GetParent();
+	 //pFrame->mySetStatusBar(str);
+	CMainFrame*   pFrame   =   (CMainFrame*)   AfxGetMainWnd(); 
+	CMFCStatusBar*   pStatusBar   =   (CMFCStatusBar*)   pFrame-> GetDescendantWindow(AFX_IDW_STATUS_BAR);
+
+	//pStatusBar->SetPaneWidth(1, str.GetLength() * 2);
+	str = "分割用时： "+ str + " ms ";
+	pStatusBar->SetPaneText(1, str,TRUE);
+
+ 
+ 
+
+

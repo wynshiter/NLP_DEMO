@@ -1,0 +1,207 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/8549653				
+
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <winsock2.h>
+#include <string.h>
+
+#pragma comment(lib,"ws2_32.lib")
+
+#define PORT 9999
+#define IPADDR "127.0.0.1"
+#define BACKLOG 20
+#define FILENAME 200
+#define LENGTH 200
+#define BUFFERSIZE 1024
+
+struct FILEHEAD //FILE-head  struct
+{
+	char filename[LENGTH];//file name
+	unsigned int length;//the byte of the file
+
+};
+
+struct FILEDATA //FILE-data  struct
+{
+	char filename[LENGTH];//file name
+	char package[BUFFERSIZE];//package data
+	unsigned int length;//the byte of the file
+	unsigned int index;//index of the package
+
+};
+
+struct sockaddr_in clientaddr;  //Definition of the external variable for thread function call
+
+void getFileInformation(FILEHEAD file)
+{
+	printf( "file information :\n" );
+	printf( "  Filename: %s\n", file.filename );
+	//printf( "  Ext: %s\n", file.ext );
+	printf( " the file length is: %ld btye\n", file.length );
+}
+
+void showClientinfo()
+{
+	//获取当前系统时间
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	char SysDate[30];
+	//将systime中的时间转变为字符串存入SysDate[30];
+	sprintf(SysDate, "%4d-%2d-%2d %2d:%2d:%2d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+	//Server显示客户端信息
+	printf("%s Recv from Client [%s:%d] : %s\n", SysDate, inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+	//服务器向客户端回显信息
+}
+
+DWORD WINAPI requestThread(LPVOID lparam)
+{
+	FILEHEAD filehead;
+	FILEDATA filedata;
+	SOCKET newsock=(SOCKET)(LPVOID)lparam;
+	//char buf[BUFFERSIZE]={0};
+	memset(&filehead,0,sizeof(filehead));
+	memset(&filedata,0,sizeof(filedata));
+
+	showClientinfo();
+
+	//printf("等待文件头信息 ...\n");
+
+	int length_file_info=recv(newsock,(char *)&filehead,sizeof(filehead),0);
+	if (SOCKET_ERROR==length_file_info)
+	{
+		printf("receive failed!\n");
+		closesocket(newsock);
+		return -1;
+		
+	}
+	if (length_file_info<=0)
+	{
+		exit(1);//异常退出
+	}
+
+	getFileInformation(filehead);//打印文件信息
+
+	FILE *fp=NULL;
+	fp=fopen(filehead.filename,"wb+");
+	if (NULL==fp)
+	{
+		perror("fail to build the file!!!\n");
+		exit(1);
+	}
+	
+	//printf("要接收的文件名为：");
+	//printf(filehead.filename);//打印文件名	
+	//printf ("\n catch file now....\n");
+	
+	int recv_length=0;//接收到字节的长度
+	
+	//Sleep(100);
+	
+	printf("开始接收...\n");
+	filedata.index=0;
+	while (1)
+	{
+		recv_length=recv(newsock,(char *)&filedata,sizeof(filedata),0);
+		if (recv_length == SOCKET_ERROR)
+		{
+			printf("recv failed !\n");
+			closesocket(newsock);
+			//WSACleanup();
+			return -1;
+		}
+		
+		fwrite(filedata.package,1,BUFFERSIZE,fp);
+		if (0==recv_length)
+		{
+			break;
+		}
+		//printf("第%d块接收成功!\n",filedata.index);
+	}
+	printf("\n接收完成...\n\n");
+	
+	fflush(fp);
+	fclose(fp);
+	fp=NULL;
+	
+	return 0;
+}
+
+int main(int argc,char *argv[])
+{
+	//初始化winsock版本信息，加载动态链接库(dll)
+	WSADATA wsData;
+	if (WSAStartup(MAKEWORD(2,2),&wsData)!=0)
+	{
+		printf("WSAStartup failed !!!\n");
+		return -1;
+	}
+	
+	//创建套接字
+	SOCKET socklisten;
+	if((socklisten=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP))==INVALID_SOCKET)
+	{
+		printf("socket failed!!!\n");
+		WSACleanup();
+		return -1;
+	}
+	
+	//设置服务器地址
+	struct sockaddr_in servaddr;
+	
+	memset(&servaddr,0,sizeof(servaddr));
+	servaddr.sin_family=AF_INET;
+	servaddr.sin_port=htons(PORT);
+	servaddr.sin_addr.S_un.S_addr=inet_addr(IPADDR);
+	
+	//绑定socket地址结构到监听套接字
+	if (bind(socklisten,(sockaddr *)&servaddr,sizeof(servaddr))!=0)
+	{
+		printf("binding failed!!!\n");
+		closesocket(socklisten);
+		WSACleanup();
+	}
+	
+	//在server上运行监听
+	if (listen(socklisten,20)!=0)
+	{
+		printf("listen failed !!!\n");
+		closesocket(socklisten);
+		WSACleanup();
+		return -1;
+	}
+	
+	//接收客户端的连接请求
+	printf("TCP server is start!!!\n");
+	
+	//clientaddrlength要有初值，
+	int client_addr_length = sizeof(clientaddr);
+	memset(&clientaddr,0,client_addr_length);
+	SOCKET connect;
+	
+	//循环等待
+	while (1)
+	{
+		if ((connect=accept(socklisten,(sockaddr *)&clientaddr,&client_addr_length))==INVALID_SOCKET)
+		{
+			printf("accept failed!!!\n");
+			closesocket(connect);
+			WSACleanup();
+			return -1;
+		}
+		
+		//创建新线程
+		DWORD ThreadID;
+		CreateThread(NULL,0,requestThread,(LPVOID)connect,0,&ThreadID);
+	}
+	
+	
+
+}
+
+ 
+
+

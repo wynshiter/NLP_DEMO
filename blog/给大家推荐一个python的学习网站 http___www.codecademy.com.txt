@@ -1,0 +1,24 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/39859819				
+
+
+ 
+注册之后，可以跟着指导，自己编码学习，比较方面：
+ 
+ 
+
+ 
+ 
+再推荐一个在线编译的代码网站，c/c++ python  都可以：
+ 
+http://codepad.org
+ 
+ 
+
+ 
+ 
+ 
+
+

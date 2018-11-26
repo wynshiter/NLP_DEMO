@@ -1,0 +1,272 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/51204953				
+
+
+找工作时候一般需要准备的算法题目类型，其实参考leetcode和poj或者剑指offer基本能够摆平大部分的题目了
+
+
+
+1.图的遍历，BFS、DFS；
+
+2.递归的回溯剪枝；
+
+3.树的建立和遍历；
+
+4.状态的二进制表示，如一列开关的状态，图某行的开关状态。
+
+
+   数据结构：
+
+1.图的表示：邻接矩阵、邻接表（比如：使用数组表示）；
+
+2.队列（BFS用，比如使用数组表示）；
+
+3.链表，可使用结构体数组表示；
+   POJ上类似难度的题目：1011（DFS+回溯剪枝，地址：http://poj.org/problem?id=1011），
+
+                                    1014（DFS），1256（回溯剪枝），1753（棋盘状态用16位二进制数表示）
+
+                                    2312（图的遍历），2531（DFS），3278（BFS穷举），3984（图的遍历，DFS或BFS）。
+
+  如果对解题方法有疑问，可以百度搜索：“poj + 题号”，如“http://www.baidu.com/baidu?wd=POJ+1011”。
+
+1.穷举法题目例子
+首先这个题目是找到方阵中，step = n的特定环的最大值：
+
+只要穷举法就ok，写这个题目需要回顾两点，1，模仿poj的标准输入输出。2.二维数组传值，需要降维，这块下标的计算
+样例输入：
+
+2
+4 3
+1 2 3 4
+12 13 14 5
+11 16 15 6
+10 9 8 7
+3 3
+0 0 0
+0 0 0
+0 0 0输出：
+
+
+92
+0
+
+
+// KDonuts.cpp : 定义控制台应用程序的入口点。
+//
+
+
+#include <stdio.h>
+#include <malloc.h>
+
+/*
+
+To read numbers	int n;
+while(scanf("%d", &n) != EOF)
+{
+　 ...
+}
+
+To read characters	int c;
+while ((c = getchar()) != EOF)
+{
+	...
+}
+
+To read lines	
+char line[1024];
+while(gets(line))
+{
+	...
+}
+*//////
+
+
+
+//只是从当前x,y 坐标的一个环的sum
+int getSum(int startX,int startY,int* array,int step,int nlength)
+{
+	int sum = 0;
+	
+	for (int i = startY;i < startY+step;i++)
+	{
+		sum = sum + *(array + startX*nlength + i);
+		sum = sum + *(array + (startX +step-1)*nlength +i);
+	}
+	
+	for (int j = startX; j< startX +step - 2;j++)
+	{
+		sum = sum + *(array+(j +1)*nlength + startY);
+		sum = sum + *(array+(j +1)*nlength+ startY + step -1);
+	}
+
+	return sum;
+}
+
+int getMax(int nlength,int step,int* array )
+{
+	int maxsum = 0;
+
+	for (int i = 0;i<=nlength-step;i++)
+	{
+
+		for (int j = 0;j<=nlength-step;j++)
+		{
+			int tmp = getSum(i,j,array,step,nlength);
+			if (maxsum<tmp)
+			{
+				maxsum = tmp;
+			}
+		}
+	}
+	return maxsum;
+}
+
+
+int main()
+{
+
+	freopen("sample.in", "r", stdin);
+	freopen("sample.out", "w", stdout);
+
+	/* 同控制台输入输出 */
+
+	int mainIndex = 0;
+	scanf("%d",&mainIndex);
+
+	for (int i = 0; i < mainIndex;i++)
+	{
+		int step = 0;
+		int N = 0;
+		scanf("%d %d",&N,&step);
+		// 下面申请内存时候要用sizeof不然free时候会算错导致堆出错
+		int *array = (int*)malloc(sizeof(int)*N*N);
+		for (int j = 0;j<N*N;j++)
+		{
+			scanf("%d",array+j);
+		}
+		printf("%d\n",getMax(N,step,array));
+
+		free(array);
+	}
+
+	
+	fclose(stdin);
+	fclose(stdout);
+
+	return 0;
+}
+
+2.各大公司最常考的题目：关于单链表的逆置
+
+// LinkListReverse.cpp : 定义控制台应用程序的入口点。
+//
+
+#include<stdio.h>
+//#include<stdlib.h>
+#include <malloc.h>
+/*链表节点定义*/
+typedef struct Lnode
+{
+	int data;
+	struct Lnode *next;
+}Lnode, *LinkList;         //定义节点，头指针类型名
+
+/*尾插法创建单链表*/
+void Create_LinkList_B(LinkList &L)
+{
+	int x, cycle = 1;
+	Lnode *p, *s;
+	L=(LinkList)malloc(sizeof(Lnode)); //生成头结点
+	L->next = NULL;
+	p=L;
+	while(cycle)    //循环接受输入节点数据，-1结束输入
+	{
+		printf("x = ?\n");
+		scanf("%d", &x);
+		if(x != -1)
+		{
+			s=(Lnode *)malloc(sizeof(Lnode)); //生成新节点
+			s->data = x;
+			p->next = s;        //把新节点插入链表尾部
+			p = s;	        	//p指针再次指向尾节点
+		}
+		else
+		{
+			cycle = 0;    //输入-1，改变循环变量，不接受新节点
+		}
+
+	}
+	p->next = NULL;
+}
+
+/*单链表的逆置，针对有头节点的情况 ，没有头节点的情况另外补上一个头结点*/
+void Reverse_LinkList(LinkList &L)
+{
+	if( (NULL==L)||(NULL==L->next) )return ;  //边界检测  
+	Lnode *pre, *q;//pre节点一直作为去掉头结点的链表的首节点，q作为保存pre的临时节点
+	pre = L->next;    //P指向链表第一个元素
+	L->next = NULL; //断开头结点与链表
+	while(pre != NULL)
+	{
+		q = pre;
+		pre = pre->next;
+		q->next = L->next;  //相当于前插法构建新的链表，和原来的相反
+		L->next = q;
+	}
+}
+//单链表逆置的递归写法：
+void ReverseList(LinkList& pCur,LinkList& ListHead)
+{
+	if( (NULL==pCur)||(NULL==pCur->next) )
+	{
+		ListHead=pCur;
+	}
+	else
+	{
+		LinkList pNext=pCur->next;
+		ReverseList(pNext,ListHead); //递归逆置后继结点
+		pNext->next=pCur;            //将后继结点指向当前结点。
+		pCur->next=NULL;
+	}
+}
+
+/*打印单链表*/
+void Print_LinkList(LinkList &L)
+{	
+	Lnode* p;
+	p = L->next;		//L是头指针，p指向第一个节点，开始打印
+	while(p != NULL)
+	{
+		printf("%d\n", p->data);
+		p = p->next;
+	}
+}
+
+/*测试函数*/
+int main()
+{
+	LinkList H;	  //声明头指针
+	Create_LinkList_B(H);
+	printf("现在开始打印链表\n");
+	Print_LinkList(H);
+
+	printf("-----逆置之后的链表-----\n");
+
+	Reverse_LinkList(H);
+	Print_LinkList(H);
+	printf("-----逆置之后的链表-----\n");
+	ReverseList(H,H);
+	Print_LinkList(H);
+	return 0;
+}
+
+
+
+这个哥们的代码基本可以作为标准答案了：
+http://blog.csdn.net/heyabo/article/details/7610732
+
+
+

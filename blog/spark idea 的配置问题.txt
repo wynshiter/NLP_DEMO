@@ -1,0 +1,61 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/51030711				
+
+
+不知道下面的错误是为什么？
+
+
+Error:scalac: missing or invalid dependency detected while loading class file 'RDD.class'.
+Could not access term hadoop in package org.apache,
+because it (or its dependencies) are missing. Check your build definition for
+missing or conflicting dependencies. (Re-run with `-Ylog-classpath` to see the problematic classpath.)
+A full rebuild may help if 'RDD.class' was compiled against an incompatible version of org.apache.
+
+
+
+我i下面这个version应该写啥？写1.6.1 不对啊，没有找到
+
+
+
+
+想跑一下下面的代码，死活有问题，哎，我就很讨厌java这套东西，环境配置半天不说，还慢的要死
+
+
+
+
+/**
+  * Created by Administrator on 2016/3/31.
+  */
+
+import org.apache.spark.{SparkConf, SparkContext}
+/**
+  * Created by Administrator on 2016/3/31.
+  */
+import scala.math.random
+
+import org.apache.spark._
+object simpleApp {
+  def main(args: Array[String]) {
+    val conf = new SparkConf().setAppName("Spark Pi").setMaster("local")
+    val spark = new SparkContext(conf)
+    val slices = if (args.length > 0) args(0).toInt else 2
+    val n = math.min(100000L * slices, Int.MaxValue).toInt // avoid overflow
+    val count = spark.parallelize(1 until n, slices).map { i =>
+        val x = random * 2 - 1
+        val y = random * 2 - 1
+        if (x*x + y*y < 1) 1 else 0
+      }.reduce(_ + _)
+    println("Pi is roughly " + 4.0 * count / n)
+    spark.stop()
+  }
+}
+
+下面分享一个ibm 大数据基础的培训资料：
+http://download.csdn.net/detail/wangyaninglm/9478412
+
+
+
+
+

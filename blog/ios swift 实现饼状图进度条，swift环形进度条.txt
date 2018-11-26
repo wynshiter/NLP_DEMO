@@ -1,0 +1,150 @@
+content
+
+
+
+
+
+ios swift 实现饼状图进度条
+
+
+//
+//  ProgressControl.swift
+//  L02MyProgressControl
+//
+//  Created by plter on 7/29/14.
+//  Copyright (c) 2014 jikexueyuan. All rights reserved.
+//
+
+import UIKit
+
+class ProgressControl: UIView {
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        // Initialization code
+        
+        self.backgroundColor = UIColor(white: 1, alpha: 0)
+    }
+
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    
+    private var _progressValue:CGFloat = 0
+
+    public func getProgressValue()->CGFloat{
+        return _progressValue
+    }
+    
+    public func setProgressValue(value:CGFloat){
+        _progressValue = value
+        
+        setNeedsDisplay()
+    }
+    
+    // Only override drawRect: if you perform custom drawing.
+    // An empty implementation adversely affects performance during animation.
+    override func drawRect(rect: CGRect)
+    {
+        // Drawing code
+        
+        var ctx = UIGraphicsGetCurrentContext()
+        
+        var r = rect.width/2
+        
+        CGContextAddArc(ctx, r, r, r, 0, 3.141592653*2, 0)
+        CGContextSetRGBFillColor(ctx, 0.7, 0.7, 0.7, 1)
+        CGContextFillPath(ctx)
+        
+        
+        CGContextAddArc(ctx, r, r, r, 0, 3.141592653*2*_progressValue, 0)
+        CGContextAddLineToPoint(ctx, r, r)
+        CGContextSetRGBFillColor(ctx, 0, 0, 1, 1)
+        CGContextFillPath(ctx)
+    }
+
+}
+
+
+viewcontroller：
+
+//
+//  ViewController.swift
+//  L02MyProgressControl
+//
+//  Created by plter on 7/29/14.
+//  Copyright (c) 2014 jikexueyuan. All rights reserved.
+//
+
+import UIKit
+
+class ViewController: UIViewController {
+                            
+    @IBAction func addProgressBtnPressed(sender: AnyObject) {
+        
+        pc.setProgressValue(pc.getProgressValue()+0.1)
+    }
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        
+        pc = ProgressControl(frame: CGRect(x: 100, y: 100, width: 100, height: 100))
+        self.view.addSubview(pc)
+    }
+    
+    
+    private var pc:ProgressControl!
+    
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+
+
+}
+
+
+
+使用alertview展示的方案：
+
+
+            let frame = CGRectMake(0, 0, 78, 78)
+            let window = UIWindow()
+            window.backgroundColor = UIColor.clearColor()
+            let mainView = UIView()
+            mainView.layer.cornerRadius = 12
+            mainView.backgroundColor = UIColor(red:0, green:0, blue:0, alpha: 0.8)
+            
+            let ai = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+            ai.frame = CGRectMake(21, 21, 36, 36)
+            ai.startAnimating()
+            mainView.addSubview(ai)
+            
+            window.frame = frame
+            mainView.frame = frame
+           
+            window.windowLevel = UIWindowLevelAlert
+            window.center = self.view.center
+            window.hidden = false
+            window.addSubview(mainView)
+一般的实现方法：
+
+
+  //  activityIndicatorView
+            
+            m_objActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+            m_objActivityIndicatorView!.frame = CGRectMake(self.view.frame.size.width/2 - 100, self.view.frame.size.height/2 - 100, 200, 200)
+            m_objActivityIndicatorView!.hidesWhenStopped = true
+            m_objActivityIndicatorView!.color = UIColor.blackColor()
+            m_objActivityIndicatorView!.layer.cornerRadius = 6
+            m_objActivityIndicatorView!.layer.masksToBounds = true
+            
+            self.view.addSubview(m_objActivityIndicatorView)
+
+
+
+

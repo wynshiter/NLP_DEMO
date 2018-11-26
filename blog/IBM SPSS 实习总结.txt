@@ -1,0 +1,166 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/49149181				
+
+
+
+ 
+2015过完年，我知道导师要出国了，自己也算是水了一个idea 的论文。希望研二能找个实习，早听说西安IBM这边有学长在里面实习过，2月底联系了一下简历就塞了过去。面试就在锦业一路软件园他们上班的地方，一去就给20分钟写了个汉诺塔。 
+
+void hanoi(int n , char A , char B , char C)
+{
+if(1 == n) //最简单的情况，终止递归的条件
+    {
+    printf("移动%c柱上第1个到%c\n",A , C);
+    }
+    else
+    {
+       hanoi(n-1 , A , C , B); //先将源柱子上的n-1个盘子移到中间介质上
+       printf("移动%c柱上第%d个到%c\n",A , n , C); //然后将源柱子上的第n个移到目标柱上
+       hanoi(n-1 , B , A , C); //下面再将中间柱子上的n-1个盘子作为一个新的汉诺塔问题解决
+
+    }
+}
+
+ 
+    之后两位师傅针对博客和做过的项目有针对性的问了一些问题，期间基本是我跟柳哥两个人互动，刘哥没怎么说话，还以为他是领导哈哈。面试就这么有惊无险的完了。最后柳哥还一直送我到楼下，后来三月底收到了柳哥确认的电话，导师也出国了，于是我开开心心的开启了世界五百强的实习旅途。
+ 
+     后来找工作面试的时候有人问我你觉的IBM这个公司怎么样？实习的时候带我的师傅说过一句话，从政治经济学角度上讲IBM是生产生产工具的公司，我们为世界其他500强提供完整系统的技术解决方案和平台。当然我不能这么回答面试官，我一般就说IBM拥有一定的技术壁垒，她们的产品非常成熟，开发人员工作量不是很大，当然这种情况在我国的软件公司逐渐赶超的情况下会慢慢改变，华为联想神州数码等国内公司在与IBM重合的业务上已经对他们造成了很大冲击。 
+
+实习过程主要做了三件事情：（有四点收获）
+
+1.学习 SPSS DATA COLLECTION产品 
+    正式上班的首要任务是进行环境搭建和安全培训，这里高大上的工作环境（邓菊说参观过bat都没这块地方大），连上厕所洗手的水都是加热过的处处彰显着蓝色巨人百年老店的逼格。每天的工作从开机到进入nodes看邮件，需要相继输入硬盘密码，开机密码，nodes密码等等。 
+ 
+之后的一周左右的时间进行产品方面的培训。 
+概况来说：我们的产品是一个完整的技术平台，提供对整个调研生命周期的支持。产品强大到支持脚本语言来写调查问卷 
+ 
+Author设计问卷的界面： 
+
+
+ 
+ server激活调查问卷：（我后期的工作主要是和server打交道） 
+
+
+ 
+  组里几个师傅写的： 
+ 
+http://www.ibm.com/developerworks/cn/data/library/techarticle/dm-1202huangq/
+ 
+2.为组内DC-watch添加一项生成hotfix readme的功能模块
+ 
+  DC-watch是leader自学了python 的django框架自己开发的一个查看组内所有人工作量的web平台，针对上述所有产品的hotfix，动态跟踪每个人的工作量，非常的简单高效，用饼状图柱状图，开会的时候一幕了然的知道每个人每周都修了多少bug，请了几天假，开了多少小时的会。 
+ 
+    我们这项任务 的需求来源于，组内产品的hotfix都需要配置一个固定格式的readme.txt文件。之前全部是手写，为了减少工作量，考虑讲这块的内容继承到DC-watch中，只需要填写或者首选一些下拉菜单就可以实现在服务器端生成readme.txt并返回本地。
+
+django是一个非常典型的MVC框架，使用django我们可以在几分钟内创建高品质，易维护，数据库驱动的应用程序。这个过程温习了一下web开发的基础知识，说实话很久不搞了post和get有啥区别都不是很清楚。
+ 
+  后来的一件事颠覆了我对web框架的理解，有一次和桂林同学讨论怎么为DataTable上添加hotfix数据，我理所当然的认为应该写SQL语句结合游标一条一条读出来放到表上展现出来就行了。后来manager review code直接指出Django 的ORM( 关系映射模型)用类来描述数据库，采用直接操作对象的方式来操作数据库，完全避免了费劲的SQL语句，非常的简单高效，这是一次对于web认识的更新，整个实习过程中这样颠覆性的观念更新还有很多，每次更新都让我的开发经验上了一个新的台阶。 
+ 
+ Django项目： 
+https://www.djangoproject.com 
+ 在线文档： 
+https://docs.djangoproject.com/en/1.8/ 
+ 中文文档： 
+http://docs.30c.org/djangobook2/ 
+
+3.设计模式的实用性
+ 
+设计模式平时我们用的比较少，23种设计模式中朗朗上口的就那么几个，适配器，单例模式，工厂，抽象工厂，观察者 
+实习的时候组内希望将产品实验性的移植到移动端，利用本身server产品具有的webservice，将调查问卷的数据载体xml请求回来，放在iPhone上通过c++解析并将对象交给object c++，最后交给swift进行展示。
+下面看一下tinyxml2解析xml中使用的vistor模式 
+tinyxml2在线文档： 
+http://www.grinninglizard.com/tinyxml2docs/index.html
+ 
+访问者模式就是表示一个作用于某对象结构中的各元素的操作。它使你可以在不改变各元素的类的前提下定义作用于这些元素的新操作。 
+抽象访问者（Visitor）角色：声明了一个或者多个访问操作，形成所有的具体元素角色必须实现的接口。 
+具体访问者（ConcreteVisitor）角色：实现抽象访问者角色所声明的接口，也就是抽象访问者所声明的各个访问操作。 
+抽象节点（Element）角色：声明一个接受操作，接受一个访问者对象作为一个参量。 
+具体节点（ConcreteElement）角色：实现了抽象元素所规定的接受操作。 
+结构对象（ObiectStructure）角色：有如下的一些责任，可以遍历结构中的所有元素；如果需要，提供一个高层次的接口让访问者对象可以访问每一个元素；如果需要，可以设计成一个复合对象或者一个聚集，如列（List）或集合（Set）。 
+ XMLDocument doctest;
+ doctest.LoadFile("QuestionXML.xml");
+ if(doctest.ErrorID()!=0)
+ {
+  cout<<doctest.ErrorID()<<endl;
+  cout<<"error"<<endl;
+ }
+ XMLElement* titleElement = doctest.FirstChildElement("Questions");
+XMLPrinter printer;
+    titleElement->Accept( &printer );
+
+   const char* xmlcstr = printer.CStr();
+   cout<<xmlcstr<<endl;
+
+输出情况： 
+
+类图： 
+
+ 
+访问者模式最合适的使用情况是需要对一个家族的对象逐个访问，并根据具体的的对象做出不同的操作，而且不希望改变原来的对象。当然在设计的时候需要让家族成员定义一个支持访问者模式的接口 
+元素对象的accept函数：用visitor依次访问每个元素（一整个家族，包括很多的node） 
+ 
+bool XMLElement::Accept( XMLVisitor* visitor ) const
+{
+    TIXMLASSERT( visitor );
+    if ( visitor->VisitEnter( *this, _rootAttribute ) ) {
+        for ( const XMLNode* node=FirstChild(); node; node=node->NextSibling() ) {
+            if ( !node->Accept( visitor ) ) {
+                break;
+            }
+        }
+    }
+    return visitor->VisitExit( *this );
+}
+
+ 
+文档类对象的accept函数：用visitor依次访问每个元素 
+ 
+bool XMLDocument::Accept( XMLVisitor* visitor ) const
+{
+    TIXMLASSERT( visitor );
+    if ( visitor->VisitEnter( *this ) ) {
+        for ( const XMLNode* node=FirstChild(); node; node=node->NextSibling() ) {
+            if ( !node->Accept( visitor ) ) {
+                break;
+            }
+        }
+    }
+    return visitor->VisitExit( *this );
+}
+
+ 
+ 
+ 
+Accept a hierarchical visit of the nodes in the TinyXML-2 DOM. Every node in the XML tree will be conditionally visited and the host will be called back via the XMLVisitor interface. 
+This is essentially a SAX interface for TinyXML-2. (Note however it doesn’t re-parse the XML for the callbacks, so the performance of TinyXML-2 is unchanged by using this interface versus any other.) 
+ 
+The interface has been based on ideas from: 
+http://www.saxproject.org/ 
+http://c2.com/cgi/wiki?HierarchicalVisitorPattern 
+Which are both good references for “visiting”. 
+An example of using Accept():
+XMLPrinter printer;
+tinyxmlDoc.Accept( &printer );
+const char* xmlcstr = printer.CStr();
+Implements tinyxml2::XMLNode.
+
+ 
+4.优雅的（elegant）设计与算法 
+在第三部分我说了这个项目的语言调用设计是这样的：swift–>object c++–>c++ 
+那么如果需要添加一个功能，就需要至少改动三个文件（模块）的代码，这样的设计明显耦合度太高，如何降低代码的耦合度？ 
+整个过程采用敏捷开发，基本上两周一个版本，那么如何避免重构代码带来的灾难呢？ 
+ 
+这就要降低耦合度，面相接口编程： 
+1.少使用继承，多使用接口隐藏实现细节 
+2.模块的功能划分尽可能单一 
+3.遵循一个定义只在一个地方出现 
+4.少使用全局变量 
+5.类的属性和方法的声明少使用public，多使用private 
+6.多使用设计模式，比如mvc 
+7.尽量不用硬编码写程序，同时也尽量避免直接使用SQL
+ 
+将近6个月的实习让我对软件开发的理解产生了很多颠覆性的观点，也让我认识到了IBM很多技术的强大，终有一天中国的软件公司也会走向全世界，这就要靠我们共同的努力啦。 
+
+

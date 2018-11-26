@@ -1,0 +1,109 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45058797				
+
+
+
+
+1.python 的安装
+
+网上很多关于django跟python 开发的资料，这块我正在实习准备用这个两个合起来搞一个基于web 的东西出来现在开始学习，写点东西记录一下心得。
+
+开发环境是windows的，所以我们到python官网下载64位的windows操作系统的安装包：
+
+https://www.python.org/ftp/python/3.4.3/python-3.4.3.amd64.msi
+
+这个版本直接添加了系统的环境变量非常的方面（吐槽一下各种开发环境环境变量的配置）。
+
+2.Django的安装
+
+下面安装Django:没错不知道大家有没有看过《被解救的姜戈》
+
+https://www.djangoproject.com/download/1.8/tarball/
+
+下载下来是.tar.gz的，可以用7z解压一下，这里推荐一下7z这款免费的解压缩软件。
+7z：
+http://downloads.sourceforge.net/sevenzip/7z920-x64.msi
+
+进入到解压好的目录：一条命令搞定安装
+
+pythonsetup.py
+install
+
+看看安装好了没：
+
+import django
+django.VERSION
+
+之后有版本信息就算是安装好了
+
+数据库什么的绑定工作我们暂时先不做，这个版本的python默认是自带SQLite 的所以，基本够用了。
+
+
+
+3.搭建一个显示时间的project
+
+打开cmd，搞到一个目录里面，随便什么目录：
+django-admin startproject 
+projectname
+
+ startproject 都创建了哪些内容：
+mysite/
+    __init__.py
+    manage.py
+    settings.py
+    urls.py
+包括下列这些文件：
+__init__.py ：让 Python 把该目录当成一个开发包 (即一组模块)所需的文件。
+manage.py ：一种命令行工具，可让你以多种方式与该 Django 项目进行交互。
+settings.py ：该 Django 项目的设置或配置。
+urls.py ：该 Django 项目的 URL 声明，即 Django 所支撑站点的内容列表
+
+
+在mysite目录（projectname）下新建一个views.py
+
+from django.http import HttpResponse
+import datetime,calendar
+import time
+
+
+def current_datetime(request):
+	now = time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime(time.time()))
+	html = "<html><body>It is now %s.</body></html>" %now
+	return HttpResponse(html)
+
+修改uls.py为：
+
+from django.conf.urls import patterns, include, url
+from django.contrib import admin
+from mysite.views import current_datetime
+
+urlpatterns = patterns('',
+    # Examples:
+    # url(r'^$', 'mysite.views.home', name='home'),
+    # url(r'^blog/', include('blog.urls')),
+
+    #url(r'^admin/', include(admin.site.urls)),
+	(r'^time/$',current_datetime),
+)
+
+
+
+进入projectname 文件夹其中，并运行 
+python manage.py runserver 命令
+
+
+参考文献：
+IBM的一个知识库：
+http://www.ibm.com/developerworks/cn/linux/l-django/
+djangobook在线版本：（上面有的代码有错误，需要大家具有一点调试技巧的）
+http://docs.30c.org/djangobook2/
+
+django官方文档：
+http://django-chinese-docs.readthedocs.org/en/latest/
+﻿﻿
+﻿﻿
+﻿﻿
+
+

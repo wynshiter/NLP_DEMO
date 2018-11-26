@@ -1,0 +1,95 @@
+content
+
+
+
+
+ 
+ 
+线程是进程的一条执行路径，它包含独立的堆栈和CPU寄存器状态，每个线程共享所有的进程资源，包括打开的文件、信号标识及动态分配的内存等。一个进程内的所有线程使用同一个地址空间，而这些线程的执行由系统调度程序控制，调度程序决定哪个线程可执行以及什么时候执行线程。线程有优先级别，优先权较低的线程必须等到优先权较高的线程执行完后再执行。在多处理器的机器上，调度程序可将多个线程放到不同的处理器上去运行，这样可使处理器任务平衡，并提高系统的运行效率。 
+Windows是一种多任务的操作系统，在Windows的一个进程内包含一个或多个线程。32位Windows环境下的Win32 API提供了多线程应用程序开发所需要的接口函数，而利用ＶＣ中提供的标准Ｃ库也可以开发多线程应用程序，相应的ＭＦＣ类库封装了多线程编程的类，用户在开发时可根据应用程序的需要和特点选择相应的工具。为了使大家能全面地了解Windows多线程编程技术，本文将重点介绍Win32 API和MFC两种方式下如何编制多线程程序。 
+多线程编程在Win32方式下和MFC类库支持下的原理是一致的，进程的主线程在任何需要的时候都可以创建新的线程。当线程执行完后，自动终止线程; 当进程结束后，所有的线程都终止。所有活动的线程共享进程的资源，因此，在编程时需要考虑在多个线程访问同一资源时产生冲突的问题。当一个线程正在访问某进程对象，而另一个线程要改变该对象，就可能会产生错误的结果，编程时要解决这个冲突。 
+Win32 API下的多线程编程 
+
+Win32 API是Windows操作系统内核与应用程序之间的界面，它将内核提供的功能进行函数包装，应用程序通过调用相关函数而获得相应的系统功能。为了向应用程序提供多线程功能，Win32 API函数集中提供了一些处理多线程程序的函数集。直接用Win32 API进行程序设计具有很多优点: 基于Win32的应用程序执行代码小，运行效率高，但是它要求程序员编写的代码较多，且需要管理所有系统提供给程序的资源。用Win32 API直接编写程序要求程序员对Windows系统内核有一定的了解，会占用程序员很多时间对系统资源进行管理，因而程序员的工作效率降低。 
+1. 用Win32函数创建和终止线程 
+
+Win32函数库中提供了操作多线程的函数，包括创建线程、终止线程、建立互斥区等。在应用程序的主线程或者其他活动线程中创建新的线程的函数如下： 
+
+HANDLE CreateThread(LPSECURITY_ATTRIBUTES lpThreadAttributes,DWORD dwStackSize,LPTHREAD_START_ROUTINE lpStartAddress,LPVOID lpParameter,DWORD dwCreationFlags,LPDWORD lpThreadId); 
+如果创建成功则返回线程的句柄，否则返回NULL。创建了新的线程后，该线程就开始启动执行了。但如果在dwCreationFlags中使用了CREATE_SUSPENDED特性，那么线程并不马上执行，而是先挂起，等到调用ResumeThread后才开始启动线程，在这个过程中可以调用下面这个函数来设置线程的优先权： 
+BOOL SetThreadPriority(HANDLE hThread,int nPriority); 
+当调用线程的函数返回后，线程自动终止。如果需要在线程的执行过程中终止则可调用函数： 
+VOID ExitThread(DWORD dwExitCode); 
+如果在线程的外面终止线程，则可调用下面的函数： 
+BOOL TerminateThread(HANDLE hThread,DWORD dwExitCode); 
+但应注意: 该函数可能会引起系统不稳定，而且线程所占用的资源也不释放。因此，一般情况下，建议不要使用该函数。 
+如果要终止的线程是进程内的最后一个线程，则线程被终止后相应的进程也应终止。 2. 线程的同步 
+
+在线程体内，如果该线程完全独立，与其他线程没有数据存取等资源操作上的冲突，则可按照通常单线程的方法进行编程。但是，在多线程处理时情况常常不是这样，线程之间经常要同时访问一些资源。由于对共享资源进行访问引起冲突是不可避免的，为了解决这种线程同步问题，Win32 API提供了多种同步控制对象来帮助程序员解决共享资源访问冲突。在介绍这些同步对象之前先介绍一下等待函数，因为所有控制对象的访问控制都要用到这个函数。 
+Win32 API提供了一组能使线程阻塞其自身执行的等待函数。这些函数在其参数中的一个或多个同步对象产生了信号，或者超过规定的等待时间才会返回。在等待函数未返回时，线程处于等待状态，此时线程只消耗很少的CPU时间。使用等待函数既可以保证线程的同步，又可以提高程序的运行效率。最常用的等待函数是： 
+DWORD WaitForSingleObject(HANDLE hHandle，DWORD dwMilliseconds); 
+而函数WaitForMultipleObject可以用来同时监测多个同步对象，该函数的声明为： 
+DWORD WaitForMultipleObject(DWORD nCount,CONST HANDLE *lpHandles,BOOL bWaitAll,DWORD dwMilliseconds); 
+（1）互斥体对象 
+Mutex对象的状态在它不被任何线程拥有时才有信号，而当它被拥有时则无信号。Mutex对象很适合用来协调多个线程对共享资源的互斥访问。可按下列步骤使用该对象： 
+首先，建立互斥体对象，得到句柄： 
+HANDLE CreateMutex(); 
+然后，在线程可能产生冲突的区域前（即访问共享资源之前）调用WaitForSingleObject，将句柄传给函数，请求占用互斥对象： 
+dwWaitResult = WaitForSingleObject(hMutex,5000L); 
+共享资源访问结束，释放对互斥体对象的占用： 
+ReleaseMutex(hMutex); 
+互斥体对象在同一时刻只能被一个线程占用，当互斥体对象被一个线程占用时，若有另一线程想占用它，则必须等到前一线程释放后才能成功。 
+（2）信号对象 
+信号对象允许同时对多个线程共享资源进行访问，在创建对象时指定最大可同时访问的线程数。当一个线程申请访问成功后，信号对象中的计数器减一，调用ReleaseSemaphore函数后，信号对象中的计数器加一。其中，计数器值大于或等于０，但小于或等于创建时指定的最大值。如果一个应用在创建一个信号对象时，将其计数器的初始值设为０，就阻塞了其他线程，保护了资源。等初始化完成后，调用ReleaseSemaphore函数将其计数器增加至最大值，则可进行正常的存取访问。可按下列步骤使用该对象： 
+首先，创建信号对象： 
+HANDLE CreateSemaphore(); 
+或者打开一个信号对象： 
+HANDLE OpenSemaphore(); 
+然后，在线程访问共享资源之前调用WaitForSingleObject。 
+共享资源访问完成后，应释放对信号对象的占用： 
+ReleaseSemaphore(); 
+（3）事件对象 
+事件对象(Event)是最简单的同步对象，它包括有信号和无信号两种状态。在线程访问某一资源之前，需要等待某一事件的发生，这时用事件对象最合适。例如：只有在通信端口缓冲区收到数据后，监视线程才被激活。 
+事件对象是用CreateEvent函数建立的。该函数可以指定事件对象的类和事件的初始状态。如果是手工重置事件，那么它总是保持有信号状钡接肦esetEvent函数重置成无信号的事件。如果是自动重置事件，那么它的状态在单个等待线程释放后会自动变为无信号的。用SetEvent可以把事件对象设置成有信号状态。在建立事件时，可以为对象命名，这样其他进程中的线程可以用OpenEvent函数打开指定名字的事件对象句柄。 
+（4）排斥区对象 
+在排斥区中异步执行时，它只能在同一进程的线程之间共享资源处理。虽然此时上面介绍的几种方法均可使用，但是，使用排斥区的方法则使同步管理的效率更高。 
+使用时先定义一个CRITICAL_SECTION结构的排斥区对象，在进程使用之前调用如下函数对对象进行初始化: 
+VOID InitializeCriticalSection(LPCRITICAL_SECTION); 
+当一个线程使用排斥区时，调用函数：EnterCriticalSection或者TryEnterCriticalSection; 
+当要求占用、退出排斥区时，调用函数LeaveCriticalSection，释放对排斥区对象的占用，供其他线程使用。 基于MFC的多线程编程 
+
+MFC是微软的VC开发集成环境中提供给程序员的基础函数库，它用类库的方式将Win32 API进行封装，以类的方式提供给开发者。由于其快速、简捷、功能强大等特点深受广大开发者喜爱。因此，建议使用MFC类库进行应用程序的开发。 
+在VC++附带的MFC类库中，提供了对多线程编程的支持，基本原理与基于Win32 API的设计一致，但由于MFC对同步对象做了封装，因此实现起来更加方便，避免了对象句柄管理上的烦琐工作。 
+在MFC中，线程分为两种：工作线程和用户接口线程。工作线程与前面所述的线程一致，用户接口线程是一种能够接收用户的输入、处理事件和消息的线程。 1. 工作线程 
+
+工作线程编程较为简单，设计思路与前面所讲的基本一致: 一个基本函数代表了一个线程，创建并启动线程后，线程进入运行状态; 如果线程用到共享资源，则需要进行资源同步处理。这种方式创建线程并启动线程时可调用函数： 
+
+
+CWinThread*AfxBeginThread( AFX_THREADPROC pfnThreadProc, LPVOID pParam,int nPriority= THREAD_PRIORITY_NORMAL,UINT nStackSize =0,DWORD dwCreateFlags=0, LPSECURITY_ATTRIBUTES lpSecurityAttrs = NULL);参数pfnThreadProc是线程执行体函数，函数原形为: UINT ThreadFunction( LPVOID pParam)。 
+参数pParam是传递给执行函数的参数； 
+参数nPriority是线程执行权限，可选值： 
+THREAD_PRIORITY_NORMAL、THREAD_PRIORITY_LOWEST、THREAD_PRIORITY_HIGHEST、THREAD_PRIORITY_IDLE。 
+参数dwCreateFlags是线程创建时的标志，可取值CREATE_SUSPENDED，表示线程创建后处于挂起状态，调用ResumeThread函数后线程继续运行，或者取值“0”表示线程创建后处于运行状态。 
+返回值是CWinThread类对象指针，它的成员变量m_hThread为线程句柄，在Win32 API方式下对线程操作的函数参数都要求提供线程的句柄，所以当线程创建后可以使用所有Win32 API函数对pWinThread->m_Thread线程进行相关操作。 
+注意：如果在一个类对象中创建和启动线程时，应将线程函数定义成类外的全局函数。 2. 用户接口线程 
+
+基于MFC的应用程序有一个应用对象，它是CWinApp派生类的对象，该对象代表了应用进程的主线程。当线程执行完并退出线程时，由于进程中没有其他线程存在，进程自动结束。类CＷinApp从CＷinThread派生出来，CＷinThread是用户接口线程的基本类。我们在编写用户接口线程时，需要从CＷinThread派生我们自己的线程类，ClassWizard可以帮助我们完成这个工作。 
+先用ClassWizard派生一个新的类，设置基类为CwinThread。注意：类的DECLARE_DYNCREATE和IMPLEMENT_DYNCREATE宏是必需的，因为创建线程时需要动态创建类的对象。根据需要可将初始化和结束代码分别放在类的InitInstance和ExitInstance函数中。如果需要创建窗口，则可在InitInstance函数中完成。然后创建线程并启动线程。可以用两种方法来创建用户接口线程，MFC提供了两个版本的AfxBeginThread函数，其中一个用于创建用户接口线程。第二种方法分为两步进行：首先，调用线程类的构造函数创建一个线程对象；其次，调用CWinThread::CreateThread函数来创建该线程。线程建立并启动后，在线程函数执行过程中一直有效。如果是线程对象，则在对象删除之前，先结束线程。CWinThread已经为我们完成了线程结束的工作。 
+3. 线程同步 
+
+前面我们介绍了Win32 API提供的几种有关线程同步的对象，在MFC类库中对这几个对象进行了类封装，它们有一个共同的基类CSyncObject，它们的对应关系为: Semaphore对应CSemaphore、Mutex对应CMutex、Event对应CEvent、CriticalSection对应CCriticalSection。另外，MFC对两个等待函数也进行了封装，即CSingleLock和CMultiLock。因四个对象用法相似，在这里就以CMutex为例进行说明： 
+创建一个CMutex对象: 
+CMutex mutex(FALSE,NULL,NULL); 
+或CMutex mutex; 
+当各线程要访问共享资源时使用下面代码： 
+CSingleLock sl(&mutex); 
+sl.Lock(); 
+if(sl.IsLocked()) 
+//对共享资源进行操作... 
+sl.Unlock(); 
+结束语 
+
+如果用户的应用程序需要多个任务同时进行相应的处理，则使用多线程是较理想的选择。这里，提醒大家注意的是在多线程编程时要特别小心处理资源共享问题以及多线程调试问题
+
+
+

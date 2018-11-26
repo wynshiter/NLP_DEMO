@@ -1,0 +1,244 @@
+content
+
+
+
+
+1.FAST（featuresfrom
+ accelerated segment test）算法
+ 
+http://blog.csdn.net/yang_xian521/article/details/7411438
+ 
+特征点检测和匹配是计算机视觉中一个很有用的技术。在物体检测，视觉跟踪，三维常年关键等领域都有很广泛的应用。很多传统的算法都很耗时，而且特征点检测算法只是很多复杂图像处理里中的第一步，得不偿失。FAST特征点检测是公认的比较快速的特征点检测方法，只利用周围像素比较的信息就可以得到特征点，简单，有效。
+ 
+ 
+FAST特征检测算法来源于corner的定义，这个定义基于特征点周围的图像灰度值，检测候选特征点周围一圈的像素值，如果候选点周围领域内有足够多的像素点与该候选点的灰度值差别够大，则认为该候选点为一个特征点。
+ 
+ 
+
+其中I（x）为圆周上任意一点的灰度，I（p）为圆心的灰度，Ed为灰度值差得阈值，如果N大于给定阈值，一般为周围圆圈点的四分之三，则认为p是一个特征点。
+ 
+ 
+为了获得更快的结果，还采用了额外的加速办法。如果测试了候选点周围每隔90度角的4个点，应该至少有3个和候选点的灰度值差足够大，否则则不用再计算其他点，直接认为该候选点不是特征点。候选点周围的圆的选取半径是一个很重要的参数，这里我为了简单高效，采用半径为3，共有16个周边像素需要比较。为了提高比较的效率，通常只使用N个周边像素来比较，也就是大家经常说的FAST-N。我看很多文献推荐FAST-9，作者的主页上有FAST-9、FAST-10、FAST-11、FAST-12，大家使用比较多的是FAST-9和FAST-12。上个图说明的更形象一些
+ 
+ 
+
+
+ 
+ 
+OpenCV里对FAST的使用也非常简单，先声明一组特征点，构建FAST特征检测，接下来调用detect函数检测图像中的特征点，最后把特征点绘制到图片上。上代码说的清楚些
+ 
+
+ 
+
+ 
+Features From Accelerated Segment Test
+1. Fast算法原理
+博客中已经介绍了很多图像特征检测算子，我们可以用LoG或者DoG检测图像中的Blobs（斑点检测），可以根据图像局部的自相关函数来求得Harris角点（Harris角点），后面又提到了两种十分优秀的特征点及它们的描述方法SIFT特征与SURF特征。
+ 
+SURF特征算是为了提高运算效率对SIFT特征的一种近似，虽然在有些实验环境中已经达到了实时，但是我们实践工程应用中，特征点的提取与匹配只是整个应用算法中的一部分，所以我们对于特征点的提取必须有更高的要求，从这一点来看前面介绍的的那些特征点方法都不可取。
+ 
+为了解决这个问题，Edward Rosten和Tom
+ Drummond在2006年发表的“Machine learning for high-speedcorner detection[1]”文章中提出了一种FAST特征，并在2010年对这篇论文作了小幅度的修改后重新发表[2]。FAST的全称为Features
+ From Accelerated SegmentTest。Rosten等人将FAST角点定义为：若某像素点与其周围领域内足够多的像素点处于不同的区域，则该像素点可能为角点。
+ 
+也就是某些属性与众不同，考虑灰度图像，即若该点的灰度值比其周围领域内足够多的像素点的灰度值大或者小，则该点可能为角点。
+ 
+ 
+2. FAST算法步骤
+从图片中选取一个像素$P$，下面我们将判断它是否是一个特征点。我们首先把它的亮度值设为$I_p$。 
+设定一个合适的阈值$t$。 
+考虑以该像素点为中心的一个半径等于3像素的离散化的Bresenham圆，这个圆的边界上有16个像素（如图1所示）。 
+
+
+
+图1 FAST特征点示意图
+现在，如果在这个大小为16个像素的圆上有$n$个连续的像素点，它们的像素值要么都比$I_p
+ + t$大，要么都比$I_p - t$小，那么它就是一个角点。（如图1中的白色虚线所示）。$n$的值可以设置为12或者9，实验证明选择9可能会有更好的效果。 
+ 
+ 
+上面的算法中，对于图像中的每一个点，我们都要去遍历其邻域圆上的16个点的像素，效率较低。我们下面提出了一种高效的测试（high-speed
+ test）来快速排除一大部分非角点的像素。该方法仅仅检查在位置1，9，5和13四个位置的像素，首先检测位置1和位置9，如果它们都比阈值暗或比阈值亮，再检测位置5和位置13。如果$P$是一个角点，那么上述四个像素点中至少有3个应该必须都大于$I_p+t$或者小于$I_p-t$，因为若是一个角点，超过四分之三圆的部分应该满足判断条件。
+ 
+如果不满足，那么$p$不可能是一个角点。对于所有点做上面这一部分初步的检测后，符合条件的将成为候选的角点，我们再对候选的角点，做完整的测试，即检测圆上的所有点。
+上面的算法效率实际上是很高的，但是有点一些缺点：
+当$n<12$时不能拒绝许多的候选点；检测出来的角点不是最优的，这是因为它的效率取决于问题的排序与角点的分布；对于角点分析的结果被丢弃了；多个特征点容易挤在一起。 
+4.非极大值抑制
+从邻近的位置选取了多个特征点是另一个问题，我们可以使用Non-Maximal Suppression来解决。
+为每一个检测到的特征点计算它的响应大小（score function）$V$。这里$V$定义为点$p$和它周围16个像素点的绝对偏差的和。考虑两个相邻的特征点，并比较它们的$V$值。$V$值较低的点将会被删除。5. OpenCV中进行FAST特征检测
+在OpenCV中进行FAST特征提取的函数为FAST。它一共有4个参数，第一个参数是输入的图像，第二个是返回的特征点，第三个是定义的阈值，第四个决定是否使用非极大值抑制。
+
+void FAST(InputArray image,vector<KeyPoint>&
+ keypoints,int threshold,boolnonmaxSuppression=true )
+
+ 
+
+C++:void FASTX(InputArray image,vector<KeyPoint>&
+ keypoints,int threshold,boolnonmaxSuppression,
+int type)
+ 
+另外还有一个接口为FASTX，它提供了第五个参数type用来指定FAST检测中像素邻域圆的参数：TYPE_9_16、TYPE_7_12、TYPE_5_8。
+ 
+ 
+ 
+6.总结
+ 
+FAST算法比其他已知的角点检测算法要快很多倍，但是当图片中的噪点较多时，它的健壮性并不好，而且算法的效果还依赖于一个阈值$t$。
+ 
+而且FAST不产生多尺度特征而且FAST特征点没有方向信息，这样就会失去旋转不变性。
+ 
+ 
+ 
+ 
+[1] Edward Rosten and Tom Drummond, “Machine learning for high speedcorner detection” in
+ 9th European Conference on Computer Vision, vol. 1, 2006,pp. 430–443.
+ 
+ 
+[2] Edward Rosten, Reid Porter, and Tom Drummond, “Faster and better: amachine learning
+ approach to corner detection” in IEEE Trans. Pattern 
+Analysisand Machine Intelligence, 2010, vol 32, pp. 105-119.
+ 
+在FAST特征提出之后，实时计算机视觉应用中特征提取性能才有显著改善。目前以其高计算效率(computational
+ performance)、高可重复性(high repeatability)成为计算机视觉领域最流行的角点检测方法。
+1997年，Simth提出了SUSAN角点检测方法[1]。网址http://users.fmrib.ox.ac.uk/~steve/susan/.在SUSAN方法的基础上，2005年,
+ Rosten在论文[2]中提出基于The segment test criterion的角点检测方法，全称“Features
+ fromAccelerated Segment Test”，简称FAST。
+ 
+ 
+
+ 
+2006
+年，Rosten在[3]中使用机器学习对FAST的一些缺点进行改进，他的主页http://www.edwardrosten.com/work/fast.html提供的FAST实现即基于此论文。后续在2009年提出性能增强(可重复性增强、计算效率下降)的FAST-ER[4]。
+ 
+ 
+
+ 
+2010
+年，Mair在ECCV会议论文[5]中提出AGAST特征。对FAST底层的the
+ accelerated segment test进行改进，通过在扩展配置空间寻找最优决策树，使用特定树的组合获得自适应并且通用的accelerated segment test。对FAST
+ 9-16 detector提速约13%，对FAST 7-12 detector提速最高30%，对FAST
+ 5-8 detector提速最高50%。AGAST项目网址http://www6.in.tum.de/Main/ResearchAgast.
+ 
+ 
+
+ 
+2011
+年，S. Leutenegger在BRISK描述子[6]中提出multi-scale
+ AGAST detector, 并用实验证明与SURF detector有等效的可重复性(equivalentrepeatability)。对Graffiti序列的第一幅图检测时间为17.20ms,约为SURF
+ detector消耗时间的16%，SIFT detector消耗时间的1%.BRISK项目地址http://www.asl.ethz.ch/people/lestefan/personal/BRISK.
+ 
+ 
+
+ 
+
+参考文献：[1]S. M. Simth, J. M. Brady, Susan - a new approach to low level imageprocessing. International Journal of Computer Vision 23, 1997.
+[2]E. Rosten, T. Drummond, Fusing points and lines for high performancetracking. IEEE International Conference on Computer Vision, 2005.
+[3]E. Rosten, T. Drummond, Machine learning for high-speed corner detection,ECCV 2006.
+[4]E. Rosten, R. Porter, T. Drummond, Faster and better: A machine learningapproach to corner detection, IEEE PAMI, 2009.
+[5]E. Mair, G. D. Hager, Adaptive and generic corner detection based on theaccelerated segment test, ECCV 2010.
+[6]S. Leutenegger, et.al. Brisk:Binary robust invariant scalable keypoints,ICCV 2011.
+ 
+ 
+ 
+代码：
+ 
+ 
+
+
+ 
+<span style="font-family:SimSun;font-size:24px;">// feature_detection.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/nonfree/nonfree.hpp>             //  sift特征在这个头文件中  
+
+#include <vector>
+
+#pragma comment(lib,"opencv_core2410d.lib")              
+#pragma comment(lib,"opencv_highgui2410d.lib")              
+#pragma comment(lib,"opencv_imgproc2410d.lib") 
+#pragma comment(lib,"opencv_features2d2410d.lib") 
+#pragma comment(lib,"opencv_nonfree2410d.lib") 
+
+using namespace std;
+using namespace cv;
+
+//struct DrawMatchesFlags
+//{   
+//	enum    {
+//		DEFAULT = 0, // 输出图像将被创建(Mat::create),
+//		// 只画出特征点，而不画出周围的circle包含特征点的大小和方向.
+//		DRAW_OVER_OUTIMG = 1, // 输出图像将被创建(using Mat::create)，匹配点将被画在输出图像的内容上.
+//		NOT_DRAW_SINGLE_POINTS = 2, // 单个的点不画出.
+//		DRAW_RICH_KEYPOINTS = 4 // 对每个特征点周围的circle，包含特征点的大小和方向将被画出.    
+//	};
+//};
+void fast_feature()
+{
+	Mat image;
+	image = imread("swan.jpg");
+	// vector of keyPoints
+	std::vector<KeyPoint> keyPoints;
+	// construction of the fast feature detector object
+	FastFeatureDetector fast(80);	// 检测的阈值为80
+	// feature point detection
+	fast.detect(image,keyPoints);
+	drawKeypoints(image, keyPoints, image, Scalar::all(-1), DrawMatchesFlags::DRAW_OVER_OUTIMG);
+	imshow("FAST feature", image);
+	//cvWaitKey(0);
+}
+
+
+
+bool sift_feature()
+{
+	Mat image = imread("swan.jpg", 1);
+	if(!image.data)
+	{
+		cout << "Fail to load image" << endl;
+		return 0;
+		
+	}
+	vector<KeyPoint> keypoints;          //  存放关键点
+
+	// 其中0.03代表特征的阀值：用于去除低对比度的关键点   10是用于降低直线敏感度的阀值：去除不稳点的边缘响应点
+	SiftFeatureDetector sift(0.03, 10.0);   
+	sift.detect(image, keypoints);
+
+	drawKeypoints(image, keypoints, image, Scalar(255,255,255), DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+	namedWindow("sift");
+	imshow("sift", image);
+	
+	
+}
+
+void main()
+{
+	sift_feature();
+	fast_feature();
+
+	waitKey(0);
+	
+}</span>
+ 
+
+ 
+ 
+参考文献：
+ 
+ 
+ 
+http://blog.csdn.net/yang_xian521/article/details/7411438
+ 
+http://blog.csdn.net/cy513/article/details/4285579
+ 
+http://blog.csdn.net/sunanger_wang/article/details/7949202
+ 
+ 
+
+
+

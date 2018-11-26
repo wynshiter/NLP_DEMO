@@ -1,0 +1,44 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/7894303				
+
+
+编译环境:Microsoft Visual c++ 2010 Express
+ 
+将上一课中的代码做如下修改:
+int DrawGLScene(GLvoid)								// 从这里开始进行所有的绘制
+{
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);			// 清除屏幕和深度缓存
+	//glLoadIdentity();							// 重置当前的模型观察矩阵
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);			// 清除屏幕及深度缓存
+	glLoadIdentity();							// 重置当前的模型观察矩阵
+	glTranslatef(-1.5f,0.0f,-6.0f);						// 左移 1.5 单位，并移入屏幕 6.0
+
+	glBegin(GL_TRIANGLES);							// 绘制三角形
+		glVertex3f( 0.0f, 1.0f, 0.0f);					// 上顶点
+		glVertex3f(-1.0f,-1.0f, 0.0f);					// 左下
+		glVertex3f( 1.0f,-1.0f, 0.0f);					// 右下
+	glEnd();		
+			
+	glTranslatef(3.0f,0.0f,0.0f);						// 右移3单位
+		glBegin(GL_QUADS);							//  绘制正方形
+		glVertex3f(-1.0f, 1.0f, 0.0f);					// 左上
+		glVertex3f( 1.0f, 1.0f, 0.0f);					// 右上
+		glVertex3f( 1.0f,-1.0f, 0.0f);					// 左下
+		glVertex3f(-1.0f,-1.0f, 0.0f);					// 右下
+	glEnd();		
+
+
+
+
+	return TRUE;								//  一切 OK
+}
+
+在编译过程中,由于先前所建立的工程是console application所以出现了如下错误:
+error LNK2019: unresolved external symbol _main referenced in function ___tmainC
+应当做如下修改:
+预编译里的_CONSOLE换成_WINDOWS并在LINKER-》system里也换成subsytem:windows
+
+

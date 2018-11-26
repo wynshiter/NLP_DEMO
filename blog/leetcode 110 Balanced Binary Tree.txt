@@ -1,0 +1,215 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46918337				
+
+
+Balanced Binary Tree Total Accepted: 63288 Total Submissions: 198315  My Submissions
+                     
+ 
+Given a binary tree, determine if it is height-balanced.
+For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
+ 
+ 
+ 
+ 
+我的解决方案：一个非递归一个递归，居然比全递归的版本慢。
+ 
+ 
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+int Depth(TreeNode* root)
+    {
+       if(root == NULL)return 0;
+        
+        int result = 0;
+        queue<TreeNode *>q;
+        q.push(root);
+        
+        while(!q.empty())
+        {
+            ++result;
+            
+            for(int i = 0,n = q.size(); i < n ; i++)
+            {
+                TreeNode* p = q.front();
+                q.pop();
+                
+                if(p->left!= NULL)q.push(p->left);
+                if(p->right!= NULL)q.push(p->right);
+            }
+            
+           
+        }
+         return result;
+    }
+    
+    bool isBalanced(TreeNode* root)
+    {
+        if(root == NULL)
+        return true;
+        
+        int left = Depth(root->left);
+        int right = Depth(root -> right);
+        return abs(left - right)<=1&& isBalanced(root -> left)&&isBalanced(root ->right);
+    }
+};
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+This problem is generally believed to have two solutions: the top down approach and the bottom up way.
+
+1.The first method checks whether the tree is balanced strictly according to the definition of balanced binary tree: the difference between the heights of the two sub trees are not bigger than 1, and both the left sub tree and right sub tree are also balanced. With the helper function depth(), we could easily write the code; 
+
+class solution {
+public:
+    int depth (TreeNode *root) {
+        if (root == NULL) return 0;
+        return max (depth(root -> left), depth (root -> right)) + 1;
+    }
+
+    bool isBalanced (TreeNode *root) {
+        if (root == NULL) return true;
+
+        int left=depth(root->left);
+        int right=depth(root->right);
+
+        return abs(left - right) <= 1 && isBalanced(root->left) && isBalanced(root->right);
+    }
+};
+
+For the current node root, calling depth() for its left and right children actually has to access all of its children, thus the complexity is O(N). We do this for each node in the tree, so the overall complexity of isBalanced will be O(N^2). This is a top down approach.
+
+2.The second method is based on DFS. Instead of calling depth() explicitly for each child node, we return the height of the current node in DFS recursion. When the sub tree of the current node (inclusive) is balanced, the function dfsHeight() returns a non-negative value as the height. Otherwise -1 is returned. According to the leftHeight and rightHeight of the two children, the parent node could check if the sub tree is balanced, and decides its return value.
+
+class solution {
+public:
+int dfsHeight (TreeNode *root) {
+        if (root == NULL) return 0;
+
+        int leftHeight = dfsHeight (root -> left);
+        if (leftHeight == -1) return -1;
+        int rightHeight = dfsHeight (root -> right);
+        if (rightHeight == -1) return -1;
+
+        if (abs(leftHeight - rightHeight) > 1)  return -1;
+        return max (leftHeight, rightHeight) + 1;
+    }
+    bool isBalanced(TreeNode *root) {
+        return dfsHeight (root) != -1;
+    }
+};
+
+In this bottom up approach, each node in the tree only need to be accessed once. Thus the time complexity is O(N), better than the first solution.
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+class Solution {
+public:
+    bool isBalanced(TreeNode *root) {
+        // recursion
+        if (!root) return true;
+        int l = maxDepth(root->left);
+        int n = maxDepth(root->right);
+        if (abs(l - n) <= 1)
+            return isBalanced(root->left) && isBalanced(root->right);
+        else
+            return false;
+    }
+
+    int maxDepth(TreeNode* root)
+    {
+        if (!root)
+            return 0;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
+    }
+};
+
+ 
+ 
+ 
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+int checkBalanceAndDepth(struct TreeNode* node, bool *isBalanced)
+{
+    int leftDepth = node->left == NULL? 0 : checkBalanceAndDepth(node->left, isBalanced);
+    if(!*isBalanced)
+    {
+        return -1;
+    }
+    int rightDepth = node->right == NULL? 0 :checkBalanceAndDepth(node->right, isBalanced);
+    if(!*isBalanced)
+    {
+        return -1;
+    }
+    int diff = leftDepth - rightDepth;
+    *isBalanced = (diff == -1 || diff == 0 || diff == 1);
+    return leftDepth > rightDepth? leftDepth + 1 : rightDepth + 1;
+}
+bool isBalanced(struct TreeNode* root) {
+    if(root == NULL) return true;
+    bool balanced = true;
+    checkBalanceAndDepth(root, &balanced);
+    return balanced;
+}
+
+ 
+ 
+ 
+ 
+ 
+ 
+
+def depth(self,root):
+        if root == None:
+            return 0
+        else:
+            return max(self.depth(root.left), self.depth(root.right))+1
+
+
+
+    def isBalanced(self, root):
+        if root == None:
+            return True
+        n1=self.depth(root.left)
+        n2=self.depth(root.right)
+        if ((n1-n2) in range(-1,2)) and self.isBalanced(root.left) and self.isBalanced(root.right):
+            return True
+        else:
+            return False
+
+ 
+ 
+ 
+ 
+ 
+﻿﻿ 
+

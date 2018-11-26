@@ -1,0 +1,35 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/41492431				
+
+
+ 
+ 
+#A Auto-Visit Web Site Tool
+import urllib
+import time
+import random
+print "Auto Click the WebPage for Click-Num..."
+for i in range(30):
+    fs = urllib.urlopen(r'http://blog.csdn.net/wangyaninglm/article/details/7243970')
+    print 'The ', i, 'time click done...'
+    time.sleep(int(random.uniform(10, 25)))
+print 'Auto Click WebPage Done...'
+
+Auto Click the WebPage for Click-Num...
+The  0 time click done...
+The  1 time click done...
+The  2 time click done...
+The  3 time click done...
+The  4 time click done...
+The  5 time click done...
+The  6 time click done...
+The  7 time click done...
+ 
+但是如果网站记录ip地址防止刷呢？学校的网络又是根据，mac来分配地址的
+所以要调用python执行一些脚本，更改mac地址，释放ip，重新获取，刷新dns
+ 
+待续。。。
+
+

@@ -1,0 +1,75 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45396661				
+
+
+
+今天看了一个华为西安研究院的一个女生代码大神的总结很有感悟，下面这句话送给大家：
+只有好的程序员才能写出人类可以理解的代码
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+the objective function is basically:
+dp(i) = max(dp[i-2] + num[i], dp[i-1]), 
+this means the current max is the max of the position i-2 plus the current num[i], or the max of the previous one i-1 (cannot including num[i] with i-1 position, otherwise it will trigger the alarm)
+我的解决方案： 
+
+class Solution {
+public:
+    int rob(vector<int>& nums)
+    {
+        if(nums.empty())return 0;
+
+        int length = nums.size();
+        vector<int> dp(length,0);
+
+        dp[0] = nums[0];
+        dp[1] = max(nums[0],nums[1]);
+
+        for(int i =2; i< length; ++i)
+        {
+            dp[i] = max(dp[i-2]+nums[i],dp[i-1]);
+        }
+
+        return dp[length-1];
+
+    }
+};
+c语言解决方案：
+#define max(a, b) ((a)>(b)?(a):(b))
+int rob(int num[], int n) {
+    int a = 0;
+    int b = 0;
+
+    for (int i=0; i<n; i++)
+    {
+        if (i%2==0)
+        {
+            a = max(a+num[i], b);
+        }
+        else
+        {
+            b = max(a, b+num[i]);
+        }
+    }
+
+    return max(a, b);
+}
+
+python解决方案：
+class Solution:
+    # @param num, a list of integer
+    # @return an integer
+    def rob(self, num):
+        # DP O(n) time, O(1) space
+        # ik: max include house k
+        # ek: max exclude house k, (Note: ek is also the maximum for house 1,...,k-1)
+        # i[k+1]: num[k] + ek #can't include house k
+        # e[k+1]: max(ik, ek) # can either include house k or exclude house k
+        i, e = 0, 0
+        for n in num: #from k-1 to k
+            i, e = n+e, max(i,e)
+        return max(i,e)
+ 
+
+

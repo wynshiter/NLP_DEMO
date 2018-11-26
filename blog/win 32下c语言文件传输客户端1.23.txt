@@ -1,0 +1,92 @@
+content
+
+
+
+#include <stdio.h>
+#include <windows.h>
+//#include <winsock2.h>
+#include <stdlib.h>
+
+
+
+#pragma comment(lib, "ws2_32.lib")  
+
+int main(int argc, char *argv[])
+
+{
+	WSADATA wsadata;
+	WSAStartup(MAKEWORD(2,0),&wsadata);
+	unsigned sock_trans=socket(AF_INET,SOCK_STREAM,0);
+
+	if (sock_trans==0)
+	{
+
+	printf ("socket build faile!!\n");
+	exit(1);
+
+	}
+
+	printf ("target pc's IP address: 127.0.0.1\n");
+
+//如果正式调试，将服务器端ip写死。
+
+
+	SOCKADDR_IN sockadd;
+	sockadd.sin_family=AF_INET;
+	sockadd.sin_port=htons(6666);
+	sockadd.sin_addr.S_un.S_addr=inet_addr("127.0.0.1");
+
+	int con_info=connect(sock_trans,(SOCKADDR*)&sockadd,sizeof(sockadd));
+
+	if (con_info==SOCKET_ERROR)
+	{
+
+	printf ("connect fail!\n");
+
+	//exit(2);
+
+	}
+
+	char buf[1024];
+
+	int freed_return_val=0;
+
+	Sleep(1000);
+
+
+	FILE *fp;
+	printf("file name:");
+	char filename[50]={0};
+	gets(filename);
+	fp=fopen(filename,"rb");
+	if (fp==NULL)
+	{
+		perror("\nopen file error:");
+		exit(1);
+	}
+
+	//freed_return_val=fread(buf,1,1024,fp);//读文件字符
+
+	while (1)
+
+	{
+	freed_return_val=fread(buf,1,1024,fp);
+	if (0==freed_return_val)
+	{
+		break;
+	}
+	//freed_return_val=fread(buf,1,1024,fp);
+	send(sock_trans,buf,freed_return_val,0);
+
+	}
+
+	fclose(fp);
+
+	closesocket(sock_trans);
+	WSACleanup();
+
+	return 0;
+
+}
+ 
+

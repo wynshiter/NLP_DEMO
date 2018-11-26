@@ -1,0 +1,280 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/78936475				
+
+
+
+
+最近想做一个简单的地理位置分析，比如获取一些城市公交站点对应的geohash，geohash其实是将平时常见的经纬度进行了降维，这样可以进行类似附近的餐馆等内容的分析。
+
+1. 正逆地理编码
+http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
+正/逆地理编码服务（又名Geocoding API）是一类Web API接口服务； 
+正向地理编码服务提供将结构化地址数据（如：北京市海淀区上地十街十号）转换为对应坐标点（经纬度）功能； 
+逆向地理编码服务提供将坐标点（经纬度）转换为对应位置信息（如所在行政区划，周边地标点分布）功能。
+1.1 百度地图api正逆地理编码存在偏差
+百度地图坐标拾取 
+http://api.map.baidu.com/lbsapi/getpoint/index.html
+
+
+可以直接使用的百度url：后面直接跟地址就好如上图（key不知道是谁的），可以发现百度的搜索分词权重直接把雍和宫地铁站定位到了雍和宫，
+http://api.map.baidu.com/geocoder?key=f247cdb592eb43ebac6ccd27f796e2d2&output=json&address=
+url new key： 
+http://api.map.baidu.com/geocoder?key=xpKTc80ZnEGiy1elZCMtEepEYKj5tqQr&output=json&address=
+http://api.map.baidu.com/geocoder/v2/?address=&output=json&ak=xpKTc80ZnEGiy1elZCMtEepEYKj5tqQr
+
+细心的读者可能发现，百度地图的api 有两个版本的接口，一个旧版本一个新版本（对应链接中的v2）。对于旧版本的api 请求过程中发现，似乎正逆地里编码的准确度和成功率没有新版本的高，但是免费配额用光了后居然还可以继续使用
+
+1.2 高德地图接口
+高德地图坐标拾取 
+http://lbs.amap.com/console/show/picker
+发送一个request请求，带上地理位置和api key 即可返回一个包含了经纬度str。 
+地理编码接口：
+# -*- coding: utf-8 -*-
+import requests
+def geocode_change_key(address,key):
+    parameters = {'address': address, 'key': key}
+    base = 'http://restapi.amap.com/v3/geocode/geo'
+    response = requests.get(base, parameters)
+    answer = response.json()
+    return str(answer['geocodes'][0]['location']).split(',')
+
+
+2. 坐标系
+谷歌地图采用的是WGS84地理坐标系（中国范围除外） 
+ 谷歌中国地图、搜搜中国地图、高德地图采用的是GCJ02地理坐标系 
+ 百度采用的是BD09坐标系。 
+ 而设备一般包含GPS芯片或者北斗芯片获取的经纬度为WGS84地理坐标系。
+所以我们要根据得到的经纬度的坐标类型和地图厂商类型在地图上标点，否则会出现获取的位置误差。为什么不统一用WGS84地理坐标系这就是国家地理测绘总局对于出版地图的要求，出版地图必须符合GCJ02坐标系标准，也就是国家规定不能直接使用WGS84地理坐标系。
+百度坐标系说明书：http://lbsyun.baidu.com/index.php?title=coordinate
+2.1 我们常说的坐标系
+
+WGS84：为一种大地坐标系，也是目前广泛使用的GPS全球卫星定位系统使用的坐标系。
+GCJ02：又称火星坐标系，是由中国国家测绘局制定的地理坐标系统，是由WGS84加密后得到的坐标系。
+BD09：为百度坐标系，在GCJ02坐标系基础上再次加密。其中bd09ll表示百度经纬度坐标，bd09mc表示百度墨卡托米制坐标。
+
+2.2 坐标转码关键代码
+# -*- coding: utf-8 -*-
+import json
+import urllib
+import math
+
+x_pi = 3.14159265358979324 * 3000.0 / 180.0
+pi = 3.1415926535897932384626  # π
+a = 6378245.0  # 长半轴
+ee = 0.00669342162296594323  # 扁率
+
+
+
+def gcj02_to_bd09(lng, lat):
+    """
+    火星坐标系(GCJ-02)转百度坐标系(BD-09)
+    谷歌、高德——>百度
+    :param lng:火星坐标经度
+    :param lat:火星坐标纬度
+    :return:
+    """
+    z = math.sqrt(lng * lng + lat * lat) + 0.00002 * math.sin(lat * x_pi)
+    theta = math.atan2(lat, lng) + 0.000003 * math.cos(lng * x_pi)
+    bd_lng = z * math.cos(theta) + 0.0065
+    bd_lat = z * math.sin(theta) + 0.006
+    return [bd_lng, bd_lat]
+
+
+def bd09_to_gcj02(bd_lon, bd_lat):
+    """
+    百度坐标系(BD-09)转火星坐标系(GCJ-02)
+    百度——>谷歌、高德
+    :param bd_lat:百度坐标纬度
+    :param bd_lon:百度坐标经度
+    :return:转换后的坐标列表形式
+    """
+    x = bd_lon - 0.0065
+    y = bd_lat - 0.006
+    z = math.sqrt(x * x + y * y) - 0.00002 * math.sin(y * x_pi)
+    theta = math.atan2(y, x) - 0.000003 * math.cos(x * x_pi)
+    gg_lng = z * math.cos(theta)
+    gg_lat = z * math.sin(theta)
+    return [gg_lng, gg_lat]
+
+
+def wgs84_to_gcj02(lng, lat):
+    """
+    WGS84转GCJ02(火星坐标系)
+    :param lng:WGS84坐标系的经度
+    :param lat:WGS84坐标系的纬度
+    :return:
+    """
+    if out_of_china(lng, lat):  # 判断是否在国内
+        return lng, lat
+    dlat = _transformlat(lng - 105.0, lat - 35.0)
+    dlng = _transformlng(lng - 105.0, lat - 35.0)
+    radlat = lat / 180.0 * pi
+    magic = math.sin(radlat)
+    magic = 1 - ee * magic * magic
+    sqrtmagic = math.sqrt(magic)
+    dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * pi)
+    dlng = (dlng * 180.0) / (a / sqrtmagic * math.cos(radlat) * pi)
+    mglat = lat + dlat
+    mglng = lng + dlng
+    return [mglng, mglat]
+
+
+def gcj02_to_wgs84(lng, lat):
+    """
+    GCJ02(火星坐标系)转GPS84
+    :param lng:火星坐标系的经度
+    :param lat:火星坐标系纬度
+    :return:
+    """
+    if out_of_china(lng, lat):
+        return lng, lat
+    dlat = _transformlat(lng - 105.0, lat - 35.0)
+    dlng = _transformlng(lng - 105.0, lat - 35.0)
+    radlat = lat / 180.0 * pi
+    magic = math.sin(radlat)
+    magic = 1 - ee * magic * magic
+    sqrtmagic = math.sqrt(magic)
+    dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * pi)
+    dlng = (dlng * 180.0) / (a / sqrtmagic * math.cos(radlat) * pi)
+    mglat = lat + dlat
+    mglng = lng + dlng
+    return [lng * 2 - mglng, lat * 2 - mglat]
+
+
+def bd09_to_wgs84(bd_lon, bd_lat):
+    lon, lat = bd09_to_gcj02(bd_lon, bd_lat)
+    return gcj02_to_wgs84(lon, lat)
+
+
+def wgs84_to_bd09(lon, lat):
+    lon, lat = wgs84_to_gcj02(lon, lat)
+    return gcj02_to_bd09(lon, lat)
+
+
+def _transformlat(lng, lat):
+    ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + \
+          0.1 * lng * lat + 0.2 * math.sqrt(math.fabs(lng))
+    ret += (20.0 * math.sin(6.0 * lng * pi) + 20.0 *
+            math.sin(2.0 * lng * pi)) * 2.0 / 3.0
+    ret += (20.0 * math.sin(lat * pi) + 40.0 *
+            math.sin(lat / 3.0 * pi)) * 2.0 / 3.0
+    ret += (160.0 * math.sin(lat / 12.0 * pi) + 320 *
+            math.sin(lat * pi / 30.0)) * 2.0 / 3.0
+    return ret
+
+
+def _transformlng(lng, lat):
+    ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + \
+          0.1 * lng * lat + 0.1 * math.sqrt(math.fabs(lng))
+    ret += (20.0 * math.sin(6.0 * lng * pi) + 20.0 *
+            math.sin(2.0 * lng * pi)) * 2.0 / 3.0
+    ret += (20.0 * math.sin(lng * pi) + 40.0 *
+            math.sin(lng / 3.0 * pi)) * 2.0 / 3.0
+    ret += (150.0 * math.sin(lng / 12.0 * pi) + 300.0 *
+            math.sin(lng / 30.0 * pi)) * 2.0 / 3.0
+    return ret
+
+
+def out_of_china(lng, lat):
+    """
+    判断是否在国内，不在国内不做偏移
+    :param lng:
+    :param lat:
+    :return:
+    """
+    return not (lng > 73.66 and lng < 135.05 and lat > 3.86 and lat < 53.55)
+
+
+if __name__ == '__main__':
+
+    lng = 
+    lat = 
+    # result1 = gcj02_to_bd09(lng, lat)
+    # result2 = bd09_to_gcj02(lng, lat)
+    # result3 = wgs84_to_gcj02(lng, lat)
+    result4 = gcj02_to_wgs84(lng, lat)
+    #result5 = bd09_to_wgs84(lng, lat)
+    #result6 = wgs84_to_bd09(lng, lat)
+
+    print (result4)
+
+
+3. geohash
+https://www.cnblogs.com/LBSer/p/3310455.html
+当geohash base32编码长度为8时，精度在19米左右，而当编码长度为9时，精度在2米左右，所以一般来说用八位就够用。
+ 
+ 
+python3如何使用geohash呢，网上说使用pip install geohash后import geohash 会报错，当然同样的作者提供了geohash包的fix版geohash2，所以安装时候应该是：(改源码的方式有点太高大上，不太安全？)
+pip install geohash2
+我很纳闷的是python中能够生成geohash 的包实在是太多了：
+
+ 
+
+3.1 获取包围盒
+可以看到7位geohash编码带上一个包围盒，相对于6位geohash编码准确许多
+ 
+
+简单写了一个类，使用geohash2（作者居然没有提供），我只好复制了mzgeohash的部分代码 
+https://gitee.com/wangyaning/python/tree/master/geohash 
+可以直接这么用：
+#e.g
+import geohash2
+print ('Geohash for 42.6, -5.6:', geohash2.encode(42.6, -5.6))
+#Geohash for 42.6, -5.6: ezs42e44yx96
+print ('Geohash for 42.6, -5.6:', geohash2.encode(42.6, -5.6, precision=5))
+#Geohash for 42.6, -5.6: ezs42
+print ('Coordinate for Geohash ezs42:', geohash2.decode('ezs42'))
+#Coordinate for Geohash ezs42: ('42.6', '-5.6')
+
+
+
+if __name__=='__main__':
+    myTestGeohash = MyGeohash()
+    #wx4g340
+    print(myTestGeohash.getneighbors('wx4g340'))
+
+输出如下：    
+{'ne': 'wx4g343', 'n': 'wx4g342', 'w': 'wx4g2fp', 'c': 'wx4g340', 'sw': 'wx4g2cz', 'se': 'wx4g31c', 'nw': 'wx4g2fr', 'e': 'wx4g341', 's': 'wx4g31b'}
+
+
+测试geohash查询接口
+https://cevin.net/geohash/
+
+
+结构化数据的处理
+爬好数据的后处理，入库
+新学了sqlldr命令，挺快，连python代码都不用写了
+sqlldr userid='username/password@serverip/instance' control=./xxx.ctl errors=99999999 rows=20000 direct=true
+data=xxxxxxx.txt
+xxx.ctl文件如下
+
+LOAD DATA
+CHARACTERSET 'UTF8'
+INFILE *
+APPEND INTO TABLE TABLENAME
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"&*!'
+trailing nullcols
+(
+linename ,
+xxxxxx,
+xxxxxx
+)
+
+
+部分参考文献
+简单的城市名转换成经纬度： 
+https://www.cnblogs.com/zle1992/p/7209932.html
+批量获取经纬度： 
+https://www.cnblogs.com/reboot777/p/7124010.html 
+用Python计算北京地铁的两站间最短换乘路线： 
+http://blog.csdn.net/myjiayan/article/details/45954679
+使用爬虫获取获取所有的 站点名 
+http://blog.csdn.net/wenwu_both/article/details/70168760
+高德地图地理编码服务
+http://blog.csdn.net/u013250416/article/details/71178156
+https://www.cnblogs.com/xautxuqiang/p/6241561.html 
+
+

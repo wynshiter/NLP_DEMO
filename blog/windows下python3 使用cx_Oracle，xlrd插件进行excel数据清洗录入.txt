@@ -1,0 +1,246 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/70188710				
+
+
+
+我们在做数据分析，清洗的过程中，很多时候会面对各种各样的数据源，要针对不同的数据源进行清洗，入库的工作。当然python这个语言，我比较喜欢，开发效率高，基本上怎么写都能运行，而且安装配置简单，基本上有网的环境pip install全部都搞定，没网的话，把whl包copy过来一行命令也就解决了( windows下python3.5使用pip离线安装whl包)。
+本篇博客就针对，在windows平台下使用python3（python2社区将要停止支持，使用3是大势所趋），读取xls，xlsx格式的数据进行清洗入库做一个小例子。
+初步业务流程
+整个业务的流程十分简单：两个大的步骤
+1. 读取xlsx数据进行清洗
+2. cx_Oracle批量入库
+
+ 
+
+建表语句：
+create table temp_table
+(
+importtime varchar2(128),
+carrier varchar2(32),
+
+);
+
+select * from temp_table
+一个例子脚本：
+# -*- coding: utf-8 -*-
+
+import xlrd
+import datetime
+import cx_Oracle
+import time
+from itertools import islice
+import os
+os.environ['NLS_LANG']='SIMPLIFIED CHINESE_CHINA.ZHS16GBK'
+
+
+
+LineName = ['1号线','2号线']
+StationName = []
+
+########################链接数据库相关######################################
+
+def getConnOracle(username,password,ip,service_name):
+    try:
+        conn = cx_Oracle.connect(username+'/'+password+'@'+ip+'/'+service_name)  # 连接数据库
+        return conn
+    except Exception:
+        print(Exception)
+
+#######################进行数据批量插入#######################
+
+def insertOracle(conn,data,input_file_name):
+    sheetnumber = getSheetNumber(data)
+    cursor = conn.cursor()
+    try:
+        for x in range(0,sheetnumber):
+            templist = excel_table_byindex(input_file_name,0,x)
+            cursor.prepare('insert into temp_table(importtime ,carrier) values(:1,:2)') 
+             # 使用cursor进行各种操作，templist数值需要和表temp_table对应
+             cursor.executemany(None,templist)
+
+        conn.commit()
+    except cx_Oracle.DatabaseError as msg:
+        print(msg)
+    finally:
+        cursor.close()
+        conn.close()
+
+###########################打开excel文件########################
+def openXLS(path):
+    try:
+        data = xlrd.open_workbook(path)
+        return data
+    except Exception:
+        print(Exception)
+
+def getSheetNumber(data):
+    sheet_num = len(data.sheets())
+    return sheet_num
+#######################一些数据清洗工作########################
+def getlineName(str):
+    for x in LineName:
+        if x in str:
+            return  x
+
+def getStationName(str):
+    for x in StationName:
+        if x in str:
+            return x
+##########将excel中除去表头的一个sheet读出来,返回一个list#############
+def excel_table_byindex(path,colnameindex = 0,by_index = 0):
+    today = time.strftime('%Y%m%d', time.localtime(time.time()))
+    data = openXLS(path)
+    table = data.sheets()[by_index]
+    nrows = table.nrows
+    ncols = table.ncols
+
+    colnames = table.row_values(colnameindex)
+    list = []
+    for rownum in range(1,nrows):
+        row = table.row_values(rownum)
+        temp_lineName = getlineName(row[6])
+        temp_stationName = getStationName(row[6])
+        if row:
+            app = [today, str(row[1]), str(row[2]),temp_stationName,temp_lineName]
+            # for i in range(len(colnames)):
+            #     app[colnames[i]] = row[i]
+            list.append(app)
+    return list
+
+###################一个可以从文件第二行开始读的办法#############
+
+def getAllStationName(path):
+    StationName_file = open(path, 'r', encoding='utf-8')
+    #count = len(StationName_file.readlines())
+
+    for line in islice(StationName_file,1,None):
+        str_temp = line.strip('\n')
+        if str_temp not in LineName and str_temp !='----'and str_temp!='':
+            StationName.append(str_temp)
+
+####################################################################
+def getStationNamefromexcel(path):
+
+    data = openXLS(path)
+    table = data.sheets()[0]
+    nrows = table.nrows
+    ncols = table.ncols
+    colnames = table.row_values(0)
+    list = []
+    for rownum in range(0,nrows):
+        row = table.row_values(rownum)[0]
+        if row:
+            list.append(row)
+    return list
+
+#################################################################
+def main():
+    username = 'xx'
+    password = 'xx'
+    ip = '192.168.1.1'
+    service_name = 'iop'
+    #获取数据库链接
+    conn = getConnOracle(username,password,ip,service_name)
+
+    input_file_name = (r"E:\code\python\findS\subwayBase\xx.xlsx")
+    #output_file_name = input("Enter the output file name:")
+    getAllStationName(r"E:\code\python\findS\subwayBase\站点.txt")
+
+
+    begin = datetime.datetime.now()
+
+    insertOracle(conn,openXLS(input_file_name),input_file_name)
+
+    # x.fetchone()
+    # c.close()  # 关闭cursor
+    # conn.close()  # 关闭连接
+
+    end = datetime.datetime.now()
+    print((end - begin).seconds)
+
+if __name__ =='__main__':
+    main()
+
+python3 windows下使用cx_Oracle操作oracle的报错问题
+报错信息如下：
+
+Traceback (most recent call last):
+  File "E:/code/python/findS/findSubwayBase.py", line 134, in <module>
+    main()
+  File "E:/code/python/findS/findSubwayBase.py", line 124, in main
+    insertOracle(conn,openXLS(input_file_name),input_file_name)
+  File "E:/code/python/findS/findSubwayBase.py", line 32, in insertOracle
+    cursor.executemany(None,templist)
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 1-6: ordinal not in range(128)
+
+Process finished with exit code 1
+在使用python3 的cx_Oracle操作oracle数据时候，不可避免的会遇到中文的编码问题，当然，上网一搜全是python2的，解决方案是：
+#在开头加上
+import sys
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
+python3中的解决方案为：加上核心代码
+import os
+os.environ['NLS_LANG']='SIMPLIFIED CHINESE_CHINA.ZHS16GBK'
+就ok啦，其实就是设置一下客户端编码 ，参考：python编码 OS.ENVIRON详解
+xlrd 操作excel
+demo代码：
+#获取一个工作表
+
+table = data.sheets()[0]          #通过索引顺序获取
+
+table = data.sheet_by_index(0) #通过索引顺序获取
+
+table = data.sheet_by_name(u'Sheet1')#通过名称获取
+
+#获取整行和整列的值（数组）
+ 　　
+table.row_values(i)
+
+table.col_values(i)
+
+#获取行数和列数
+　　
+nrows = table.nrows
+ncols = table.ncols
+
+#循环行列表数据
+for i in range(nrows ):
+      print table.row_values(i)
+
+#单元格
+cell_A1 = table.cell(0,0).value
+
+cell_C4 = table.cell(2,3).value
+
+#使用行列索引
+cell_A1 = table.row(0)[0].value
+
+cell_A2 = table.col(1)[0].value
+
+#简单的写入
+row = 0
+
+col = 0
+
+# 类型 0 empty,1 string, 2 number, 3 date, 4 boolean, 5 error
+ctype = 1 value = '单元格的值'
+
+xf = 0 # 扩展的格式化
+
+table.put_cell(row, col, ctype, value, xf)
+
+table.cell(0,0)  #单元格的值'
+
+table.cell(0,0).value #单元格的值'
+参考链接
+[OS.ENVIRON详解]: http://blog.csdn.net/junweifan/article/details/7615591
+[python编码]:http://www.cnblogs.com/fkissx/p/5417363.html
+再次强烈推荐，精通oracle+python系列：官方文档 
+http://www.oracle.com/technetwork/cn/articles/dsl/mastering-oracle-python-1391323-zhs.html 
+离线版本下载链接： 
+http://download.csdn.net/detail/wangyaninglm/9815726 
+
+

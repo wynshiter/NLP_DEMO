@@ -1,0 +1,272 @@
+content
+
+
+
+ 
+ 
+
+转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
+
+来自：shiter编写程序的艺术
+
+基础介绍
+OpenCV里提取目标轮廓的函数是findContours，它的输入图像是一幅二值图像，输出的是每一个连通区域的轮廓点的集合：vector<vector<Point>>。外层vector的size代表了图像中轮廓的个数，里面vector的size代表了轮廓上点的个数。
+
+
+轮廓进行填充的时候我会有下面2步骤：
+
+a）依次遍历轮廓点，将点绘制到img上
+
+
+    void drawMaxAreaLine(cv::Mat &dst, const std::vector<cv::Point> maxAreaPoints)
+    {
+        int step = dst.step;
+        auto data = dst.data;
+        for (int i = 0; i < maxAreaPoints.size(); ++i)
+        {
+            *(data + maxAreaPoints[i].x + maxAreaPoints[i].y * step) = 255;
+        }
+    }
+
+
+
+b）使用floodFill以及一个种子点进行填充
+
+    floodFill(savedGrayMat, Point(currentFrameEdge[0].x + 2, currentFrameEdge[0].y + 2), 255);
+
+主要函数用法
+
+
+C++: void findContours(InputOutputArray image,
+ OutputArrayOfArrays contours, int mode, int method, Point offset=Point())
+Python: cv2.findContours(image,
+ mode, method[, contours[, hierarchy[, offset]]]) →
+ contours, hierarchy
+
+C: int cvFindContours(CvArr* image,
+ CvMemStorage* storage, CvSeq** first_contour, int header_size=sizeof(CvContour), int mode=CV_RETR_LIST, intmethod=CV_CHAIN_APPROX_SIMPLE, CvPoint offset=cvPoint(0,0) )
+Python: cv.FindContours(image,
+ storage, mode=CV_RETR_LIST, method=CV_CHAIN_APPROX_SIMPLE, offset=(0, 0)) → contours
+Parameters:
+
+image – Source, an 8-bit single-channel image. Non-zero pixels are treated as 1’s. Zero pixels remain 0’s, so the image is treated asbinary .
+ You can use compare() , inRange() , threshold() , adaptiveThreshold() , Canny() ,
+ and others to create a binary image out of a grayscale or color one. The function modifies the image while extracting the contours. If mode
+ equals to CV_RETR_CCOMP orCV_RETR_FLOODFILL,
+ the input can also be a 32-bit integer image of labels (CV_32SC1).contours – Detected contours. Each contour is stored as a vector of points.hierarchy – Optional output vector, containing information about the image topology. It has as many elements as the number of contours. For each i-th contour contours[i] ,
+ the elements hierarchy[i][0] , hiearchy[i][1] , hiearchy[i][2] ,
+ and hiearchy[i][3] are set to 0-based indices in contours of
+ the next and previous contours at the same hierarchical level, the first child contour and the parent contour, respectively. If for the contour i there
+ are no next, previous, parent, or nested contours, the corresponding elements of hierarchy[i]will be negative.mode –
+Contour retrieval mode (if you use Python see also a note below).
+CV_RETR_EXTERNAL retrieves only the extreme outer contours. It sets hierarchy[i][2]=hierarchy[i][3]=-1 for
+ all the contours.CV_RETR_LIST retrieves all of the contours without establishing any hierarchical relationships.CV_RETR_CCOMP retrieves all of the contours and organizes them into a two-level hierarchy. At the top level, there are external boundaries of the components. At the second level,
+ there are boundaries of the holes. If there is another contour inside a hole of a connected component, it is still put at the top level.CV_RETR_TREE retrieves all of the contours and reconstructs a full hierarchy of nested contours. This full hierarchy is built and shown in the OpenCV contours.c demo.method –
+Contour approximation method (if you use Python see also a note below).
+CV_CHAIN_APPROX_NONE stores absolutely all the contour points. That is, any 2 subsequent points (x1,y1) and (x2,y2) of
+ the contour will be either horizontal, vertical or diagonal neighbors, that is, max(abs(x1-x2),abs(y2-y1))==1.CV_CHAIN_APPROX_SIMPLE compresses horizontal, vertical, and diagonal segments and leaves only their end points. For example, an up-right rectangular contour is encoded with 4 points.CV_CHAIN_APPROX_TC89_L1,CV_CHAIN_APPROX_TC89_KCOS applies one of the flavors of the Teh-Chin chain approximation algorithm. See[TehChin89] for
+ details.offset – Optional offset by which every contour point is shifted. This is useful if the contours are extracted from the image ROI and then they should be analyzed in the whole image
+ context.
+
+cvFindContours(tour_buf,storage, &contour,sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);   
+       tour_buf 是需要查找轮廓的单通道灰度图像 ，       storage 是临时存储区 ，          contour是存储轮廓点的CvSeq实例，          CV_RECT_EXTERNAL 只查找外围轮廓，还有CV_RECT_TREE    
+
+
+输入图像image必须为一个2值单通道图像
+contours参数为检测的轮廓数组，每一个轮廓用一个point类型的vector表示
+hiararchy参数和轮廓个数相同，每个轮廓contours[ i ]对应4个hierarchy元素hierarchy[ i ][ 0 ] ~hierarchy[ i ][ 3 ]，分别表示后一个轮廓、前一个轮廓、父轮廓、内嵌轮廓的索引编号，如果没有对应项，该值设置为负数。
+mode表示轮廓的检索模式
+
+CV_RETR_EXTERNAL表示只检测外轮廓
+CV_RETR_LIST检测的轮廓不建立等级关系
+CV_RETR_CCOMP建立两个等级的轮廓，上面的一层为外边界，里面的一层为内孔的边界信息。如果内孔内还有一个连通物体，这个物体的边界也在顶层。
+CV_RETR_TREE建立一个等级树结构的轮廓。具体参考contours.c这个demo
+
+method为轮廓的近似办法
+
+CV_CHAIN_APPROX_NONE存储所有的轮廓点，相邻的两个点的像素位置差不超过1，即max（abs（x1-x2），abs（y2-y1））==1
+CV_CHAIN_APPROX_SIMPLE压缩水平方向，垂直方向，对角线方向的元素，只保留该方向的终点坐标，例如一个矩形轮廓只需4个点来保存轮廓信息
+CV_CHAIN_APPROX_TC89_L1，CV_CHAIN_APPROX_TC89_KCOS使用teh-Chinl chain 近似算法
+
+         正确调用查找函数后，接下来就是从轮廓序列contour（这里的contour不单单只有一个轮廓序列) 提取轮廓点了.     contour可能是空指针，提取前最好判断一下   在提取之前还可以调用一个函数：            contour = cvApproxPoly( contour, sizeof(CvContour), storage, CV_POLY_APPROX_DP, 3, 1 );            可能是拟合，有这一句找出的轮廓线更直。   contour里面包含了很多个轮廓，每个轮廓是单独存放的.  
+
+ 
+#include "cv.h"
+#include <iostream>
+#include <cxcore.h>
+#include <highgui.h>
+#include <math.h> 
+#include <vector>
+#include <algorithm>
+
+#pragma comment(lib,"opencv_core2410d.lib")    
+#pragma comment(lib,"opencv_highgui2410d.lib")    
+#pragma comment(lib,"opencv_imgproc2410d.lib") 
+
+
+using namespace std; 
+
+typedef struct
+{
+	CvPoint cP;
+	int height;
+	int width;
+
+} RecP;
+//自定义排序函数
+namespace my
+{
+bool less(const RecP& s1, const RecP& s2)
+{
+	//if(s1.cP.x < s2.cP.x && s1.cP.y < s2.cP.y)
+	return s1.cP.x < s2.cP.x;          //依次增大
+
+} 
+}
+
+void PrintVector( vector<RecP> & vec)  
+{    
+	for(vector<RecP>::iterator n = vec.begin() ; n != vec.end() ; n++ )  
+	{  
+		cout<< n->cP.x <<'\t'<< n->cP.y <<'\t'<< n->height<<'\t'<< n->width <<endl;  
+	}  
+}  
+
+IplImage* src; 
+IplImage* img; 
+IplImage* dst; 
+IplImage* bianyuan;
+CvMemStorage* storage=NULL;
+
+int thresh=50;
+
+void on_trackbar(int pos)
+{         
+	CvSeq* contour=0;
+	if(storage==NULL)
+	{
+		dst=cvCreateImage(cvGetSize(bianyuan), 8, 3); 
+		storage=cvCreateMemStorage(0); 
+	}
+	else 
+	{
+		cvClearMemStorage(storage); 
+	} 
+	cvSmooth(bianyuan, bianyuan, CV_GAUSSIAN, 3, 3, 0, 0);
+	cvThreshold( bianyuan, img, thresh, 200, CV_THRESH_BINARY);
+
+	cvNamedWindow( "threshold", 1);
+	cvShowImage( "threshold", img );
+
+	cvFindContours(img, storage, &contour, sizeof(CvContour), CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE, cvPoint(0,0));  //查找轮廓
+	cvZero( dst );     //将数组中所有通道的所有元素的值都设置为0
+
+	vector<RecP> vecP;
+
+	int n=0;
+	for( ; contour; contour = contour->h_next )                                                           
+	{
+		CvRect rect=cvBoundingRect(contour,1);       // 获取矩形边界框 
+
+		if(abs(rect.width-rect.height)>3)
+		{
+			rect.width=0;
+			rect.height=0;
+			rect.x = rect.x + 640;
+			rect.y = rect.y + 480;
+		}
+
+
+		CvPoint pt1=cvPoint(rect.x, rect.y), pt2=cvPoint(rect.x+rect.width, rect.y+rect.height);   //定义矩形对顶点
+
+		cvRectangle(dst, pt1, pt2, CV_RGB(255,0,0), 1, CV_AA, 0);      //绘制矩形边框
+		cvLine(dst, pt1, pt2, CV_RGB(0,255,0), 1, CV_AA, 0);           //矩形对角线相连
+
+		pt1=cvPoint(rect.x, rect.y+rect.height),
+			pt2=cvPoint(rect.x+rect.width, rect.y);
+
+		cvLine(dst, pt1, pt2, CV_RGB(0,255,0), 1, CV_AA,0);            //矩形对角线相连
+
+		RecP tmp;
+		CvPoint p1;
+		p1 = cvPoint(rect.x + rect.width/2, rect.y + rect.height/2);   //矩形中心坐标
+
+		tmp.cP = p1;
+		tmp.height = rect.height;
+		tmp.width = rect.width;
+		vecP.push_back(tmp);
+		//printf("(%d,%d)\n", p1);
+		sort(vecP.begin(), vecP.end(),my::less);    //依次增大
+		//printf("(%d,%d):(%d,%d)\n", vecP[n].cP, vecP[n].height, vecP[n].width);
+		n++;
+	} 
+	PrintVector(vecP);
+
+	cvShowImage( "Components", dst ); 
+}                                                                                                           
+int main()                                                                           
+{                                                                                                             
+
+	const char* a = "Chess.jpg";
+	src = cvLoadImage(a, 0);
+	cvSmooth(src,src,CV_GAUSSIAN,5,5,0,0);
+	cvNamedWindow( "Source0000",1);                                                                               
+	cvShowImage( "Source0000", src);  
+
+	IplImage* bw =NULL;
+	IplImage* color=NULL;
+	IplImage* jh=NULL;
+	IplImage* sm=NULL;
+	if( !src )
+		return -1;
+	jh = cvCreateImage( cvGetSize(src), 8, 1 );
+	sm = cvCreateImage( cvGetSize(src), 8, 1 );
+	bw = cvCreateImage( cvGetSize(src), 8, 1 );
+	color = cvCreateImage( cvGetSize(src), 8, 3 );
+	cvEqualizeHist( src, jh);
+	cvSmooth(jh, sm, CV_MEDIAN, 3, 3, 0, 0);
+
+	cvCanny(sm,bw,200,600,3);
+	cvCvtColor( bw, color, CV_GRAY2BGR );
+	cvSaveImage("color.bmp",color);
+
+	const char* b = "color.bmp";
+	bianyuan = cvLoadImage(b, 0);
+	img=cvCreateImage(cvGetSize(bianyuan),8,1); 
+
+	cvNamedWindow( "Source",1);                                                                               
+	cvShowImage( "Source", bianyuan);  
+
+	cvNamedWindow( "Components",1);                                                                           
+
+	on_trackbar(0);
+
+	cvWaitKey(0);                                                                                             
+	cvDestroyWindow( "sorce" );                                                                               
+	cvDestroyWindow( "threshold" );                                                                           
+	cvDestroyWindow( "Components" );                                                                          
+	cvReleaseImage( &src);                                                                                    
+	cvReleaseImage( &img );                                                                                   
+	cvReleaseImage(&dst);                                                                                     
+	cvReleaseMemStorage(&storage); 
+	return 0;
+}
+
+
+ 
+ 
+ 
+ 实现效果
+ 
+
+
+参考文献
+http://blog.csdn.net/zcube/article/details/7357602# 轮廓分析
+
+
+
+转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
+
+来自：shiter编写程序的艺术
+ 
+

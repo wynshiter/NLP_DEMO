@@ -1,0 +1,199 @@
+content
+
+
+
+
+在我的小 rmbp 256G的硬盘里，实在是装不下100多个G的虚拟机了，所以想把一些东西迁移到这两年很火的Docker下，Docker以前也有过一两次，只是按着别人给的用法用的，具体的一些细节并没有深入，和git一样，这么牛掰的东西怎么能不好好学一些呢？
+
+
+Docker和虚拟机的区别
+
+Docker是一种容器，虚拟机是一种管理程序虚拟机化(hypervisor virtualization,HV)。管理程序虚拟化通过中间层将一台或者多台独立的机器虚拟运行在物理硬件之上，而容器(比如Docker)则是直接运行在操作系统内核之上的用户空间。由于容器是运行在操作系统上的，所以只能运行底层和宿主机相同或者类似的操作系统，比如说在Ubuntu下可以在容器里运行Centos，却不能运行Windows。
+
+目前Windows上的Docker可以跑Linux的Docker容器，是因为底下跑了Linux的VM，但是马上就可以支持Windows Server 2016了，如链接[Introducing the Technical Preview of Docker Engine for Windows Server 2016](http://Introducing the Technical Preview of Docker Engine for Windows Server 2016)。
+
+容器的优点：
+
+一次save，到处运行。
+启动速度快，消耗资源少。Docker与虚拟机性能比较
+
+容器缺点：
+
+资源隔离方面不如虚拟机。
+安全性问题，“权限隔离”做的不够好，只要有Docker的命令权限，就可以操作所有的Docker实例。
+
+Docker的目标
+
+
+提供一个简单、轻量的建模方式。
+职责的逻辑分离，防止开发环境和部署环境不一致，导致出现“开发时一切正常，肯定是运维问题”的情况。
+快速、高效的开发生命周期。
+
+Docker的核心组件
+
+
+Docker客户端和服务器
+Docker是一个C/S架构的程序，Docker客户端需要向Docker服务器发出请求，服务器完成请求后返回信息。一个本地Docker客户端可以连接远端的Docker服务器进行操作，如下图。
+
+Docker镜像
+镜像是构建Docker世界的基石。用户基于镜像来维护自己的容器。Docker镜像是Docker容器运行时的只读模板，每一个镜像由一系列的层 (layers) 组成。Docker使用 UnionFS来将这些层联合到单独的镜像中。UnionFS允许独立文件系统中的文件和文件夹(称之为分支)被透明覆盖，形成一个单独连贯的文件系统。正因为有了这些层的存在，Docker是如此的轻量。当你改变了一个Docker镜像，比如升级到某个程序到新的版本，一个新的层会被创建。因此，不用替换整个原先的镜像或者重新建立(在使用虚拟机的时候你可能会这么做)，只是一个新的层被添加或升级了。现在你不用重新发布整个镜像，只需要升级，层使得分发Docker镜像变得简单和快速。
+Docker仓库(Registry)
+Docker使用Registry来保存用户构建的镜像，就像苹果的apple store。Registry分为私有和公有两种，Docker公司自己运营的Registry叫做Docker Hub。
+Docker容器
+Docker可以帮你构建和部署容器，用户只需要把自己的应用程序或服务打包放进容器即可。每一个Docker容器都是从Docker镜像创建的。Docker容器可以运行、开始、停止、移动和删除。每一个Docker容器都是独立和安全的应用平台，Docker容器是Docker的运行部分。
+Docker的技术组件
+Docker可以被安装在x64架构，内核3.10以上的linux系主机、win10以上windows和OS X 10.10.3且2010年以后的Mac上。在2013年Docker刚发布的时候，它是一款基于LXC的开源容器管理引擎。把LXC复杂的容器创建与使用方式简化为Docker自己的一套命令体系。 随着Docker的不断发展，它开始有了更为远大的目标，那就是反向定义容器的实现标准，将底层实现都抽象化到Libcontainer的接口。这就意味 着，底层容器的实现方式变成了一种可变的方案，无论是使用namespace、cgroups技术抑或是使用systemd等其他方案，只要实现了 Libcontainer定义的一组接口，Docker都可以运行。
+
+安装
+
+安装方法都很简单，值得注意的是当前Docker版本的安装需求，比如现在Linux下安装的需求就上x64架构，内核3.10以上。
+Mac下安装方法，直接在官网上下载docker app，安装即可。 
+Linux下安装方法，Linux下最简单的安装方法就是apt和yum包管理工具进行安装了。 
+Windows下安装方法
+还有一个比较好用的安装脚本，这个脚本只支持在lsb、debian、fedora、oracle、centos、redhat、os这几个发行版中使用。
+在安装结束后，可以使用docker info命令来查看Docker是否装好了。Mac下的docker info结果：
+~  docker info
+Containers: 0
+Running: 0
+Paused: 0
+Stopped: 0
+Images: 0
+Server Version: 1.12.1
+Storage Driver: aufs
+Root Dir: /var/lib/docker/aufs
+Backing Filesystem: extfs
+Dirs: 0
+Dirperm1 Supported: true
+Logging Driver: json-file
+Cgroup Driver: cgroupfs
+Plugins:
+Volume: local
+Network: null bridge host overlay
+Swarm: inactive
+Runtimes: runc
+Default Runtime: runc
+Security Options: seccomp
+Kernel Version: 4.4.20-moby
+Operating System: Alpine Linux v3.4
+OSType: linux
+Architecture: x86_64
+CPUs: 4
+Total Memory: 1.952 GiB
+Name: moby
+ID: FSZQ:ZPKN:NEUW:55GH:Q33R:7L7M:5FLN:GW6E:CLHJ:NO66:WL4K:A3L5
+Docker Root Dir: /var/lib/docker
+Debug Mode (client): false
+Debug Mode (server): true
+File Descriptors: 34
+Goroutines: 98
+System Time: 2016-09-29T01:48:55.851895948Z
+EventsListeners: 2
+Registry: https://index.docker.io/v1/
+Insecure Registries:
+127.0.0.0/8
+Mac装好后如下图的样子，基本功能都已经在菜单上了。
+
+同时Mac还有一个GUI界面Kitmatic，目前还是beta版，但是用起来还是很不错的。
+
+各种各样的image看起来很好看。
+使用入门
+
+先把Docker的命令行打印出来。
+~  docker --help
+Usage: docker [OPTIONS] COMMAND [arg...]
+      docker [ --help | -v | --version ]
+
+A self-sufficient runtime for containers.
+
+Options:
+
+ --config=~/.docker              Location of client config files
+ -D, --debug                     Enable debug mode
+ -H, --host=[]                   Daemon socket(s) to connect to
+ -h, --help                      Print usage
+ -l, --log-level=info            Set the logging level
+ --tls                           Use TLS; implied by --tlsverify
+ --tlscacert=~/.docker/ca.pem    Trust certs signed only by this CA
+ --tlscert=~/.docker/cert.pem    Path to TLS certificate file
+ --tlskey=~/.docker/key.pem      Path to TLS key file
+ --tlsverify                     Use TLS and verify the remote
+ -v, --version                   Print version information and quit
+
+Commands:
+   attach    Attach to a running container
+   build     Build an image from a Dockerfile
+   commit    Create a new image from a container's changes
+   cp        Copy files/folders between a container and the local filesystem
+   create    Create a new container
+   diff      Inspect changes on a container's filesystem
+   events    Get real time events from the server
+   exec      Run a command in a running container
+   export    Export a container's filesystem as a tar archive
+   history   Show the history of an image
+   images    List images
+   import    Import the contents from a tarball to create a filesystem image
+   info      Display system-wide information
+   inspect   Return low-level information on a container, image or task
+   kill      Kill one or more running containers
+   load      Load an image from a tar archive or STDIN
+   login     Log in to a Docker registry.
+   logout    Log out from a Docker registry.
+   logs      Fetch the logs of a container
+   network   Manage Docker networks
+   node      Manage Docker Swarm nodes
+   pause     Pause all processes within one or more containers
+   port      List port mappings or a specific mapping for the container
+   ps        List containers
+   pull      Pull an image or a repository from a registry
+   push      Push an image or a repository to a registry
+   rename    Rename a container
+   restart   Restart a container
+   rm        Remove one or more containers
+   rmi       Remove one or more images
+   run       Run a command in a new container
+   save      Save one or more images to a tar archive (streamed to STDOUT by default)
+   search    Search the Docker Hub for images
+   service   Manage Docker services
+   start     Start one or more stopped containers
+   stats     Display a live stream of container(s) resource usage statistics
+   stop      Stop one or more running containers
+   swarm     Manage Docker Swarm
+   tag       Tag an image into a repository
+   top       Display the running processes of a container
+   unpause   Unpause all processes within one or more containers
+   update    Update configuration of one or more containers
+   version   Show the Docker version information
+   volume    Manage Docker volumes
+   wait      Block until a container stops, then print its exit code
+
+Run 'docker COMMAND --help' for more information on a command.'
+我相信能用Docker都是的大神，就不翻译了。
+在安装好以后来运行一个最简单的hello world吧。
+docker run hello-world
+所见即所得，如图。
+
+在运行docker run的时候，可以看到打印出了Hello from Docker!，首先docker在本地去检查了是否有一个叫做hello-world的镜像，在这里，我们刚装好的docker里必然是没有的，所以docker就去Docker Hub上找这个镜像，找到以后下载下来，run。读一下这个helloworld的输出，可以docker run -it ubuntu bash来运行一个ubuntu。来试一试
+# -i 代表保持STDIN开启，-t 代表为容器分配一个tty。
+docker run -it ubuntu bash
+运行以后，在docker hub里下载好ubuntu镜像后，docker构造好容器启动，就可以和正常的shell一样的进行操作了。
+
+更多内容尽在docker-learn1。
+参考链接
+
+
+[Introducing the Technical Preview of Docker Engine for Windows Server 2016](http://Introducing the Technical Preview of Docker Engine for Windows Server 2016)
+Docker与虚拟机性能比较
+第一本Docker书
+5分钟弄懂Docker
+一次“奇幻”的Docker libcontainer代码阅读之旅
+Docker背后的容器管理—Libcontainer深度解析
+LXC：Linux 容器工具
+阿里云Registry加速器
+docker使用阿里云Docker镜像库加速
+非常好的一篇Docker教程，比较全面
+知乎_Docker的应用场景在哪里
+一个比较详细的命令用法
+
+原文链接：http://dengnanyi.com/2016/09/28/docker-learn-0/ 
+
+

@@ -1,0 +1,53 @@
+content
+
+
+
+// 为包含指针的关联容器指定比较类型.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <set>
+#include <string> 
+#include <iostream>
+
+using namespace  std;
+
+
+struct  StringPtrLess:
+	public binary_function<const string*, const string*, bool>
+	{
+		bool operator()(const string *ps1, const string *ps2) const
+		{
+			return *ps1 < *ps2;
+		}
+	};
+
+
+typedef set<string*, StringPtrLess> StringPtrSet;
+StringPtrSet ssp;
+
+int main()
+{
+
+	
+	
+
+	ssp.insert(new string("apple"));
+	ssp.insert(new string("toy"));
+	ssp.insert(new string("cat"));
+
+
+	for (StringPtrSet::const_iterator i = ssp.begin();i != ssp.end();++i)
+	{
+		cout<<(**i)<<endl;
+	}
+
+
+	getchar();
+	return 0;
+
+
+}
+
+ 
+

@@ -1,0 +1,383 @@
+content
+
+
+
+OpenCV混合高斯模型函数注释说明
+一、cvaux.h
+#define CV_BGFG_MOG_MAX_NGAUSSIANS   500
+//高斯背景检测算法的默认参数设置
+#define CV_BGFG_MOG_BACKGROUND_THRESHOLD     0.7     //高斯分布权重之和阈值
+#define CV_BGFG_MOG_STD_THRESHOLD               2.5     //λ=2.5（99%）
+#define CV_BGFG_MOG_WINDOW_SIZE                  200    //学习率α=1/win_size
+#define CV_BGFG_MOG_NGAUSSIANS                   5       //k=5个混合高斯模型
+#define CV_BGFG_MOG_WEIGHT_INIT                  0.05	 //初始权重
+#define CV_BGFG_MOG_SIGMA_INIT                   30		 //初始标准差
+#define CV_BGFG_MOG_MINAREA                     15.f		 //？？？
+
+#define CV_BGFG_MOG_NCOLORS                      3       //颜色通道数
+/************* CV_BG_STAT_MODEL_FIELDS()的宏定义**********************/ 
+#define CV_BG_STAT_MODEL_FIELDS()                                                   
+    int             type; 		//type of BG model
+    CvReleaseBGStatModel release;  //                                               \
+    CvUpdateBGStatModel update;                                                     \
+    IplImage*       background;   /*8UC3 reference background image*/               \
+    IplImage*       foreground;   /*8UC1 foreground image*/                         \
+    IplImage**      layers;       /*8UC3 reference background image, can be null */ \
+    int             layer_count;  /* can be zero */                                 \
+    CvMemStorage*   storage;      /*storage for foreground_regions?/              \
+    CvSeq*          foreground_regions /*foreground object contours*/
+/*************************高斯背景模型参数结构体*************************/
+typedef struct CvGaussBGStatModelParams
+{    
+    int     win_size;     //等于 1/alpha
+    int     n_gauss;      //高斯模型的个数
+    double  bg_threshold, std_threshold, minArea;	// bg_threshold：高斯分布权重之和阈值、std_threshold：2.5、minArea：？？？
+    double  weight_init, variance_init;		//权重和方差
+}CvGaussBGStatModelParams;
+/**************************高斯分布模型结构体***************************/
+typedef struct CvGaussBGValues
+{
+    int         match_sum;
+    double      weight;
+    double      variance[CV_BGFG_MOG_NCOLORS];
+    double      mean[CV_BGFG_MOG_NCOLORS];
+}
+CvGaussBGValues;
+typedef struct CvGaussBGPoint		
+{
+    CvGaussBGValues* g_values;
+}
+CvGaussBGPoint;
+/*************************高斯背景模型结构体*************************/
+typedef struct CvGaussBGModel
+{
+    CV_BG_STAT_MODEL_FIELDS();
+    CvGaussBGStatModelParams   params;    
+    CvGaussBGPoint*            g_point;    
+    int                        countFrames;
+}
+CvGaussBGModel;
+二、cvbgfg_gaussmix.cpp
+//////////////////////////////////////////////////////////// cvCreateGaussianBGModel////////////////////////////////////////////////////////////////
+功能：高斯背景模型变量bg_model初始化赋值
+CV_IMPL CvBGStatModel* cvCreateGaussianBGModel( IplImage* first_frame, CvGaussBGStatModelParams* parameters)
+{
+    CvGaussBGModel* bg_model = 0;		//高斯背景状态模型变量
+    
+    CV_FUNCNAME( "cvCreateGaussianBGModel" );
+    
+    __BEGIN__;
+    
+    double var_init;
+    CvGaussBGStatModelParams params;	//高斯背景状态模型参数变量
+    int i, j, k, n, m, p;
+    //初始化参数，如果参数为空，则进行初始化赋值
+    if( parameters == NULL )
+    {
+        params.win_size = CV_BGFG_MOG_WINDOW_SIZE;		//学习率α=1/200=0.005
+        params.bg_threshold = CV_BGFG_MOG_BACKGROUND_THRESHOLD;	//判断是否为背景点的阈值0.7
+        params.std_threshold = CV_BGFG_MOG_STD_THRESHOLD;//标准阈值2.5
+        params.weight_init = CV_BGFG_MOG_WEIGHT_INIT;		//权重值0.05
+        params.variance_init = CV_BGFG_MOG_SIGMA_INIT*CV_BGFG_MOG_SIGMA_INIT; //方差30*30
+        params.minArea = CV_BGFG_MOG_MINAREA;			//？？？
+        params.n_gauss = CV_BGFG_MOG_NGAUSSIANS;		//高斯模型个数
+    }
+    else
+    {
+        params = *parameters;
+    }
+    
+    if( !CV_IS_IMAGE(first_frame) )		//如果第一帧不是图像，则报错
+        CV_ERROR( CV_StsBadArg, "Invalid or NULL first_frame parameter" );
+    
+    CV_CALL( bg_model = (CvGaussBGModel*)cvAlloc( sizeof(*bg_model) ));	//申请内存空间
+    memset( bg_model, 0, sizeof(*bg_model) );
+    bg_model->type = CV_BG_MODEL_MOG;		// CV_BG_MODEL_MOG高斯背景模型
+    bg_model->release = (CvReleaseBGStatModel)icvReleaseGaussianBGModel;	//释放内存的函数指针
+    bg_model->update = (CvUpdateBGStatModel)icvUpdateGaussianBGModel;	//更新高斯模型的函数指针    
+bg_model->params = params;
+
+    //申请内存空间
+    CV_CALL( bg_model->g_point = (CvGaussBGPoint*)cvAlloc(sizeof(CvGaussBGPoint)*
+        ((first_frame->width*first_frame->height) + 256)));		//256?
+    
+    CV_CALL( bg_model->background = cvCreateImage(cvSize(first_frame->width,
+        first_frame->height), IPL_DEPTH_8U, first_frame->nChannels));
+    CV_CALL( bg_model->foreground = cvCreateImage(cvSize(first_frame->width,
+        first_frame->height), IPL_DEPTH_8U, 1));
+    
+    CV_CALL( bg_model->storage = cvCreateMemStorage());
+    
+    //初始化
+    var_init = 2 * params.std_threshold * params.std_threshold;		//初始化方差
+    CV_CALL( bg_model->g_point[0].g_values =
+        (CvGaussBGValues*)cvAlloc( sizeof(CvGaussBGValues)*params.n_gauss*
+        (first_frame->width*first_frame->height + 128)));			//128?
+	//n：表示像素点的索引值
+	//p：表示当前像素对应颜色通道的首地址
+	// g_point[]：对应像素点、g_values[]：对应高斯模型、variance[]和 mean[]：对应颜色通道
+    for( i = 0, p = 0, n = 0; i < first_frame->height; i++ )		//行
+    {
+        for( j = 0; j < first_frame->width; j++, n++ )		//列
+        {
+            bg_model->g_point[n].g_values = bg_model->g_point[0].g_values + n*params.n_gauss;//每个像素点的第一个高斯模型的地址（每个像素对应n_gauss个高斯分布模型）
+
+		   //初始化第一个高斯分布模型的参数
+            bg_model->g_point[n].g_values[0].weight = 1;    //取较大权重，此处设置为1
+            bg_model->g_point[n].g_values[0].match_sum = 1;//高斯函数被匹配的次数（？？？）
+            for( m = 0; m < first_frame->nChannels; m++)	   //对各颜色通道的方差和均值赋值
+            {
+                bg_model->g_point[n].g_values[0].variance[m] = var_init;	//初始化较大的方差
+                bg_model->g_point[n].g_values[0].mean[m] = (unsigned char)first_frame->imageData[p + m];														//赋值为当前像素值
+            }
+
+		   //初始化剩下的高斯分布模型的参数
+            for( k = 1; k < params.n_gauss; k++)
+            {
+                bg_model->g_point[n].g_values[k].weight = 0;//各高斯分布取相等且较小权重值，此处取0
+                bg_model->g_point[n].g_values[k].match_sum = 0;
+                for( m = 0; m < first_frame->nChannels; m++)
+{
+                    bg_model->g_point[n].g_values[k].variance[m] = var_init; //初始化较大的方差
+                    bg_model->g_point[n].g_values[k].mean[m] = 0;		  //赋值0
+                }
+            }
+            p += first_frame->nChannels;
+        }
+    }
+    
+    bg_model->countFrames = 0;
+    
+    __END__;
+    
+    if( cvGetErrStatus() < 0 )
+    {
+        CvBGStatModel* base_ptr = (CvBGStatModel*)bg_model;
+        
+        if( bg_model && bg_model->release )
+            bg_model->release( &base_ptr );
+        else
+            cvFree( &bg_model );
+        bg_model = 0;
+    }
+    
+    return (CvBGStatModel*)bg_model;
+}
+////////////////////////////////////////////////////////// icvUpdateGaussianBGModel ///////////////////////////////////////////////////////////////
+功能：对高斯背景模型变量bg_model进行更新
+static int CV_CDECL icvUpdateGaussianBGModel( IplImage* curr_frame, CvGaussBGModel*  bg_model )
+{
+    int i, j, k;
+    int region_count = 0;
+    CvSeq *first_seq = NULL, *prev_seq = NULL, *seq = NULL;
+    
+    bg_model->countFrames++;
+    
+    for( i = 0; i < curr_frame->height; i++ )	//行
+    {
+        for( j = 0; j < curr_frame->width; j++ )	//列
+        {
+            int match[CV_BGFG_MOG_MAX_NGAUSSIANS];
+            double sort_key[CV_BGFG_MOG_MAX_NGAUSSIANS];
+            const int nChannels = curr_frame->nChannels;	//通道数目
+            const int n = i*curr_frame->width+j;			//像素索引值
+            const int p = n*curr_frame->nChannels;		//像素点颜色通道的首地址
+            
+            // A few short cuts
+            CvGaussBGPoint* g_point = &bg_model->g_point[n];
+            const CvGaussBGStatModelParams bg_model_params = bg_model->params;
+            double pixel[4];
+            int no_match;
+            
+            for( k = 0; k < nChannels; k++ )		//拷贝各通道颜色分量值
+                pixel[k] = (uchar)curr_frame->imageData[p+k];
+            
+            no_match = icvMatchTest( pixel, nChannels, match, g_point, &bg_model_params );
+		   //判断高斯背景模型更新帧数是否达到设置值win_size（？？？）
+（初始更新阶段和一般更新阶段在更新处理过程中是不同的，其中定义初始更新阶段为帧数小于win_size）
+            if( bg_model->countFrames == bg_model->params.win_size )	//一般更新阶段
+            {
+                icvUpdateFullWindow( pixel, nChannels, match, g_point, &bg_model->params );
+                if( no_match == -1)
+                    icvUpdateFullNoMatch( curr_frame, p, match, g_point, &bg_model_params );
+            }
+            else
+            {
+                icvUpdatePartialWindow( pixel, nChannels, match, g_point, &bg_model_params );
+                if( no_match == -1)
+                    icvUpdatePartialNoMatch( pixel, nChannels, match, g_point, &bg_model_params );
+            }
+            icvGetSortKey( nChannels, sort_key, g_point, &bg_model_params );
+            icvInsertionSortGaussians( g_point, sort_key, (CvGaussBGStatModelParams *)&bg_model_params );
+            icvBackgroundTest( nChannels, n, p, match, bg_model );
+        }
+    }
+    
+    //foreground filtering
+    
+    //filter small regions
+    cvClearMemStorage(bg_model->storage);
+    
+    //cvMorphologyEx( bg_model->foreground, bg_model->foreground, 0, 0, CV_MOP_OPEN, 1 );
+    //cvMorphologyEx( bg_model->foreground, bg_model->foreground, 0, 0, CV_MOP_CLOSE, 1 );
+    
+    cvFindContours( bg_model->foreground, bg_model->storage, &first_seq, sizeof(CvContour), CV_RETR_LIST );
+    for( seq = first_seq; seq; seq = seq->h_next )
+    {
+        CvContour* cnt = (CvContour*)seq;
+        if( cnt->rect.width * cnt->rect.height < bg_model->params.minArea )
+        {
+            //delete small contour
+            prev_seq = seq->h_prev;
+            if( prev_seq )
+            {
+                prev_seq->h_next = seq->h_next;
+                if( seq->h_next ) seq->h_next->h_prev = prev_seq;
+            }
+            else
+            {
+                first_seq = seq->h_next;
+                if( seq->h_next ) seq->h_next->h_prev = NULL;
+            }
+        }
+        else
+        {
+            region_count++;
+        }
+    }
+    bg_model->foreground_regions = first_seq;
+    cvZero(bg_model->foreground);
+    cvDrawContours(bg_model->foreground, first_seq, CV_RGB(0, 0, 255), CV_RGB(0, 0, 255), 10, -1);
+    
+    return region_count;
+}
+//////////////////////////////////////////////////////////// icvMatchTest ////////////////////////////////////////////////////////////////
+功能：将当前像素与个高斯分布进行匹配判断，如果匹配成功，则返回相应高斯分布的索引值
+static int icvMatchTest( double* src_pixel, int nChannels, int* match,
+                         const CvGaussBGPoint* g_point,
+                         const CvGaussBGStatModelParams *bg_model_params )
+{
+    int k;
+    int matchPosition=-1;
+    for ( k = 0; k < bg_model_params->n_gauss; k++) match[k]=0;	//高斯分布匹配标识数组初始化置0
+    
+for ( k = 0; k < bg_model_params->n_gauss; k++)
+{
+        double sum_d2 = 0.0;
+        double var_threshold = 0.0;
+        for(int m = 0; m < nChannels; m++)	//计算当前高斯分布各通道均值与像素点各通道值相减
+{
+            double d = g_point->g_values[k].mean[m]- src_pixel[m];
+            sum_d2 += (d*d);
+            var_threshold += g_point->g_values[k].variance[m];
+        }  //difference < STD_LIMIT*STD_LIMIT or difference**2 < STD_LIMIT*STD_LIMIT*VAR
+        var_threshold = _model_params->std_threshold*bg_model_params->std_threshold*var_threshold;
+//匹配方程为：或者
+        if(sum_d2 < var_threshold)
+{
+            match[k] = 1;		//匹配时标识置1
+            matchPosition = k;	//存储匹配的高斯分布索引值
+            break;				//一旦匹配，就终止与后续高斯分布的匹配
+        }
+    }
+    
+    return matchPosition;		//返回匹配上的高斯分布索引值
+}
+//////////////////////////////////////////////////// icvUpdateFullWindow ////////////////////////////////////////////////////////////
+功能：更新各高斯分布的权重值（对于匹配上的高斯分布要增大权值，其余的减小权值），如果存在匹配上的高斯分布，还要更新其均值和方差。
+static void icvUpdateFullWindow( double* src_pixel, int nChannels, int* match,
+                                 CvGaussBGPoint* g_point,
+                                 const CvGaussBGStatModelParams *bg_model_params )
+{
+    const double learning_rate_weight = (1.0/(double)bg_model_params->win_size);	//学习率α
+for(int k = 0; k < bg_model_params->n_gauss; k++)
+{
+	   //若match[k]=0，则权重ω的更新公式：
+	   //若match[k]=0，则权重ω的更新公式：
+        g_point->g_values[k].weight = 
+g_point->g_values[k].weight + (learning_rate_weight*((double)match[k] -g_point->g_values[k].weight));
+        if(match[k])			//更新匹配的高斯分布的参数
+{
+            //参数学习率
+double learning_rate_gaussian =         (double)match[k]/(g_point->g_values[k].weight*(double)bg_model_params->win_size);	
+            for(int m = 0; m < nChannels; m++)
+{
+                const double tmpDiff = src_pixel[m] - g_point->g_values[k].mean[m];
+			  //均值μ更新公式为：
+                g_point->g_values[k].mean[m] = 
+g_point->g_values[k].mean[m] +(learning_rate_gaussian * tmpDiff);
+			 //方差更新公式为：
+                g_point->g_values[k].variance[m] = g_point->g_values[k].variance[m]+
+                    (learning_rate_gaussian*((tmpDiff*tmpDiff) - g_point->g_values[k].variance[m]));
+            }
+        }
+    }
+}
+//////////////////////////////////////////////////// icvUpdateFullNoMatch ////////////////////////////////////////////////////////////
+功能：当前像素点与所有高斯分布都不匹配时，需要将比值最小的高斯分布替换为新的高斯分布（权值小、方差大），其余的高斯分布保持原来的均值和方差，但权值需要减小。
+static void icvUpdateFullNoMatch( IplImage* gm_image, int p, int* match,
+                                  CvGaussBGPoint* g_point,
+                                  const CvGaussBGStatModelParams *bg_model_params)
+{
+    int k, m;
+    double alpha;
+    int match_sum_total = 0;
+
+    //new value of last one
+    g_point->g_values[bg_model_params->n_gauss - 1].match_sum = 1;	//将新的高斯分布的match_sum置为1
+    
+    //get sum of all but last value of match_sum    
+    for( k = 0; k < bg_model_params->n_gauss ; k++ )
+        match_sum_total += g_point->g_values[k].match_sum;
+    
+	//设置新的高斯分布的参数
+    g_point->g_values[bg_model_params->n_gauss - 1].weight = 1./(double)match_sum_total; //给新的高斯分布设置一个较小的权值，即1.0/ match_sum_total
+    for( m = 0; m < gm_image->nChannels ; m++ )
+    {
+        // first pass mean is image value
+        g_point->g_values[bg_model_params->n_gauss - 1].variance[m] = bg_model_params->variance_init;	//初始化一个较大的方差
+        g_point->g_values[bg_model_params->n_gauss - 1].mean[m] = (unsigned char)gm_image->imageData[p + m]; //将当前像素值作为均值
+    }
+    
+//更新其余高斯分布的参数
+    alpha = 1.0 - (1.0/bg_model_params->win_size);
+    for( k = 0; k < bg_model_params->n_gauss - 1; k++ )
+{
+	   //更新权值的公式为：
+        g_point->g_values[k].weight *= alpha;
+        if( match[k] )	//对于匹配的高斯分布，权值更新公式为
+            g_point->g_values[k].weight += alpha;
+    }
+}
+//////////////////////////////////////////////////// icvUpdatePartialWindow ////////////////////////////////////////////////////////////
+功能：更新各高斯分布的权重值（对于匹配上的高斯分布要增大权值，其余的减小权值），如果存在匹配上的高斯分布，还要更新其均值和方差。
+static void icvUpdatePartialWindow( double* src_pixel, int nChannels, int* match, CvGaussBGPoint* g_point, const CvGaussBGStatModelParams *bg_model_params )
+{
+    int k, m;
+    int window_current = 0;
+    
+    for( k = 0; k < bg_model_params->n_gauss; k++ )
+        window_current += g_point->g_values[k].match_sum;
+    
+    for( k = 0; k < bg_model_params->n_gauss; k++ )
+    {
+        g_point->g_values[k].match_sum += match[k];
+        double learning_rate_weight = (1.0/((double)window_current + 1.0)); //increased by one since sum
+        g_point->g_values[k].weight = g_point->g_values[k].weight +
+            (learning_rate_weight*((double)match[k] - g_point->g_values[k].weight));
+        
+        if( g_point->g_values[k].match_sum > 0 && match[k] )
+        {
+            double learning_rate_gaussian = (double)match[k]/((double)g_point->g_values[k].match_sum);
+            for( m = 0; m < nChannels; m++ )
+            {
+                const double tmpDiff = src_pixel[m] - g_point->g_values[k].mean[m];
+                g_point->g_values[k].mean[m] = g_point->g_values[k].mean[m] +
+                    (learning_rate_gaussian*tmpDiff);
+                g_point->g_values[k].variance[m] = g_point->g_values[k].variance[m]+
+                    (learning_rate_gaussian*((tmpDiff*tmpDiff) - g_point->g_values[k].variance[m]));
+            }
+        }
+    }
+} 
+

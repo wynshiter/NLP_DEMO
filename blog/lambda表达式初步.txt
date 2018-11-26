@@ -1,0 +1,63 @@
+content
+
+
+
+// Lambda_test20140801.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <algorithm>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+
+int main()
+{
+	//创建一个包含10个元素的集合对象
+	vector<int> v;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		v.push_back(i);
+	}
+
+	//使用for_each 语句和lambda表达式来实现对偶元素的计数
+
+	int evenCount = 0;
+	for_each(v.begin(),v.end(),[&evenCount](int n){
+		
+		cout<<n;
+
+		if (n % 2 == 0)
+		{
+			cout<<" is even"<<endl;
+
+			//increment the counter
+			evenCount++;
+
+		}
+		else
+		{
+			cout<<" is odd"<<endl;
+
+		}
+	
+	
+	
+	});
+
+	//将偶元素个数打印出来
+	cout<<"There are "<<evenCount<<" even numbers in the vector"<<endl;
+
+
+	getchar();
+
+
+
+
+	return 0;
+}
+
+ 
+

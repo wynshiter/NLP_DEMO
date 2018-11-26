@@ -1,0 +1,33 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/17799655				
+
+
+《暗战强人：黑客攻防入门全程图解》
+第一部分基础知识：
+ 
+ 
+
+进程选项卡中一些常用的映像名称解释：
+smss.exe：会话管理
+csrss.exe：子系统服务器进程
+winlogon.exe：管理用户登录
+service.exe：系统服务进程
+lsass.exe：管理IP安全策略及启动ISAKMP/Oakley（IKE）和IP安全启动程序。
+svchost.exe：从动态链接库中运行服务的通用主机进程名称（在windows XP系统中通常有6个svchost.exe进程）
+spoolsv.exe：将文件加载到内存中以便打印
+explorer.exe：资源管理进程
+internat.ext：输入法进程
+ 
+端口分类：
+1.公认端口，well known ports
+2.注册端口，registered ports
+3.动态端口，dynamic and/or private ports
+ 
+常见端口：
+端口：1   服务：tcpmux
+ 
+ 
+
+

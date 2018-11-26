@@ -1,0 +1,270 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/77435795				
+
+
+
+leetcode 主要是一个针对北美的coder人群找工作的代码练习网站，我在2015年初次接触这个网站的时候，总共只有200多道题目，是一个类似acm 的a题网站。这些年变化越来越大，主要是因为找工作当然是多样化的考核过程，leetcode 也逐渐与时俱进，推出了下面几个类别的练习，今天我们随便挑几个练习一下：
+
+175. Combine Two Tables —SQL
+Table: Person
+
+
+
+Column Name
+Type
+
+
+
+PersonId
+int
+
+
+FirstName
+varchar
+
+
+LastName
+varchar
+
+
+PersonId is the primary key column for this table.
+Table: Address
+
+
+
+Column Name
+Type
+
+
+
+AddressId
+int
+
+
+PersonId
+int
+
+
+City
+varchar
+
+
+State
+varchar
+
+
+AddressId is the primary key column for this table.
+
+Write a SQL query for a report that provides the following information for each person in the Person table, regardless if there is an address for each of those people: 
+FirstName, LastName, City, State
+# Write your MySQL query statement below
+
+#
+/** 这是个内链接
+select t1.FirstName,t1.LastName ,t2.City,t2.State from 
+
+(select * from Person as t1),
+（select * from Address as t2),
+
+where t1.PersonId=t2.PersonId
+
+*/
+
+select FirstName,LastName,City,State  from Person left join Address on  Person.PersonId=Address.PersonId
+数据库到底有多少种链接呢？
+1、内联接（典型的联接运算，使用像 =  或 <> 之类的比较运算符）。包括相等联接和自然联接。 
+内联接使用比较运算符根据每个表共有的列的值匹配两个表中的行。
+2、外联接。外联接可以是左向外联接、右向外联接或完整外部联接。 
+在 FROM子句中指定外联接时，可以由下列几组关键字中的一组指定： 
+1）LEFT  JOIN或LEFT OUTER JOIN 
+左向外联接的结果集包括  LEFT OUTER子句中指定的左表的所有行，而不仅仅是联接列所匹配的行。如果左表的某行在右表中没有匹配行，则在相关联的结果集行中右表的所有选择列表列均为空值。 
+2）RIGHT  JOIN 或 RIGHT  OUTER  JOIN 
+右向外联接是左向外联接的反向联接。将返回右表的所有行。如果右表的某行在左表中没有匹配行，则将为左表返回空值。 
+3）FULL  JOIN 或 FULL OUTER JOIN 
+完整外部联接返回左表和右表中的所有行。当某行在另一个表中没有匹配行时，则另一个表的选择列表列包含空值。如果表之间有匹配行，则整个结果集行包含基表的数据值。   
+3、交叉联接 
+交叉联接返回左表中的所有行，左表中的每一行与右表中的所有行组合。交叉联接也称作笛卡尔积。 
+FROM 子句中的表或视图可通过内联接或完整外部联接按任意顺序指定；但是，用左或右向外联接指定表或视图时，表或视图的顺序很重要。有关使用左或右向外联接排列表的更多信息，请参见使用外联接。
+
+多表查询分为 内、外连接
+外连接分为左连接（left join 或left outer join）、右连接（right join 或者 right outer join）、和完整外部连接 （full join 或者 full outer join）
+左连接（left join 或 left outer join）的结果就是left join子句中的左表的所有行，而不仅仅是链接列所匹配的行，如果左表中的某行在右表中没有匹配，则在相关联的结果行中右表的所有选择列均为空值（NULL）
+SQL语法　 
+    select * from table1 left join table2 on table1.条件列名 = table2.条件列名；
+注释： 显示的就是table1中的所有列和能匹配的列 
+右连接（right join 或 right outer join ）在这里不做多说这左连接很象但是是相反的，只说一下语法 
+select *from table1 right join table2 on table1. 条件列= table2.条件列 
+完全外部连接（full join 或 full outer join） 
+显示左右表中的所有行，当某一个表中没有匹配的行时，则另一个表的选择列表列包含空值（NULL）如果有则显示全部数据 
+SQL语法： 
+select *from table1 full join table2 on table1.条件列名= table2.条件列名
+内连接： 
+概念：内连接就是用比较运算符比较要用连接列的值的连接 
+内连接（join 或者inner join ） 
+SQL语法： 
+select *fron table1 join table2 on table1.条件列名 = table2.条件列名 
+返回符合匹配条件的两表列 
+等价于： 
+select A* ,B* from table1 A ,table2 B where A.条件列名 =B.条件列名 
+select *form table1 cross join table2 where table1.条件列名 = table2.条件列名（注： Cross join 后面不能跟on 只能用where） 
+交叉连接（完全）
+概念：没有用where子句的交叉连接将产生连接所涉及的笛卡尔积第一个表的行数乘以第二个表的行数等于笛卡尔积和结果集的大小 
+交叉连接： Cross join（不带条件where，如果带返回或显示的是匹配的行数）
+SQL语法： 
+select *from table1 cross join table2 
+如果有条件（where） 
+select * from table1 cross join table2 where table1. 条件列名= table2.条件列名 
+等价于
+select *from table1,table2 (不带where)
+
+193. Valid Phone Numbers — shell
+Given a text file file.txt that contains list of phone numbers (one per line), write a one liner bash script to print all valid phone numbers.
+You may assume that a valid phone number must appear in one of the following two formats: (xxx) xxx-xxxx or xxx-xxx-xxxx. (x means a digit)
+You may also assume each line in the text file must not contain leading or trailing white spaces.
+For example, assume that file.txt has the following content:
+987-123-4567
+123 456 7890
+(123) 456-7890
+
+Your script should output the following valid phone numbers:
+987-123-4567
+(123) 456-7890
+
+三种解决方案：
+Using grep
+在CentOS下面，grep -E主要是用来支持扩展正则表达式，比如|、&这些符号，用于grep多条件查询，并非是使用标准正则表达式。在shell下面man grep看了下，加上-P（使用Perl的正则引擎）即可过滤出目标数据.
+grep -P '^(\d{3}-|\(\d{3}\) )\d{3}-\d{4}$' file.txt
+Using sed:
+sed 是一种在线编辑器，它一次处理一行内容。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern space），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。接着处理下一行，这样不断重复，直到文件末尾。文件内容并没有 改变，除非你使用重定向存储输出。Sed主要用来自动编辑一个或多个文件；简化对文件的反复操作；编写转换程序等。
+sed使用参数
+[root@www ~]# sed [-nefr] [动作]
+
+选项与参数： 
+    -n ：使用安静(silent)模式。在一般 sed 的用法中，所有来自 STDIN 的数据一般都会被列出到终端上。但如果加上 -n 参数后，则只有经过sed 特殊处理的那一行(或者动作)才会被列出来。 
+    -e ：直接在命令列模式上进行 sed 的动作编辑； 
+    -f ：直接将 sed 的动作写在一个文件内， -f filename 则可以运行 filename 内的 sed 动作； 
+    -r ：sed 的动作支持的是延伸型正规表示法的语法。(默认是基础正规表示法语法) 
+    -i ：直接修改读取的文件内容，而不是输出到终端。
+动作说明： [n1[,n2]]function
+
+n1, n2 ：不见得会存在，一般代表『选择进行动作的行数』，举例来说，如果我的动作是需要在 10 到 20 行之间进行的，则『 10,20[动作行为] 』
+function：
+
+a ：新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～ 
+  c ：取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！ 
+  d ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚； 
+  i ：插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)； 
+  p ：列印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～ 
+  s ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正规表示法！例如 1,20s/old/new/g 就是啦！
+
+sed -n -r '/^([0-9]{3}-|\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/p' file.txt
+Using awk:
+简单来说awk就是把文件逐行的读入，以空格为默认分隔符将每行切片，切开的部分再进行各种分析处理 
+使用方法
+awk '{pattern + action}' {filenames}
+尽管操作可能会很复杂，但语法总是这样，其中 pattern 表示 AWK 在数据中查找的内容，而 action 是在找到匹配内容时所执行的一系列命令。花括号（{}）不需要在程序中始终出现，但它们用于根据特定的模式对一系列指令进行分组。 pattern就是要表示的正则表达式，用斜杠括起来。
+awk语言的最基本功能是在文件或者字符串中基于指定规则浏览和抽取信息，awk抽取信息后，才能进行其他文本操作。完整的awk脚本通常用来格式化文本文件中的信息。
+通常，awk是以文件的一行为处理单位的。awk每接收文件的一行，然后执行相应的命令，来处理文本。
+awk '/^([0-9]{3}-|\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/' file.txt
+
+或者使用：
+grep -e '\(^[0-9]\{3\}-[0-9]\{3\}-[0-9]\{4\}$\)' -e '\(^([0-9]\{3\})[ ]\{1\}[0-9]\{3\}-\([0-9]\{4\}\)$\)'  file.txt
+
+In Bash, we use \ to escape next one trailing character;
+^ is used to denote the beginning of a line 
+$ is used to denote the end of a line
+{M} is used to denote to match exactly M times of the previous occurence/regex 
+(…) is used to group pattern/regex together
+Back to this problem: 
+it requires us to match two patterns, for better readability, I used -e and separate the two patterns into two regexes, the first one matches this case: xxx-xxx-xxxx and the second one matches this case: (xxx) xxx-xxxx
+Please vote this post up if you find it helpful for your understanding!
+
+534. Design TinyURL — system design
+https://segmentfault.com/a/1190000006140476
+
+Note: For the coding companion problem, please see: Encode and Decode TinyURL. 
+  How would you design a URL shortening service that is similar to TinyURL?
+
+Background:
+
+TinyURL is a URL shortening service where you enter a URL such as https://leetcode.com/problems/design-tinyurl and it returns a short URL such as http://tinyurl.com/4e9iAk.
+
+Requirements:
+
+For instance, “http://tinyurl.com/4e9iAk” is the tiny url for the page “https://leetcode.com/problems/design-tinyurl“. The identifier (the highlighted part) can be any string with 6 alphanumeric characters containing 0-9, a-z, A-Z. 
+  Each shortened URL must be unique; that is, no two different URLs can be shortened to the same URL. 
+  Note about Questions: 
+  Below are just a small subset of questions to get you started. In real world, there could be many follow ups and questions possible and the discussion is open-ended (No one true or correct way to solve a problem). If you have more ideas or questions, please ask in Discuss and we may compile it here!
+
+Questions: 
+1. How many unique identifiers possible? Will you run out of unique URLs? 
+2. Should the identifier be increment or not? Which is easier to design? Pros and cons? 
+3. Mapping an identifier to an URL and its reversal - Does this problem ring a bell to you? 
+4. How do you store the URLs? Does a simple flat file database work? 
+5. What is the bottleneck of the system? Is it read-heavy or write-heavy? 
+6. Estimate the maximum number of URLs a single machine can store. 
+7. Estimate the maximum number of queries per second (QPS) for decoding a shortened URL in a single machine. 
+8. How would you scale the service? For example, a viral link which is shared in social media could result in a peak QPS at a moment’s notice. 
+9. How could you handle redundancy? i,e, if a server is down, how could you ensure the service is still operational? 
+10. Keep URLs forever or prune, pros/cons? How we do pruning? (Contributed by @alex_svetkin) 
+11. What API would you provide to a third-party developer? (Contributed by @alex_svetkin) 
+12. If you can enable caching, what would you cache and what’s the expiry time? (Contributed by @Humandroid)
+public class URLService {
+    HashMap<String, Integer> ltos;
+    HashMap<Integer, String> stol;
+    static int COUNTER;
+    String elements;
+    URLService() {
+        ltos = new HashMap<String, Integer>();
+        stol = new HashMap<Integer, String>();
+        COUNTER = 1;
+        elements = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    }
+    public String longToShort(String url) {
+        String shorturl = base10ToBase62(COUNTER);
+        ltos.put(url, COUNTER);
+        stol.put(COUNTER, url);
+        COUNTER++;
+        return "http://tiny.url/" + shorturl;
+    }
+    public String shortToLong(String url) {
+        url = url.substring("http://tiny.url/".length());
+        int n = base62ToBase10(url);
+        return stol.get(n);
+    }
+
+    public int base62ToBase10(String s) {
+        int n = 0;
+        for (int i = 0; i < s.length(); i++) {
+            n = n * 62 + convert(s.charAt(i));
+        }
+        return n;
+
+    }
+    public int convert(char c) {
+        if (c >= '0' && c <= '9')
+            return c - '0';
+        if (c >= 'a' && c <= 'z') {
+            return c - 'a' + 10;
+        }
+        if (c >= 'A' && c <= 'Z') {
+            return c - 'A' + 36;
+        }
+        return -1;
+    }
+    public String base10ToBase62(int n) {
+        StringBuilder sb = new StringBuilder();
+        while (n != 0) {
+            sb.insert(0, elements.charAt(n % 62));
+            n /= 62;
+        }
+        while (sb.length() != 6) {
+            sb.insert(0, '0');
+        }
+        return sb.toString();
+    }
+} 
+
+

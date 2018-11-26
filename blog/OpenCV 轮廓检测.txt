@@ -1,0 +1,292 @@
+content
+
+
+
+读入彩色3通道图像，转换成灰度图像，再转换成二值图像，完后检测轮廓。
+ 
+// cvtcolor.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+
+
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+#pragma comment(lib, "opencv_highgui2410d.lib")
+#pragma comment(lib, "opencv_core2410d.lib")
+#pragma comment(lib, "opencv_imgproc2410d.lib")
+
+using namespace cv;
+using namespace std;
+
+int main()
+{
+	string image_name = "swan.jpg";
+
+	Mat src = imread(image_name);
+	imshow("src",src);
+				
+	Mat gray(src.size(),CV_8U);
+	cvtColor(src,gray,CV_BGR2GRAY);//转换成灰度图
+
+	imshow("gray",gray);
+
+	threshold(gray,gray,128,255,THRESH_BINARY);//转换成2值图像
+	imshow("binary",gray);
+
+	/////////////////////////////////////////////////////////////////////
+	std::vector<std::vector<cv::Point>> contours;
+	cv::findContours(gray, 
+		contours, // a vector of contours 
+		CV_RETR_EXTERNAL, // retrieve the external contours
+		CV_CHAIN_APPROX_NONE); // retrieve all pixels of each contours
+
+	// Print contours' length
+	std::cout << "Contours: " << contours.size() << std::endl;
+	std::vector<std::vector<cv::Point>>::const_iterator itContours= contours.begin();
+	for ( ; itContours!=contours.end(); ++itContours) 
+	{
+
+		std::cout << "Size: " << itContours->size() << std::endl;
+	}
+
+	// draw black contours on white image
+	cv::Mat result(gray.size(),CV_8U,cv::Scalar(255));
+	cv::drawContours(result,contours,
+		-1, // draw all contours
+		cv::Scalar(0), // in black
+		2); // with a thickness of 2
+
+	cv::namedWindow("Contours");
+	cv::imshow("Contours",result);
+
+
+	// draw contours on the original image
+	cv::Mat original= cv::imread(image_name);
+	cv::drawContours(original,contours,
+		-1, // draw all contours
+		cv::Scalar(255,255,255), // in white
+		-1); // with a thickness of 2
+
+	cv::namedWindow("Contours on Animals");
+	cv::imshow("Contours on Animals",original);
+
+	// Let's now draw black contours on white image
+	result.setTo(cv::Scalar(255));
+	cv::drawContours(result,contours,
+		-1, // draw all contours
+		cv::Scalar(0), // in black
+		-1); // with a thickness of 1
+	//image= cv::imread("test.png",0);
+
+
+
+
+	waitKey(0);
+
+	return 0;
+}
+
+
+
+ 
+ 
+ 
+实现效果：
+ 
+
+ 
+ 
+ 
+添加代码只显示不大不小的轮廓：
+//除去太长或者太短的轮廓   
+	int cmin = 10;   
+	int cmax = 500000;   
+	vector<std::vector<cv::Point>>::iterator itc = contours.begin();   
+	while(itc != contours.end())   
+	{   
+		if(itc->size() < cmin || itc->size() > cmax)   
+			itc = contours.erase(itc);   
+		else   
+			++itc;   
+
+	}    
+
+ 
+ 
+ 
+其他相关的一些说明：
+http://blog.sina.com.cn/s/blog_8fc98fe501017ypb.html
+先看提取轮廓的代码：
+
+
+
+[cpp] 
+view plaincopy
+
+Mat image = imread("D:/picture/images/binaryGroup.bmp",0);  if(!image.data)       return -1;  imshow("源图像",image);      //获取轮廓   std::vector> contours;   //获取轮廓：   findContours(image,         //图像      contours,               //轮廓点                      //包含图像拓扑结构的信息（可选参数，这里没有选）      CV_RETR_EXTERNAL,           //获取轮廓的方法（这里获取外围轮廓）      CV_CHAIN_APPROX_NONE);      //轮廓近似的方法（这里不近似，获取全部轮廓）  //打印轮廓信息   std::cout<<"共有外围轮廓："<<contours.size()<<"条"<<std::endl;  std::vector>::const_iterator itContours = contours.begin();  for(;itContours != contours.end();++itContours)  {       std::cout<<"每个轮廓的长度: "<<itContours->size()<<std::endl;  }   
+
+注意到轮廓的存储格式为std::vector>，他说明整个轮廓是若干条轮廓按一定顺序组成的，而每个轮廓中的点也是有顺序的。
+
+画出轮廓就比较简单了：
+
+
+
+[cpp] 
+view plaincopy
+
+//画出轮廓   Mat result(image.size(),CV_8U,Scalar(255));   //画出轮廓，参数为：画板，轮廓，轮廓指示（这里画出所有轮廓），颜色，线粗  drawContours(result,contours,-1,Scalar(0),2);   imshow("提取外围轮廓",result);   
+
+还要注意提取轮廓的方法还有很多种，比如CV_RETR_LIST代表所有轮廓
+
+
+
+[cpp] 
+view plaincopy
+
+findContours(image,         //图像      contours,               //轮廓点                      //包含图像拓扑结构的信息（可选参数，这里没有选）      CV_RETR_LIST,           //获取轮廓的方法（这里获取所有轮廓）      CV_CHAIN_APPROX_NONE);      //轮廓近似的方法（这里不近似，获取全部轮廓  //画出轮廓   drawContours(result,contours,-1,Scalar(0),2);   imshow("提取所有轮廓",result);   
+
+通常，这样提取的轮廓包含一些我们不希望的轮廓（比如一些小洞），或者假如我们知道我们感兴趣的物体轮廓的大概范围时，我们就可以用下面的办法缩小目标范围：
+
+
+
+[cpp] 
+view plaincopy
+
+//除去太长或者太短的轮廓   int cmin = 100;  int cmax = 1000;  std::vector>::const_iterator itc = contours.begin();  while(itc != contours.end())  {       if(itc->size() < cmin || itc->size() > cmax)          itc = contours.erase(itc);      else          ++itc;  }      //把结果画在源图像上：   Mat original = imread("D:/picture/images/group.jpg");  if(!original.data)       return -1;  drawContours(original,contours,-1,Scalar(255,255,255),2);  imshow("动物的轮廓",original);      //将轮廓重绘于白板上   result.setTo(Scalar(255));   drawContours(result,contours,-1,Scalar(0),1);   
+
+
+怎么提取轮廓的特征呢？OpenCV提供了很多函数，我们展示其中的几个：
+
+
+
+[cpp] 
+view plaincopy
+
+//轮廓的形状描述子   //外接矩形   Rect r0 = boundingRect(Mat(contours[0]));  rectangle(result,r0,Scalar(0),2);      //最小外接圆   float radius;   Point2f center;   minEnclosingCircle(Mat(contours[1]),center,radius);   circle(result,Point(center),static_cast<</span>int>(radius),Scalar(0),2);     //多边形估计   std::vector poly;   //参数为：输入图像的2维点集，输出结果，估计精度，是否闭合  approxPolyDP(Mat(contours[2]),poly,5,true);  std::cout<<"多边形大小："<<poly.size()<<std::endl;  //画出结果   std::vector::const_iterator itp = poly.begin();  while(itp != poly.end()-1)  {       line(result,*itp,*(itp+1),Scalar(0),2);      ++itp;   }   //将第一个点和最后一点连起来   line(result,*(poly.begin()),*(poly.end()-1),Scalar(128),2);        //计算凸包   std::vector hull;   convexHull(Mat(contours[3]),hull);   std::vector::const_iterator it= hull.begin();  while(it != (hull.end()-1))  {       line(result,*it,*(it+1),Scalar(0),2);      ++it;   }   line(result,*(hull.begin()),*(hull.end()-1),Scalar(0),2);        //计算矩信息   itc = contours.begin();   while(itc != contours.end())  {       //计算所有的距      Moments mom = moments(Mat(*itc++));      //计算并画出质心      circle(result,Point(mom.m10/mom.m00,mom.m01/mom.m00),2,Scalar(2),2);  }   imshow("形状描述子",result);   
+
+我们再次看到，轮廓的确是有顺序的。值得注意的是矩信息：OpenCV提供了一个结构体Moments，它的元素就是计算好的矩信息，里面存放了常用的距。
+其实，OpenCV还提供了许多其他的形状描述子，比如函数cv::minAreaRect计算了最小外界倾斜的矩形。函数 cv::contourArea估计轮廓区域的面积（里面的像素数）。函数cv::pointPolygonTest计算一个点是否在轮廓内，cv::matchShapes测量了2两个轮廓的相似程度等等。这里就不一一介绍了。
+ 
+
+原文地址：findContours函数参数说明及相关函数作者：鸳都学童
+
+findContours函数，这个函数的原型为：
+void findContours(InputOutputArray image, OutputArrayOfArrays contours, OutputArray hierar-
+chy, int mode, int method, Point offset=Point())
+参数说明
+输入图像image必须为一个2值单通道图像
+contours参数为检测的轮廓数组，每一个轮廓用一个point类型的vector表示
+hiararchy参数和轮廓个数相同，每个轮廓contours[ i ]对应4个hierarchy元素hierarchy[ i ][ 0 ] ~hierarchy[ i ][ 3 ]，分别表示后一个轮廓、前一个轮廓、父轮廓、内嵌轮廓的索引编号，如果没有对应项，该值设置为负数。
+mode表示轮廓的检索模式
+
+CV_RETR_EXTERNAL表示只检测外轮廓
+CV_RETR_LIST检测的轮廓不建立等级关系
+CV_RETR_CCOMP建立两个等级的轮廓，上面的一层为外边界，里面的一层为内孔的边界信息。如果内孔内还有一个连通物体，这个物体的边界也在顶层。
+CV_RETR_TREE建立一个等级树结构的轮廓。具体参考contours.c这个demo
+
+method为轮廓的近似办法
+
+CV_CHAIN_APPROX_NONE存储所有的轮廓点，相邻的两个点的像素位置差不超过1，即max（abs（x1-x2），abs（y2-y1））==1
+CV_CHAIN_APPROX_SIMPLE压缩水平方向，垂直方向，对角线方向的元素，只保留该方向的终点坐标，例如一个矩形轮廓只需4个点来保存轮廓信息
+CV_CHAIN_APPROX_TC89_L1，CV_CHAIN_APPROX_TC89_KCOS使用teh-Chinl chain 近似算法
+
+offset表示代表轮廓点的偏移量，可以设置为任意值。对ROI图像中找出的轮廓，并要在整个图像中进行分析时，这个参数还是很有用的。
+findContours后会对输入的2值图像改变，所以如果不想改变该2值图像，需创建新mat来存放，findContours后的轮廓信息contours可能过于复杂不平滑，可以用approxPolyDP函数对该多边形曲线做适当近似
+contourArea函数可以得到当前轮廓包含区域的大小，方便轮廓的筛选
+findContours经常与drawContours配合使用，用来将轮廓绘制出来。其中第一个参数image表示目标图像，第二个参数contours表示输入的轮廓组，每一组轮廓由点vector构成，第三个参数contourIdx指明画第几个轮廓，如果该参数为负值，则画全部轮廓，第四个参数color为轮廓的颜色，第五个参数thickness为轮廓的线宽，如果为负值或CV_FILLED表示填充轮廓内部，第六个参数lineType为线型，第七个参数为轮廓结构信息，第八个参数为maxLevel
+得到了复杂轮廓往往不适合特征的检测，这里再介绍一个点集凸包络的提取函数convexHull，输入参数就可以是contours组中的一个轮廓，返回外凸包络的点集
+还可以得到轮廓的外包络矩形，使用函数boundingRect，如果想得到旋转的外包络矩形，使用函数minAreaRect，返回值为RotatedRect；也可以得到轮廓的外包络圆，对应的函数为minEnclosingCircle；想得到轮廓的外包络椭圆，对应的函数为fitEllipse，返回值也是RotatedRect，可以用ellipse函数画出对应的椭圆
+如果想根据多边形的轮廓信息得到多边形的多阶矩，可以使用类moments，这个类可以得到多边形和光栅形状的3阶以内的所有矩，类内有变量m00，m10，m01，m20，m11，m02，m30，m21，m12，m03，比如多边形的质心为 x = m10 / m00，y = m01 / m00。
+如果想获得一点与多边形封闭轮廓的信息，可以调用pointPolygonTest函数，这个函数返回值为该点距离轮廓最近边界的距离，为正值为在轮廓内部，负值为在轮廓外部，0表示在边界上。
+ 
+转自：http://blog.sina.com.cn/s/blog_662c78590100z0rg.html
+
+
+ 
+ 
+ 
+static int getContoursByCplus(char* Imgname, double minarea, double whRatio)
+{
+	cv::Mat src, dst, canny_output;
+	/// Load source image and convert it to gray
+	src = imread(Imgname, 0);
+
+	if (!src.data)
+	{
+		std::cout << "read data error!" << std::endl;
+		return -1;
+	}
+	blur(src, src, Size(3, 3));
+
+	
+	//the pram. for findContours,
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+
+	/// Detect edges using canny
+	Canny(src, canny_output, 80, 255, 3);
+	/// Find contours
+	findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+	//CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE
+
+	double maxarea = 0;
+	int maxAreaIdx = 0;
+
+	for (int i = 0; i<contours.size(); i++)
+	{
+
+		double tmparea = fabs(contourArea(contours[i]));
+		if (tmparea>maxarea)
+		{
+			maxarea = tmparea;
+			maxAreaIdx = i;
+			continue;
+		}
+		
+		if (tmparea < minarea)
+		{
+			//删除面积小于设定值的轮廓
+			contours.erase(contours.begin() + i); 
+			std::wcout << "delete a small area" << std::endl;
+			continue;
+		}
+		//计算轮廓的直径宽高
+		Rect aRect =boundingRect(contours[i]);
+		if ((aRect.width / aRect.height)<whRatio)
+		{
+			//删除宽高比例小于设定值的轮廓
+			contours.erase(contours.begin() + i); 
+			std::wcout << "delete a unnomalRatio area" << std::endl;
+			continue;
+		}
+	}
+	/// Draw contours,彩色轮廓
+	dst= Mat::zeros(canny_output.size(), CV_8UC3);
+	for (int i = 0; i< contours.size(); i++)
+	{
+		//随机颜色
+		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+		drawContours(dst, contours, i, color, 2, 8, hierarchy, 0, Point());
+	}
+	// Create Window
+	char* source_window = "countors";
+	namedWindow(source_window, CV_WINDOW_NORMAL);
+	imshow(source_window, dst);
+	cv:; waitKey(0);
+	
+	return 0;
+}
+ 
+
+cvDrawContours(gray_image,c,cvScalarAll(0),cvScalarAll(0),0,CV_FILLED);
+用参数CV_FILLED就可以了 ，这样可以填充轮廓，进而得到模版有点类似图像分割了。
+还有一种方法就是：
+http://blog.csdn.net/augusdi/article/details/9011935
+ 
+
+

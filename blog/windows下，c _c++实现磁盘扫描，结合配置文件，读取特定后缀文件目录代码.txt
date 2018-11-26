@@ -1,0 +1,493 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/8668132				
+
+
+#include <windows.h>
+#include <iostream>
+#include <fstream> 
+#include <locale.h>
+#include "stdio.h"
+#include "OperatingIni.h"
+
+using namespace std;
+
+class ScanDisk //磁盘搜索类
+{
+public:
+
+	ScanDisk(TCHAR *Expansion,TCHAR *FileName);//构造函数
+	~ScanDisk();
+
+   	TCHAR DriveString[MAX_PATH];// 驱动器列表
+	TCHAR Driver[MAX_PATH];//驱动器名
+	TCHAR Expansion[MAX_PATH];//后缀名
+	TCHAR FileName[MAX_PATH];//构造函数使用生成的文件名
+	TCHAR Name[MAX_PATH];//还未传送的文件路径
+	TCHAR ConfigName[MAX_PATH];//要使用的配置文件名
+	DWORD count;//文件个数
+	DWORD Transform_count;//已传送文件个数
+
+	CIniReader *Reader;
+	CIniWriter *Writer;
+	FILE *fp;//文件指针，创建路径文件
+public:
+
+TCHAR * GetFirstFile();//得到第一个文件路径
+//void ModifyPath(TCHAR *path);//修改路径字符串
+void SearchforAllDriver(); //搜索所有驱动器
+void GetDriverList();//得到驱动器列表
+bool Search(TCHAR *Path,TCHAR *File);//递归搜索
+bool TcharMarch(TCHAR *fileName,TCHAR *Extension);//文件后缀名匹配
+void SetExpansion(TCHAR *Expansion);//设置新的文件后缀
+void SetConfigName(TCHAR *ConfigName);//设置需要操作的配置文件名
+void InitOperateIni(TCHAR *ConfigName);//初始化配置信息类
+void GetAllExpansion();//得到所有后缀名并且检索目录写入文件
+};
+
+ScanDisk::ScanDisk(TCHAR *Expansion,TCHAR *FileName)//初始化工作
+{
+	memset(this->DriveString,0,sizeof(this->DriveString));
+	memset(this->Driver,0,sizeof(this->Driver));
+	memset(this->Expansion,0,sizeof(this->Expansion));
+	memset(this->FileName,0,sizeof(this->FileName));
+	memset(this->Name,0,sizeof(this->Name));
+	memset(this->ConfigName,0,sizeof(this->ConfigName));
+	this->count=0;//文件个数
+	this->Transform_count=0;//已传送文件个数为0
+
+	memcpy(this->Expansion,Expansion,wcslen(Expansion)*2);
+	memcpy(this->FileName,FileName,wcslen(FileName)*2);
+	//MessageBox(NULL,this->FileName,NULL,MB_OK);
+//	MessageBox(NULL,this->Expansion,NULL,MB_OK);
+
+}
+
+ScanDisk::~ScanDisk()
+{
+	fclose(this->fp);
+
+}
+
+void ScanDisk::SetExpansion(TCHAR *Expansion)
+{
+	memset(this->Expansion,0,sizeof(this->Expansion));
+	memcpy(this->Expansion,Expansion,wcslen(Expansion)*2);
+}
+
+void ScanDisk::SetConfigName(TCHAR *ConfigName)
+{
+	memset(this->ConfigName,0,sizeof(this->ConfigName));
+	memcpy(this->ConfigName,ConfigName,wcslen(ConfigName)*2);
+}
+
+void ScanDisk::InitOperateIni(TCHAR *ConfigName)
+{
+	memset(this->ConfigName,0,sizeof(this->ConfigName));
+	memcpy(this->ConfigName,ConfigName,wcslen(ConfigName)*2);
+	this->Writer=new CIniWriter(this->ConfigName);
+	this->Reader=new CIniReader(this->ConfigName);
+	(this->Writer)->WriteInteger(L"Setting",L"count",this->count);
+	(this->Writer)->WriteInteger(L"Setting",L"Transform_count",this->Transform_count);
+}
+
+void ScanDisk::GetAllExpansion()//读取配置文件中的每一个后缀名，遍历磁盘写入文件
+{
+	TCHAR *expansion=(this->Reader)->ReadString(L"Setting", L"extension", L"");//此处设计不是很好
+	int length=lstrlen(expansion)+1;//没有斜杠零
+	int i=0;
+	TCHAR temp[MAX_PATH]={0};
+	for (int j=0;j<length;j++)
+	{
+
+		if (((*expansion)!=L',')&&((*expansion)!=L'\0'))
+		{
+			memcpy(&temp[i],expansion,sizeof(TCHAR));
+			temp[i++];
+			expansion++;
+		}
+		
+		if (((*expansion)==L',')||((*expansion)==L'\0'))
+		{ 
+
+			temp[i]=L'\0';
+			this->SetExpansion(temp);
+			this->SearchforAllDriver();
+			if ((*expansion)==L'\0')
+			{
+				break;
+			}
+			expansion++;
+			i=0;
+			memset(temp,0,sizeof(temp));
+				
+		}
+
+	 }
+	 
+
+ 
+ 
+}
+
+
+TCHAR * ScanDisk::GetFirstFile()
+{
+	DWORD number=(this->Reader)->ReadInteger(L"Setting",L"Transform_count",this->Transform_count);//看看读到第几个文件了
+	this->fp=_wfopen(this->FileName,L"r"); //读的方式打开
+	if(!this->fp) 
+	{ 
+		cout<<L"Can not open the .txt file"<<endl; 
+	}
+	else
+	{
+		cout<<"the file is opened !"<<endl; 
+	}
+	//TCHAR path[MAX_PATH]={0};
+	for (int i=0;i<=number;i++)
+	{
+			fgetws(this->Name,MAX_PATH,this->fp);//
+	}
+	//fgetws(this->Name,MAX_PATH,this->fp);//
+	this->Name[lstrlen(this->Name)-1]=0;//去掉文件最后的0A
+	wprintf(this->Name);
+	//MessageBox(NULL,this->Name,NULL,MB_OK);
+	this->Transform_count++;
+	(this->Writer)->WriteInteger(L"Setting",L"Transform_count",this->Transform_count);
+	fclose(this->fp);
+	
+	return this->Name;
+
+}
+
+void ScanDisk::SearchforAllDriver()
+{
+
+	memset(this->Driver,0,sizeof(this->Driver));
+	
+	this->GetDriverList();
+	int driverCount=0;
+	TCHAR * pDrive= this->DriveString;
+	while( *pDrive )
+	{
+		pDrive += wcslen( pDrive ) + 1;
+		driverCount++;
+		
+	} 
+//	printf("%d\n",driverCount);//总共几个驱动器
+	pDrive= this->DriveString;
+	
+	this->fp=_wfopen(this->FileName,L"a+"); //追加的方式打开
+	if(!this->fp) 
+	{ 
+		cout<<L"Can not open the .txt file"<<endl; 
+	}
+	else
+	{
+		cout<<"the file is opened !"<<endl; 
+	}
+	//for (int i=0;i<driverCount;i++)
+	//{
+	while( * pDrive )
+	{
+		memcpy(this->Driver,pDrive,wcslen(this->DriveString)+1);//控制字符长度，和缓冲区
+		//MessageBox(NULL,this->Driver,NULL,MB_OK);
+		this->Search(this->Driver,this->Expansion);
+		fflush(this->fp);
+		pDrive=pDrive+wcslen(pDrive)+1;
+	}
+	//}
+	(this->Writer)->WriteInteger(L"Setting",L"count",this->count);
+
+}
+
+void ScanDisk::GetDriverList()
+{
+	TCHAR	DriveString[MAX_PATH];
+	// 前一个字节为令牌，后面的52字节为驱动器跟相关属性
+	GetLogicalDriveStrings(sizeof(DriveString), DriveString);
+	memcpy(this->DriveString,DriveString,sizeof(this->DriveString));
+}
+
+
+bool ScanDisk::TcharMarch(TCHAR *fileName,TCHAR *Extension)//文件后缀名匹配
+{
+	int length_of_ext=wcslen(Extension);
+	int length_of_name=wcslen(fileName);
+	int i=0;
+	while(i<length_of_ext)
+	{
+		if (fileName[i+(length_of_name-length_of_ext)]!=Extension[i])
+		{
+			return false;
+		}
+		else
+			i++;
+	}
+	return true;
+
+}
+
+bool ScanDisk::Search(TCHAR *Path,TCHAR *File)
+{
+	HANDLE hFind;
+	WIN32_FIND_DATA wfd;
+	
+	ZeroMemory(&wfd,sizeof(WIN32_FIND_DATA));
+	TCHAR PathTemp[MAX_PATH];
+	memset(PathTemp,0,sizeof(PathTemp));
+
+	swprintf(PathTemp,L"%s\\*.*",Path);
+	hFind=FindFirstFile(PathTemp,&wfd);
+
+	if(INVALID_HANDLE_VALUE==hFind)
+	{
+		//MessageBox(NULL,L"INVALID_HANDLE_VALUE",L"FindFirstFile",MB_OK);
+		return false;
+	}
+	
+	do
+	{
+		if('.'==wfd.cFileName[0])
+		{
+			continue;
+		}
+		
+		if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			swprintf(PathTemp,L"%s\\%s",Path,wfd.cFileName);
+			//MessageBox(NULL,PathTemp,"Directory",MB_OK);
+			//wprintf(PathTemp);
+			//printf("\n");
+			Search(PathTemp,File);
+			fflush(this->fp);
+		}
+		else
+		{
+			
+			if (TcharMarch(wfd.cFileName,File))
+			{
+			
+				swprintf(PathTemp,L"%s\\%s",Path,wfd.cFileName);
+				//MessageBox(NULL,L"Found",PathTemp,MB_OK);
+				//printf(PathTemp);
+				//wprintf(PathTemp);
+				//printf("\n");
+///////////////////////////////////////////////////////////////////////////////////
+//				TCHAR temp[MAX_PATH];
+//				memcpy(temp," ",sizeof(temp));
+//				temp[MAX_PATH-2]=L'\0';
+//				memcpy(temp,PathTemp,lstrlen(PathTemp)*2);
+//////////////////////////////////////////////////////////////////////////////////
+				fwprintf(this->fp,L"%s",PathTemp);
+				
+				fwprintf(this->fp,L"\n");
+				this->count++;//文件个数加1
+				
+			}
+		}
+		
+	}while(FindNextFile(hFind,&wfd));
+	
+	FindClose(hFind);
+	
+	return true;
+	
+}
+
+
+这个代码必须在unicode工程下使用，支持中文路径，"OperatingIni.h"//这个头文件,如下所示
+ 
+ 
+#include <tchar.h>
+#include <iostream>
+#include <Windows.h>
+
+class CIniReader
+{
+public:
+	CIniReader(TCHAR * szFileName); 
+	int ReadInteger(TCHAR* szSection, TCHAR* szKey, int iDefaultValue);
+	//float ReadFloat(TCHAR* szSection, TCHAR* szKey, float fltDefaultValue);
+	bool ReadBoolean(TCHAR* szSection, TCHAR* szKey, bool bolDefaultValue);
+	TCHAR* ReadString(TCHAR* szSection, TCHAR* szKey, const TCHAR* szDefaultValue);
+private:
+	TCHAR m_szFileName[MAX_PATH];
+};
+
+class CIniWriter
+{
+public:
+	CIniWriter(TCHAR* szFileName); 
+	void WriteInteger(TCHAR* szSection, TCHAR* szKey, int iValue);
+	//void WriteFloat(TCHAR* szSection, TCHAR* szKey, float fltValue);
+	void WriteBoolean(TCHAR* szSection, TCHAR* szKey, bool bolValue);
+	void WriteString(TCHAR* szSection, TCHAR* szKey, TCHAR* szValue);
+	void DeleteString(TCHAR* szSection, TCHAR* szKey);
+private:
+	TCHAR m_szFileName[MAX_PATH];
+};
+
+
+CIniReader::CIniReader(TCHAR* szFileName)
+{
+	memset(m_szFileName, 0x00, MAX_PATH);
+	memcpy(m_szFileName, szFileName, wcslen(szFileName)*2);//注意此处
+}
+
+int CIniReader::ReadInteger(TCHAR* szSection, TCHAR* szKey, int iDefaultValue)
+{
+	int iResult = GetPrivateProfileInt(szSection,  szKey, iDefaultValue, m_szFileName); 
+	return iResult;
+}
+
+//float CIniReader::ReadFloat(TCHAR* szSection, TCHAR* szKey, float fltDefaultValue)
+//{
+//TCHAR szResult[255];
+//TCHAR szDefault[255];
+//float fltResult;
+//	swprintf(szDefault, L"%f",fltDefaultValue);
+//	GetPrivateProfileString(szSection,  szKey, szDefault, szResult, 255, m_szFileName); 
+//	fltResult =  atof(szResult);
+//	return fltResult;
+//}
+
+bool CIniReader::ReadBoolean(TCHAR* szSection, TCHAR* szKey, bool bolDefaultValue)
+{
+	TCHAR szResult[MAX_PATH];
+	TCHAR szDefault[MAX_PATH];
+	bool bolResult;
+	swprintf(szDefault, L"%s", bolDefaultValue? L"True" : L"False");
+	GetPrivateProfileString(szSection, szKey, szDefault, szResult, 255, m_szFileName); 
+	bolResult =  (wcscmp(szResult, L"True") == 0 || 
+		wcscmp(szResult, L"true") == 0) ? true : false;
+	return bolResult;
+}
+
+TCHAR* CIniReader::ReadString(TCHAR* szSection, TCHAR* szKey, const TCHAR* szDefaultValue)
+{
+	TCHAR* szResult = new TCHAR[MAX_PATH];
+	memset(szResult, 0x00, MAX_PATH);
+	GetPrivateProfileString(szSection,  szKey, 
+		szDefaultValue, szResult, MAX_PATH, m_szFileName); 
+	return szResult;
+}
+
+CIniWriter::CIniWriter(TCHAR* szFileName)
+{
+	memset(m_szFileName, 0x00, MAX_PATH);
+	memcpy(m_szFileName, szFileName, wcslen(szFileName)*2);
+}
+
+void CIniWriter::WriteInteger(TCHAR* szSection, TCHAR* szKey, int iValue)
+{
+	TCHAR szValue[MAX_PATH];
+	swprintf(szValue, L"%d", iValue);
+	WritePrivateProfileString(szSection,  szKey, szValue, m_szFileName); 
+}
+
+//void CIniWriter::WriteFloat(TCHAR* szSection, TCHAR* szKey, float fltValue)
+//{
+//TCHAR szValue[255];
+//swprintf(szValue,L"%f", fltValue);
+//WritePrivateProfileString(szSection,  szKey, szValue, m_szFileName); 
+//}
+
+void CIniWriter::WriteBoolean(TCHAR* szSection, TCHAR* szKey, bool bolValue)
+{
+	TCHAR szValue[MAX_PATH];
+	swprintf(szValue, L"%s", bolValue ? L"True" : L"False");
+	WritePrivateProfileString(szSection,  szKey, szValue, m_szFileName); 
+}
+
+void CIniWriter::WriteString(TCHAR* szSection, TCHAR* szKey, TCHAR* szValue)
+{
+	WritePrivateProfileString(szSection,  szKey, szValue, m_szFileName);
+}
+
+void CIniWriter::DeleteString(TCHAR* szSection, TCHAR* szKey)
+{
+	WritePrivateProfileString(szSection,szKey,NULL,m_szFileName);
+}
+
+
+主函数可以这么写：
+#include "ScanDisk.h"
+//#include "OperatingIni.h"
+
+int main()
+{
+	//_wsetlocale设置中文语言环境
+	_wsetlocale(LC_ALL,L"chs");
+	
+	
+	
+
+  //*/
+	//_wsetlocale设置中文语言环境
+//	_wsetlocale(LC_ALL,L"chs");
+	
+	CIniWriter iniWriter(L".//Log.ini");
+	iniWriter.WriteString(L"Setting",L"extension", L".txt");   
+	//iniWriter.WriteInteger(L"Setting", L"count", 2); 
+	////iniWriter.WriteFloat(L"Setting", L"Height", 1.82f); 
+	//iniWriter.WriteBoolean(L"Setting", L"Marriage", false);  
+	//iniWriter.WriteBoolean(L"Setting", L"Marriage", NULL); 
+	//iniWriter.DeleteString(L"Setting",L"Marriage");
+	//iniWriter.WriteString("ff", "Name", "jia");   
+	//	iniWriter.WriteInteger("ff", "Age", 8); 
+	//iniWriter.WriteFloat("ff", "Height", 1.82f); 
+	//iniWriter.WriteBoolean("ff", "Marriage", false); 
+	
+	CIniReader iniReader(L".//Log.ini");
+	
+	TCHAR *szName = iniReader.ReadString(L"Setting", L"extension", L"");   
+//	int iAge = iniReader.ReadInteger(L"Setting", L"Age", 0); 
+	//float fltHieght = iniReader.ReadFloat(L"Setting", L"Height", 1.80f); 
+//	bool bMarriage = iniReader.ReadBoolean(L"Setting", L"Marriage", true); 
+	
+	//std::cout<<L"Name:"<<szName<<std::endl
+	//	<<L"Age:"<<iAge<<std::endl 
+	//<<L"Height:"<<fltHieght<<std::endl 
+	//<<L"Marriage:"<<bMarriage<<std::endl; 
+	//wprintf(szName);
+//	wprintf(L"\n");
+	//wprintf(L"%d\n",iAge);
+    _wremove(L"Logger.log");//删除ini文件
+	TCHAR *file= L"Logger.log";
+	TCHAR *ext=szName;
+	ScanDisk sd(ext,file);
+	sd.InitOperateIni(L".//Log.ini");
+	sd.GetAllExpansion();
+	sd.SearchforAllDriver();
+	sd.GetFirstFile();
+	sd.GetFirstFile();
+	//sd.SetExpansion(L".dsp");
+	//sd.SearchforAllDriver();
+	//sd.GetFirstFile();
+//	MessageBox(NULL,sd.GetFirstFile(),NULL,MB_OK);
+	
+
+
+ 
+	//fclose(fp);
+	//fclose(sd.fp);
+	system("pause");
+	return 0;
+}
+
+ 
+ 
+ 
+配置文件：
+
+ 
+部分搜索结果：
+
+资源下载：
+ 
+http://download.csdn.net/detail/wangyaninglm/8301303
+ 
+
+

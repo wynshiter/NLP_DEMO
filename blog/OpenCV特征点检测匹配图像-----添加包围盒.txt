@@ -1,0 +1,175 @@
+content
+
+
+
+
+
+
+最终效果：
+
+
+其实这个小功能非常有用，甚至加上只有给人感觉好像人脸检测，目标检测直接成了demo了，主要代码如下：
+
+// localize the object
+	std::vector<Point2f> obj;
+	std::vector<Point2f> scene;
+
+	for (size_t i = 0; i < good_matches.size(); ++i)
+	{
+		// get the keypoints from the good matches
+		obj.push_back(keyPoints_1[ good_matches[i].queryIdx ].pt);
+		scene.push_back(keyPoints_2[ good_matches[i].trainIdx ].pt);
+	}
+	Mat H = findHomography( obj, scene, CV_RANSAC );
+
+	// get the corners from the image_1
+	std::vector<Point2f> obj_corners(4);
+	obj_corners[0] = cvPoint(0,0);
+	obj_corners[1] = cvPoint( img_1.cols, 0);
+	obj_corners[2] = cvPoint( img_1.cols, img_1.rows);
+	obj_corners[3] = cvPoint( 0, img_1.rows);
+	std::vector<Point2f> scene_corners(4);
+
+	perspectiveTransform( obj_corners, scene_corners, H);
+
+	// draw lines between the corners (the mapped object in the scene - image_2)
+	line( img_matches, scene_corners[0] + Point2f( img_1.cols, 0), scene_corners[1] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+	line( img_matches, scene_corners[1] + Point2f( img_1.cols, 0), scene_corners[2] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+	line( img_matches, scene_corners[2] + Point2f( img_1.cols, 0), scene_corners[3] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+	line( img_matches, scene_corners[3] + Point2f( img_1.cols, 0), scene_corners[0] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+
+
+
+
+
+    基本原理是利用函数：findHomography，该 函数是求两幅图像的单应性矩阵或者叫（单映射矩阵），它是一个3*3的矩阵。findHomography： 计算多个二维点对之间的最优单映射变换矩阵 H（3行x3列） ，使用最小均方误差或者RANSAC方法 。
+
+    单应性矩阵算过后的投影点的偏移量 scene_corners[0]，就是在匹配图像中的点的位置，因为效果图像相当于增加了一个待匹配图像的宽度，所以每一个点都要加上Point2f( img_1.cols, 0)
+
+
+两个重要函数的介绍：
+findHomography功能：在两个平面之间寻找单映射变换矩阵结构：Mat findHomography(InputArray srcPoints, InputArray dstPoints, int method=0, double ransacReprojThreshold=3, OutputArray mask=noArray() )srcPoints ：在原平面上点的坐标，CV_32FC2 的矩阵或者vector<Point2f> dstPoints ：在目标平面上点的坐标，CV_32FC2 的矩阵或者 vector<Point2f> . method – 用于计算单映射矩阵的方法.  0 - 使用所有的点的常规方法 CV_RANSAC - 基于 RANSAC 的方法CV_LMEDS - 基于Least-Median 的方法ransacReprojThreshold： 处理一组点对为内部点的最大容忍重投影误差（只在RANSAC方法中使用），其形式为：    如果     那么点i则被考虑为内部点，如果srcPoints和dstPoints是以像素为单位，通常把参数设置为1-10范围内  这个函数的作用是在原平面和目标平面之间返回一个单映射矩阵 因此反投影误差是最小的。如果参数被设置为0，那么这个函数使用所有的点和一个简单的最小二乘算法来计算最初的单应性估计，但是，如果不是所有的点对都完全符合透视变换，那么这个初始的估计会很差，在这种情况下，你可以使用两个robust算法中的一个。 RANSAC 和LMeDS , 使用坐标点对生成了很多不同的随机组合子集（每四对一组），使用这些子集和一个简单的最小二乘法来估计变换矩阵，然后计算出单应性的质量，最好的子集被用来产生初始单应性的估计和掩码。 RANSAC方法几乎可以处理任何异常，但是需要一个阈值， LMeDS 方法不需要任何阈值，但是只有在inliers大于50%时才能计算正确，最后，如果没有outliers和噪音非常小，则可以使用默认的方法。PerspectiveTransform功能：向量数组的透视变换 结构：void perspectiveTransform(InputArray src, OutputArray dst, InputArray m)src ：输入两通道或三通道的浮点数组，每一个元素是一个2D/3D 的矢量转换dst ：输出和src同样的size和type m ：3x3 或者4x4浮点转换矩阵 转换方法为： 文档官方介绍： 实现代码：// OpenCV_sift.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+#include <vector>
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/legacy/legacy.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+
+using namespace cv;
+using namespace std;
+
+#pragma comment(lib,"opencv_core2410d.lib")                  
+#pragma comment(lib,"opencv_highgui2410d.lib")                  
+#pragma comment(lib,"opencv_objdetect2410d.lib")     
+#pragma comment(lib,"opencv_imgproc2410d.lib")    
+#pragma comment(lib,"opencv_features2d2410d.lib")
+#pragma comment(lib,"opencv_legacy2410d.lib")
+#pragma comment(lib,"opencv_calib3d2410d.lib")
+
+int main()
+{
+    Mat img_1 = imread("1.jpg");
+    Mat img_2 = imread("2.jpg");
+    if (!img_1.data || !img_2.data)
+    {
+        cout << "error reading images " << endl;
+        return -1;
+    }
+
+    ORB orb;
+    vector<KeyPoint> keyPoints_1, keyPoints_2;
+    Mat descriptors_1, descriptors_2;
+
+    orb(img_1, Mat(), keyPoints_1, descriptors_1);
+    orb(img_2, Mat(), keyPoints_2, descriptors_2);
+
+    BruteForceMatcher<HammingLUT> matcher;
+    vector<DMatch> matches;
+    matcher.match(descriptors_1, descriptors_2, matches);
+
+    double max_dist = 0; double min_dist = 100;
+    //-- Quick calculation of max and min distances between keypoints
+    for( int i = 0; i < descriptors_1.rows; i++ )
+    { 
+        double dist = matches[i].distance;
+        if( dist < min_dist ) min_dist = dist;
+        if( dist > max_dist ) max_dist = dist;
+    }
+    printf("-- Max dist : %f \n", max_dist );
+    printf("-- Min dist : %f \n", min_dist );
+    //-- Draw only "good" matches (i.e. whose distance is less than 0.6*max_dist )
+    //-- PS.- radiusMatch can also be used here.
+    std::vector< DMatch > good_matches;
+    for( int i = 0; i < descriptors_1.rows; i++ )
+    { 
+        if( matches[i].distance < 0.6*max_dist )
+        { 
+            good_matches.push_back( matches[i]); 
+        }
+    }
+
+    Mat img_matches;
+    drawMatches(img_1, keyPoints_1, img_2, keyPoints_2,
+        good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+        vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+
+    // localize the object
+    std::vector<Point2f> obj;
+    std::vector<Point2f> scene;
+
+    for (size_t i = 0; i < good_matches.size(); ++i)
+    {
+        // get the keypoints from the good matches
+        obj.push_back(keyPoints_1[ good_matches[i].queryIdx ].pt);
+        scene.push_back(keyPoints_2[ good_matches[i].trainIdx ].pt);
+    }
+    Mat H = findHomography( obj, scene, CV_RANSAC );
+
+    // get the corners from the image_1
+    std::vector<Point2f> obj_corners(4);
+    obj_corners[0] = cvPoint(0,0);
+    obj_corners[1] = cvPoint( img_1.cols, 0);
+    obj_corners[2] = cvPoint( img_1.cols, img_1.rows);
+    obj_corners[3] = cvPoint( 0, img_1.rows);
+    std::vector<Point2f> scene_corners(4);
+
+    perspectiveTransform( obj_corners, scene_corners, H);
+
+    // draw lines between the corners (the mapped object in the scene - image_2)
+    line( img_matches, scene_corners[0] + Point2f( img_1.cols, 0), scene_corners[1] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+    line( img_matches, scene_corners[1] + Point2f( img_1.cols, 0), scene_corners[2] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+    line( img_matches, scene_corners[2] + Point2f( img_1.cols, 0), scene_corners[3] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+    line( img_matches, scene_corners[3] + Point2f( img_1.cols, 0), scene_corners[0] + Point2f( img_1.cols, 0),Scalar(0,255,0));
+
+
+    imshow( "Match", img_matches);
+    cvWaitKey();
+    return 0;
+}当然也可以用其他特征点检测的算法来做：/*
+SIFT sift;
+sift(img_1, Mat(), keyPoints_1, descriptors_1);
+sift(img_2, Mat(), keyPoints_2, descriptors_2);
+BruteForceMatcher<L2<float> >  matcher;
+*/
+
+/*
+SURF surf;
+surf(img_1, Mat(), keyPoints_1);
+surf(img_2, Mat(), keyPoints_2);
+SurfDescriptorExtractor extrator;
+extrator.compute(img_1, keyPoints_1, descriptors_1);
+extrator.compute(img_2, keyPoints_2, descriptors_2);
+BruteForceMatcher<L2<float> >  matcher;
+*/
+图片：参考文献：ORB特征早在，OpenCV2.3RC中已经有了实现OpenCV中ORB特征这个是之前系列中转载整理的文章1.http://blog.csdn.net/wangyaninglm/article/details/448057092.http://docs.opencv.org/2.4.10/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html?highlight=findhomography#cv.FindHomography3.http://www.360doc.com/content/14/0410/14/10724725_367760906.shtml4.http://blog.csdn.net/chenjiazhou12/article/details/22825487?utm_source=tuicool&utm_medium=referral
+5.http://blog.csdn.net/merlin_q/article/details/7026375
+
+
+
+

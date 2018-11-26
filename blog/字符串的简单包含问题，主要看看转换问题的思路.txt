@@ -1,0 +1,84 @@
+content
+
+
+
+两个思路，都是把字符串转换为其他数字，完后进行数字的运算，素数的运算，或者我们熟知的打点法，或者是hash算法。
+ 
+问题代码来源：
+ 
+http://blog.csdn.net/v_JULY_v
+ 
+
+ 
+ 
+// algorithm_sub_string.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int prime[26] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101};
+
+bool AcontainsB(const char *A, const char *B)// 位运算的版本
+{
+	int have = 0;
+	while (*B)
+	{
+		have = have|(1 << (*(B++) - 'a')) ;
+	}
+
+	while (*A)
+	{
+		if (have & (1 << (*(A++) - 'a')) == 0)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	string strOne = "adfadfe";
+	string strTwo = "ad";
+
+	int sumIndex = 1;
+
+	//遍历长字符串
+	for (int i = 0;i < strOne.length();i++)
+	{
+		sumIndex = sumIndex * prime[(strOne[i] - 'a')];
+	}
+
+	int sumTwo = 1;
+	//遍历短字符串
+	for (int j = 0;j < strTwo.length();j++)
+	{
+		sumTwo = sumTwo * prime[(strTwo[j] - 'a')];
+	}
+
+	if (sumIndex % sumIndex == 0)
+	{
+		cout<<"include the short string!"<<endl;
+	}
+
+	if (AcontainsB(strOne.c_str(),strTwo.c_str()))
+	{
+		cout<<"include the short string!"<<endl;
+	}
+
+	getchar();
+
+	return 0;
+}
+
+
+
+ 
+
+

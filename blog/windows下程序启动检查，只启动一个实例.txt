@@ -1,0 +1,71 @@
+content
+
+
+
+ 
+ 
+问题来源：http://bbs.csdn.net/topics/390998279?page=1#post-398983061
+ 
+ 
+ 
+ 
+// Only_once.cpp : 定义控制台应用程序的入口点。
+//
+
+
+
+
+
+//请参考<<windows核心编程>>
+#include "StdAfx.h"
+#include <iostream>
+#include <windows.h>
+using namespace std;
+
+#define MUTEX_NAME     TEXT("Global//onename")//onename可以改别的
+
+bool IsSingleProcess()
+{
+	HANDLE hMutex = CreateMutex(NULL, FALSE, MUTEX_NAME);
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
+		::CloseHandle(hMutex);
+		return FALSE;
+	}
+	else
+	{
+		return TRUE;
+	}
+}
+
+
+//函数名: exit()
+//
+//		 所在头文件：stdlib.h
+//
+//		 功 能: 关闭所有文件，终止正在执行的进程。
+//
+//		 exit(1)表示异常退出.这个1是返回给操作系统的。
+//
+//		 exit(x)（x不为0）都表示异常退出
+//
+//		 exit(0)表示正常退出
+//
+//		 exit()的参数会被传递给一些操作系统，包括UNIX,Linux,和MS DOS，以供其他程序使用。
+int main()
+{
+	if (!IsSingleProcess())
+	{
+		cout << "already exist" << endl;
+		getchar();
+		exit(1);
+	}
+	Sleep(100000);
+	return 0;
+}
+
+
+
+ 
+
+

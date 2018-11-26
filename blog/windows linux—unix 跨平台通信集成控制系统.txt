@@ -1,0 +1,863 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/41940287				
+
+
+首先，我们可以用到这个开源的开发包：
+mdk(Micro-Development-Kit)微量级软件开发包，提供几个常用类，主要实现了一个高性能的并发服务器引擎 
+  使用c++开发，是一个跨平台的开发包，支持linux32/linux64/win32/win64的类库  。
+  mdk服务器引擎，提出面向业务的服务器开发模式，根据服务器业务层最关心的3件事，抽象出连接发生（OnConnect），消息到达（OnClose），连接关闭（OnClose）3个接口，让服务器端开发者可以全身心的投入业务逻辑的开发中。 
+特点：        提供分布式支持，自身是一个server-client的结合体（即做服务器使用的同时，也可以像client一样去连接别的服务器，组成分布式系统），并且io接口统一到onconnect onmsg onclose中，不必区别对待        事件轮巡使用的是原生epoll iocp实现，确保了对io响应速度的完全掌控        几乎等同于lock free的并发算法，保证并发效率       
+ 欢迎大家共同学习使用。
+ 
+http://download.csdn.net/detail/wangyaninglm/8260299
+或者是这里：
+https://github.com/huoyu820125/Micro-Development-Kit
+ 
+ 
+ 我们写客户端的时候可以用到里面 的socket类
+socket.h如下：
+// Socket.h: interface for the Socket class.
+//
+//////////////////////////////////////////////////////////////////////
+/***********************************************************************
+
+************************************************************************/
+
+#ifndef MDK_SOCKET_H
+#define MDK_SOCKET_H
+
+#include <iostream>
+
+using namespace std;
+
+#ifdef WIN32
+#include <windows.h>
+
+
+
+#define socklen_t int
+#else
+#include <errno.h>
+
+#include <string.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <sys/select.h>
+#include <sys/types.h>
+
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket close
+typedef int SOCKET;
+#endif
+
+
+#include <time.h>
+#include <assert.h>
+#include <string>
+
+namespace mdk
+{
+
+class Socket
+{
+public:
+	enum SocketError
+	{
+		seTimeOut = -2,
+		seSocketClose = -1,
+		seError = -3,
+	};
+	enum protocol 
+	{
+		tcp = SOCK_STREAM,
+		udp = SOCK_DGRAM,
+	};
+
+	Socket();
+	Socket( SOCKET hSocket, protocol nProtocolType );
+	virtual ~Socket();
+	
+public:
+	//
+	SOCKET GetSocket();
+	/*
+		
+	*/
+	bool Init(protocol nProtocolType);
+	/**
+		
+	 */
+	void Close();
+	//
+	bool IsClosed();
+
+	//////////////////////////////////////////////////////////////////////////
+	/*
+    TCP
+		
+	*/
+	int Send( const void* lpBuf, int nBufLen, int nFlags = 0 );
+	/*
+		
+	*/
+	int Receive( void* lpBuf, int nBufLen, bool bCheckDataLength = false, long lSecond = 0, long lMinSecond = 0 );
+
+	//////////////////////////////////////////////////////////////////////////
+	/*UDP
+	
+	*/
+	int SendTo( const char *strIP, int nPort, const void* lpBuf, int nBufLen, int nFlags = 0 );
+	/*
+		
+	*/
+	int ReceiveFrom( char* lpBuf, int nBufLen, std::string &strFromIP, int &nFromPort, bool bCheckDataLength = false, long lSecond = 0, long lMinSecond = 0 );
+
+	/*
+		
+	*/
+	bool Connect( const char* lpszHostAddress, unsigned short nHostPort );
+
+	/*
+		
+	*/
+	bool StartServer( int nPort );
+	/*
+	*/
+	bool Accept(Socket& rConnectedSocket);
+	//
+	void GetWanAddress( std::string& strWanIP, int& nWanPort );
+	//
+	void GetLocalAddress( std::string& strWanIP, int& nWanPort );
+	/*
+		
+	*/
+	bool SetSockMode( bool bWait = false );
+	/*
+		
+	*/
+	bool SetSockOpt( int nOptionName, const void* lpOptionValue, int nOptionLen, int nLevel = SOL_SOCKET );
+
+	/*
+	*/
+	static bool SocketInit(void *lpVoid = NULL);
+	static void SocketDestory();
+	//
+	void GetLastErrorMsg( std::string &strError );
+	
+	//
+	//
+	static bool InitForIOCP( SOCKET hSocket );
+
+	/*
+		
+	*/
+	void Attach( SOCKET hSocket );
+	/*
+		
+	*/
+	SOCKET Detach();
+
+	//
+	//
+	bool InitWanAddress();
+	//
+	//
+	bool InitLocalAddress();
+	
+protected:
+	/*
+		
+	*/
+	bool TimeOut( long lSecond, long lMinSecond );
+	//
+	bool WaitData();
+	/*
+		
+	*/
+	void GetAddress( const sockaddr_in &sockAddr, std::string &strIP, int &nPort );
+	/*
+		
+	*/
+	bool Bind( unsigned short nPort, char *strIP = NULL );
+	/*
+		
+	*/
+	bool Listen( int nConnectionBacklog = SOMAXCONN );
+		
+public:
+private:
+	SOCKET m_hSocket;//
+	bool m_bBlock;//
+	bool m_bOpened;//
+	sockaddr_in m_sockAddr;
+	std::string m_strWanIP;
+	int m_nWanPort;
+	std::string m_strLocalIP;
+	int m_nLocalPort;
+};
+
+}//namespace mdk
+
+#endif // MDK_SOCKET_H
+
+
+ 
+socket.cpp的实现：
+// Socket.cpp: implementation of the Socket class.
+//
+//////////////////////////////////////////////////////////////////////
+#include <stdio.h>
+#include <iostream>
+#include "Socket.h"
+
+#ifdef WIN32
+//#include <windows.h>
+#pragma comment ( lib, "ws2_32.lib" )
+#endif
+
+using namespace std;
+namespace mdk
+{
+
+Socket::Socket()
+{
+	m_hSocket = INVALID_SOCKET;
+	m_bBlock = true;
+	m_bOpened = false;//
+}
+
+Socket::Socket( SOCKET hSocket, protocol nProtocolType )
+{
+	m_hSocket = hSocket;
+	m_bBlock = true;
+	m_bOpened = false;//
+	Init(nProtocolType);
+	InitWanAddress();
+	InitLocalAddress();
+}
+
+Socket::~Socket()
+{
+
+}
+
+/*
+
+*/
+bool Socket::SocketInit(void *lpVoid)
+{
+#ifdef WIN32
+	// initialize Winsock library
+	WSADATA *lpwsaData = (WSADATA *)lpVoid;
+	WSADATA wsaData;
+	if (lpwsaData == NULL)
+		lpwsaData = &wsaData;
+
+	WORD wVersionRequested = MAKEWORD(1, 1);
+	__int32 nResult = WSAStartup(wVersionRequested, lpwsaData);
+	if (nResult != 0)
+		return false;
+
+	if (LOBYTE(lpwsaData->wVersion) != 1 || HIBYTE(lpwsaData->wVersion) != 1)
+	{
+		WSACleanup();
+		return false;
+	}
+#endif
+	return true;
+}
+
+void Socket::SocketDestory()
+{
+#ifdef WIN32
+	WSACleanup();
+#endif
+}
+
+
+void Socket::GetLastErrorMsg( string &strError )
+{
+	char strErr[1024];
+#ifdef WIN32
+	LPSTR lpBuffer;
+	DWORD dwErrorCode = WSAGetLastError();
+
+	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER
+		| FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		dwErrorCode,
+		LANG_NEUTRAL,
+		(LPTSTR)&lpBuffer,
+		0,
+		NULL );
+	sprintf( strErr, "Socket Error(%ld):%s", dwErrorCode, lpBuffer );
+	strError = strErr;
+	LocalFree(lpBuffer);
+
+#else
+	sprintf( strErr, "socket errno(%d):%s\n", errno, strerror(errno) );
+	strError = strErr;
+#endif
+}
+
+
+bool Socket::InitForIOCP( SOCKET hSocket )
+{
+#ifdef WIN32
+	return 0 == setsockopt( hSocket,
+		SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
+		(char *)&(hSocket), sizeof(hSocket) );
+#else
+	return true;
+#endif
+}
+
+
+//
+SOCKET Socket::GetSocket()
+{
+	return m_hSocket;
+}
+
+
+void Socket::GetWanAddress( string& strWanIP, int& nWanPort )
+{
+	nWanPort = m_nWanPort;
+	strWanIP = m_strWanIP;
+	return;
+}
+
+
+
+bool Socket::InitWanAddress()
+{
+	assert( INVALID_SOCKET != m_hSocket );
+
+	sockaddr_in sockAddr;
+	memset(&sockAddr, 0, sizeof(sockAddr));
+	socklen_t nSockAddrLen = sizeof(sockAddr);
+	if ( SOCKET_ERROR == getpeername( m_hSocket,
+		(sockaddr*)&sockAddr, &nSockAddrLen ) ) return false;
+	m_nWanPort = ntohs(sockAddr.sin_port);
+	m_strWanIP = inet_ntoa(sockAddr.sin_addr);
+
+	return true;
+}
+
+
+void Socket::GetLocalAddress( string& strWanIP, int& nWanPort )
+{
+	nWanPort = m_nLocalPort;
+	strWanIP = m_strLocalIP;
+	return;
+}
+
+bool Socket::InitLocalAddress()
+{
+	sockaddr_in sockAddr;
+	memset(&sockAddr, 0, sizeof(sockAddr));
+	socklen_t nSockAddrLen = sizeof(sockAddr);
+	if ( SOCKET_ERROR == getsockname( m_hSocket,
+		(sockaddr*)&sockAddr, &nSockAddrLen )) return false;
+	m_nLocalPort = ntohs(sockAddr.sin_port);
+	m_strLocalIP = inet_ntoa(sockAddr.sin_addr);
+
+	return true;
+}
+
+/*
+
+*/
+bool Socket::Init(protocol nProtocolType)
+{
+	if ( m_bOpened ) return true;
+	if ( m_hSocket == INVALID_SOCKET )
+	{
+		m_hSocket = socket( PF_INET, nProtocolType, 0 );
+		if ( m_hSocket == INVALID_SOCKET ) return false;
+	}
+	m_bOpened = true;
+
+	return m_bOpened;
+}
+
+/*
+
+*/
+bool Socket::Connect( const char *lpszHostAddress, unsigned short nHostPort)
+{
+	assert( NULL != lpszHostAddress );
+
+	sockaddr_in sockAddr;
+	memset(&sockAddr,0,sizeof(sockAddr));
+	sockAddr.sin_family = AF_INET;
+	sockAddr.sin_addr.s_addr = inet_addr(lpszHostAddress);
+	sockAddr.sin_port = htons( nHostPort );
+
+	if ( SOCKET_ERROR != connect(m_hSocket, (sockaddr*)&sockAddr, sizeof(sockAddr)) )
+	{
+		InitWanAddress();
+		InitLocalAddress();
+		return true;
+	}
+
+	return false;
+}
+
+//
+bool Socket::StartServer( int nPort )
+{
+	if ( !this->Bind( nPort ) ) return false;
+	return this->Listen();
+}
+
+//
+bool Socket::IsClosed()
+{
+	return !m_bOpened;
+}
+/*
+
+*/
+void Socket::Close()
+{
+	if ( INVALID_SOCKET == m_hSocket ) return;
+	if ( m_bOpened )
+	{
+		closesocket(m_hSocket);
+		m_bOpened = false;
+	}
+	m_hSocket = INVALID_SOCKET;
+	return;
+}
+
+/*
+
+*/
+void Socket::Attach(SOCKET hSocket)
+{
+	m_hSocket = hSocket;
+	m_bBlock = true;
+	m_bOpened = true;//
+	InitWanAddress();
+	InitLocalAddress();
+}
+
+/*
+
+*/
+SOCKET Socket::Detach()
+{
+	SOCKET hSocket = m_hSocket;
+	m_hSocket = INVALID_SOCKET;
+	m_bBlock = true;
+	m_bOpened = false;//
+	return hSocket;
+}
+
+/*
+
+*/
+int Socket::Receive( void* lpBuf, int nBufLen, bool bCheckDataLength, long lSecond, long lMinSecond )
+{
+	if ( TimeOut( lSecond, lMinSecond ) ) return seTimeOut;//³¬Ê±
+	int nResult;
+	int nFlag = 0;
+	if ( bCheckDataLength ) nFlag = MSG_PEEK;
+	nResult = recv(m_hSocket, (char*)lpBuf, nBufLen, nFlag);
+	if ( 0 == nResult ) return seSocketClose;//
+	if ( SOCKET_ERROR != nResult ) return nResult;//ú
+
+	//socket
+#ifdef WIN32
+		int nError = GetLastError();
+		if ( WSAEWOULDBLOCK == nError ) return 0;//
+		return seError;
+#else
+		if ( EAGAIN == errno ) return 0;//
+		return seError;
+#endif
+}
+
+/*
+
+*/
+int Socket::Send( const void* lpBuf, int nBufLen, int nFlags )
+{
+	int nSendSize = send(m_hSocket, (char*)lpBuf, nBufLen, nFlags);
+	if ( 0 > nSendSize )
+	{
+#ifdef WIN32
+		int nError = GetLastError();
+		return -1;
+#else
+		return -1;
+#endif
+	}
+	if ( nSendSize <= nBufLen ) return nSendSize;
+	return -1;
+}
+
+/*
+
+*/
+bool Socket::Bind( unsigned short nPort, char *strIP )
+{
+	memset(&m_sockAddr,0,sizeof(m_sockAddr));
+	m_sockAddr.sin_family = AF_INET;
+	if ( NULL == strIP ) m_sockAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	else
+	{
+		unsigned long lResult = inet_addr( strIP );
+		if ( lResult == INADDR_NONE ) return false;
+		m_sockAddr.sin_addr.s_addr = lResult;
+	}
+	m_sockAddr.sin_port = htons((unsigned short)nPort);
+
+	return (SOCKET_ERROR != bind(m_hSocket, (sockaddr*)&m_sockAddr, sizeof(m_sockAddr)));
+}
+
+/*
+
+*/
+bool Socket::Listen( int nConnectionBacklog )
+{
+	return (SOCKET_ERROR != listen(m_hSocket, nConnectionBacklog));
+}
+
+/*
+
+*/
+bool Socket::Accept(Socket& rConnectedSocket)
+{
+	assert( INVALID_SOCKET == rConnectedSocket.m_hSocket );
+	socklen_t sockAddLen = 0;
+	rConnectedSocket.m_hSocket = accept(m_hSocket, NULL, &sockAddLen);
+	if ( INVALID_SOCKET == rConnectedSocket.m_hSocket )
+	{
+#ifdef WIN32
+		if ( WSAEWOULDBLOCK == GetLastError() ) return true;//
+#else
+		if ( EAGAIN == errno ) return true;//
+#endif
+		return false;//socket
+	}
+	rConnectedSocket.m_bOpened = true;
+	rConnectedSocket.InitWanAddress();
+	rConnectedSocket.InitLocalAddress();
+	return true;
+}
+
+/*
+
+*/
+bool Socket::SetSockOpt(
+						   int nOptionName,
+						   const void* lpOptionValue,
+						   int nOptionLen,
+						   int nLevel)
+{
+	return ( SOCKET_ERROR != setsockopt(
+		m_hSocket,
+		nLevel,
+		nOptionName,
+		(char *)lpOptionValue,
+		nOptionLen));
+}
+
+/*
+
+*/
+bool Socket::TimeOut( long lSecond, long lMinSecond )
+{
+	if ( lSecond <= 0 && lMinSecond <= 0 ) return false;
+	//
+	timeval outtime;//
+	outtime.tv_sec = lSecond;
+	outtime.tv_usec =lMinSecond;
+	int nSelectRet;
+#ifdef WIN32
+	FD_SET readfds = { 1, m_hSocket };
+	nSelectRet=::select( 0, &readfds, NULL, NULL, &outtime ); //
+#else
+	fd_set readfds;
+	FD_ZERO(&readfds);
+	FD_SET(m_hSocket, &readfds);
+	nSelectRet=::select(m_hSocket+1, &readfds, NULL, NULL, &outtime); //
+#endif
+
+	if ( SOCKET_ERROR == nSelectRet )
+	{
+		return true;
+	}
+	if ( 0 == nSelectRet ) //
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//
+bool Socket::WaitData()
+{
+	int nSelectRet;
+#ifdef WIN32
+	FD_SET readfds = { 1, m_hSocket };
+	nSelectRet=::select( 0, &readfds, NULL, NULL, NULL ); //
+#else
+	fd_set readfds;
+	FD_ZERO(&readfds);
+	FD_SET(m_hSocket, &readfds);
+	nSelectRet=::select(m_hSocket+1, &readfds, NULL, NULL, NULL); //
+#endif
+	if ( SOCKET_ERROR == nSelectRet )
+	{
+		return false;
+	}
+	if ( 0 == nSelectRet ) //
+	{
+		return false;
+	}
+	return true;
+}
+
+/*
+
+*/
+bool Socket::SetSockMode( bool bWait )
+{
+#ifdef WIN32
+	m_bBlock = bWait;
+	unsigned long ul = 1;
+	if ( m_bBlock ) ul = 0;
+	else ul = 1;
+	int ret = ioctlsocket( m_hSocket, FIONBIO, (unsigned long*)&ul );
+	if ( ret == SOCKET_ERROR )
+	{
+		return false;
+	}
+#else
+	m_bBlock = bWait;
+	int flags = fcntl( m_hSocket, F_GETFL, 0 ); //
+	if ( !m_bBlock )
+		fcntl( m_hSocket, F_SETFL, flags|O_NONBLOCK );//
+	else
+		fcntl( m_hSocket, F_SETFL, flags&(~O_NONBLOCK&0xffffffff) );//
+#endif
+	return true;
+}
+
+/*
+
+*/
+int Socket::SendTo( const char *strIP, int nPort, const void* lpBuf, int nBufLen, int nFlags )
+{
+	sockaddr_in sockAddr;
+	memset(&sockAddr,0,sizeof(sockAddr));
+	sockAddr.sin_family = AF_INET;
+	sockAddr.sin_port = htons(nPort);
+	sockAddr.sin_addr.s_addr = inet_addr(strIP);
+
+	int ret = sendto( m_hSocket, (const char*)lpBuf, nBufLen, nFlags,
+		(sockaddr*)&sockAddr, sizeof(sockaddr));
+	if (ret < 0) ret = -1;
+	return ret;
+}
+
+/*
+*/
+int Socket::ReceiveFrom( char* lpBuf, int nBufLen, string &strFromIP, int &nFromPort, bool bCheckDataLength, long lSecond, long lMinSecond )
+{
+	strFromIP = "";
+	nFromPort = -1;
+	if ( 0 >= nBufLen ) return 0;
+	sockaddr_in sockAddr;
+	socklen_t nAddrLen = sizeof(sockaddr);
+	/* waiting for receive data */
+	int nResult;
+	int nFlag = 0;
+	while ( true )
+	{
+		if ( TimeOut( lSecond, lMinSecond ) ) return seTimeOut;
+		if ( bCheckDataLength )nFlag = MSG_PEEK;
+		nResult = recvfrom(m_hSocket, lpBuf, nBufLen, nFlag, (sockaddr*)&sockAddr, &nAddrLen);
+		if ( nAddrLen > 0 ) GetAddress(sockAddr, strFromIP, nFromPort);
+		if ( SOCKET_ERROR == nResult ) //
+		{
+#ifndef WIN32
+			if ( EAGAIN == errno ) return 0;//
+			return seError;
+#else
+			int nError = GetLastError();
+			if ( 0 == nError )//
+			{
+				if ( MSG_PEEK == nFlag )//
+				{
+					recvfrom(m_hSocket, lpBuf, nBufLen, 0, (sockaddr*)&sockAddr, &nAddrLen);
+				}
+				continue;
+			}
+			if ( WSAEWOULDBLOCK == nError ) return 0;//
+			return seError;
+#endif
+		}
+		break;
+	}
+	return nResult;
+}
+
+void Socket::GetAddress( const sockaddr_in &sockAddr, string &strIP, int &nPort )
+{
+	nPort = ntohs(sockAddr.sin_port);
+	strIP = inet_ntoa(sockAddr.sin_addr);
+}
+
+}//namespace mdk
+
+
+ 
+ 定义一个客户端的经常用的头文件：
+ 
+//
+//  mac.h
+//  mac_client
+//
+//  Created by mac mac on 13-5-8.
+//  Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+//
+
+#ifndef mac_client_mac_h
+#define mac_client_mac_h
+////////////////////////////////////////////////////////////////////////////////////////
+/*
+1.注意中文标点，编译器不容易察觉
+2.server 和client端的宏定义大小要统一
+*/
+/////////////////////////////////////////////////////////////////////////////////////////
+#define MAX_SIZE 1024
+#define MAX_NAME_LENGTH 64
+#define MAX_PATH 260            //保持和windows端定义的一样
+#define MAX_PATH_MAC 256       //苹果的最大长度
+#define FALSE 0
+#define TRUE 1
+
+#define MAX_SEND_BUFFER 1024*4
+#define MAX_RECV_BUFFER 1024*4
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+typedef struct Command //自定义命令结构体
+{
+    int order;//命令序号
+    long datasize;
+    void * hwnd;//窗口句柄
+    
+}Command;
+ 
+
+typedef struct Server_Address //服务器地址
+{
+    
+    char strIP[3][MAX_PATH];//服务器ip
+    unsigned int uPort[3] ; //服务器端口
+    char remark[MAX_NAME_LENGTH];
+}Server_Address;
+
+
+typedef struct _SYS_INFO //到时候得增加备注
+{
+    Command         cmd;
+    char            remark[MAX_NAME_LENGTH];            //备注
+    char            computer_name[MAX_NAME_LENGTH];     //
+    char            user_name[MAX_NAME_LENGTH];         //
+    char            sys_version[MAX_NAME_LENGTH];       //
+    char            cpu_type[MAX_NAME_LENGTH];          //
+    char            host_ip_address[MAX_NAME_LENGTH];   //内网ip
+    char            ip_addresss[MAX_NAME_LENGTH];       //外网ip
+    char            uuid[MAX_NAME_LENGTH];             //被控端的唯一标识
+    
+    unsigned int    cpu_num;                            //
+    unsigned int    mem_total;                          //
+    int             host_id;                            //
+}SYS_INFO;
+
+
+
+
+enum 
+{
+    COMMAND_BIGIN = 20000,     //命令开始
+    TOKEN_ONLINE,              //上线命令
+    COMMAND_BREAK,             //断开链接
+    COMMAND_UNINSTALL,         //卸载　
+    COMMAND_MODIFY_REMARK,     //修改备注
+///////////////////////////////////////////////////////////////////////////
+    COMMAND_MANAGER_FILE,           //打开文件管理窗口
+    COMMAND_GET_DIRECTORY,          //获取控制端主机根目录下所有文件信息 
+    COMMAND_GET_REQUEST_DIRECTORY,  //获取双击请求目录中所有文件信息
+    COMMAND_SEARCH_FILE,            //文件搜索，还没做
+    COMMAND_WRONG_DIRECTORY,        //目录为空或者不可读
+    COMMAND_DELETE_FILE,            //删除文件
+    COMMAND_FILE_CLOSE,             //关闭当前文件管理功能的链接
+//////////////////////////////////////////////////////////////////////////
+    
+    COMMAND_MANAGER_CMD,    //打开cmd管理窗口
+    TOKEN_CMD_NEXT,         //等待下一个命令
+    COMMAND_SHELL,          //控制端请求的shell命令
+    COMMAND_SHELL_CLOSE,    //关闭shell
+////////////////////////////////////////////////////////////////////////// 
+    COMMAND_MANAGER_DOWNLOAD,   //打开文件下载功能
+    TOKEN_DOWNLOAD_SETUP,   //控制端发送文件下载连接和uuid
+    COMMAND_GET_FILEDATA,   //请求文件数据
+    TOKEN_SENT_FILEDATA,    //发送文件数据
+    TOKEN_CANT_GET_DATA,    //给控制端发送消息文件不可读
+////////////////////////////////////////////////////////////////////////
+    COMMAND_MANAGER_UPLOAD,     //开启文件上传
+    TOKEN_UPLOAD_SETUP,         //接受文件上传连接
+    COMMAND_SENT_UPLOAD_DATA,   //发送上传文件数据
+    TOKEN_UPLOAD_DATA,          //请求上传文件数据
+    TOKEN_UPLOAD_COMPLETE,      //文件上传完成
+    COMMAND_RUN_PROGARM,        //上传运行的文件
+    
+    COMMAND_UPLOAD_CLOSE,      //关闭上传进程和连接
+    
+    
+ };
+
+
+
+#endif
+
+
+ 
+客户端centos下面使用正常，开发环境codeblocks
+ 客户端下载：
+http://download.csdn.net/detail/wangyaninglm/8326249
+ 
+服务器windows 7，xp都没有问题，开发环境visual studio 2010
+服务端下载：
+http://download.csdn.net/detail/wangyaninglm/8326321
+ 
+ 整体界面：
+
+命令行效果：
+
+文件管理效果：
+
+ 
+未完待续
+。
+。
+。
+
+

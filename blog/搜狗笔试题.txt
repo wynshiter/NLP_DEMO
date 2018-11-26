@@ -1,0 +1,105 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/48752613				
+
+
+
+
+
+
+
+#include <iostream>
+#include <stdio.h>
+using namespace std;
+
+int main()
+{
+    int pid;
+    int num = 1;
+
+    pid = fork();
+
+    if(pid > 0)
+    {
+         num ++;
+         cout<<num<<endl;
+         cout<<&num<<endl;
+         cout<<endl;
+    }
+    else if(pid ==0)
+    {
+         cout<<num<<endl;
+         cout<<&num<<endl;
+         cout<<endl;
+    }
+
+
+    cout<<num<<endl;
+    getchar();
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+// sougoutest.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+
+class A
+{
+public:
+ virtual void test(float a){cout<<'1';}
+};
+class B:public A
+{
+public:
+	void test(int b){cout<<'2';}
+};
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	A *a = new A;
+	B *b = new B;
+	a= b;
+	a->test(1.1);
+	a->test(1);
+	b->test((float)1.1);//调不到父类的test？为何
+	b->test(1);
+	((A*)b)->test(1);//为何这样可以调用到父类？
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+﻿﻿
+
+

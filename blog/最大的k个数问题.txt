@@ -1,0 +1,56 @@
+content
+
+
+
+ 
+代码来源：
+ 
+http://blog.csdn.net/v_JULY_v
+ 
+调整堆为小顶堆的代码片：基本思想就是把孩子节点中大的一个跟父节点交换
+void HeapAdjust(int array[], int i, int Length)
+{
+	int child, temp;
+	for (temp = array[i]; 2*i + 1 <Length; i = child)
+	{
+		 child = 2*i +1;
+		 if (child < Length - 1 && array[child +1] < array[child])
+		 {
+ 			 child++;
+		 }
+
+		 if (temp > array[child])
+		 {
+			 array[i] = array[child];
+		 }
+		 else
+			 break;
+
+		 array[child] = temp;
+	}
+}
+ 
+ 
+一般来说，进行初始化建立堆的时候，需要对数组的一般进行调整，调用代码：
+ 
+只需要用一般的数进行调整，就能保证小顶堆的建立。
+for (int i = Length/2 - 1;i >= 0; --i)
+	{//初试建堆，时间复杂度为o（n）
+		HeapAdjust(array,i,Length);
+	}
+
+
+ 
+下面是交互两个数的代码片：使用三次异或操作：
+void Swap(int *a, int *b)
+{
+	//异或预算用来交互两个数
+	*a = *a^*b;
+	*b = *a^*b;
+	*a = *a^*b;
+}
+
+
+ 
+
+

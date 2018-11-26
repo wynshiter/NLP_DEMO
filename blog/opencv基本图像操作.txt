@@ -1,0 +1,93 @@
+content
+
+
+
+// Basic_OpenCV_2.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "cv.h"
+#include "highgui.h"
+
+using namespace std;
+
+void SmoothImage(IplImage* image)//平滑函数
+{
+	cvNamedWindow("Smooth_in");
+	cvNamedWindow("Smooth_out");
+	cvShowImage("Smooth_in",image);
+
+	IplImage* out = cvCreateImage(cvGetSize(image),IPL_DEPTH_8U,3);
+	cvSmooth(image,out,CV_BLUR,32,32);//平滑函数,后面两个参数是窗口大小
+	cvShowImage("Smooth_out",out);
+
+	cvReleaseImage(&out);
+
+	cvWaitKey(0);
+	cvDestroyAllWindows();
+}
+
+void doPyrDown(IplImage* in, int filter = IPL_GAUSSIAN_5x5)//图像缩小为一半
+{
+	//Best to make sure input image is divisible by two.
+	assert(in->width%2 == 0 && in->height%2 == 0);
+	IplImage* out = cvCreateImage(cvSize(in->width/2 , in->height/2) , in->depth , in->nChannels);
+	cvPyrDown(in , out);
+
+	cvNamedWindow("PyrDown_out");
+	cvShowImage("PyrDown_out",out);
+	cvReleaseImage(&out);
+
+	cvWaitKey(0);
+	cvDestroyAllWindows();
+	//return out;
+
+
+}
+
+void doCanny(IplImage* in , double lowThresh , double highThresh , double aperture)
+{
+	IplImage* out = cvCreateImage(cvSize(in->width,in->height) , IPL_DEPTH_8U , 1);
+	if(in->nChannels != 1)
+	{
+		//cout<<"error! unsupported format or combination of formats() in unknown function"<<endl;
+		//return;//canny only handles gray scale image
+
+		//若不是灰度图，直接转化成灰度图
+		IplImage* gray =  cvCreateImage(cvGetSize(in), IPL_DEPTH_8U, 1);  
+	    cvCvtColor(in, gray, CV_BGR2GRAY);
+		out = gray;
+	}
+		
+
+	cvCanny(in , out , lowThresh , highThresh , aperture );
+
+	cvNamedWindow("Canny_out");
+	cvShowImage("Canny_out",out);
+	cvReleaseImage(&out);
+
+	cvWaitKey(0);
+	cvDestroyAllWindows();
+
+
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	IplImage* image = cvLoadImage("lena.jpg");
+	//SmoothImage(image);
+	//doPyrDown(image);
+	doCanny(image ,10 , 100 , 3 );
+
+
+
+	system("pause");
+	return 0;
+}
+
+
+
+ 
+
+

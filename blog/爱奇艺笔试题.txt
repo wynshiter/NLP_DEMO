@@ -1,0 +1,71 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/48766471				
+
+
+
+
+// aiqiyitest.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+using namespace std;
+
+
+int fun(int a,int b)
+{
+	static int m =1,i=2;
+	i+= m +1;
+	m = i +a +b;
+	return m;
+}
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	int k = 5,m = 2,p;
+	p = fun(k,m);
+	cout<<p<<",";
+	p = fun(k,m);
+	cout<<p<<endl;
+	return 0;
+}
+
+
+
+
+
+
+
+// aiqiyitest.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+using namespace std;
+int i = 0;
+
+ void fun()
+ {
+	 {
+
+	 static int i = 1;
+	 std::cout<<i++<<',';
+	 }
+	 std::cout<<i<<',';
+ }
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	fun();
+	fun();
+	return 0;
+}
+
+
+
+
+

@@ -1,0 +1,124 @@
+content
+
+
+
+启动级别:init 0,1,2,3,4,5,6
+2010-10-29 15:47:50|  分类：linux之路阅读376
+评论0  字号：大中小 订阅
+
+这是个很久的知识点了，只是自己一直都迷迷糊糊的，今天在翻出来好好理解下。。
+0:停机
+1：单用户形式，只root进行维护
+2：多用户，不能使用net file system
+3：完全多用户
+5：图形化
+4：安全模式
+6：重启 
+
+其实，可以通过查看/etc/rc.d/中的rc*.d的文件来对比理解。。
+init 0，对应的系统会运行，/etc/rc.d/rc0.d里指定的程序。我们来看下名称。
+[root@localhost  ～]# ls /etc/rc.d/rc0.d 
+K01dnsmasq    K15ksmtuned  K35nmb         K60crond       K74lm_sensors  K83portreserve     K85rpcgssd    K88iscsi
+     K90network       S00killall
+K10cups       K16ksm       K35smb         K66gpsd        K75netfs       K84NetworkManager
+  K85rpcidmapd  K88rsyslog   K92ip6tables 
+    S01halt
+K10saslauthd  K20nfs       K36mysqld      K69rpcsvcgssd  K75udev-post   K84wpa_supplicant  K86nfslock    K89iscsid
+    K92iptables
+K10xfs        K25sshd      K50haldaemon   K70vboxdrv     K76openvpn     K85mdmonitor       K87alsasound
+  K89netplugd  K98qemu
+K15gpm        K30sendmail  K50netconsole  K74acpid       K83bluetooth   K85messagebus      K87rpcbind    K89rdisc
+     K99lvm2-monitor
+依照上述红色字体，开机会执行的两个进程是killall和halt，这两个都表示为终止进程。故init 0是用于表示关机的。
+
+init 1，对应的系统会运行，/etc/rc.d/rc1.d里指定的程序。
+[root@localhost ～] # ls /etc/rc.d/rc1.d
+K01dnsmasq    K15ksmtuned  K35nmb         K60crond       K74lm_sensors   K84NetworkManager  K85rpcidmapd  K88rsyslog
+   K92ip6tables    S99single
+K10cups       K16ksm       K35smb         K66gpsd        K75netfs        K84wpa_supplicant
+  K86nfslock    K89iscsid    K92iptables
+K10saslauthd  K20nfs       K36mysqld      K69rpcsvcgssd  K76openvpn      K85mdmonitor       K87alsasound
+  K89netplugd  K98qemu
+K10xfs        K25sshd      K50haldaemon   K70vboxdrv     K83bluetooth    K85messagebus      K87rpcbind
+    K89rdisc    S02lvm2-monitor
+K15gpm        K30sendmail  K50netconsole  K74acpid       K83portreserve  K85rpcgssd         K88iscsi  
+    K90network  S26udev-post
+这个级别启动的服务有三个，udev、lvm相关的和single(单用户模式的服务)。故此级别是单用户模式，只有root能用，不支持其他用户。
+
+init 2，对应的系统会运行，/etc/rc.d/rc2.d里指定的程序。
+[root@localhost ~ ]# ls /etc/rc.d/rc2.d/
+K01dnsmasq    K20nfs       K36mysqld      K74lm_sensors      K85rpcgssd    K89netplugd     S08iptables
+    S23NetworkManager  S30vboxdrv    S99local
+K10saslauthd  K25sshd      K50haldaemon   K75netfs           K85rpcidmapd  K89rdisc       
+ S12rsyslog     S24portreserve     S35qemu
+K10xfs        K30sendmail  K50netconsole  K76openvpn         K86nfslock    K90network      S13rpcbind
+     S25cups            S85gpm
+K15ksmtuned   K35nmb       K66gpsd        K83bluetooth       K88iscsi      S02lvm2-monitor
+  S15mdmonitor   S26acpid           S90crond
+K16ksm        K35smb       K69rpcsvcgssd  K84wpa_supplicant  K89iscsid    S08ip6tables  
+   S22messagebus  S26udev-post       S99alsasound
+这个级别启动的服务多了，NetworkManager/iptables/acpid/alsa都已经开启，但是nfs,smb,openvpn相关服务没有开启，这个级别不支持nfs。
+
+init 3 ， 对应的系统运行/etc/rc.d/rc3.d
+[root@localhost ~] # ls /etc/rc.d/rc3.d/
+K01dnsmasq    K30sendmail    K74lm_sensors      K89rdisc        S08iptables  S18rpcidmapd
+       S25cups       S35qemu       S85ksmtuned   S99local
+K10saslauthd  K36mysqld      K76openvpn         K90network      S12rsyslog   S19rpcgssd
+         S25netfs      S50bluetooth  S90crond
+K10xfs        K50netconsole  K84wpa_supplicant  K99lvm2-monitor  S13iscsi     S22messagebus    
+  S26acpid      S50haldaemon  S91nmb
+K20nfs        K66gpsd        K85mdmonitor      S07iscsid        S13rpcbind
+   S23NetworkManager  S26udev-post  S84ksm        S91smb
+K25sshd       K69rpcsvcgssd  K89netplugd       S08ip6tables     S14nfslock   S24portreserve
+     S30vboxdrv    S85gpm        S99alsasound
+这个级别nfs服务是开启的，被成为完全多用户模式。
+
+init 4
+[root@localhost ~ ]# ls /etc/rc.d/rc4.d/
+K01dnsmasq    K30sendmail    K66gpsd            K85mdmonitor    S07iscsid    
+ S13rpcbind     S23NetworkManager  S26udev-post  S84ksm        S99local
+K10saslauthd  K35nmb         K69rpcsvcgssd      K89netplugd     S08ip6tables  S14nfslock
+     S24portreserve     S30vboxdrv    S85gpm
+K10xfs        K35smb         K74lm_sensors      K89rdisc        S08iptables
+   S18rpcidmapd   S25cups            S35qemu       S85ksmtuned
+K20nfs        K36mysqld      K76openvpn         K90network      S12rsyslog  
+  S19rpcgssd     S25netfs           S50bluetooth  S90crond
+K25sshd       K50netconsole  K84wpa_supplicant  K99lvm2-monitor  S13iscsi      S22messagebus  S26acpid
+           S50haldaemon  S99alsasound
+ 此模式被称为安全模式。
+
+init 5
+[root@localhost ~ ]# ls /etc/rc.d/rc5.d/
+
+K01dnsmasq    K25sshd        K66gpsd         K84wpa_supplicant  K87rpcbind   K90network      S22messagebus
+      S26udev-post  S84ksm        S99local
+K10saslauthd  K30sendmail    K69rpcsvcgssd   K85mdmonitor       K88iscsi     K99lvm2-monitor  S23NetworkManager
+  S30vboxdrv    S85ksmtuned
+K10xfs        K36mysqld      K74lm_sensors   K85rpcgssd         K89iscsid    S08ip6tables
+     S25cups            S35qemu       S91nmb
+K15gpm        K50netconsole  K76openvpn      K85rpcidmapd       K89netplugd  S08iptables
+      S25netfs           S50bluetooth  S91smb
+K20nfs        K60crond       K83portreserve  K86nfslock         K89rdisc    S12rsyslog
+       S26acpid           S50haldaemon  S99alsasound
+
+完整的图形模式
+
+init 6
+[root@localhost ~ ]# ls /etc/rc.d/rc6.d/
+K01dnsmasq    K15ksmtuned  K35nmb         K60crond       K74lm_sensors  K83portreserve     K85rpcgssd    K88iscsi
+     K90network      S00killall
+K10cups       K16ksm       K35smb         K66gpsd        K75netfs       K84NetworkManager
+  K85rpcidmapd  K88rsyslog   K92ip6tables    
+S01reboot
+K10saslauthd  K20nfs       K36mysqld      K69rpcsvcgssd  K75udev-post   K84wpa_supplicant  K86nfslock    K89iscsid
+    K92iptables
+K10xfs        K25sshd      K50haldaemon   K70vboxdrv     K76openvpn     K85mdmonitor       K87alsasound
+  K89netplugd  K98qemu
+K15gpm        K30sendmail  K50netconsole  K74acpid       K83bluetooth   K85messagebus      K87rpcbind    K89rdisc
+     K99lvm2-monitor
+这个级别里，只有两个服务，一个为killall，一个是reboot，即，关闭现在的系统，重启。故此级别是重启。
+
+不同的系统版本，可能里面的文件会不同，如果要查看，可以通过ll来看，其实他们都是软连接。
+
+
+

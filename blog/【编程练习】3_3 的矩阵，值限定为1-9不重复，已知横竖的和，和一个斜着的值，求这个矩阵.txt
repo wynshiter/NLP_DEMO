@@ -1,0 +1,298 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/48129665				
+
+
+﻿﻿
+x     x     x 11
+x     x     x 15
+x     x     x 19
+16  14   15 15
+
+讨论贴：
+http://bbs.csdn.net/topics/391816265
+
+先求横竖斜三行的精确匹配方法：
+// puzzl.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+// puzzle.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <vector>
+#include <set>
+#include <iostream>
+
+using namespace std;
+
+int result[3][3] = {0};
+
+bool check(int a, int b, int c, int sum)
+{
+ if((a + b  + c )== sum)
+  return true;
+ else 
+  return false;
+}
+
+int lastValue(int a, int b,int sum)
+{
+ return (sum - a - b);
+}
+
+//min max
+vector<vector<int> > zuhe(int min,int max,int sum)
+{
+
+ vector<vector<int> > quanji;
+ for(int i = min;i < max; ++i)
+ { 
+  for(int j = 1;j < max; ++j)
+  {
+   if(i + j > sum)
+    continue;
+   else
+   {
+    for(int k = 1; k <max ;++k)
+    {
+     if(check(i,j,k,sum))
+     {
+      vector<int> ziji;
+      ziji.push_back(i);
+      ziji.push_back(j);
+      ziji.push_back(k);
+      if (i!=j&&j!=k&&i!=k)
+      {
+       quanji.push_back(ziji);
+      }
+      
+      
+     }
+     else
+     {
+      continue;
+     }
+    }
+   }
+  }
+
+ }
+
+ return quanji;
+}
+
+vector<vector<int> > filter_zuhe(int key,vector<vector<int> > temp)
+{
+ vector<vector<int> >::iterator iter ;
+ for(iter = temp.begin(); iter!=temp.end(); )
+ {
+  if( (*iter)[0] != key)
+   iter = temp.erase(iter);
+  else
+   iter ++ ;
+ }
+
+ return temp;
+}
+
+
+bool isOk()
+{
+	set<int> mySet;
+
+	for(int i = 0;i <3; ++i)
+	{
+		for(int j = 0;j<3;++j)
+		{
+			if(result[i][j]>0&&result[i][j]<10)
+			{
+				mySet.insert(result[i][j]);
+			}
+		}
+	}
+
+	if(mySet.size()!=9)
+	{return false;}
+	else
+	{
+		if(mySet.size()==9)
+		{
+			for(int i = 0;i <3; ++i)
+			{
+				cout <<endl;
+				for(int j = 0;j<3;++j)
+				{
+					cout<<result[i][j]<<" ";
+				}
+			}
+
+			return true;
+		}
+	}
+}
+
+void dayin()
+{
+	for(int i = 0;i <3; ++i)
+			{
+				cout <<endl;
+				for(int j = 0;j<3;++j)
+				{
+					cout<<result[i][j]<<" ";
+				}
+			}
+
+	cout<<endl;
+}
+
+void qingling()
+{
+	for(int i = 0;i <3; ++i)
+	{
+		for(int j = 0;j<3;++j)
+		{
+			(result[i][j]=0);
+		}
+	}
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+ vector<vector<int> > quanjiheng = zuhe(1,9,11);
+ vector<vector<int> > quanjishu = zuhe(1,9,16);
+ vector<vector<int> > quanjixie = zuhe(1,9,15);
+
+ int sizeheng = quanjiheng.size();
+ int sizeshu = quanjishu.size();
+ int sizexie = quanjixie.size();
+
+ int key = 0,last_key = 0;
+
+ vector<vector<int> > quanjishufilter;
+ vector<vector<int> > quanjixiefilter;
+
+ for(int i = 0;i < sizeheng ; ++i)
+ {
+	   key = quanjiheng[i][0];
+	   if (key!=last_key)
+	   {
+		quanjishufilter = filter_zuhe(key,quanjishu);
+		quanjixiefilter = filter_zuhe(key,quanjixie);
+	   }
+	   last_key = key;
+	   //给横行赋值
+	  for (int j = 0;j< 3;++j)
+	  {
+	   result[0][j] = quanjiheng[i][j];
+	  
+	  }
+  
+	  int sizeshu = quanjishufilter.size();
+	  for (int k = 0; k< sizeshu;++k)
+	  {
+		  //给竖行赋值
+		  for(int j = 0;j<3;++j)
+		  {
+			   result[j][0] = quanjishufilter[k][j];
+		  }
+
+		  int sizexie = quanjixiefilter.size();
+		  for(int x = 0; x < sizexie; ++x)
+		  {
+			  for(int j = 0; j < 3 ;++j)
+			  {
+				  result[j][j] = quanjixiefilter[x][j];
+			  }
+				result[2][1] = 14 - result[0][1]-result[1][1];
+				result[1][2] = 15-  result[1][0]-result[1][1];
+				if(isOk())
+				{
+					//dayin();
+					getchar();
+					//return 0;
+				}
+				else
+				{
+					
+					
+				}
+		  }
+
+	
+	 }
+
+   qingling();
+  
+ }
+ 
+
+ getchar();
+ system("pause");
+ return 0;
+}
+
+
+
+
+
+
+
+
+
+排列组合的方法：
+
+
+template <typename T>
+void swap(T* array, unsigned int i, unsigned int j)
+{
+	T t = array[i];
+	array[i] = array[j];
+	array[j] = t;
+}
+
+void FullArray(int* array, size_t array_size, unsigned int index)
+{
+	if (index >= array_size)
+	{
+		if ((array[0] + array[1] + array[2] == 11) &&
+			(array[3] + array[4] + array[5] == 15) &&
+			(array[6] + array[7] + array[8] == 19) && 
+			(array[0] + array[3] + array[6] == 16) &&
+			(array[1] + array[4] + array[7] == 14) &&
+			(array[2] + array[5] + array[8] == 15) &&
+			(array[0] + array[4] + array[8] == 15))
+		{
+			printf("%d,%d,%d\n", array[0], array[1], array[2]);
+			printf("%d,%d,%d\n", array[3], array[4], array[5]);
+			printf("%d,%d,%d\n\n", array[6], array[7], array[8]);
+		}
+
+		return;
+	}
+
+	for (unsigned int i = index; i < array_size; ++i)
+	{
+		swap(array, i, index);
+
+		FullArray(array, array_size, index + 1);
+
+		swap(array, i, index);
+	}
+}
+
+int main(int argc, char* argv[])
+{
+	int value[9] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+	
+	FullArray(value, 9, 0);
+}
+
+
+
+模仿人做的方法，任意填写3个空位，保证不同行不同列，或者不在一个斜线。就可以算出来剩下的。
+
+

@@ -1,0 +1,212 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50756108				
+
+
+
+You are given two linked lists representing two non-negative numbers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+我的想法有点复杂，就是两个加数全部逆置，就是遍历放到栈里面，完后出栈加起来放在容器中，返回链表
+但是这个算法好像有错误，
+非常不解：
+
+
+
+// addtwonumber.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <stack>
+#include <vector>
+
+using namespace std;
+
+struct ListNode {
+	     int val;
+	     ListNode *next;
+	     ListNode(int x) : val(x), next(NULL) {}
+	 };
+
+ListNode* addTwoNumbers(ListNode* l1, ListNode* l2)
+{
+	ListNode* temp1 = l1;
+	ListNode* temp2 = l2;
+	stack<int> s_int1,s_int2;
+	vector<int> v_int;
+
+
+	
+	int length = 0,length1 = 0,length2 =0;
+	while(temp1)
+	{
+		++length1;
+		
+		s_int1.push(temp1->val);
+		temp1 = temp1->next;
+		
+	}
+
+	while(temp2)
+	{
+		++length2;
+		
+
+		s_int2.push(temp2->val);
+		temp2 = temp2->next;
+	}
+
+	length = length1>length2?length1:length2;
+	int jinwei = 0;
+	int flag = 0;
+	int value1 = 0;
+	int value2 = 0;
+
+	while(!s_int1.empty()||!s_int2.empty()||flag)
+	{
+		if (!s_int1.empty())
+		{
+			value1 = s_int1.top();
+			s_int1.pop();
+		}
+		else
+		{
+		value1 = 0;
+		}
+		if (!s_int2.empty())
+		{
+
+			value2 = s_int2.top();
+			s_int2.pop();
+		}
+		else
+		{
+		value2 = 0;
+		}
+		
+		
+
+		jinwei = value1 + value2  + flag;
+		
+			v_int.push_back(jinwei%10);
+			jinwei = jinwei/10;
+			
+
+	}
+
+
+
+	ListNode* result = (ListNode* )malloc(sizeof(ListNode));
+	result->val = v_int[0];
+	
+	ListNode* t = NULL;
+	
+	ListNode* r = result;
+	for(int i = 1; i <length;++i)
+	{
+		t = (ListNode* )malloc(sizeof(ListNode));
+		t->val = v_int[i];
+		t->next = NULL;
+		r->next = t;
+		r = t;
+	   
+
+	}
+	return result;
+
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+	ListNode n1(1),n2(2),n3(3); 
+
+	n1.next = &n2;
+	n2.next = &n3;
+
+	ListNode n4(9),n5(5),n6(6);
+	n4.next = &n5;
+	//n5.next = &n6;
+
+
+	ListNode l1(1),l2(0);
+
+	addTwoNumbers(&n1,&n4);
+	addTwoNumbers(&l1,&l2);
+	return 0;
+}
+
+正确的代码：非常简介
+
+基本思路差不多
+
+ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) 
+{
+    ListNode preHead(0), *p = &preHead;
+    int extra = 0;
+    while (l1 || l2 || extra) {
+        if (l1) extra += l1->val, l1 = l1->next;
+        if (l2) extra += l2->val, l2 = l2->next;
+        p->next = new ListNode(extra % 10);
+        extra /= 10;
+        p = p->next;
+    }
+    return preHead.next;
+}
+
+ListNode *addTwoNumbers(ListNode *l1, ListNode *l2)
+ {
+    ListNode preHead(0), *p = &preHead;
+    int extra = 0;
+    while (l1 || l2 || extra) {
+        int sum = (l1 ? l1->val : 0) + (l2 ? l2->val : 0) + extra;
+        extra = sum / 10;
+        p->next = new ListNode(sum % 10);
+        p = p->next;
+        l1 = l1 ? l1->next : l1;
+        l2 = l2 ? l2->next : l2;
+    }
+    return preHead.next;
+}
+python代码：
+
+
+class Solution:
+# @return a ListNode
+def addTwoNumbers(self, l1, l2):
+    carry = 0
+    root = n = ListNode(0)
+    while l1 or l2 or carry:
+        v1 = v2 = 0
+        if l1:
+            v1 = l1.val
+            l1 = l1.next
+        if l2:
+            v2 = l2.val
+            l2 = l2.next
+        carry, val = divmod(v1+v2+carry, 10)
+        n.next = ListNode(val)
+        n = n.next
+    return root.next
+
+
+def addTwoNumbers(self, l1, l2):
+        carry = 0;
+        res = n = ListNode(0);
+        while l1 or l2 or carry:
+            if l1:
+                carry += l1.val
+                l1 = l1.next;
+            if l2:
+                carry += l2.val;
+                l2 = l2.next;
+            carry, val = divmod(carry, 10)
+            n.next = n = ListNode(val);
+        return res.next;
+
+
+
+

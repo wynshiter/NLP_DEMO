@@ -1,0 +1,19 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/41051835				
+
+
+今天台式机插着无线网卡连接学校无线网，结果就要登录了，完后ip地址固定半天，换了mac地址重新分配还是不能改，ping了主机也不通，我想可能是dns没有刷新。现在收集几个dos命令用来配置网络：
+ 
+1.ipconfig/release使计算机将自己目前租用的IP地址交还给DHCP服务器（只在动态配置IP地址的机器上起作用）
+ 
+2.ipconfig/renew向DHCP服务器申请新的IP地址，与上条命令一起使用（只在动态配置IP地址的机器上起作用）
+ 
+3.ipconfig/displaydns显示DNS客户解析器缓存的内容，包括从本地主机文件预装载的记录以及由域名解析服务器解析的所有资源记录
+ 
+4.ipconfig/flushdns清理并重设DNS客户解析器缓存的内容
+5.ipconfig/registerdns初始化网络适配器上配置的DNS和IP地址，可用于解决客户和DNS服务器之间的动态更新问题，而不必重新启动计算机
+ 
+
+

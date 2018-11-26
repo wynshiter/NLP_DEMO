@@ -1,0 +1,134 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/80400078				
+
+
+
+ssh登录
+pem 文件下载：
+从aws 下载pem 文件
+使用ssh登录
+
+ssh -i "xxx.pem" ec2-user@ec2-xxx.cn-north-1.compute.amazonaws.com.cn
+
+
+设置并安装vsftp
+$sudo yum install vsftpd
+
+$useradd -d /dir username 
+
+$sudo passwd username
+
+$sudo chmod 777 /dir/upload/ -R
+配置vsftp conf
+修改vsftpd配置文件：
+
+sudo vi /etc/vsftpd.conf  
+修改后的内容如下：
+# Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+anonymous_enable=NO
+#
+# Uncomment this to allow local users to log in.
+local_enable=YES
+#
+# Uncomment this to enable any form of FTP write command.
+write_enable=YES
+#
+# Default umask for local users is 077. You may wish to change this to 022,
+# if your users expect that (022 is used by most other ftpd's)
+local_umask=022
+#
+
+
+# Activate directory messages - messages given to remote users when they
+# go into a certain directory.
+dirmessage_enable=YES
+#
+# The target log file can be vsftpd_log_file or xferlog_file.
+# This depends on setting xferlog_std_format parameter
+xferlog_enable=YES
+#
+# Make sure PORT transfer connections originate from port 20 (ftp-data).
+connect_from_port_20=YES
+
+# Switches between logging into vsftpd_log_file and xferlog_file files.
+# NO writes to vsftpd_log_file, YES to xferlog_file
+xferlog_std_format=YES
+
+
+# When "listen" directive is enabled, vsftpd runs in standalone mode and
+# listens on IPv4 sockets. This directive cannot be used in conjunction
+# with the listen_ipv6 directive.
+listen=YES
+
+
+pam_service_name=vsftpd
+userlist_enable=YES
+tcp_wrappers=YES
+userlist_enable=YES
+userlist_deny=NO
+userlist_file=/etc/vsftpd/user_list
+#只有写入vsftpd.chroot_list的帐户不被chroot
+chroot_local_user=YES
+chroot_list_enable=YES
+#vsftpd.chroot_list需要手动建立
+chroot_list_file=/etc/vsftpd/chroot_list
+#允许文本模式下载
+ascii_download_enable=YES
+#允许文本模式上传
+ascii_upload_enable=YES
+#允许文本模式下载
+ascii_download_enable=YES
+#允许文本模式上传
+ascii_upload_enable=YES
+#启用被动模式
+pasv_enable=YES
+pasv_promiscuous=YES
+pasv_min_port=60000
+pasv_max_port=60020
+由于该配置使用了被动模式，所以需要在linux防火墙配置中，开放路由器转发端口
+
+sudo iptables -A INPUT -p tcp --dport 60000:60020 -j ACCEPT
+
+编辑允许访问ftp服务器的用户列表：
+sudo vi /etc/vsftpd/user_list  
+把不需要的注释掉，最后加上一行ftpUserName
+非受限用户
+凡是加在文件vsftpd/chroot_list中的用户都是不受限止的用户,即, 可以浏览其主目录的上级目录。在这里默认为空：
+sudo vi /etc/vsftpd/chroot_list 
+直接保存退出
+启动ftp服务
+sudo service vsftpd start  
+ec2 权限设置
+最后，需要在EC2控制台中设置Security Group，增加ftp所需端口
+20，21以及60000-60020 
+
+客户端安装与说明
+https://filezilla-project.org/
+推荐使用FileZilla，并设置为被动模式
+如果出现如下错误：
+ftp> ls
+200 PORT command successful. Consider using PASV.
+425 Failed to establish connection.
+ftp> put
+(local-file) iz_
+usage: put local-file remote-file
+ftp> put
+(local-file) test.txt
+(remote-file) test.txt
+local: test.txt remote: test.txt
+200 PORT command successful. Consider using PASV.
+425 Failed to establish connection.
+ftp> bye
+421 Timeout.
+有可能是windows 本地防火墙的问题，可以关闭防火墙 
+或者首先使用被动模式 
+quote PASV
+解决问题的思路如下：
+1、防火墙（本机、客户机）
+2、FTP目录的权限
+3、客户机是否是IPv6网络
+4、客户机的网关限制了外网ftp 
+
+

@@ -1,0 +1,60 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45485491				
+
+
+
+Rotate an array of n elements to the right by k steps.
+For example, with n = 7 and k = 3, the array [1,2,3,4,5,6,7] is rotated to [5,6,7,1,2,3,4]. 
+Note: 
+ Try to come up as many solutions as you can, there are at least 3 different ways to solve this problem. 
+思想： 
+1.—567旋转—765 
+2.—1234旋转—4321 
+3.—整体旋转4321765—5671234
+解决方案：
+void reverse(int left,int right,int *array)
+{
+    int temp = 0;
+    while(left<right)
+    {
+
+        temp = array[left];
+        array[left]= array[right];
+        array[right] = temp;
+        left++;
+        right--;
+    }
+}
+
+void rotate(int* nums, int numsSize, int k)
+{
+    k = k%numsSize;//不知道为何这里要加上这一句？
+    reverse(0,numsSize-k-1,nums);
+    reverse(numsSize-k,numsSize-1,nums);
+    reverse(0,numsSize-1,nums);
+}
+
+python解决方案：
+class Solution:
+# @param nums, a list of integer
+# @param k, num of steps
+# @return nothing, please modify the nums list in-place.
+def rotate(self, nums, k):
+    if not nums:
+        return
+    k%=len(nums)
+    nums.reverse()
+    self.reverse(nums,0,k-1)
+    self.reverse(nums,k,len(nums)-1)
+
+
+def reverse(self,nums,start,end):
+    while start<end:
+        nums[start],nums[end]=nums[end],nums[start]
+        start+=1
+        end-=1
+ 
+
+

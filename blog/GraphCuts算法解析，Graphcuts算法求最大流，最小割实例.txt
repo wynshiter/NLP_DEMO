@@ -1,0 +1,139 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/40717957				
+
+
+ 
+ 图割论文大合集下载：
+http://download.csdn.net/detail/wangyaninglm/8292305
+ 
+代码：
+/* graph.h */
+/* Vladimir Kolmogorov (vnk@cs.cornell.edu), 2001. */
+
+/*
+	This software library is a modification of the maxflow algorithm
+	described in
+
+	An Experimental Comparison of Min-Cut/Max-Flow Algorithms
+	for Energy Minimization in Computer Vision.
+	Yuri Boykov and Vladimir Kolmogorov.
+	In Third International Workshop on Energy Minimization
+	Methods in Computer Vision and Pattern Recognition, September 2001
+
+	This algorithm was originally developed at Siemens.
+	The main modification is that two trees are used for finding
+	augmenting paths - one grows from the source and the other
+	from the sink. (The original algorithm used only the former one).
+	Details will be described in my PhD thesis.
+
+	This implementation uses an adjacency list graph representation.邻接链表
+	Memory allocation:
+		Nodes: 22 bytes + one field to hold a residual capacity
+		       of t-links (by default it is 'short' - 2 bytes)
+		Arcs: 12 bytes + one field to hold a residual capacity 剩余容量
+		      (by default it is 'short' - 2 bytes)
+	(Note that arcs are always added in pairs （弧都是成对的添加）- in forward and reverse directions)
+
+	Example usage (computes a maxflow on the following graph):
+
+		        SOURCE
+		       /       \
+		     1/         \2
+		     /      3    \
+		   node0 -----> node1
+		     |   <-----   |
+		     |      4     |
+		     \            /
+		     5\          /6
+		       \        /
+		          SINK
+
+	///////////////////////////////////////////////////
+
+	#include <stdio.h>
+	#include "graph.h"
+
+	void test_maxflow()
+	{
+		Graph::node_id nodes[2];
+		Graph *g = new Graph();
+
+		nodes[0] = g -> add_node();
+		nodes[1] = g -> add_node();
+		g -> set_tweights(nodes[0], 1, 5);
+		g -> set_tweights(nodes[1], 2, 6);
+		g -> add_edge(nodes[0], nodes[1], 3, 4);
+
+		Graph::flowtype flow = g -> maxflow();
+
+		printf("Flow = %d\n", flow);
+		printf("Minimum cut:\n");
+		if (g->what_segment(nodes[0]) == Graph::SOURCE)
+			printf("node0 is in the SOURCE set\n");
+		else
+			printf("node0 is in the SINK set\n");
+		if (g->what_segment(nodes[1]) == Graph::SOURCE)
+			printf("node1 is in the SOURCE set\n");
+		else
+			printf("node1 is in the SINK set\n");
+
+		delete g;
+	}
+
+	///////////////////////////////////////////////////
+*/
+
+ 
+ 
+void test_maxflow()
+{
+	Graph::node_id nodes[2];
+	Graph *g = new Graph();
+
+	nodes[0] = g -> add_node();
+	nodes[1] = g -> add_node();
+	g -> set_tweights(nodes[0], 3, 3);
+	g -> set_tweights(nodes[1], 3, 1);
+	g -> add_edge(nodes[0], nodes[1], 1, 0);
+
+	Graph::flowtype flow = g -> maxflow();
+
+	printf("Flow = %d\n", flow);
+	printf("Minimum cut:\n");
+	if (g->what_segment(nodes[0]) == Graph::SOURCE)
+		printf("node0 is in the SOURCE set\n");
+	else
+		printf("node0 is in the SINK set\n");
+	if (g->what_segment(nodes[1]) == Graph::SOURCE)
+		printf("node1 is in the SOURCE set\n");
+	else
+		printf("node1 is in the SINK set\n");
+
+	delete g;
+}
+
+ 
+ 
+
+ 
+ 
+这块主要就是要理解，什么是maxflow，以及节点最后分割的类型是SOURCE还是SINK分别意味着什么
+ 
+graphcuts算法时间复杂度与其他最大流算法的比较：
+
+ 
+ 
+ 
+添加几篇文章地址：
+ 
+graphcuts资料博客大合集
+http://vision.csd.uwo.ca/code/
+ 
+http://lincccc.blogspot.tw/2011/04/graph-cut-and-its-application-in.html
+http://blog.csdn.net/zouxy09/article/details/8532106
+http://lincccc.blogspot.tw/2011/03/cuda-cuts-fast-graph-cuts-on-gpu_03.html
+http://blog.csdn.net/hebby06/article/details/5341228
+
+

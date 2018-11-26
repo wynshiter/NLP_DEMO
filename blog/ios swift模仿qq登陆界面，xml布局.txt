@@ -1,0 +1,872 @@
+content
+
+
+
+
+给大家推荐两个学习的地址：
+极客学院的视频：http://www.jikexueyuan.com/path/ios/
+一个博客：http://blog.csdn.net/lizhongfu2013/article/details/29210015
+
+主要想要实现一个模仿的登陆界面
+代码：
+
+//
+//  LoginViewController.swift
+//  IBM_LOGIN
+//
+//  Created by dcintern on 6/26/15.
+//  Copyright (c) 2015 dcintern. All rights reserved.
+//
+
+//import Foundation
+
+import UIKit
+
+class LoginViewController: UIViewController
+{
+
+    
+
+
+/// 定义属性
+var QQNumber = UITextField()
+var PassNumber = UITextField()
+
+
+override func viewDidLoad() {
+    
+    self.view.backgroundColor = UIColor.whiteColor()
+    super.viewDidLoad()
+    
+    // 添加头图片
+    [self .addAllSubViews()];
+}
+
+// 添加所有子控件
+func addAllSubViews(){
+    
+    /// 平铺背景
+    var headImage = UIImageView(frame: CGRectMake(0,0, 400, 800))
+    headImage.image =  UIImage(named:"123.jpeg")
+    self.view.addSubview(headImage)
+    
+    /// QQ号输入提示，暂时没有用到
+    var phoneText = UILabel(frame: CGRectMake(30, 240, UIScreen.mainScreen().bounds.size.width-60, 30))
+    phoneText.text = ""
+    self.view.addSubview(phoneText)
+    
+    /// QQ号输入框
+    var QQNumber = UITextField(frame: CGRectMake(30, 150, UIScreen.mainScreen().bounds.size.width-60, 30))
+    QQNumber.placeholder = " username"
+    QQNumber.layer.borderWidth = 2
+    QQNumber.layer.borderColor = UIColor.lightGrayColor().CGColor
+    QQNumber.layer.cornerRadius = 5
+    QQNumber.keyboardType = UIKeyboardType.NumberPad
+    self.view.addSubview(QQNumber)
+    self.QQNumber = QQNumber
+    
+    /// 密码输入提示，暂时没用到
+    var passText = UILabel(frame: CGRectMake(30, 300, UIScreen.mainScreen().bounds.size.width-60, 30))
+    passText.text = ""
+    self.view.addSubview(passText)
+    
+    /// 密码输入框
+    var PassNumber = UITextField(frame: CGRectMake(30, 200, UIScreen.mainScreen().bounds.size.width-60, 30))
+    PassNumber.placeholder = " password"
+    PassNumber.layer.borderWidth = 2
+    PassNumber.layer.borderColor = UIColor.lightGrayColor().CGColor
+    PassNumber.layer.cornerRadius = 5
+    self.view.addSubview(PassNumber)
+    self.PassNumber = PassNumber
+    
+    /// 密码找回
+    var button = UIButton(frame: CGRectMake(200, 360, 120, 30))
+    UIButton.buttonWithType(UIButtonType.Custom)
+    button.setTitle("忘记密码", forState: UIControlState.Normal)
+    button.setTitleColor(UIColor.lightGrayColor(), forState: UIControlState.Normal)
+    self.view.addSubview(button)
+    button.addTarget(self, action: "onClick", forControlEvents: UIControlEvents.TouchUpInside)
+    
+}
+
+/// 密码找回方法实现
+func onClick()
+{
+    
+    ///找回密码提示
+    UIAlertView(title: "温馨提示", message: "新密码已发送至手机上", delegate: nil, cancelButtonTitle: "确定", otherButtonTitles: "取消").show()
+}
+/**
+点击界面键盘辞去第一响应者
+*/
+override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+{
+    
+    self.QQNumber.resignFirstResponder()
+    self.PassNumber.resignFirstResponder()
+}
+
+}
+
+
+
+ 实现根据xml进行布局：
+
+import UIkit
+
+
+
+class LoginViewController :  UIViewController,NSXMLParserDelegate
+
+{
+
+        
+
+        ///
+
+        
+
+    
+
+        /// 定义属性
+
+        var m_Username = UITextField()
+
+        var m_Password = UITextField()
+
+    
+
+    
+
+        var m_backgroundRect = CGRectMake(0,0,0,0)
+
+        var m_UsernameRect = CGRectMake(0,0,0,0)
+
+        var m_PassWordRect = CGRectMake(0,0,0,0)
+
+    
+
+        var m_ConnectRect = CGRectMake(0,0,0,0)
+
+        var m_ForgetRect = CGRectMake(0,0,0,0)
+
+    
+
+        var myActivityIndicator: UIActivityIndicatorView!
+
+        
+
+        override func viewDidLoad()
+
+        {
+
+            
+
+            self.view.backgroundColor = UIColor.whiteColor()
+
+            super.viewDidLoad()
+
+            
+
+            
+
+            var parser = NSXMLParser(contentsOfURL: NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("LoginLayout", ofType: "xml")!))
+
+            
+
+            parser?.delegate = self
+
+            parser?.parse()
+
+            // 添加头图片
+
+            [self .addAllSubViews()];
+
+        }
+
+        
+
+        // 添加所有子控件
+
+        func addAllSubViews()
+
+        {
+
+            
+
+            /// 平铺背景
+
+           // var headImage = UIImageView(frame: m_backgroundRect)
+
+           // headImage.image =  UIImage(named:"background.jpg")
+
+            //self.view.addSubview(headImage)
+
+            
+
+            
+
+           
+
+            
+
+            //float lightblue[]={0.6824f, 0.7882f, 1.0f, 1.0f};
+
+            //var color = CGColorCreate(CGColorSpaceCreateDeviceRGB(), myColor)
+
+            ServerAddress.layer.borderColor = UIColor.blackColor().CGColor
+
+            ServerAddress.layer.cornerRadius = 5
+
+            self.view.addSubview(ServerAddress)
+
+            self.m_ServerAddress = ServerAddress
+
+            
+
+            /// username input textbox
+
+            var Username = UITextField(frame: m_UsernameRect)
+
+            Username.placeholder = " username"
+
+            Username.layer.borderWidth = 2
+
+            Username.layer.borderColor = UIColor.blackColor().CGColor
+
+            Username.layer.cornerRadius = 5
+
+            
+
+            self.view.addSubview(Username)
+
+            self.m_Username = Username
+
+            
+
+            /// password input textbox
+
+            var Password = UITextField(frame: m_PassWordRect)
+
+            Password.placeholder = " password"
+
+            Password.layer.borderWidth = 2
+
+            Password.layer.borderColor = UIColor.blackColor().CGColor
+
+            Password.layer.cornerRadius = 5
+
+            self.view.addSubview(Password)
+
+            self.m_Password = Password
+
+            
+
+            /// confirm the connection button
+
+            var confirmbutton = UIButton(frame: m_ConnectRect)
+
+            UIButton.buttonWithType(UIButtonType.Custom)
+
+            
+
+            confirmbutton.setTitle("Connect", forState: UIControlState.Normal)
+
+            confirmbutton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
+
+            self.view.addSubview(confirmbutton)
+
+            confirmbutton.addTarget(self, action: "onClickConfirm", forControlEvents: UIControlEvents.TouchUpInside)
+
+            
+
+
+
+            
+
+            /// findback password button
+
+            var button = UIButton(frame: m_ForgetRect)
+
+            UIButton.buttonWithType(UIButtonType.Custom)
+
+            button.setTitle("Forget password!", forState: UIControlState.Normal)
+
+            button.setTitleColor(UIColor.lightGrayColor(), forState: UIControlState.Normal)
+
+            self.view.addSubview(button)
+
+            button.addTarget(self, action: "onClickFindPasswordBack", forControlEvents: UIControlEvents.TouchUpInside)
+
+            
+
+            
+
+           // myActivityIndicator = UIActivityIndicatorView()
+
+            
+
+            //myActivityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.Gray
+
+            //myActivityIndicator.center = self.view.center;
+
+            
+
+            myActivityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .White)
+
+            myActivityIndicator.frame = CGRectMake(self.view.frame.size.width/2 - 50, 250, 100, 100)
+
+            myActivityIndicator.color = UIColor.blackColor()
+
+            
+
+            self.view.addSubview(myActivityIndicator);
+
+            
+
+        }
+
+    
+
+        ///on confirm connettion
+
+        func onClickConfirm()
+
+        {
+
+        
+
+        ///check if ip,username,passname is correct
+
+           println(m_ServerAddress.text)
+
+            //eares the space before and after
+
+            
+
+
+
+            
+
+           
+
+        }
+
+    
+
+        /// 密码找回方法实现
+
+        func onClickFindPasswordBack()
+
+        {
+
+            
+
+            ///找回密码提示, otherButtonTitles: "取消"这个参数如何传进去？
+
+            UIAlertView(title: "温馨提示", message: "新密码已发送至手机上", delegate: nil, cancelButtonTitle: "确定").show()
+
+        }
+
+        /**
+
+        点击界面键盘辞去第一响应者
+
+        */
+
+        override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+
+        {
+
+                      self.m_Username.resignFirstResponder()
+
+            self.m_Password.resignFirstResponder()
+
+        }
+
+        
+
+        
+
+        
+
+        var currentNodeName:String!
+
+        
+
+        func parser(parser: NSXMLParser, didStartElement elementName: String!, namespaceURI: String!, qualifiedName qName: String!, attributes attributeDict: [NSObject : AnyObject]!)
+
+        {
+
+            
+
+            currentNodeName = elementName
+
+            
+
+            //review the code using swith
+
+            if elementName == "background"
+
+            {
+
+                let x = CGFloat(((attributeDict["x"]! as String )as NSString).floatValue)
+
+                let y = CGFloat(((attributeDict["y"]! as String ) as NSString).floatValue)
+
+                let Width = CGFloat(((attributeDict["Width"]! as String )as NSString).floatValue)
+
+                let Height = CGFloat(((attributeDict["Height"]! as String ) as NSString).floatValue)
+
+                
+
+                m_backgroundRect = CGRectMake(x,y,Width,Height)
+
+                
+
+            }
+
+            else if(elementName == "ServerAddress")
+
+            {
+
+                let x = CGFloat(((attributeDict["x"]! as String )as NSString).floatValue)
+
+                let y = CGFloat(((attributeDict["y"]! as String ) as NSString).floatValue)
+
+                let Width = CGFloat(((attributeDict["Width"]! as String )as NSString).floatValue)
+
+                let Height = CGFloat(((attributeDict["Height"]! as String ) as NSString).floatValue)
+
+                
+
+                m_ServerAddressRect = CGRectMake(x,y,Width,Height)
+
+            }
+
+
+
+            else if(elementName == "Username")
+
+            {
+
+                let x = CGFloat(((attributeDict["x"]! as String )as NSString).floatValue)
+
+                let y = CGFloat(((attributeDict["y"]! as String ) as NSString).floatValue)
+
+                let Width = CGFloat(((attributeDict["Width"]! as String )as NSString).floatValue)
+
+                let Height = CGFloat(((attributeDict["Height"]! as String ) as NSString).floatValue)
+
+
+
+                m_UsernameRect = CGRectMake(x,y,Width,Height)
+
+            }
+
+            else if(elementName == "Password")
+
+            {
+
+                let x = CGFloat(((attributeDict["x"]! as String )as NSString).floatValue)
+
+                let y = CGFloat(((attributeDict["y"]! as String ) as NSString).floatValue)
+
+                let Width = CGFloat(((attributeDict["Width"]! as String )as NSString).floatValue)
+
+                let Height = CGFloat(((attributeDict["Height"]! as String ) as NSString).floatValue)
+
+
+
+                m_PassWordRect = CGRectMake(x,y,Width,Height)
+
+            }
+
+            else if(elementName == "Connect")
+
+            {
+
+                let x = CGFloat(((attributeDict["x"]! as String )as NSString).floatValue)
+
+                let y = CGFloat(((attributeDict["y"]! as String ) as NSString).floatValue)
+
+                let Width = CGFloat(((attributeDict["Width"]! as String )as NSString).floatValue)
+
+                let Height = CGFloat(((attributeDict["Height"]! as String ) as NSString).floatValue)
+
+                
+
+                m_ConnectRect = CGRectMake(x,y,Width,Height)
+
+            }
+
+            else if(elementName == "Forget")
+
+            {
+
+                let x = CGFloat(((attributeDict["x"]! as String )as NSString).floatValue)
+
+                let y = CGFloat(((attributeDict["y"]! as String ) as NSString).floatValue)
+
+                let Width = CGFloat(((attributeDict["Width"]! as String )as NSString).floatValue)
+
+                let Height = CGFloat(((attributeDict["Height"]! as String ) as NSString).floatValue)
+
+                
+
+                m_ForgetRect = CGRectMake(x,y,Width,Height)
+
+            }
+
+
+
+        }
+
+        
+
+        func parser(parser: NSXMLParser, foundCharacters string: String!) {
+
+            //        println(string)
+
+            
+
+            var str = string.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+
+            if str != ""{
+
+                println("current node : \(currentNodeName),value : \(str)")
+
+            }
+
+        }
+
+        
+
+        
+
+        override func didReceiveMemoryWarning() {
+
+            super.didReceiveMemoryWarning()
+
+            // Dispose of any resources that can be recreated.
+
+        }
+
+    
+
+    
+
+    lazy var m_connect: ConnectServer? = {
+
+        
+
+        return ConnectServer()
+
+        }()
+
+    
+
+}
+
+
+
+
+
+
+
+
+
+
+xml：
+
+<LoginLayout>
+    <background x="0" y="0" Width="400" Height="800">
+        <Image name="background.jpg">  </Image>
+    </background>
+    
+    
+    <Username x="30" y="150" Width="300" Height="30">
+    </Username>
+    <Password x="30" y="200" Width="300" Height="30">
+    </Password>
+    
+    
+    
+    <Connect x="30" y="250" Width="100" Height="30">
+    </Connect>
+    
+    <Forget x="200" y="250" Width="200" Height="30">
+    </Forget>
+</LoginLayout>
+
+
+ 对xml解析类的封装：
+NSXMLParser(data: data)，这个有几种初始化的方法，但是string就不行，得转换成NSdata，还是比较蛋疼的
+
+//
+//  VMXMLParser.swift
+//  XMLParserTest
+//
+//  Created by Jimmy Jose on 22/08/14.
+//https://github.com/varshylmobile/VMXMLParser
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+import Foundation
+
+// Todo: Add documentation
+class VMXMLParser: NSObject,NSXMLParserDelegate{
+    
+    private let kParserError = "Parser Error"
+    private var activeElement = ""
+    private var previousElement = "-1"
+    private var previousElementValue = ""
+    private var arrayFinalXML = NSMutableArray()
+    private var dictFinalXML  = NSMutableDictionary()
+    private var completionHandler:((tags:NSArray?, error:String?)->Void)?
+    
+    var lameMode = true
+    
+    var reoccuringTag:NSString = ""
+    var m_Projects:[String] = []
+    /**
+    Initializes a new parser with url of NSURL type.
+    
+    :param: url The url of xml file to be parsed
+    :param: completionHandler The completion handler
+    
+    :returns: Void.
+    */
+    
+    override init() {
+        
+        super.init()
+        
+    }
+    
+    func parseXMLFromURL(url:NSURL,takeChildOfTag:NSString,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        
+        self.reoccuringTag = takeChildOfTag
+        VMXMLParser().initWithURL(url, completionHandler: completionHandler)
+        
+    }
+    
+    func parseXMLFromURLString(urlString:NSString,takeChildOfTag:NSString,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        self.reoccuringTag = takeChildOfTag
+        
+        initWithURLString(urlString, completionHandler: completionHandler)
+    }
+    
+    
+    func parseXMLFromData(data:NSData,takeChildOfTag:NSString,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        self.reoccuringTag = takeChildOfTag
+        initWithContentsOfData(data, completionHandler:completionHandler)
+        
+    }
+    
+    
+    class func initParserWithURL(url:NSURL,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        
+        VMXMLParser().initWithURL(url, completionHandler: completionHandler)
+        
+    }
+    
+    class func initParserWithURLString(urlString:NSString,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        
+        VMXMLParser().initWithURLString(urlString, completionHandler: completionHandler)
+    }
+    
+    
+    class func initParserWithData(data:NSData,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        
+        VMXMLParser().initWithContentsOfData(data, completionHandler:completionHandler)
+        
+    }
+    
+    
+    private func initWithURL(url:NSURL,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil) -> AnyObject {
+        
+        parseXMLForUrl(url :url, completionHandler: completionHandler)
+        
+        return self
+        
+    }
+    
+    
+    
+    private func initWithURLString(urlString :NSString,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil) -> AnyObject {
+        
+        let url = NSURL(string: urlString as String)!
+        parseXMLForUrl(url :url, completionHandler: completionHandler)
+        
+        return self
+    }
+    
+    private func initWithContentsOfData(data:NSData,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil) -> AnyObject {
+        
+        initParserWith(data: data)
+        
+        return self
+        
+    }
+    
+    private func parseXMLForUrl(#url:NSURL,completionHandler:((tags:NSArray?, error:String?)->Void)? = nil){
+        
+        self.completionHandler = completionHandler
+        
+        beginParsingXMLForUrl(url)
+        
+    }
+    
+    private func beginParsingXMLForUrl(url:NSURL){
+        
+        let request:NSURLRequest = NSURLRequest(URL:url)
+        
+        let queue:NSOperationQueue = NSOperationQueue()
+        
+        NSURLConnection.sendAsynchronousRequest(request,queue:queue,completionHandler:{response,data,error in
+            
+            if(error != nil){
+                if(self.completionHandler != nil){
+                    self.completionHandler?(tags:nil,error:error.localizedDescription)
+                }
+                
+            }else{
+                
+                self.initParserWith(data: data)
+                
+            }})
+    }
+    
+    
+    private func initParserWith(#data:NSData){
+        
+        var parser = NSXMLParser(data: data)
+        parser.delegate = self
+        
+        var success:Bool = parser.parse()
+        
+        if success {
+            
+            if(self.arrayFinalXML.count > 0)
+            {
+                if(self.completionHandler != nil)
+                {
+                    self.completionHandler?(tags:self.arrayFinalXML,error:nil)
+                }
+            }
+            
+        }
+        else
+        {
+            
+            if(self.completionHandler != nil)
+            {
+                self.completionHandler?(tags:nil,error:kParserError)
+            }
+        }
+        
+    }
+    
+    internal func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [NSObject : AnyObject]) {
+        activeElement = elementName;
+        println(elementName)
+        if elementName == "Project"
+        {
+            let name = (attributeDict["Name"]! as String )
+            println(name)
+            m_Projects.append(name)
+            
+        }
+
+        if(reoccuringTag.isEqualToString(elementName)){
+            
+            dictFinalXML = NSMutableDictionary()
+        }
+    }
+    
+    internal func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        
+        if(reoccuringTag.length == 0){
+            if((dictFinalXML.objectForKey(activeElement)) != nil){
+                
+                arrayFinalXML.addObject(dictFinalXML)
+                dictFinalXML = NSMutableDictionary()
+                
+            }else{
+                
+                dictFinalXML.setValue(previousElementValue, forKey: activeElement)
+            }
+        }else{
+            //println(elementName)
+            if(reoccuringTag.isEqualToString(elementName)){
+                
+                arrayFinalXML.addObject(dictFinalXML)
+                dictFinalXML = NSMutableDictionary()
+                
+            }else{
+                
+                dictFinalXML.setValue(previousElementValue, forKey: activeElement)
+                
+            }
+            
+        }
+        
+        previousElement = "-1"
+        previousElementValue = ""
+        
+    }
+    
+    
+    internal func parser(parser: NSXMLParser, foundCharacters string: String?) {
+
+        if var str = string as NSString? {
+            str = str.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+            
+            if((previousElement as NSString).isEqualToString("-1")){
+                
+                previousElement = activeElement
+                previousElementValue = str as String
+                
+            }else{
+                
+                if((previousElement as NSString).isEqualToString(activeElement)){
+                    
+                    previousElementValue = previousElementValue + (str as String)
+                    
+                }else{
+                    
+                    previousElement = activeElement
+                    previousElementValue = str as String
+                }
+            }   
+        }
+    }
+    
+    
+    internal func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError) {
+        if(self.completionHandler != nil){
+            self.completionHandler?(tags:nil,error:parseError.localizedDescription)
+        }
+    }
+    
+}
+
+
+
+

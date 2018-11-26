@@ -1,0 +1,546 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/51638549				
+
+
+
+1.Harris角点检测
+Harris角点检测算法是一个极为简单的角点检测算法，该算法在1988年就被发明了，算法的主要思想是如果像素周围显示存在多于一个方向的边，我们认为该点为兴趣点。基本原理是根据公式： 
+ 
+化简为求解矩阵，最后根据矩阵的特征值判断是否为角点 
+ 
+ 
+实现效果： 
+ 
+代码（不用OpenCV）：
+
+# -*- coding: utf-8 -*-
+from pylab import *
+from PIL import Image
+from numpy import *
+from scipy.ndimage import filters
+
+print 'hello'
+
+def compute_harris_response(im,sigma=3):
+    """ Compute the Harris corner detector response function 
+        for each pixel in a graylevel image. """
+
+    # derivatives
+    imx = zeros(im.shape)
+    filters.gaussian_filter(im, (sigma,sigma), (0,1), imx)
+    imy = zeros(im.shape)
+    filters.gaussian_filter(im, (sigma,sigma), (1,0), imy)
+
+    # compute components of the Harris matrix
+    Wxx = filters.gaussian_filter(imx*imx,sigma)
+    Wxy = filters.gaussian_filter(imx*imy,sigma)
+    Wyy = filters.gaussian_filter(imy*imy,sigma)
+
+    # determinant and trace
+    Wdet = Wxx*Wyy - Wxy**2
+    Wtr = Wxx + Wyy
+
+    return Wdet / Wtr
+
+
+def get_harris_points(harrisim,min_dist=10,threshold=0.1):
+    """ Return corners from a Harris response image
+        min_dist is the minimum number of pixels separating 
+        corners and image boundary. """
+
+    # find top corner candidates above a threshold
+    corner_threshold = harrisim.max() * threshold
+    harrisim_t = (harrisim > corner_threshold) * 1
+
+    # get coordinates of candidates
+    coords = array(harrisim_t.nonzero()).T
+
+    # ...and their values
+    candidate_values = [harrisim[c[0],c[1]] for c in coords]
+
+    # sort candidates (reverse to get descending order)
+    index = argsort(candidate_values)[::-1]
+
+    # store allowed point locations in array
+    allowed_locations = zeros(harrisim.shape)
+    allowed_locations[min_dist:-min_dist,min_dist:-min_dist] = 1
+
+    # select the best points taking min_distance into account
+    filtered_coords = []
+    for i in index:
+        if allowed_locations[coords[i,0],coords[i,1]] == 1:
+            filtered_coords.append(coords[i])
+            allowed_locations[(coords[i,0]-min_dist):(coords[i,0]+min_dist), 
+                        (coords[i,1]-min_dist):(coords[i,1]+min_dist)] = 0
+
+    return filtered_coords
+
+
+def plot_harris_points(image,filtered_coords):
+    """ Plots corners found in image. """
+
+    figure()
+    gray()
+    imshow(image)
+    plot([p[1] for p in filtered_coords],
+                [p[0] for p in filtered_coords],'*')
+    axis('off')
+    show()
+
+
+def get_descriptors(image,filtered_coords,wid=5):
+    """ For each point return pixel values around the point
+        using a neighbourhood of width 2*wid+1. (Assume points are 
+        extracted with min_distance > wid). """
+
+    desc = []
+    for coords in filtered_coords:
+        patch = image[coords[0]-wid:coords[0]+wid+1,
+                            coords[1]-wid:coords[1]+wid+1].flatten()
+        desc.append(patch)
+
+    return desc
+
+
+def match(desc1,desc2,threshold=0.5):
+    """ For each corner point descriptor in the first image, 
+        select its match to second image using
+        normalized cross correlation. """
+
+    n = len(desc1[0])
+
+    # pair-wise distances
+    d = -ones((len(desc1),len(desc2)))
+    for i in range(len(desc1)):
+        for j in range(len(desc2)):
+            d1 = (desc1[i] - mean(desc1[i])) / std(desc1[i])
+            d2 = (desc2[j] - mean(desc2[j])) / std(desc2[j])
+            ncc_value = sum(d1 * d2) / (n-1) 
+            if ncc_value > threshold:
+                d[i,j] = ncc_value
+
+    ndx = argsort(-d)
+    matchscores = ndx[:,0]
+
+    return matchscores
+
+
+def match_twosided(desc1,desc2,threshold=0.5):
+    """ Two-sided symmetric version of match(). """
+
+    matches_12 = match(desc1,desc2,threshold)
+    matches_21 = match(desc2,desc1,threshold)
+
+    ndx_12 = where(matches_12 >= 0)[0]
+
+    # remove matches that are not symmetric
+    for n in ndx_12:
+        if matches_21[matches_12[n]] != n:
+            matches_12[n] = -1
+
+    return matches_12
+
+
+def appendimages(im1,im2):
+    """ Return a new image that appends the two images side-by-side. """
+
+    # select the image with the fewest rows and fill in enough empty rows
+    rows1 = im1.shape[0]    
+    rows2 = im2.shape[0]
+
+    if rows1 < rows2:
+        im1 = concatenate((im1,zeros((rows2-rows1,im1.shape[1]))),axis=0)
+    elif rows1 > rows2:
+        im2 = concatenate((im2,zeros((rows1-rows2,im2.shape[1]))),axis=0)
+    # if none of these cases they are equal, no filling needed.
+
+    return concatenate((im1,im2), axis=1)
+
+
+def plot_matches(im1,im2,locs1,locs2,matchscores,show_below=True):
+    """ Show a figure with lines joining the accepted matches 
+        input: im1,im2 (images as arrays), locs1,locs2 (feature locations), 
+        matchscores (as output from 'match()'), 
+        show_below (if images should be shown below matches). """
+
+    im3 = appendimages(im1,im2)
+    if show_below:
+        im3 = vstack((im3,im3))
+
+    imshow(im3)
+
+    cols1 = im1.shape[1]
+    for i,m in enumerate(matchscores):
+        if m>0:
+            plot([locs1[i][1],locs2[m][1]+cols1],[locs1[i][0],locs2[m][0]],'c')
+    axis('off')
+
+def imresize(im,sz):
+    """    Resize an image array using PIL. """
+    pil_im = Image.fromarray(uint8(im))
+
+    return array(pil_im.resize(sz))
+"""
+Example of detecting Harris corner points (Figure 2-1 in the book).
+"""
+
+# 读入图像
+im = array(Image.open('swan.jpg').convert('L'))
+
+# 检测harris角点
+harrisim = compute_harris_response(im)
+
+# Harris响应函数
+harrisim1 = 255 - harrisim
+
+figure()
+gray()
+
+#画出Harris响应图
+subplot(141)
+imshow(harrisim1)
+print harrisim1.shape
+axis('off')
+axis('equal')
+
+
+threshold = [0.01, 0.05, 0.1]
+for i, thres in enumerate(threshold):
+    filtered_coords = get_harris_points(harrisim, 6, thres)
+    subplot(1, 4, i+2)
+    imshow(im)
+    print im.shape
+    plot([p[1] for p in filtered_coords], [p[0] for p in filtered_coords], '*')
+    axis('off')
+
+#原书采用的PCV中PCV harris模块
+#harris.plot_harris_points(im, filtered_coords)
+
+# plot only 200 strongest
+# harris.plot_harris_points(im, filtered_coords[:200])
+
+
+# Figure 2-2下面的图
+im1 = array(Image.open("swan.jpg").convert("L"))
+im2 = array(Image.open("swan.jpg").convert("L"))
+# resize to make matching faster
+im1 = imresize(im1, (im1.shape[1]/2, im1.shape[0]/2))
+im2 = imresize(im2, (im2.shape[1]/2, im2.shape[0]/2))
+
+wid = 5
+harrisim = compute_harris_response(im1, 5)
+filtered_coords1 = get_harris_points(harrisim, wid+1)
+d1 = get_descriptors(im1, filtered_coords1, wid)
+
+harrisim = compute_harris_response(im2, 5)
+filtered_coords2 = get_harris_points(harrisim, wid+1)
+d2 = get_descriptors(im2, filtered_coords2, wid)
+
+print 'starting matching'
+matches = match_twosided(d1, d2)
+
+figure()
+gray() 
+plot_matches(im1, im2, filtered_coords1, filtered_coords2, matches)
+show()
+
+
+OpenCV函数cv2.cornerHarris() 有四个参数 其作用分别为 :
+img - Input image, it should be grayscale and float32 type. 
+blockSize - It is the size of neighbourhood considered for corner detection 
+ksize - Aperture parameter of Sobel derivative used. 
+k - Harris detector free parameter in the equation.
+当然可以使用OpenCV在亚像素上提高算法的精度，使用函数cv2.cornerSubPix()，不过应该使用最新版的OpenCV 我电脑上是2.4.9版本，好像文档[2]中的代码没有调试通过， 
+下面是OpenCV代码的效果： 
+
+代码：
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jun 11 23:21:18 2016
+
+@author: season
+"""
+
+import cv2
+import numpy as np
+
+
+filename = 'swan.jpg'
+img = cv2.imread(filename)
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+gray = np.float32(gray)
+dst = cv2.cornerHarris(gray,2,3,0.04)
+
+#result is dilated for marking the corners, not important
+dst = cv2.dilate(dst,None)
+
+# Threshold for an optimal value, it may vary depending on the image.
+img[dst>0.01*dst.max()]=[0,0,255]
+
+cv2.imshow('dst',img)
+if cv2.waitKey(0) & 0xff == 27:
+    cv2.destroyAllWindows()
+测试OpenCV，numpy模块的代码：
+#test cv2 and numpy package
+print cv2.__version__
+a = np.arange(10)
+print(a)
+2.sift特征
+在Harris角点中对于下图所示的特征，小窗口中可能认为是角点，当窗口尺寸变化，则可能检测不到角点。 
+ 
+2004年提出的Scale Invariant Feature Transform (SIFT) 是改进的基于尺度不变的特征检测器。
+SIFT特征包括兴趣点检测器和描述子，它对于尺度，旋转和亮度都具有不变性。
+有下面四个步骤 
+1. Scale-space Extrema Detection 
+2. Keypoint Localization 
+3. Orientation Assignment 
+4. Keypoint Descriptor 
+5. Keypoint Matching
+sift特征点检测效果： 
+ 
+sift的OpenCV代码比较简单：
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Jun 11 20:22:51 2016
+
+@author: season
+"""
+
+import cv2
+
+import numpy as np
+#import pdb
+#pdb.set_trace()#turn on the pdb prompt
+
+#test cv2 and numpy package
+print cv2.__version__
+a = np.arange(10)
+print(a)
+
+img = cv2.imread('swan.jpg')
+gray= cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+sift = cv2.SIFT()
+kp = sift.detect(gray,None)
+
+img=cv2.drawKeypoints(gray,kp)
+
+cv2.imwrite('sift_keypoints.jpg',img)
+cv2.imshow("sift_keypoint",img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+3.SURF特征点
+In 2006, three people, Bay, H., Tuytelaars, T. and Van Gool, L, published another paper, “SURF: Speeded Up Robust Features” which introduced a new algorithm called SURF. As name suggests, it is a speeded-up version of SIFT. 
+ 在SURF算法中，特征点的判据为某像素亮度的Hessian矩阵的行列式(Dxx*Dyy-Dxy*Dxy)为一个极值。由于Hessian矩阵的计算需要用到偏导数的计算，这一般通过像素点亮度值与高斯核的某一方向偏导数卷积而成；在SURF算法里，为提高算法运行速度，在精度影响很小的情况下，用近似的盒状滤波器（0，1，1组成的box filter）代替高斯核。因为滤波器仅有0，-1,1，因此卷积的计算可以用积分图像（Integral image）来优化（O(1)的时间复杂度），大大提高了效率。 
+ Surf在速度上比sift要快许多，这主要得益于它的积分图技术，已经Hessian矩阵的利用减少了降采样过程，另外它得到的特征向量维数也比较少，有利于更快的进行特征点匹配。
+基于surf的人脸识别：
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 15 22:05:44 2016
+
+@author: Administrator
+"""
+import cv2
+
+
+import numpy
+
+opencv_haystack =cv2.imread('woman.jpg')
+opencv_needle =cv2.imread('face.jpg')
+
+ngrey = cv2.cvtColor(opencv_needle, cv2.COLOR_BGR2GRAY)
+hgrey = cv2.cvtColor(opencv_haystack, cv2.COLOR_BGR2GRAY)
+
+# build feature detector and descriptor extractor
+hessian_threshold = 85
+detector = cv2.SURF(hessian_threshold)
+(hkeypoints, hdescriptors) = detector.detect(hgrey, None, useProvidedKeypoints = False)
+(nkeypoints, ndescriptors) = detector.detect(ngrey, None, useProvidedKeypoints = False)
+
+# extract vectors of size 64 from raw descriptors numpy arrays
+rowsize = len(hdescriptors) / len(hkeypoints)
+if rowsize > 1:
+    hrows = numpy.array(hdescriptors, dtype = numpy.float32).reshape((-1, rowsize))
+    nrows = numpy.array(ndescriptors, dtype = numpy.float32).reshape((-1, rowsize))
+    #print hrows.shape, nrows.shape
+else:
+    hrows = numpy.array(hdescriptors, dtype = numpy.float32)
+    nrows = numpy.array(ndescriptors, dtype = numpy.float32)
+    rowsize = len(hrows[0])
+
+# kNN training - learn mapping from hrow to hkeypoints index
+samples = hrows
+responses = numpy.arange(len(hkeypoints), dtype = numpy.float32)
+#print len(samples), len(responses)
+knn = cv2.KNearest()
+knn.train(samples,responses)
+
+# retrieve index and value through enumeration
+count = 1
+
+for i, descriptor in enumerate(nrows):
+    descriptor = numpy.array(descriptor, dtype = numpy.float32).reshape((1, rowsize))
+    #print i, descriptor.shape, samples[0].shape
+    retval, results, neigh_resp, dists = knn.find_nearest(descriptor, 1)
+    res, dist =  int(results[0][0]), dists[0][0]
+    #print res, dist
+
+    if dist < 0.1:
+        count = count+1
+        # draw matched keypoints in red color
+        color = (0, 0, 255)
+#    else:
+#        # draw unmatched in blue color
+#        color = (255, 0, 0)
+    # draw matched key points on haystack image
+        x,y = hkeypoints[res].pt
+        center = (int(x),int(y))
+        cv2.circle(opencv_haystack,center,2,color,-1)
+        # draw matched key points on needle image
+        x,y = nkeypoints[i].pt
+        center = (int(x),int(y))
+        cv2.circle(opencv_needle,center,2,color,-1)
+
+
+cv2.imshow("Input Image", opencv_haystack)
+cv2.waitKey(0)
+cv2.imshow("The match Result", opencv_needle)
+cv2.waitKey(0)
+
+print count
+if count>40:
+    print "Yes Success!"
+else:
+    print "False Face!"
+#cv2.waitKey(0)
+#cv2.destroyAllWindows()
+4.ORB特征
+一种新的具有局部不变性的特征 —— ORB特征，从它的名字中可以看出它是对FAST特征点与BREIF特征描述子的一种结合与改进，这个算法是由Ethan Rublee,Vincent Rabaud,Kurt Konolige以及Gary R.Bradski在2011年一篇名为“ORB：An Efficient Alternative to SIFT or SURF”的文章中提出。就像文章题目所写一样，ORB是除了SIFT与SURF外一个很好的选择，而且它有很高的效率，最重要的一点是它是免费的，SIFT与SURF都是有专利的，你如果在商业软件中使用，需要购买许可。
+实现效果： 
+
+代码：
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jun 16 11:11:18 2016
+
+@author: Administrator
+"""
+
+import numpy as np
+import cv2
+#from matplotlib import pyplot as plt
+print cv2.__version__
+
+
+img1 = cv2.imread('woman.jpg',0)          # queryImage
+img2 = cv2.imread('face.jpg',0) # trainImage
+def drawMatches(img1, kp1, img2, kp2, matches):
+    """
+    My own implementation of cv2.drawMatches as OpenCV 2.4.9
+    does not have this function available but it's supported in
+    OpenCV 3.0.0
+
+    This function takes in two images with their associated 
+    keypoints, as well as a list of DMatch data structure (matches) 
+    that contains which keypoints matched in which images.
+
+    An image will be produced where a montage is shown with
+    the first image followed by the second image beside it.
+
+    Keypoints are delineated with circles, while lines are connected
+    between matching keypoints.
+
+    img1,img2 - Grayscale images
+    kp1,kp2 - Detected list of keypoints through any of the OpenCV keypoint 
+              detection algorithms
+    matches - A list of matches of corresponding keypoints through any
+              OpenCV keypoint matching algorithm
+    """
+
+    # Create a new output image that concatenates the two images together
+    # (a.k.a) a montage
+    rows1 = img1.shape[0]
+    cols1 = img1.shape[1]
+    rows2 = img2.shape[0]
+    cols2 = img2.shape[1]
+
+    out = np.zeros((max([rows1,rows2]),cols1+cols2,3), dtype='uint8')
+
+    # Place the first image to the left
+    out[:rows1,:cols1] = np.dstack([img1, img1, img1])
+
+    # Place the next image to the right of it
+    out[:rows2,cols1:] = np.dstack([img2, img2, img2])
+
+    # For each pair of points we have between both images
+    # draw circles, then connect a line between them
+    for mat in matches:
+
+        # Get the matching keypoints for each of the images
+        img1_idx = mat.queryIdx
+        img2_idx = mat.trainIdx
+
+        # x - columns
+        # y - rows
+        (x1,y1) = kp1[img1_idx].pt
+        (x2,y2) = kp2[img2_idx].pt
+
+        # Draw a small circle at both co-ordinates
+        # radius 4
+        # colour blue
+        # thickness = 1
+        cv2.circle(out, (int(x1),int(y1)), 4, (255, 0, 0), 1)   
+        cv2.circle(out, (int(x2)+cols1,int(y2)), 4, (255, 0, 0), 1)
+
+        # Draw a line in between the two points
+        # thickness = 1
+        # colour blue
+        cv2.line(out, (int(x1),int(y1)), (int(x2)+cols1,int(y2)), (255, 0, 0), 1)
+
+
+    # Show the image
+    cv2.imshow('Matched Features', out)
+    cv2.waitKey(0)
+    cv2.destroyWindow('Matched Features')
+
+    # Also return the image if you'd like a copy
+    return out
+
+# Initiate SIFT detector
+orb = cv2.ORB()
+
+# find the keypoints and descriptors with SIFT
+kp1, des1 = orb.detectAndCompute(img1,None)
+kp2, des2 = orb.detectAndCompute(img2,None)
+# create BFMatcher object
+bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+# Match descriptors.
+matches = bf.match(des1,des2)
+
+# Sort them in the order of their distance.
+matches = sorted(matches, key = lambda x:x.distance)
+
+# Draw first 10 matches.
+img3 = drawMatches(img1,kp1,img2,kp2,matches[:10])
+
+cv2.imshow('dst',img3)
+if cv2.waitKey(0) & 0xff == 27:
+    cv2.destroyAllWindows()
+#plt.imshow(img3),plt.show()
+
+
+'''
+draw match 函数在下面的链接中有自己的实现，我直接复制过来了
+
+http://stackoverflow.com/questions/20259025/module-object-has-no-attribute-drawmatches-opencv-python
+'''
+未完待续
+参考文献
+[1]http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_table_of_contents_feature2d/py_table_of_contents_feature2d.html 
+[2]http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_features_harris/py_features_harris.html#exercises 
+
+

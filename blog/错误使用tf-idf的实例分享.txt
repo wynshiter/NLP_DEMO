@@ -1,0 +1,96 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/79921856				
+
+
+
+作者：一人
+项目中需要计算两个电视节目的相似程度，有人提出将自然语言处理当中的经典TF-IDF（Item frequency-inverse document frequency）引入作为节目的特征，然后使用余弦距离进行相似度计算。由于TF-IDF的应用领域与电视节目的信息表示不符，因此将其应用于电视节目相似度计算当中是不合适的。本文首先介绍视频语义的表示，接着对于文本语义的TF-IDF进行分析，最后描述提出的方案，解释当中的误区并做说明。
+视频与文本的语义表示
+视频语义的标签化表示
+视频内容的提取技术有以下几种1：
+
+对视频中物品进行识别形成序列
+对视频截图的语义序列与字幕的语义序列进行结合
+提取标题的关键词
+人工制作视频标签
+
+当前由于相关技术并不成熟，业界大多采用最后一种方法，人工从标签库当中选取部分作为视频内容的表示。具体节目的表示示例如下：
+{
+    "alias" : "伯恩的身份/叛谍追击/神鬼认证",
+    "duration" : 118,
+    "enName" : "The Bourne Identity",
+    "language" : "英语",
+    "name" : "谍影重重",
+    "issue" : "2002-01-01",
+    "director" : "道格·里曼",
+    "cast" : "马特·达蒙/弗兰卡·波坦特/克里斯·库珀/克里夫·欧文",
+    "summary" : "在这个故事中，一位失忆的人(马特-戴蒙饰)被一艘意大利渔船的人...",
+    "grade_score" : 8.9,
+    "tag" : "冒险/悬疑/动作/惊悚/剧情",
+    "country" : "美国",
+    ...
+}
+上面的tag字段就是对于电影《谍影重重》的语义表示。需要说明的是每个标签的放置并不代表标签的重要程度，它们对于节目的表示是等同的。
+在电视节目内容提取中，对视频的语义表示形成了标签列表。而在自然语言处理当中，对文章的语义表示产生了TF-IDF。
+文献语义的表示TF-IDF
+引述维基百科的解释[^tfidf]
+
+In information retrieval, tf–idf or TFIDF, short for term frequency–inverse document frequency, is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. It is often used as a weighting factor in searches of information retrieval, text mining, and user modeling. The tf-idf value increases proportionally to the number of times a word appears in the document and is offset by the frequency of the word in the corpus, which helps to adjust for the fact that some words appear more frequently in general.
+
+对于它的解释说明，TF-IDF表示词语对于文献的重要程度。专业解释为词语蕴含的信息在文献信息中所占的比重2。它有以下两个特点：
+
+一篇文档中该词出现的次数越多，它的值越大。
+有该词出现的文档数目越大，它的值越小。
+
+计算公式如下：
+
+tf(t,d)=ft,dndtf(t,d)=ft,dndtf(t,d) = \frac{f_{t,d}} {n_d}
+idf(t,D)=logN|{d∈D:t∈d}|idf(t,D)=logN|{d∈D:t∈d}|idf(t, D) = log\frac{N} {|\{d \in D: t \in d\}|}
+tf−idf=tf∗idftf−idf=tf∗idftf-idf = tf * idf
+
+ft,dft,df_{t,d}表示词ttt在文献ddd中出现的次数，ndndn_d表示文献ddd中词的个数。NNN是语料库中文献的个数，|{d∈D:t∈d}||{d∈D:t∈d}||\{d \in D: t \in d\}|表示有该词语出现的文献数目。
+结果示例如下：
+
+
+
+word
+TF-IDF
+
+
+
+我
+0.0012
+
+
+爱
+0.0025
+
+
+北京天安门
+0.0128
+
+
+…
+…
+
+
+文献语义的表示如下：
+[x_0, x_1, x_2, ...] = [0.0012, 0.0025, 0.0128, ...]
+这里词语“我”与“爱”在很多文档中会出现，认为它蕴含的信息量就少，因此TF-IDF值较低；“北京天安门”相较而言出现次数就少，因此认为它蕴含的信息量就大，TF-IDF值就大。
+通过计算文献中每个词的TF-IDF值，最终形成的向量代表了文献的语义。
+通过上面的分析我们可以得出，在文献中采用IDF计算方式的目的是为了更加准确的对文献语义进行表示。这种方式能够将语义丰富的词与语义稀少的词进行量化，追求的是词与词之间的区分度。因此，在任何想借鉴这种方式的应用中，忽略这一事实将导致不准确甚至错误的结果。
+错误使用TF-IDF
+混淆文本语义表示与视频语义表示
+项目需求是计算两个视频相似度，采用的视频语义表示是标签化的列表。有人提出的方案是将媒体库中的所有节目当做文本语料库，将每个节目的tag（即标签化列表）作为文献，其中的每个标签作为词，计算每个标签的TF-IDF，组成视频向量，最后使用余弦公式计算视频之间的相似度。由于标签列表不会重复，tf的作用可以忽略，只有IDF发挥作用。
+IDF会扭曲视频的语义表示
+在视频标签列表上采用IDF方式，将会错误的扭曲视频的语义表示。我们的目标是计算视频节目的相似程度，那么节目的表示向量越准确最终的相似结果就越准确。而在视频语义的表示中我们已经确认了标签列表是一种相对准确的表示方式。如果在标签列表上采用IDF的方式，我们可以视为是对标签做权重，原来的方式视每个标签的权重为1，经过IDF之后的权重视为A (A<1)，它受出现该标签的节目数目的大小影响，即该标签在各个节目中分布的越广，则A越小。
+我们知道，视频节目的语义表示直接由视频内容决定，与其他视频没有任何关系。因此，经过IDF的变化将扭曲原本准确的视频语义表示。因此这个方案是不合适的。
+
+学习博客和公开课的知识是初学者学习的常见方式，但是不可停留在只是知道如何做，需追求对其中原理的理解。当与别人意见不一致时，更不可不假思索直接使用博客内容作为自己的证明材料，千万铭记，别人的不一定是对的，我们要以批判的角度对待别人的东西。在回顾这个内容的过程当中，吾亦受益匪浅。
+
+呢喃，视频内容语义智能提取技术，知乎专栏，2017-05-08 
+[^tfidf]: wikipedia, TF-IDF，维基百科， 2018-03-22 ↩吴军，数学之美[第11章]，2012 ↩ 
+
+

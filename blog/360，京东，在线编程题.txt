@@ -1,0 +1,202 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/48740119				
+
+
+
+
+
+题目：
+讨论帖：
+点击打开链接
+
+
+int main()
+{
+switch (getchar() - '0')
+{
+case 2: puts("3"); break;
+case 3: puts("25"); break;
+case 4: puts("253"); break;
+case 5: puts("3121"); break;
+case 6: puts("46651"); break;
+case 7: puts("823537"); break;
+case 8: puts("16777209"); break;
+}
+#include <stdio.h>
+#include <math.h>
+size_t apple(size_t b)
+{
+    return b>0?pow(b,b)-(b-1):0;
+}
+int main()
+{
+    printf("%d\n",apple(8));
+    return 0;
+}
+
+
+
+void apple(short bear, short apple_sum, short count){
+	if(count == bear){
+		return;
+	}
+	apple_sum += pow(count,count) - count + 1;
+	count++;
+	apple(bear, apple_sum, count);
+}
+2.
+讨论帖子：
+http://bbs.csdn.net/topics/391830032
+
+
+void print(vector<char>& vData)
+{
+vector<char>::iterator it = vData.begin();
+for(; it != vData.end(); it++)
+{
+if(*it == '0' || *it == '2' || *it == '3' || *it == '5' || *it == '6' 
+|| *it == '7' || *it == '8' || *it == '9')
+{
+cout<<" - ";
+}
+else if(*it == '*')
+{
+cout<<" ";
+}
+else
+{
+cout<<"   ";
+}
+}
+cout<<endl;
+for(it = vData.begin(); it != vData.end(); it++)
+{
+if(*it == '0' || *it == '4' || *it == '8' || *it == '9')
+{
+cout<<"| |";
+}
+else if(*it == '5' || *it == '6')
+{
+cout<<"|  ";
+}
+else if(*it == '*')
+{
+cout<<" ";
+}
+else
+{
+cout<<"  |";
+}
+}
+cout<<endl;
+for(it = vData.begin(); it != vData.end(); it++)
+{
+if(*it == '0' || *it == '1' || *it == '7')
+{
+cout<<"   ";
+}
+else if(*it == '*')
+{
+cout<<"*";
+}
+else
+{
+cout<<" - ";
+}
+}
+cout<<endl;
+for(it = vData.begin(); it != vData.end(); it++)
+{
+if(*it == '0' || *it == '6' || *it == '8')
+{
+cout<<"| |";
+}
+else if(*it == '2')
+{
+cout<<"|  ";
+}
+else if(*it == '*')
+{
+cout<<" ";
+}
+else
+{
+cout<<"  |";
+}
+}
+cout<<endl;
+for(it = vData.begin(); it != vData.end(); it++)
+{
+if(*it == '0' || *it == '2' || *it == '3' || *it == '5' || *it == '6' 
+|| *it == '8' || *it == '9')
+{
+cout<<" _ ";
+}
+else if(*it == '*')
+{
+cout<<" ";
+}
+else
+{
+cout<<"   ";
+}
+}
+cout<<endl;
+}
+
+int main()
+{
+int n, i, k;
+while(cin>>n)
+{
+i = 2;
+if(n < 2)
+continue;
+vector<int> vData;
+while(n >= i)
+{
+if(n % i == 0)
+{
+n = n / i;
+vData.push_back(i);
+}
+else
+{
+i++;
+}
+}
+
+vector<char> vRes;
+int vDataSize = vData.size();
+for(k = 0; k < vDataSize; k++)
+{
+stack<int> temp;
+while(vData[k] > 0)
+{
+int value = vData[k] % 10;
+temp.push(value);
+vData[k] /= 10;
+}
+while(!temp.empty())
+{
+vRes.push_back(temp.top() + 48);
+temp.pop();
+}
+vRes.push_back('*');
+}
+if(!vRes.empty())
+{
+vRes.pop_back();
+}
+
+print(vRes);
+}
+return 0;
+}
+
+﻿﻿
+﻿﻿
+
+

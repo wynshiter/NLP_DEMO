@@ -1,0 +1,281 @@
+content
+
+
+
+ 
+  VC之CString,wchar_t,int,string,char*之间的转换
+
+
+1. CString 转 wchar_t
+CString path = "asdf";
+wchar_t wstr[256] = path.AllocSysString();
+或者：
+wchar_t wcstring[256];
+MultiByteToWideChar(CP_ACP,0,path,-1,wcstring,256);
+ 
+2. wchar_t转CString
+WideCharToMultiByte(CP_ACP,0,wcstring,256,path.GetBuffer(0),256,NULL,NULL);
+path.ReleaseBuffer(0);
+ 
+3. string 转 CString
+CString.format("%s", string.c_str());
+ 
+4. char 转 CString
+CString.format("%s", char*);
+ 
+5. char 转 string
+string s(char *);
+ 
+6. string 转 char *
+char *p = string.c_str();
+ 
+7.CString 转 string
+string s(CString.GetBuffer());
+CString   str   =   "fdjfdas";  
+
+string   s   =   (LPCTSTR)str;
+ 
+ 
+ 
+1，string -> CString
+CString.format("%s", string.c_str());
+用c_str()确实比data()要好.
+
+
+2，char -> string
+string s(char *);
+你的只能初始化，在不是初始化的地方最好还是用assign().
+ 
+
+3,CString -> string
+string s(CString.GetBuffer());
+GetBuffer()后一定要ReleaseBuffer(),否则就没有释放缓冲区所占的空间.
+ 
+ 
+《C++标准函数库》中说的
+有三个函数可以将字符串的内容转换为字符数组和C—string
+1.data(),返回没有”\0“的字符串数组
+2,c_str()，返回有”\0“的字符串数组
+3，copy()
+---------------------------------------------------------------
+CString与int、char*、char[100]之间的转换- -
+CString与int、char*、char[100]之间的转换- -
+CString互转int
+ 
+ 
+将字符转换为整数，可以使用atoi、_atoi64或atol。
+而将数字转换为CString变量，可以使用CString的Format函数。如
+CString s;
+int i = 64;
+s.Format("%d", i)
+Format函数的功能很强，值得你研究一下。
+ 
+ 
+void CStrDlg::OnButton1()
+{
+// TODO: Add your control notification handler code here
+CString ss="1212.12";
+int temp=atoi((char*)LPCTSTR(ss));
+CString aa;
+aa.Format("%d",temp);
+AfxMessageBox("var is " + aa);
+}
+sart.Format("%s",buf);
+ 
+ 
+ 
+CString互转char*
+ 
+ 
+///char * TO cstring
+CString strtest;
+char * charpoint;
+charpoint="give string a value";
+strtest=charpoint;
+///CString TO char *
+charpoint=strtest.GetBuffer(strtest.GetLength());
+标准C里没有string,char *==char []==string
+ 
+ 
+char *转成CString
+ 
+ 
+可以用CString.Format("%s",char *)这个方法来将char *转成CString。
+CString转成char *
+用操作符（LPCSTR）strtest 或者 (char*)（LPCSTR）strtest 就可以了。
+CString转换 char[100]
+char a[100];
+CString str("aaaaaa");
+strncpy(a,(LPCTSTR)str,sizeof(a));
+Trackback: http://tb.blog.csdn.net/TrackBack.aspx?PostId=1570001
+ 
+ 
+ 
+(一) 概述
+string和CString均是字符串模板类，string为标准模板类（STL）定义的字符串类，已经纳入C++标准之中；
+CString（typedef CStringT > CString）为Visual C++中最常用的字符串类，继承自CSimpleStringT类，主要应用在MFC和ATL编程中，主要数据类型有char(应用于ANSI)，wchar_t(unicode)，TCHAR(ANSI与unicode均可)；
+char*为C编程中最常用的字符串指针，一般以'\0'为结束标志；
+ 
+ 
+ 
+(二) 构造
+string是方便的，可以从几乎所有的字符串构造而来，包括CString和char*；
+CString次之，可以从基本的一些字符串变量构造而来，包括char*等；
+char*没有构造函数，仅可以赋值；
+举例：
+char* psz = “joise”;
+CString cstr( psz );
+string str( cstr );
+ 
+ 
+(三) 运算符重载
+a) operator=
+string是最方便的，几乎可以直接用所有的字符串赋值，包括CString和char*；
+CString次之，可以直接用些基本的字符串赋值，包括char*等；
+char*只能由指针赋值，并且是极危险的操作，建议使用strcpy或者memcpy，而且char*在声明的时候如未赋初值建议先设为NULL，以避免野指针，令你抓狂；
+举例：
+char *psz = NULL;
+psz = new char[10]; //当然，以上的直接写成char *psz = new char[10];也是一样
+memset( psz, 0, 10 );
+strcpy( psz, “joise” );
+CString cstr;
+cstr = psz;
+string str;
+str = psz;
+str = cstr;
+delete []psz;
+b) operator+
+string与CString差不多，可以直接与char*进行加法，但不可以相互使用+运算符，即string str = str + cstr是非法的，须转换成char*；
+char*没有+运算，只能使用strcat把两个指针连在一起；
+举例：
+char* psz = “joise”;
+CString cstr = psz;
+cstr = cstr + psz;
+string str = psz;
+str = str + str + psz;
+strcat( psz, psz );
+strcat( psz, cstr );//合法
+strcat( psz, str );//非法，由此可见，CString可自动转换为const char*，而string不行
+c) operator +=
+string是最强大的，几乎可以与所有的字符串变量+=，包括CString和char*；
+CString次之，可以与基本的一些字符串变量进行+=而来，包括char*等；
+char*没有+=运算符，只能使用strcat把两个指针连在一起；
+d) operator[]
+CString最好，当越界时会抛出断言异常；
+string与char*下标越界结果未定义；
+举例：
+char* psz = “joise”;
+CString cstr = psz;
+cout << cstr[8];
+string str = psz;
+cout << str[8];
+cout << psz[8];
+e) operator== 、operator!=、operator> 、operator< 、operator>= 、perator<=
+CString与string之间不可以进行比较，但均可以与char*进行比较，并且比较的是值，而不是地址；
+cout << ( psz == cstr );
+cout << ( psz == str );
+cout << ( str == psz );
+cout << ( cstr == psz );//以上代码返回均为1
+ 
+ 
+(四) 常用算法
+a) 查找
+ 
+作用 char* string CString
+查找指定值 strchr
+strstr
+strrstr
+strspn find Find
+第一个匹配的值 fild_first_of FindOneOf 从后面开始查找 ReserveFind 指定匹配方式 find_if 
+注：find_if中是把范围内的值挨个代入匹配函数直至返回true
+ 
+b) 比较
+ 
+作用 char* string CString 查找指定值(区分大小写) strcmp
+strncmp
+strcoll
+_strncoll operator<
+operator>
+operator<=
+operator>=
+operator==
+operator!= Collate
+Compare 查找指定值(不区分大小写) _stricmp
+_strnicmp
+_stricoll
+_strnicoll CollateNoCase
+CompareNoCas 
+注：返回值如果<0则前面的值小于后面的值，反之亦然
+ 
+c) 替换
+ 
+作用 char* string CString 查找指定值 _strset
+_strnset
+replace
+replace_copy
+replace_copy_if
+replace_if Replace 
+
+
+d) 插入
+ 
+作用 char* string CString 查找指定值 insert Insert
+
+ 
+e) 增加 作用 char* string CString 动态增加值 strcat push
+append Append
+AppendChar
+AppendFormat
+ 
+f) 截取
+ 
+作用 char* string CString 得到部分值 用下标操作 substr Left
+Mid
+Right
+Truncate
+ 
+g) 移除
+ 
+作用 char* string CString 移除部份值 remove Remove 移除空白值 RemoveBlanks
+注：此为ATL提供，非C函数 remove_if Trim
+TrimLeft
+TrimRig
+ 
+h) 转换大小写
+ 
+作用 char* string CString 转换大小写 _strlwr
+_strupr MakeLower
+MakeUpper
+ 
+i) 与其他类型转换
+ 
+作用 char* string CString 转化为数字 atoi
+atod
+atof Format 转化为char* c_str
+GetBuffer
+GetBufferSetLen 
+j) 格式化
+作用 char* string CString 格式化 sprintf Format
+k) 得到长度
+作用 char* string CString
+得到长度 strlen length GetLength 得到大小 size GetAllocLength 
+l) 判断为空
+作用 char* string CString 判断是否为空判断是否==NULL或者第一个字符是否是'\0' empty IsEmpty
+
+m) 重定义大小
+作用 char* string CString 重定义大小 realloc
+new resize GetBufferSetLength 
+n) 释放资源
+作用 char* string CString 释放 free
+delete (delete[]) ReleaseBuffer
+ReleaseBufferSetLength
+(五) 安全性>
+CString > string > char*；
+(六) 灵活性
+CString > string >char*；
+(七) 可移植性
+char* = string > CString
+*****************
+CHAR 转CString之间等于就可以了啊！
+
+

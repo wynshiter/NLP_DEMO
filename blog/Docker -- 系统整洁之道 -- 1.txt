@@ -1,0 +1,174 @@
+content
+
+
+
+
+在上文Docker – 系统整洁之道 – 0中已经对Docker是什么，安装Docker以及怎么运行一个简单的容器有了初步了解，这篇文章介绍Docker的一些命令和Docker镜像的使用及操作。
+
+
+一些Docker命令
+
+Docker的命令按照使用一个容器的顺序进行。
+docker info 查看Docker的信息
+~  docker info
+Containers: 0
+Running: 0
+Paused: 0
+Stopped: 0
+Images: 8
+Server Version: 1.12.1
+Storage Driver: aufs
+Root Dir: /var/lib/docker/aufs
+...
+能查看到docker信息，说明docker是安装好的。
+docker run 运行一个容器
+~  docker run -it ubuntu
+root@8eac2e6cf194:/# ls
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@8eac2e6cf194:/#
+由于在上文中已经运行过一次该条命令，所以ubuntu的镜像已经下载到了本地，此次运行就可以使用该镜像产生一个容器，在容器启动后，上过-it获取到命令行，运行命令ls。
+使用–name标志可以给容器定义一个名字，如 
+docker run –name this_is_first_ubunt_container -it ubuntu 
+就会创建一个名字叫做this_is_first_ubunt_container的ubuntu的容器。名字只能使用大小写字母，数字，下划线，原点和横线，即[a-zA-Z0-9_.-]。
+
+关于docker run的帮助可以使用docker run --help获取。
+
+docker ps 列出所有的容器
+~  docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+8eac2e6cf194        ubuntu              "/bin/bash"         5 minutes ago       Up 5 minutes                            modest_davinci
+使用docker ps命令可以看到当前正在运行的容器有哪些，并给出了一些相应的属性。给命令增加参数-a就可以获取当前所有的容器，包括已经停止的，如下。
+~  docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS                          PORTS               NAMES
+4d0cc9a960f1        hello-world         "/hello"            About a minute ago   Exited (0) About a minute ago                       small_roentgen
+8eac2e6cf194        ubuntu              "/bin/bash"         4 minutes ago        Up 4 minutes                                        modest_davinci
+docker ps -n x，显示最后x个容器，不管容器正在运行还是停止。
+docker start 重新启动已经停止的容器
+docker start 
+docker start this_is_first_ubunt_container
+docker attatch 附着容器
+docker attach this_is_first_ubunt_container
+docker stop 停止一个容器
+~  docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+4d0cc9a960f1        hello-world         "/hello"            4 minutes ago       Exited (0) 4 minutes ago                       small_roentgen
+8eac2e6cf194        ubuntu              "/bin/bash"         8 minutes ago       Up 8 minutes                                   modest_davinci
+~  docker stop 8eac2e6cf194
+8eac2e6cf194
+~  docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+4d0cc9a960f1        hello-world         "/hello"            4 minutes ago       Exited (0) 4 minutes ago                       small_roentgen
+8eac2e6cf194        ubuntu              "/bin/bash"         8 minutes ago       Exited (0) 5 seconds ago                       modest_davinci
+前几个命令整体练习
+创建一个有名字的container，停止它，启动它。
+~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                  PORTS               NAMES
+03248ab5d03b        tomcat:latest       "catalina.sh run"   2 days ago          Exited (0) 2 days ago                       tomcat
+4d0cc9a960f1        hello-world         "/hello"            4 days ago          Exited (0) 4 days ago                       
+~ docker run --name this_is_first_ubunt_container -it ubuntu
+root@894b1f0fa739:/# whoami
+root
+root@894b1f0fa739:/# exit
+exit
+~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
+894b1f0fa739        ubuntu              "/bin/bash"         21 seconds ago      Exited (0) 14 seconds ago                       this_is_first_ubunt_container
+03248ab5d03b        tomcat:latest       "catalina.sh run"   2 days ago          Exited (0) 2 days ago                           tomcat
+4d0cc9a960f1        hello-world         "/hello"            4 days ago          Exited (0) 4 days ago                           small_roentgen
+~ docker start 894b1f0fa739
+894b1f0fa739
+~ docker attach 894b1f0fa739
+root@894b1f0fa739:/# whoami
+root
+root@894b1f0fa739:/# exit
+exit
+~ docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS                     PORTS               NAMES
+894b1f0fa739        ubuntu              "/bin/bash"         About a minute ago   Exited (0) 8 seconds ago                       this_is_first_ubunt_container
+03248ab5d03b        tomcat:latest       "catalina.sh run"   2 days ago           Exited (0) 2 days ago                          tomcat
+4d0cc9a960f1        hello-world         "/hello"            4 days ago           Exited (0) 4 days ago                          small_roentgen
+~ docker start this_is_first_ubunt_container
+this_is_first_ubunt_container
+~ docker attach this_is_first_ubunt_container
+root@894b1f0fa739:/# whoami
+root
+root@894b1f0fa739:/# exit
+exit
+守护式容器
+上面创建的ubuntu是交互式运行的容器(interactive container)，也可以创建一个长期运行的容器–守护式容器(daemonized container)。
+~ docker run --name daemon_ubuntu -d ubuntu /bin/sh -c "while true;do echo hello world;sleep 1;done"
+e56ae29adaf1d27cf49e05bccda5a7214be458fecc2afb0ff7721f16af8e044c
+~ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS               NAMES
+e56ae29adaf1        ubuntu              "/bin/sh -c 'while tr"   About a minute ago   Up About a minute                       daemon_ubuntu
+docker logs 容器日志
+~ docker logs daemon_ubuntu
+hello world
+hello world
+hello world
+hello world
+...
+
+~ docker logs --tail 0 -f daemon_ubuntu
+hello world
+hello world
+hello world
+hello world
+hello world
+docker top 容器进程
+~ docker top daemon_ubuntu
+PID                 USER                TIME                COMMAND
+2792                root                0:00                /bin/sh -c while true;do echo hello world;sleep 1;done
+3264                root                0:00                sleep 1
+容器内运行进程
+~ docker exec -d daemon_ubuntu touch /etc/new_config_file
+~ docker exec -it daemon_ubuntu /bin/sh
+# ls -l /etc | grep new
+-rw-r--r-- 1 root root       0 Oct 13 02:21 new_config_file
+docker inspect 容器详细信息
+~  docker inspect daemon_ubuntu
+# 获取容器运行状态
+~  docker inspect --format='{{.State.Running}}' daemon_ubuntu
+# 查看容器IP地址
+~ docker inspect --format='{{.NetworkSettings.IPAddress}}' daemon_ubuntu
+自动重启容器
+docker run –restart=always –name daemon_ubuntu -d ubuntu /bin/sh -c “while true;do echo hello world;sleep 1;done”
+–restart=always 无论容器的退出代码为何，都自动重启。 
+–restart=on-failure 当容器退出代码不为0时，自动重启。 
+–restart=on-failure:5 重启5次。
+docker rm 删除容器
+
+运行中的Docker容器是无法删除的。
+
+# 删除所有容器
+docker rm `docker ps -a -q`
+Docker 镜像
+docker images
+
+Linux  /var/lib/docker 
+  Mac $HOME/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
+
+docker pull ubuntu:16.10 获取ubuntu仓库中tag为16.10的镜像。
+docker pull -a ubuntu 获取ubuntu仓库中所有镜像。
+docker images ubuntu 列出本地所有ubuntu仓库的镜像。
+docker run 的时候如果没有指定镜像的版本，则拉取最新版本进行创建。
+Docker Hub 中仓库分为两种，一种是用户仓库（user repository），这种是用户创建使用的的，命名方式为username/repositoryname，意义为用户名/仓库名；一种是顶层仓库（top－repository），由docker内部人员管理。
+docker search 查找Docker Hub上公用可用镜像。
+
+获取镜像时，格式其实可以看做 用户/仓库:标签。 由于很多仓库为官网所有，所有很多都变成了 仓库:标签，如上面写的 ubuntu:16.10，ubutnu仓库的tag为16.10的镜像。
+
+构建镜像
+docker commit 
+docker build 和 Dockerfile文件
+
+一般来说，我们不是真正「创建」了一个镜像，而是基于一个已有的镜像，构建了一个新的镜像。
+
+参考链接
+
+
+Docker 从入门到实践
+第一本Docker书
+一个比较详细的命令用法
+ 
+
+

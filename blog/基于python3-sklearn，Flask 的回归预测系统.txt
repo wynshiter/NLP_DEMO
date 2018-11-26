@@ -1,0 +1,346 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/78118444				
+
+
+
+看到一副图片挺有意思，放在片头 
+
+序
+“傍晚小街路面上沁出微雨后的湿润，和煦的西风吹来，抬头看看天边的晚霞，嗯明天又是一个好天气。走到水果摊旁，挑了个根蒂蜷缩、敲起来声音浊响的青绿西瓜，一边满心期待着皮薄肉厚瓤甜的爽落感，一边愉快地想着，这学期狠下了工夫，基础概念弄得很清楚，算法作业也是信手拈来，这门课成绩一定差不了!”
+上面的经验是靠我们人类自身完成的，计算机能帮忙么？机器学习正是这样一门学科，它致力于研究如何通过计算的手段，利用经验来改善系统自身的性能。
+现在各行各业强调使用大数据手段进行数据分析，大数据的上帝视角带给我们的核心竞争力是对于个体甚至群体行为的预测，那么我们就来看看使用回归类算法对于数值型的数据如何来进行预测
+什么是回归？
+优点：结果易于理解，计算上不复杂。 
+缺点：对非线性的数据拟合不好。 
+适用数据类型：数值型和标称型数据。
+使用算法：使用回归，可以在给定输入的时候预测出一个数值，这是对分类方法的提升，因为这样可以预测连续型数据而不仅仅是离散的类别标签
+回归的一般方法： 
+（1）收集数据：采用任意方法收集数据； 
+（2）准备数据：回归需要数值型数据，标称型数据将被转换成二值型数据； 
+（3）分析数据：绘出数据的可视化二维图，有助于对数据做出理解和分析。在采用缩减法求得新回归系数后，可以将新拟合线绘在图上进行对比； 
+（4）训练算法：找到回归系数； 
+（5）测试算法：使用R2（相关系数的平方）或顶测值和数据的拟合度，来分析模型的效果； 
+使用算法：使用回归，可以在给定输入的时候预测出一个数值，这是对分类方法的提升，因为这样可以预测出连续型数据而不仅仅是离散型的类别标签
+原理简介 
+普通最小二乘法（ordinary least squares）
+问题：如何知道sklearn拟合公式的参数结果是多少y=ax+b怎么知道a，b？
+#
+线性回归（Linear regression）是利用称为线性回归方程的最小二乘函数（最小化误差平方和）对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归。
+
+典型业务场景
+假设一路公交，在其始发站每小时会来很多人等车，坐车人数会和很多因素相关（天气，是否节假日）。 
+为了方便调度人员预测下一个小时，或者当天的坐车人数，可以采用回归算法制作基于时间的预测系统。
+可能要有的功能
+1.出现异常增量时候的预警，异常增量，概念的定义。 
+2.预测值和真实值的差别
+数据准备
+history 表中记录了所有公交卡历史记录
+建表语句，从已经采集的数据中构建,主要为两列
+create table t_hour_count
+(
+quantity varchar2(128)
+time_frame varchar2(128)
+);
+其中人的主要标识为公交卡（id），我们从公交卡的记录表history中将每小时坐车的人筛选出来，由于只要数量，所以只要group_by之后再 去重再count
+create table  t_hour_count as  
+select count(distinct ta.id) quantity, group_by time_frame
+  from (select tt.*, to_char(tt.update_time, 'yyyymmddhh24') group_by
+          from (select *
+                  from history
+                 where id in (select distinct id
+                                    from t_公交卡 tc
+                                   where tc.type = '公交')) tt
+         where update_time >
+               to_date('20170716 00:00:00', 'yyyymmdd hh24:ss:mi')
+           and update_time <
+               to_date('20170721 00:00:00', 'yyyymmdd hh24:ss:mi')) ta
+ group by ta.group_by
+ order by group_by;
+
+参考代码
+python链接oracle 的简单框架
+#coding = utf-8
+import cx_Oracle
+import time
+import json
+
+import os
+os.environ['NLS_LANG']='SIMPLIFIED CHINESE_CHINA.ZHS16GBK'
+#-----------------------connect oracle-------------------------------
+username = '**'
+password = '**'
+ip = '*.*.*.*'
+service_name = '*'
+
+def getConnOracle(username,password,ip,service_name):
+    try:
+        conn = cx_Oracle.connect(username+'/'+password+'@'+ip+'/'+service_name)  # 连接数据库
+        return conn
+    except Exception:
+        print(Exception)
+
+conn = getConnOracle(username, password, ip, service_name)
+
+def getOracleSelect(conn):
+
+    cursor = conn.cursor()
+    try:
+        sqlString = "select time_frame,quantity from t_hour_count order by time_frame"
+        sqlresult = cursor.execute(sqlString)  # 使用cursor进行各种操作
+        result = sqlresult.fetchall()
+        return result
+
+    except cx_Oracle.DatabaseError as msg:
+        print(msg)
+    finally:
+        cursor.close()
+#----------------------------------   
+
+自定义数据指标统计
+计算一段时间的均值，最大，最小等指标
+#----------------------------------------------------------------------------------------------       
+def my_average(result_list = []):
+    sumvalue = 0
+    if len(result_list)==0:
+        return 0
+    for i in result_list:
+        sumvalue = i[1] + sumvalue
+    return int(sumvalue/len(result_list))
+
+#add 'my' to declare this function is user-defined
+def my_min(result_list = []):
+    if len(result_list)==0:
+        return 0
+    valuelist  = [i[1] for i in result_list]
+    return min(valuelist)
+
+def my_max(result_list = []):
+    if len(result_list)==0:
+        return 0
+    valuelist  = [i[1] for i in result_list]
+    return max(valuelist)
+
+def generateAllresult():
+
+    localtime = time.localtime()
+
+    all_result = [list(i) for i in getOracleSelect(conn)]
+    all_result_time = [[(time.strptime(i[0],"%Y%m%d%H")),i[1]] for i in all_result]
+    all_result_time_today = [i  for i in all_result_time if  i[0].tm_yday > localtime.tm_yday-1]
+    all_result_time_yesterday = [i  for i in all_result_time if i[0].tm_yday < localtime.tm_yday and i[0].tm_yday > localtime.tm_yday-2]
+
+    all_result_time_thedaybeforeyesterday = [i  for i in all_result_time if i[0].tm_yday < localtime.tm_yday-1 and i[0].tm_yday > localtime.tm_yday-3]
+
+    all_result_time_last3day = [i  for i in all_result_time if i[0].tm_yday < localtime.tm_yday and i[0].tm_yday > localtime.tm_yday-4]
+
+    all_result_time_last7day = [i  for i in all_result_time if i[0].tm_yday < localtime.tm_yday and i[0].tm_yday > localtime.tm_yday-8]
+
+    all_result_time_lastweekthisday = [i  for i in all_result_time if i[0].tm_yday < localtime.tm_yday-6 and i[0].tm_yday > localtime.tm_yday-8]
+
+    my_dict = {"all_result":all_result_time,"today":all_result_time_today,"yesterday":all_result_time_yesterday,"before_yesterday":all_result_time_thedaybeforeyesterday,"last3day":all_result_time_last3day,"last7day":all_result_time_last7day,"lastweekthisday":all_result_time_lastweekthisday}
+    my_result_dict = {}
+    for item in my_dict:
+        #print(my_dict[item])
+        #print(len(my_dict[item]))
+        my_result_dict[item] = [my_average(my_dict[item]),my_max(my_dict[item]),my_min(my_dict[item])]
+    #print(my_result_dict)
+    return my_result_dict
+
+
+
+Flask页面展示
+还有一个3js需要下载
+整个项目的目录结果如下图所示： 
+在windows上cmd中居然也有tree命令，使用tree  /f显示如下结构：
+
+页面html：
+
+<title xmlns="http://www.w3.org/1999/html">monitor.com</title>
+<!DOCTYPE HTML>
+<html>
+     <head>
+         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+         <title>Highstock Example</title>
+
+         <script type="text/javascript" src="../static/js/jquery-1.8.2.min.js"></script>
+         <style type="text/css">
+ ${demo.css}
+         </style>
+         <script type="text/javascript">
+ $(function () {
+     $.getJSON('/data?callback=?', function (data) {
+
+         // Create the chart
+         $('#container').highcharts('StockChart', {
+
+             rangeSelector: {
+                 inputEnabled: $('#container').width() > 480,
+                 selected: 1
+             },
+
+             title: {
+                 text: '人数情况小时统计'
+             },
+
+             series: [{
+                 name: '人数情况小时统计',
+                 data: data,
+                 type: 'spline',
+                 tooltip: {
+                     valueDecimals: 2
+                 }
+             }]
+         });
+     });
+ });
+         </script>
+     </head>
+
+     <p>
+<script src="../static/js/2.js"></script>
+<script src="../static/js/3.js"></script>
+
+
+<div id="container" style="height: 400px"></div>
+
+     <script type="text/javascript">
+
+ $(function () {
+     $.getJSON('/predict?callback=?', function (data) {
+
+     });
+ });
+         </script>
+
+<p>{{"统计概况"}}</p>
+<table border="1">
+<tr>
+<td>日期</td>
+<td>  平均值 </td>
+<td>最大值</td>
+<td>最小值</td>
+</tr>
+{%for key in mydict%}
+<tr>
+<td>{{key}}</td>
+<td>{{mydict[key][0]}}</td>
+<td>{{mydict[key][1]}}</td>
+<td>{{mydict[key][2]}}</td>
+</tr>
+{%endfor%}
+</table>
+
+<img src="../static/sample.png" width="640" height="480">
+
+     </body>
+</html>
+
+
+
+from flask import Flask, request, render_template
+
+app = Flask(__name__)
+@app.route("/", methods=["GET", "POST"])
+def hello():
+    if request.method == "GET":
+        today_Regression()
+        return render_template("mon.html",mydict=generateAllresult())
+    else:
+        return "post method is not define"
+
+
+@app.route("/data", methods=["GET"])
+def getdata():
+    #today_Regression()
+    ones = [[(time.strptime(i[0],"%Y%m%d%H")), i[1]] for i in getOracleSelect(conn)]
+    ones = [[time.mktime(i[0])*1000+28800000,i[1]] for i in ones]
+    return "%s(%s);" % (request.args.get('callback'), json.dumps(ones))
+
+'''
+
+
+'''
+
+
+sklearn 回归预测
+
+
+#--------------------------------------------------------------------------------------
+from sklearn import linear_model
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+#dataset = pd.read_csv('CSV.csv')
+#x is time ,y is people like [[1],[2],[3]]
+def my_Regression(X_array=[[]],Y_array=[[]]):
+    X = np.array(X_array)
+    y = np.array(Y_array)
+    print (type(X))
+
+    from sklearn.preprocessing import PolynomialFeatures
+    poly_reg = PolynomialFeatures(degree = 2)
+    X_poly = poly_reg.fit_transform(X)
+    lin_reg_2 = linear_model.LinearRegression()
+    lin_reg_2.fit(X_poly,y)
+
+    print(lin_reg_2.intercept_)
+
+    X_grid = np.arange(min(X),max(X),0.1)
+    X_grid = X_grid.reshape((len(X_grid),1))
+    plt.scatter(X,y,color = 'red')
+    plt.plot(X_grid,lin_reg_2.predict(poly_reg.fit_transform(X_grid)),color = 'blue')
+    plt.title('predict(2-Polynomial Regression)')
+    plt.xlabel('time')
+    plt.ylabel('people count')
+    plt.savefig("./static/sample.png",dpi=200)
+    #plt.show()
+def today_Regression():
+
+    localtime = time.localtime()
+
+    all_result = [list(i) for i in getOracleSelect(conn)]
+    all_result_time = [[(time.strptime(i[0],"%Y%m%d%H")),i[1]] for i in all_result]
+    all_result_time_today = [i  for i in all_result_time if  i[0].tm_yday > localtime.tm_yday-1]
+
+    X_array = [[time.mktime(i[0])]  for i in all_result_time if  i[0].tm_yday > localtime.tm_yday-1]
+    Y_array = [i[1] for i in all_result_time_today]
+
+    my_Regression(X_array,Y_array)
+
+if __name__ =='__main__':
+
+    app.run(host="0.0.0.0", port=55555, debug=True)
+使用一天的数据绘制一个二次函数，保存到本地作为一张图片 
+ 
+但是sklearn怎么输出二次函数的参数呢，我一直没有找到
+
+未完待续，将来将这个小项目共享出来 
+js文件下载地址：
+1： 
+http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js 
+2：2.js 
+http://cdnjs.cloudflare.com/ajax/libs/highstock/2.0.4/highstock.js
+3：3.js 
+http://code.highcharts.com/modules/exporting.js
+大数据框架下的回归预测 
+官方文档 
+http://spark.apache.org/docs/latest/ml-classification-regression.html#regression 
+中文翻译 
+http://www.apache.wiki/display/Spark/ML+Pipelines 
+python接口： 
+http://spark.apache.org/docs/latest/api/python/pyspark.ml.html#module-pyspark.ml.regression
+spark mllib 全面介绍： 
+http://www.cnblogs.com/shishanyuan/p/4747761.html
+python实现： 
+http://www.cnblogs.com/adienhsuan/p/5654481.html
+学习笔记： 
+http://www.cnblogs.com/charlotte77/p/5518368.html
+参考文献
+机器学习实战，第八章 
+周志华，机器学习 
+
+

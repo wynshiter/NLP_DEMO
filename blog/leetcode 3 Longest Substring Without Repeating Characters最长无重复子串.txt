@@ -1,0 +1,174 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/51068831				
+
+
+Given a string, find the length of the longest substring without repeating characters. For example, the longest substring without
+ repeating letters for "abcabcbb" is "abc", which the length is 3. For "bbbbb" the longest substring is "b", with the length of 1.
+
+这个应该是一个典型的动态规划问题：http://bbs.csdn.net/topics/310174805
+直观地得到一个思路，表达起来真够难的，直接写代码要更容易以abcbef这个串为例用一个数据结构pos记录每个元素曾出现的下标，初始为-1从s[0]开始，pos['a'] == -1，说明a还未出现过，令pos['a'] = 0，视为将a"加入当前串"，同时长度++同理令pos['b'] = 1,pos['c'] = 2到s[3]时，pos['b'] != -1，说明'b'在前面已经出现过了，此时可得到一个不重复串"abc"，刷新当前的最大长度，然后做如下处理：pos[s[0~2]] = -1，亦即将"ab""移出当前串"，同时当前长度减去3重复以上过程
+int lengthOfLongestSubstring(string s) {
+        vector<int> dict(256, -1);
+        int maxLen = 0, start = -1;
+        for (int i = 0; i != s.length(); i++) {
+            if (dict[s[i]] > start)
+                start = dict[s[i]];
+            dict[s[i]] = i;
+            maxLen = max(maxLen, i - start);
+        }
+        return maxLen;
+    }
+
+
+/**
+ * Solution (DP, O(n)):
+ *
+ * Assume L[i] = s[m...i], denotes the longest substring without repeating
+ * characters that ends up at s[i], and we keep a hashmap for every
+ * characters between m ... i, while storing <character, index> in the
+ * hashmap.
+ * We know that each character will appear only once.
+ * Then to find s[i+1]:
+ * 1) if s[i+1] does not appear in hashmap
+ *    we can just add s[i+1] to hash map. and L[i+1] = s[m...i+1]
+ * 2) if s[i+1] exists in hashmap, and the hashmap value (the index) is k
+ *    let m = max(m, k), then L[i+1] = s[m...i+1], we also need to update
+ *    entry in hashmap to mark the latest occurency of s[i+1].
+ *
+ * Since we scan the string for only once, and the 'm' will also move from
+ * beginning to end for at most once. Overall complexity is O(n).
+ *
+ * If characters are all in ASCII, we could use array to mimic hashmap.
+ */
+
+int lengthOfLongestSubstring(string s) {
+    // for ASCII char sequence, use this as a hashmap
+    vector<int> charIndex(256, -1);
+    int longest = 0, m = 0;
+
+    for (int i = 0; i < s.length(); i++) {
+        m = max(charIndex[s[i]] + 1, m);    // automatically takes care of -1 case
+        charIndex[s[i]] = i;
+        longest = max(longest, i - m + 1);
+    }
+
+    return longest;
+}
+
+
+下面给出python代码：
+
+class Solution:
+    # @return an integer
+    def lengthOfLongestSubstring(self, s):
+        start = maxLength = 0
+        usedChar = {}
+
+        for i in range(len(s)):
+            if s[i] in usedChar and start <= usedChar[s[i]]:
+                start = usedChar[s[i]] + 1
+            else:
+                maxLength = max(maxLength, i - start + 1)
+
+            usedChar[s[i]] = i
+
+        return maxLength下面是c语言的版本：
+
+
+
+// testlongsetString.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <stdio.h>
+#include<iostream>
+
+using namespace std;
+
+void GetMaxUnRepeatSubStr(char *str)
+{
+	//global var
+	int hashTable[256] ={0};
+	char* pMS = str;
+	int mLen = 0;
+
+	//temp var
+	char* pStart = pMS;
+	int len = mLen;
+	char* p = pStart;
+	while(*p != '\0')
+	{
+		if(hashTable[*p] == 1)
+		{
+			if(len > mLen)
+			{
+				pMS = pStart;
+				mLen = len;
+			}
+
+			while(*pStart != *p)
+			{
+				hashTable[*pStart] = 0;
+				pStart++;
+				len--;
+			}
+			pStart++;
+		}
+		else
+		{
+			hashTable[*p] = 1;
+			len++;
+		}
+		p++;
+	}
+	// check the last time
+	if(len > mLen)
+	{
+		pMS = pStart;
+		mLen = len;
+	}
+	//print the longest substring
+	while(mLen>0)
+	{
+		cout<<*pMS<<" ";
+		mLen--;
+		pMS++;
+	}
+	cout<<endl;
+}
+
+int main()
+{
+	char* str1="bdabcdcf";
+	GetMaxUnRepeatSubStr(str1);
+	char* str2="abcdefb";
+	GetMaxUnRepeatSubStr(str2);
+	char* str3="abcbef";
+	GetMaxUnRepeatSubStr(str3);
+
+	return 0;
+}参考文献：
+
+
+http://bbs.csdn.net/topics/310174805
+
+
+
+http://www.cnblogs.com/luxiaoxun/archive/2012/10/02/2710471.html
+
+
+
+http://dsqiu.iteye.com/blog/1701324
+
+
+
+
+http://www.ahathinking.com/archives/123.html
+
+
+
+
+
+

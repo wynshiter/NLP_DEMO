@@ -1,0 +1,177 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45246197				
+
+
+
+就是几个动物，自动排列生成什么的
+
+class Animal(object):
+	def __init__(self,name,weight):
+		self.name = name
+		self.weight = weight
+	def eat(self):
+		self.weight +=1
+	def speak(self):
+		print ("i am a animal")
+	def walk(self):
+		print ("i am walking")	
+	
+class Dog(Animal):
+	def __init__(self,name,weight):
+		Animal.__init__(self,name,weight)
+	def eat():
+		self.weight +=1
+	def speak(self):
+		print ("i am a dog")
+	def walk(self):
+		print ("i am walking")	
+class Duck(Animal):
+	def __init__(self,name,weight):
+		Animal.__init__(self,name,weight)
+	def eat(self):
+		self.weight +=1
+	def speak(self):
+		print ("i am a duck")
+	def walk(self):
+		print ("i am walking")	
+class Cat(Animal):
+	def __init__(self,name,weight):
+		Animal.__init__(self,name,weight)
+	def eat(self):
+		self.weight +=1
+	def speak(self):
+		print ("i am a dog")
+	def walk():
+		print ("i am walking")	
+
+
+
+#animal = Dog("Dog",24)
+
+#animal.speak()
+
+def reAnimals(zoo):
+	
+	string = "animal"
+	for x in range(0,21):
+		if x%3 ==0:
+			animal = Dog(string+str(x),x+2)
+		if x%3 ==1:
+			animal = Duck(string+str(x),x)		
+		if x%3 ==2:
+			animal = Cat(string+str(x),x)
+		zoo.append(animal)
+	return zoo
+
+
+#zoo = [item for item in animal if item.weight <= 10 and item.weight >= 0]
+
+def filterAnimal(animal):
+	zoo = []
+	for x in range(0,len(animal)):
+		if animal[x].weight<=10 and animal[x].weight>=0:
+			zoo.append(animal[x])
+	#animal.clear()
+	#animal = zoo
+	return zoo
+
+animal = []
+dongwu = []
+
+dongwu = filterAnimal(reAnimals(dongwu))
+
+for x in dongwu:
+	x.speak()
+	print (x.weight)
+
+
+
+#print (animal[x].weight)
+
+
+		
+
+
+
+改版代码：
+
+class Animal(object):
+	def __init__(self,name,weight):
+		self.name = name
+		self.weight = weight
+	def eat(self):
+		self.weight +=1
+	def fly(self):
+		print ("i am a animal and i can fly")
+	def jump(self):
+		print ("i can jump ")	
+	
+class Tiger(Animal):
+	def __init__(self,name,weight):
+		Animal.__init__(self,name,weight)
+	def eat():
+		self.weight +=1
+	def fly(self):
+		print ("i am a Tiger and i cant fly")
+	def jump(self):
+		print ("i can jump ")		
+class Bird(Animal):
+	def __init__(self,name,weight):
+		Animal.__init__(self,name,weight)
+	def eat(self):
+		self.weight +=1
+	def fly(self):
+		print ("i am a bird and i can fly")
+	def jump(self):
+		print ("i can jump ")	
+class Snake(Animal):
+	def __init__(self,name,weight):
+		Animal.__init__(self,name,weight)
+	def eat(self):
+		self.weight +=1
+	def fly(self):
+		print ("i am a snake and i cant fly")
+	def jump(self):
+		print ("i cant jump ")	
+        
+container = []
+dongwu = []
+
+class Zoo(object):
+    def filterAnimal(animal):
+        container = []
+        for x in range(0,len(animal)):
+            if animal[x].weight<=10 and animal[x].weight>=0:
+                container.append(animal[x])
+        return container
+    def reAnimals(container):
+        string = "animal"   
+        for x in range(0,21):
+            if x%3 ==0:
+                animal = Tiger(string+str(x),x+2)
+            if x%3 ==1:
+                animal = Bird(string+str(x),x)		
+            if x%3 ==2:
+                animal = Snake(string+str(x),x)
+            container.append(animal)
+        return container	
+    def relax():
+        dongwu = Zoo.filterAnimal(Zoo.reAnimals(container))
+        for x in dongwu:
+            x.fly()
+            x.jump()
+            
+
+Zoo.relax()
+
+
+		
+
+
+
+
+
+
+

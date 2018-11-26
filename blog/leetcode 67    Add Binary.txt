@@ -1,0 +1,127 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46766027				
+
+
+Add Binary 
+Total Accepted: 46815 
+Total Submissions: 189215 
+My Submissions 
+                      
+
+
+
+
+Given two binary strings, return their sum (also a binary string). 
+For example,
+a = "11"
+b = "1"
+Return "100". 
+
+
+
+
+
+我的解决方案：
+class Solution {
+public:
+    string addBinary(string a, string b) 
+    {
+        
+        string result = "";
+        int c = 0;
+        int i = a.size() - 1;
+        int j = b.size() - 1;
+        
+        while(i >= 0 || j >=0 ||c ==1)
+        {
+            c += i >= 0 ? a[i--] - '0':0;
+            c += j >= 0 ? b[j--] - '0':0;
+            result = char( c% 2 + '0') + result;
+            c /= 2;
+            
+        }
+        
+        return result;
+        
+        
+    }
+};
+
+c语言解决方案：
+char* addBinary(char* a, char* b) {
+    int n, m;
+    for (n=0; *a; a++, n++) ;
+    for (m=0; *b; b++, m++) ;
+    char *p = (char*)malloc(m>n ? m+2 : n+2), *last = p;
+    int c = 0;
+    while (n || m || c) {
+        int s = c;
+        if (n) {
+            s += *(--a)-'0';
+            --n;
+        }
+        if (m) {
+            s += *(--b)-'0';
+            --m;
+        }
+        *last++ = (s&1)+'0';
+        c = s>>1;
+    }
+    *last=0;
+    char *start = p, t;
+    while (start+1 < last) { // reverse string
+        t = *start;
+        *start++=*(--last);
+        *last=t;
+    }
+    return p;
+}数字电路版本代码：加法器的实现https://leetcode.com/discuss/40846/c-4ms-solution-inspired-by-hardware-full-adder-circuit
+
+
+
+python 的三个版本：
+
+class Solution:
+    # @param {string} a
+    # @param {string} b
+    # @return {string}
+    def addBinary(self, a, b):
+        i, m, n, result, carry = 1, len(a), len(b), [], 0
+        while i <= m or i <= n:
+            temp = carry
+            if i <= m:
+                temp += int(a[-i])
+            if i <= n:
+                temp += int(b[-i])
+
+            carry = temp / 2
+            result.append(str(temp % 2))
+            i += 1
+
+        if carry:
+            result.append(str(carry))
+
+        return ''.join(result[::-1])
+
+or a really short one if you want
+
+class Solution:
+    # @param {string} a
+    # @param {string} b
+    # @return {string}
+    def addBinary(self, a, b):
+        return '{0:b}'.format(int(a, 2) + int(b, 2))
+
+
+class Solution:
+    # @param {string} a
+    # @param {string} b
+    # @return {string}
+    def addBinary(self, a, b):
+        return bin(int(a,2) + int(b,2))[2:]
+
+﻿﻿
+
+

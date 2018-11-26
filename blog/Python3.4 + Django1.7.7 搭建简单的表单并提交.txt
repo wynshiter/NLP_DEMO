@@ -1,0 +1,210 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45099623				
+
+
+
+
+
+后面还有一个问题，是我把txt生成了，但是网页没有返回我还不知道，现在怎么直接返回txt并且展示出来txt 的内容，希望大牛不吝赐教
+
+首先有一个问题
+django1.7之前，这样用：
+
+HttpResponse(simplejson.dumps({“status”: ‘200’, “message”:u’登录成功’}), mimetype=’application/json’)
+
+没问题，但是django1,7之后就报错了，查了下问题发现应该这样用：
+
+HttpResponse(simplejson.dumps({“status”: ‘200’, “message”:u’登录成功’}), 
+content_type=’application/json’)
+
+html模版：
+<html>
+<style type="text/css">
+    {# <ul class="errorlist">。。。</ul> #}
+    {# ul标签下的class="errorlist"的属性进行渲染 #}{# 标签下的属性 #}
+    ul.errorlist {
+        margin: 0;
+        padding: 0;
+    }
+    {# <ul class="errorlist"><li>单词个数低于4个!</li></ul> #}
+    {# errorlist class下的 li标签内的元素进行渲染 #}{# 属性下一级的标签 #}
+    .errorlist li {
+        background-color: red;
+        color: white;
+        display: block;
+        font-size: 10px;
+        margin: 0 0 3px;
+        padding: 4px 5px;
+    }
+    .field{
+        background-color:#BCD8F5;
+    }
+</style>
+<head>
+    <title>Contact us</title>
+</head>
+<body>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+    <form action="" method="post">
+        <div class="field">
+		This is a brief description of Interim Fix ：
+            {# 自动生成的默认错误信息显示 #}
+            {# 会被翻译成：<ul class="errorlist"><li>这个字段是必填项。</li></ul> #}
+            {{ form.subject.errors }}
+            <label for="id_subject">12</label>
+            {{ form.subject }}
+            {# 自定义的错误信息显示 #}
+            {% if form.subject.errors%}
+            <label for="id_self_def_error_info" style="color: red;">
+                *自定义错误信息：主题不能为空
+            </label>
+            {% endif %}
+
+        </div>
+        <div class="field">
+            {{ form.email.errors }}
+            <label for="id_email"> for IBM SPSS Data Collection DDL 7 ("Software").</label>
+            {{ form.email }}
+        </div>
+        <div class="field">
+            {{ form.message.errors }}
+            <label for="id_message">页面中自定义的信息:</label>
+            {{ form.message }}
+        </div>
+        <input type="submit" value="提交">
+    </form>
+</body>
+</html>
+
+
+form.py
+#coding： gb2312
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=10,label='subject')#设置最大长度为10
+    email = forms.EmailField(required=False,label='Email')#非必要字段
+    message = forms.CharField(widget=forms.Textarea,label='message')#指定form中组件的类型
+
+    #自定义校验规则，该方法在校验时被系统自动调用，次序在“字段约束”之后
+    def clean_message(self):
+        message = self.cleaned_data['message']#能到此处说明数据符合“字段约束”要求
+        num_words = len(message.split())
+        if num_words < 0:#单词个数
+            raise forms.ValidationError("your word is too short!")
+        return message
+
+
+
+views.py
+
+#coding： gb2312
+from django.http import HttpResponse
+import datetime,calendar
+import time
+from django.http import HttpResponse
+from django.template import Context
+from django.template.loader import get_template
+from django.http import HttpResponse, Http404
+from django.contrib.auth.models import User
+from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
+from django.contrib.auth import logout
+from django.template import RequestContext
+#from django import form
+
+from django.shortcuts import render 
+from .forms import ContactForm 
+#from django.shortcuts import render_to_response
+#from django_manage_app.forms import ContactForm
+
+def current_datetime(request):
+    now = time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime(time.time()))
+    html = '<html><body>It is now %s.</body></html>' %now
+    return HttpResponse(html)
+    
+def contact_author(request):
+    if request.method == 'POST':#提交请求时才会访问这一段，首次访问页面时不会执行
+        form = ContactForm(request.POST)
+        if form.is_valid():#说明各个字段的输入值都符合要求
+            cd = form.cleaned_data#只有各个字段都符合要求时才有对应的cleaned_data
+            #print (form.cleaned_data())
+            print (cd['subject'])
+            print (cd['email'])
+            print (cd['message'])
+            return HttpResponseRedirect('/thanks/')
+        else:#有部分字段不符合要求，会有error相关信息给加到form中去，需要覆盖掉
+            #print (form)
+            print ('The data does not meet the requirements')
+            print (form['subject'].errors)
+            print (form['email'].errors)
+            print (form['message'].errors)
+    else:#首次访问该url时没有post任何表单
+        form = ContactForm()#第一次生成的form里面内容的格式
+        print (form)
+        print (form.is_valid())
+
+    #“首次访问”和“提交的信息不符合要求”时被调用
+    return render_to_response('contact_author.html', {'form': form})
+
+
+def thanks(request):
+
+    return render_to_response('thanks.html')
+    
+    
+def download_file(request):   
+    #from django.http import HttpResponse          
+    ## CSV  
+    #import csv      
+    #response = HttpResponse(mimetype='text/csv')  
+    #response['Content-Disposition'] = 'attachment; filename=my.csv'  
+    #writer = csv.writer(response)  
+    #writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])  
+    #writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])  
+ 
+    # Text file  #要是返回txt放开这部分代码 return response
+    #response = HttpResponse(content_type="text/plain")                                   
+    #response['Content-Disposition'] = 'attachment; filename=my.txt'                
+    #response.write("aa/n")  
+    #response.write("bb")   
+     
+    # PDF file   
+    #http://code.djangoproject.com/svn/django/branches/0.95-bugfixes/docs/outputting_pdf.txt  
+    #from reportlab.pdfgen import canvas  #need pip install reportlab
+    #response = HttpResponse()#)mimetype='application/pdf')  
+    #response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'  
+    #p = canvas.Canvas(response)  
+    #p.drawString(100, 100, "Hello world.")  
+    #p.showPage()  
+    #p.save()  
+    #response = HttpResponse()
+    fout=open("mysite//test.txt","wt") 
+    str = "hello world"
+    fout.write(str)
+    fout.close()     
+    #response['Content-Disposition'] = 'attachment; filename=test.txt' 
+    data = open("mysite//test.txt", "rb").read()
+
+    html = '<html><body>%s</body></html>' %str
+    return HttpResponse(data, content_type="text/plain")
+    
+
+
+ 参考文献：
+
+http://blog.chedushi.com/archives/7538
+
+
+﻿﻿
+﻿﻿
+
+

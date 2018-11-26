@@ -1,0 +1,71 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46351121				
+
+
+ 
+Easy OpenCL with Python
+
+ 
+原文  http://www.drdobbs.com/open-source/easy-opencl-with-python/240162614
+ 
+
+ 
+OpenCL与python联合工作：与CUDA的前景分析
+http://www.opengpu.org/forum.php?mod=viewthread&tid=16571
+ 
+如果你对python熟，可以用 PyOpenCL, 兼顾 host 端的简洁与 device 端的高效。
+kernel 函数可以写在单独的 *.cl 文件里， 一句 python 命令就可以 load + build:
+ prg_src = open( 'kernel_test1.cl', 'r').read()
+ prg = cl.Program(ctx, prg_src).build()
+
+ #!/usr/bin/env python
+
+ import numpy as np
+ import pyopencl as cl
+
+ a_np = np.random.rand(50000).astype(np.float32)
+ b_np = np.random.rand(50000).astype(np.float32)
+
+ ctx = cl.create_some_context()
+ queue = cl.CommandQueue(ctx)
+
+ mf =  cl.mem_flags
+ a_g = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=a_np)
+ b_g = cl.Buffer(ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=b_np)
+
+ prg = cl.Program(ctx, """
+         __kernel void sum(__global const float *a_g, 
+                           __global const float *b_g, 
+                           __global float *res_g) 
+             {
+                 int gid = get_global_id(0);
+                 res_g[gid] = a_g[gid] + b_g[gid];
+             }
+             """).build()
+
+ res_g = cl.Buffer(ctx, mf.WRITE_ONLY, a_np.nbytes)
+ prg.sum(queue, a_np.shape, None, a_g, b_g, res_g)
+
+ res_np = np.empty_like(a_np)
+ cl.enqueue_copy(queue, res_np, res_g)
+
+ # Check on CPU with Numpy:
+ print(res_np - (a_np + b_np))
+ print(np.linalg.norm(res_np - (a_np + b_np)))
+
+ 
+GPGPU OpenCL/CUDA 高性能编程的10大注意事项
+ 
+http://www.cnblogs.com/xudong-bupt/p/3630952.html
+ 
+从零开始学习OpenCL开发（一）架构 
+ 
+http://blog.csdn.net/leonwei/article/details/8880012
+ 
+在Android上使用OpenCL调用GPU加速 
+http://blog.csdn.net/dj0379/article/details/39484061
+ 
+
+

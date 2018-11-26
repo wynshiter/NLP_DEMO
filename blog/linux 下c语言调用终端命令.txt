@@ -1,0 +1,88 @@
+content
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_SIZE 1024
+
+int main()
+{
+    FILE *fstream = NULL;
+    int error=0;
+    char buff[MAX_SIZE]={0};
+
+    if(NULL == (fstream=popen("ls -r","w")))//这个应该是写方式的管道
+    {
+        fprintf(stderr,"execute command failed:%s",strerror(error));
+        return -1;
+    }
+
+    if(NULL != fgets(buff,sizeof(buff),fstream))
+    {
+        printf("%s",buff);
+    }
+     else
+     {
+         pclose(fstream);
+         return -1;
+     }
+     pclose(fstream);
+    printf("Hello world!\n");
+    return 0;
+}
+
+上面的函数功能，就是ls -r这个命令的结果输出到调试窗口
+
+下面是输入的版本：主要是调用popen函数，这个函数的缺点是要默认的开启一个sh
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SIZE 1024
+
+void InputShell(char * shell)
+{
+    FILE *read_fp = NULL;
+    char buffer[MAX_SIZE];
+    int chars_read = 0;
+
+    memset(buffer, 0, sizeof(buffer));
+    read_fp = popen(shell, "r");
+
+    if (read_fp != NULL)
+    {
+        chars_read = fread(buffer, sizeof(char), MAX_SIZE, read_fp);
+        while (chars_read > 0)//读取多数shell命令，shell命令比较长。
+        {
+            buffer[chars_read - 1] = 0;
+            printf("Reading:\n%s\n", buffer);
+            chars_read = fread(buffer, sizeof(char), MAX_SIZE, read_fp);
+        }
+        pclose(read_fp);
+
+        //return EXIT_SUCCESS;
+    }
+}
+
+int main()
+{
+    char shell[MAX_SIZE] = {0} ;//= NULL;
+    //while(1)
+    //{
+           scanf("%s",shell);
+    //gets(shell);
+        InputShell(shell);
+    //}
+
+
+
+    return EXIT_FAILURE;
+}
+
+ 
+

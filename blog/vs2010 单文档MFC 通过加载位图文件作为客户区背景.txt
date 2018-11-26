@@ -1,0 +1,58 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45418507				
+
+
+
+实现效果：
+
+这个其实是一个非常常见的功能，大家都会考虑给自己简单的工程做一个背景界面。其实只要在view类中重载OnEraseBkgnd（）这个函数就好了。
+代码如下：
+BOOL CdddView::OnEraseBkgnd(CDC* pDC)
+{
+    // TODO: 在此添加消息处理程序代码和/或调用默认值
+
+
+    CString string("b.bmp"); 
+    HBITMAP hbitmap=(HBITMAP)::LoadImage(AfxGetInstanceHandle(),string, 
+        IMAGE_BITMAP,1024,768, LR_CREATEDIBSECTION|LR_LOADFROMFILE); 
+    //VERY IMPORTANT:NOT CALL THE SUPER CLASS FUNCTION 
+    CPaintDC dc(this); 
+    if(hbitmap==NULL) 
+        return FALSE; 
+    CBitmap bitmap; 
+    bitmap.Attach(hbitmap); 
+    BITMAP bmp; 
+    bitmap.GetBitmap(&bmp); 
+    CDC memDc;
+
+    memDc.CreateCompatibleDC(pDC);
+    CBitmap* pOldBitmap = memDc.SelectObject(&bitmap);
+    CRect rect;
+    GetClientRect(&rect);
+    pDC->SetStretchBltMode(COLORONCOLOR);//这个模式不设置的话会导致图片严重失真
+    pDC->StretchBlt(0,0,rect.Width() ,rect.Height(),
+        &memDc,0,0,bmp.bmWidth,bmp.bmHeight,SRCCOPY);
+    memDc.SelectObject(pOldBitmap);
+    memDc.DeleteDC();                                      //删除DC
+    return TRUE; 
+}
+
+顺便给工程换个标题栏：
+BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
+{
+    if( !CFrameWndEx::PreCreateWindow(cs) )
+        return FALSE;
+    // TODO: 在此处通过修改
+    //  CREATESTRUCT cs 来修改窗口类或样式
+    cs.style &=~FWS_ADDTOTITLE;
+
+    cs.lpszName = _T("XXX系统");
+
+    return TRUE;
+}
+加载位图时候有的格式可能还有点问题，下面是讨论贴： 
+http://bbs.csdn.net/topics/391027250?page=1#post-399164597 
+
+

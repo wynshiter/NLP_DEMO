@@ -1,0 +1,150 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/8549862				
+
+
+#include<stdio.h>
+#include <stdlib.h>
+#include <winsock2.h>
+#include <string.h>
+
+#pragma comment(lib,"ws2_32.lib")
+
+#define PORT 9999
+#define IPADDR "127.0.0.1"
+#define BACKLOG 20
+#define FILENAME 200
+#define LENGTH 200
+#define BUFFERSIZE 1024
+
+struct FILEHEAD //FILE-head  struct
+{
+	char filename[LENGTH];//file name
+	//char ext[LENGTH];
+	unsigned int length;//the byte of the file
+
+};
+
+struct FILEDATA //FILE-data  struct
+{
+	char filename[LENGTH];//file name
+	char package[BUFFERSIZE];//package data
+	unsigned int length;//the byte of the file
+	unsigned int index;//index of the package
+	
+};
+
+void getFileInformation(FILEHEAD file)
+{
+	printf( "file information :\n" );
+	printf( "  Filename: %s\n", file.filename );
+	//printf( "  Ext: %s\n", file.ext );
+	printf( "  length is btye: %ld btye\n", file.length );
+}
+
+
+int main(int argc, char *argv[])
+{
+	FILEHEAD filehead;
+	FILEDATA filedata;
+	WSADATA wsadata;
+	WSAStartup(MAKEWORD(2,0),&wsadata);
+	SOCKET sock_trans=socket(AF_INET,SOCK_STREAM,0);
+	
+	memset(&filehead,0,sizeof(filehead));
+	memset(&filedata,0,sizeof(filedata));
+	
+	if (0==sock_trans)
+	{
+		printf ("socket build faile!!\n");
+		exit(1);
+	}
+	
+	printf ("target pc's IP address: 127.0.0.1\n");
+	printf("输入文件名(包括路径)：\n");
+	scanf("%s",filehead.filename);
+	
+	//如果正式调试，将服务器端ip写死。
+		
+	SOCKADDR_IN sockadd;
+	sockadd.sin_family=AF_INET;
+	sockadd.sin_port=htons(PORT);
+	sockadd.sin_addr.S_un.S_addr=inet_addr(IPADDR);
+	
+	int con_info=connect(sock_trans,(SOCKADDR*)&sockadd,sizeof(sockadd));
+	
+	if (SOCKET_ERROR==con_info)
+	{
+		printf ("connect fail!\n");
+		exit(1);
+	}
+	
+	//Sleep(100);
+
+	FILE *fp= NULL;
+	fp=fopen(filehead.filename,"rb");
+	if (NULL==fp)
+	{
+		printf("cannot open the %s \n",filehead.filename);
+		exit(1);
+	}
+	
+	fseek(fp,0l,SEEK_END);//此处将fp移到了文件末尾，要移动回去,不然读文件总是零
+	filehead.length=ftell(fp);
+	fseek(fp,0l,SEEK_SET);//将文件指针移动回头部
+
+	char ext[LENGTH]={0};
+	_splitpath(filehead.filename, NULL, NULL, filehead.filename, ext);//分割文件名
+	strcat(filehead.filename,ext);
+	strcpy(filedata.filename,filehead.filename);
+
+	getFileInformation(filehead);
+
+	//setFileInformation();
+	//freed_return_val=fread(buf,1,1024,fp);//读文件字符
+	//char buf[BUFFER];	
+	int fread_return_val=0;//文件读出字符的返回值
+	Sleep(3000);
+
+	//发送文件头信息
+	printf("发送文件头信息...\n");
+	send(sock_trans,(char *)&filehead,sizeof(filehead),0);
+
+	//char buf[BUFFERSIZE]={0};
+	filedata.index=0;
+	printf("发送文件信息...\n");
+	while (1)		
+		{	
+			fread_return_val=fread(filedata.package,1,BUFFERSIZE,fp);
+			//fread_return_val=fread(buf,1,BUFFERSIZE,fp);
+			if (0==fread_return_val)
+			{
+				break;
+			}
+			filedata.index++;
+			send(sock_trans,(char *)&filedata,sizeof(filedata),0);
+			//send(sock_trans,buf,BUFFERSIZE,0);
+			printf("第%d块发送完成!\n",filedata.index);		
+		}
+
+
+	
+	
+	
+	fclose(fp);
+	
+	closesocket(sock_trans);
+	WSACleanup();
+	printf("\n发送文件完成...\n");	
+
+	system("pause");
+	
+	return 0;
+	
+}
+
+
+ 
+
+

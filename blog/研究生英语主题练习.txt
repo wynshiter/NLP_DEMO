@@ -1,0 +1,89 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/51813391				
+
+
+
+science and technology (Mobile phone,Emai)—-口语练习 
+p.s.希望大家主要借鉴格式，忽略具体内容
+My cellphone
+My cellphone belongs to Nokia E-series with QWER-keyboard which is my favourite.It is very convenient and fast to send text message and find the contant.In addition,although it looks old,It’s still a smart phone, with symbian system in it,navigation,Instant messageer . 
+advantage 
+  mobile phones help avoid people travelling long distance to get to know the things in person. 
+nowadays, cellphone has become a social tool and it change the way we bank and play,fragmentation our time,there is statistic shows that… 
+driving widespread change in the banking and retailing industies. 
+disadvantages 
+  The radio activites may do harm to our health.People get addict to paste pictures on the social online world and catch friend’s attention.If someone gose out for dinner, the first thing she or him dose is to take a picture of the food instead of enjoy the food. Too much attention on the cellphone distracts people’s focus on the enjoyment of life.
+Culture shock
+Culture shock usually involves at least four stages,namely Excitement and Enthusiasm,Irritability, Adaptation,Biculturalism.The journey through it has also been portrayed as moving from ethnocentrism to ethnorelativism. 
+  The first stage is the feeling of excitement and enthusiasm that when you go to a new place and meeting with different new people however,this stage do not last long as soon as real differences become evident,The differences that go beyond food and language.Irritability can come at any time, and this is the second stage. 
+  In addition, the longest, most difficult and most rewarding stage called – Adaptation.During this process, students work at adapting to the native customs and habits. 
+  At last, the so called Biculturalism stage will occur, this is when the student realize that they have become competent in another culture.They accept the whole fact. 
+  In one word,the better you can adapt to another culture, the less discomfort and depression you will feel about culture shock.
+City makes a better life
+According to the text,the author tell us how the city hurts your brain and what you can do about it.At the beginnin ,the author take some examples to evident that once man is starklack of nature and being in a city may cause something like cognitive deficits,low productivity of the brain and so on.In addition,living in the city may cause attention problem and as we all know the density of urban life also make us easily lose self-control since the brain is assaulted with temptation and resisting them which makes us exhausted. 
+  At last ,although someone suggest that nature can help our brain restore attention because its full of objects that automatically capture our attention without triggering a negative emotion;  the author still remind us that cities still remain the sources of intellectual life.Just as the 2010 ShangHai Expo says: City makes a better life. 
+  Urban life has both positive and negative side: On one hand, the city always been an engine of intelletual life, on the other hand, it is not easy to live in the city because it spreads terrible disease and is far away from nature with conciderable pressures. 
+  As far as I am conserned,I support the idea of living in the city,In china city’s infrasturcture is much better than the rural-area, it get better school,hospital , and vary kinds of goods.If you have a privaty car it will make more convenient to go everywhere,and get whatever you want. 
+However, the air contidion of city  is getting more and more terrible.If you want to make all walks of your life convenient you must suffer it,It’s a really akward situation in our country.
+car you want to buy
+In the future I would like to have a BMW. I think BMW makes the slickest car on the road. First, I would choose a car rather than a motorbike or truck because cars are a nice mix between maneuverability and versatility. A big rig like a truck wastes a lot of gas. A motorcycle can get good mileage, but does not work well in snowstorms. 
+  I would want to buy a red, mid-sized BMW. I would pick red because it is a color that stands out in a crowd. I would keep it washed and spruced-up all the time so that it would turn the girls’ heads. It is difficult to wow someone with your car if the inside looks like a pigsty. 
+The car will cost a pretty penny. BMWs are not a poor man’s cars. Most people who drive them are really loaded. In light of this, it will probably take some time before I can shell out the money to buy one. 
+  I would like to buy a BMW because a good car is a mark of pride in China. Not all cars are the same. I really like cars and tend to dote on them. I love the feeling of driving on the open road. I like driving with the pedal to the metal, going as fast as the car will go. I love to go joy riding at night without the lights. It is a heart-stopping experience. I guess I really want the car as a trophy to show off to my coworkers. If I owned a BMW I would be the envy of the whole office.
+Personal Statement
+I would like to build on my solid education and experience as an engineer for a Ph.D. degree in computer science at a distinguished university. I wish in particular to be trained at an advance level in software system, image process, and three-dimensional reconstruction. My ultimate goal is to become an outstanding software engineer, and create excellent product to make people live a better life. As an applicant to Carnegie Mellon University’s doctoral program in Computer Science, I am very glad to have this opportunity to give you a brief introduction of myself.
+I received a bachelor degree from Xi’an University of Arts and Science in 2012, major in Software Engineering. Throughout four years of undergraduate study, I completed the whole fundamental courses related to both software and hardware areas of research, such as, Data Structures, Software Engineering, Computer Network, Operating System, programming languages: c, c++,java. Moreover, as a term project,I designed and developed a student information management system, using MFC and Microsoft SQL 2005 edition’s database. My graduate design is Fingerprint Contrast and Analysis System. In this design, I adopt the Visual Studio 2008 edition’s MFC, in accordance with software development which uses top-to-down process and gradual refinement of the classic model, successfully achieve enhancement, binarization, thinning of fingerprint image which is based on BMP format. These achievements build a foundation for my choice of direction in postgraduate study.
+After graduate from school, I was employed by a company which is specializing in network and communication security testing products. During the work time, I was not only learned the standardization process of software development, but also participated in research a remote control system based on Mac OS 10.8 named Mac-Shell. This new system, implement a typical remote monitoring system’s basic function, document management, remote command line and so on.
+When I was in the workplace, besides what I had mentioned above, I did several other projects which greatly enhanced my ability of programming and debugging skills. However when I am faced up with some practical problems, for instance, Queue Scheduling, Parallel Programming, and other algorithm issues, due to lack of related knowledge, the solution I designed always seems imperfect and occurs all kinds of problems. So in order to improve my theoretical cognition, I went to Shaanxi Normal University for further education. My research directions include image processing, pattern recognition, three-dimensional reconstruction. After all these years of study, I am glad to say that my competence at independent research will serve me well, as I try to put my ideas into practice.
+As far as I am concerned, a deeper exploit in my area can only be accomplished in a quality doctoral program like yours. In view of the above, I would greatly appreciate it, if you could accept me into your program and offer me whatever financial you might be able to. By giving me an opportunity to study under your seasoned guidance, you will produce not only another computer scientist but also a computer scientist who will spawn many other computer scientists.
+Curriculum Vitae
+Yaning Wang 
+No.620 West Chang’an Street, Chang’an District, Xi’an, Shaanxi Province 
+Phone:  
+Email: 
+Education:
+M.A., Computer Software and Theory, Shaanxi Normal University, 2013 
+Concentrations: Image Processing, Image Segmentation, 3D Reconstruction 
+Thesis:
+B.A., Software Engineering, Xi’an University, 2008
+Experience:
+Intern, 2012.6-2012.10 
+Chinasoft International 
+Learning specification process of software development
+Programmer, 2013.1-2013.8 
+AstronomyPoint Network Technology 
+Writing network security-related software project
+Research Skills:
+Extensive knowledge of Image Processing and Image Segmentation
+Professional Qualifications:
+National Software Testing programmer certificate 
+NCRE band-three network engineering certificate 
+NCRE band-four database engineer certificate
+Awards: 
+College Scholarships 2008-2012 
+College Scholarships 2013
+Skills:
+Microsoft Office, Familiar with Linux, Unix 
+Programming ability in C++/C, MFC 
+Fluent in English
+self-introduction
+First of all, thanks for giving me such an opportunity to come here today ,I feel very honored.
+I was  born in Xi’an,and lived here for more than twenty five years .I love the local customs and practices. In 2008 I was admitted to the Xi’an University major in software engineering , in the past 4 years of college life, I had learned the computer network, data structure, operating system and other professional foundation courses, c, c++, Java and other programming languages. 
+After graduating from college.I go to a  network security company, participated in the design and development a remote monitoring and control system based on windows, monitoring objects for Mac notebook, achieved the function of the document management, file upload, download, remote command execution and so on.
+I go to  Shaanxi Normal University in 2013 for further education, research the relevant contents of computer vision ,during the school time I go to  IBM SPSS as a intern, learning Python and participated to a IOS project, recently I’m learning the big data processing related content, including cluster building, the basic concept of distributed data processing, and some open source tools.
+above all 
+I suppose I am a hard working and very nice person, I hope  I can have the opportunity to work in your company.Thank you
+Smart phone and our life
+In recent 10 years, smart phone occurs and greatly impacts our interactions.Mobiles make it convenient for us to keep in touch with each other wherever they are,by using Micro-message and QQ.It has been part of our life, and we are all addicted to it.Have you ever ask yourself, am I over-dependent on cell-phones nowadays.
+Needless to say, everyday when you wake up, the first thing you have to do is to check the phone and see if someone send a new statement,In addition, when you go out for a dinner,  the first thing you do is to take a picture of the food instead of enjoying it. Too much attention on the cellphone have already distracted your focus on the enjoyment of life.
+As far as I am concerned, cell-phone can be used as alarm ,watch,cinema and useful-tools for search knowledge.However ,it is only a tool, we can’t be the slave of it.Setting free ourself from the cellphone must on the prerequisite that we must set free our mind, and get focus on the real world.
+On My Graduate Program
+Last year,I give up my job to enter ShannXi Normal university to get a master degree of computer science.My intention is quite simple for my farther study–make a better living and make myself clear about academic, practical problems.
+However, when I begin my learning here, I suppose I have to figure out somethings as follows, first of all, nowsdays there are many more exceptionally qualified job seekers than jobs, what kind of skill will make me competitive in the market.In the three years learning I will search for that kind of ability.In addition, as an academic graduate sutdent, I have to publish a thesis. How can I be creative and generate my original idea, and then put them into practise, would be a big problem for me to consider all alone.
+As far as I can concern, what I can do is to start right here and now to cherish every minutes, to implement my goal and dream.Just as a famous saying goes: Every day in every way my life is getting better and better.
+文档下载
+http://download.csdn.net/detail/wangyaninglm/9566432 
+
+

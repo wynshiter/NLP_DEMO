@@ -1,0 +1,55 @@
+content
+
+
+
+// matlab_engine.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+#include "engine.h"
+#include "windows.h"
+
+#pragma comment(lib, "libeng.lib")
+#pragma comment(lib, "libmx.lib")
+#pragma comment(lib, "libmat.lib")
+
+void main()
+{
+	Engine* pEng = NULL;
+	if (!(pEng = engOpen(NULL)))
+	{
+		printf("Open matlab enging fail!");
+		return;
+	}
+
+	//call Engine plot A*sin(t)+B A=2 B=1
+
+	mxArray *A = NULL;
+
+	double init = 2;
+	A = mxCreateDoubleMatrix(1, 1, mxREAL);
+	memcpy((void*) mxGetPr(A), (void*)&init, sizeof (double));
+	engPutVariable(pEng, "A", A);
+
+	init = 1;
+	memcpy((void*) mxGetPr(A), (void*)&init, sizeof (double));
+	engPutVariable(pEng, "B", A);
+
+	mxDestroyArray(A);
+
+	Sleep(3*60*1000);
+
+	engEvalString(pEng, "t=0:0.2:7;plot(t,A*sin(t)+B);");
+
+	if(NULL != pEng)
+	{
+		engClose(pEng);
+	}
+
+	//return 0;
+}
+
+ 
+
+

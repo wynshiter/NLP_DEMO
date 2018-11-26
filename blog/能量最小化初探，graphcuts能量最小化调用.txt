@@ -1,0 +1,114 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/40687131				
+
+
+1.相对于能量函数来说，能量最小化的办法都有哪些？
+  梯度下降
+  模拟退火
+  图割
+ 
+2.这个 跟最优化问题的求解，有什么联系跟区别呢？
+基本上差不多，其实就是求出来了函数的一个最小值，我们看问题的时候不妨把能量二字去掉。单纯的理解为函数
+ 
+3.这个能量的观点是否跟信息熵类似，让系统的熵最小？
+其实也都差不多，都是求最小值的。
+ 
+ 
+我们可以看到下面的代码就求出来了相关表达式，在x =0 ，y = 1， z= 1时候能够取得最小值。
+ 
+ 
+ 
+/* energy.h */
+/* Vladimir Kolmogorov (vnk@cs.cornell.edu), 2003. */
+
+/*
+	This software implements an energy minimization technique described in
+
+	What Energy Functions can be Minimized via Graph Cuts?
+	Vladimir Kolmogorov and Ramin Zabih. 
+	To appear in IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI). 
+	Earlier version appeared in European Conference on Computer Vision (ECCV), May 2002. 
+
+	More specifically, it computes the global minimum of a function E of binary
+	variables x_1, ..., x_n which can be written as a sum of terms involving
+	at most three variables at a time:
+
+		E(x_1, ..., x_n) = \sum_{i}     E^{i}    (x_i)
+		                 + \sum_{i,j}   E^{i,j}  (x_i, x_j)
+		                 + \sum_{i,j,k} E^{i,j,k}(x_i, x_j, x_k)
+
+	The method works only if each term is "regular". Definitions of regularity
+	for terms E^{i}, E^{i,j}, E^{i,j,k} are given below as comments to functions
+	add_term1(), add_term2(), add_term3(). 
+
+	This software can be used only for research purposes. IF YOU USE THIS SOFTWARE,
+	YOU SHOULD CITE THE AFOREMENTIONED PAPER IN ANY RESULTING PUBLICATION.
+
+	In order to use it, you will also need a MAXFLOW software which can be
+	obtained from http://www.cs.cornell.edu/People/vnk/software.html
+
+
+	Example usage
+	(Minimizes the following function of 3 binary variables:
+	E(x, y, z) = x - 2*y + 3*(1-z) - 4*x*y + 5*|y-z|):
+
+	///////////////////////////////////////////////////
+
+	#include <stdio.h>
+	#include "energy.h"
+
+	void test_energy()
+	{
+		// Minimize the following function of 3 binary variables:
+		// E(x, y, z) = x - 2*y + 3*(1-z) - 4*x*y + 5*|y-z|
+		   
+		Energy::Var varx, vary, varz;
+		Energy *e = new Energy();
+
+		varx = e -> add_variable();
+		vary = e -> add_variable();
+		varz = e -> add_variable();
+
+		e -> add_term1(varx, 0, 1);  // add term x ,常数项为0，一次项系数为1
+		e -> add_term1(vary, 0, -2); // add term -2*y
+		e -> add_term1(varz, 3, 0);  // add term 3*(1-z)
+
+		//e -> add_term2(x, y, 0, 0, 0, -4); // add term -4*x*y
+		//e -> add_term2(y, z, 0, 5, 5, 0); // add term 5*|y-z|
+
+		Energy::TotalValue Emin = e -> minimize();
+		
+		printf("Minimum = %d\n", Emin);
+		printf("Optimal solution:\n");
+		printf("x = %d\n", e->get_var(varx));
+		printf("y = %d\n", e->get_var(vary));
+		printf("z = %d\n", e->get_var(varz));
+
+		delete e;
+	}
+
+	///////////////////////////////////////////////////
+*/
+
+ 
+ 
+
+输出结果：
+ 
+
+ 
+boykov跟kolmogorkov与2001年提出的一种新的最大流最小割算法，该算法基于增广路算法，通过扩展，标记，更新被标记的节点，形成新的搜索树，并不断重复。
+标准移动的定义：在进行能量函数的最优化过程中，仅改变图像中一个像素点的视差标记值,如图 4-2（b）示。通过这种标准移动很容易遇到局部极小值，从而不能准确的计算出能量函数的最小值。而α 扩展移动则是对那些视差标记不为α 的集合同时进行大规模的优化（多个像素同时进行标准移动），使其中的一部分像素点的视差标记重新被标记为α ，剩余的像素点集合的视差标记值保持不变，如图 4-2（c）示，视差标记为β 和γ 中的部分像素点被重新标记为α
+ 。而α − β交换移动则是在一次交换移动（可以理解为优化）的过程中，视差标记α 像素点集合和视差标记为β 的像素点集合同时大规模进行交换（swap），而那些视差标记不等于α 和β 的像素点集合则不改变，如图 4-2（d）示，标记为γ 的像素集合没有发生改变，视差标记α 像素点集合和视差标记为β 进行了部分交换。
+
+ 
+ 
+ 
+图像分割论文合集下载：
+ 
+http://download.csdn.net/detail/wangyaninglm/8292305
+ 
+
+

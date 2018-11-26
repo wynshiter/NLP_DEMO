@@ -1,0 +1,156 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46884943				
+
+
+Given a binary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by level).
+For example:
+Given binary tree {3,9,20,#,#,15,7},
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+
+
+return its level order traversal as:
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+
+
+
+confused what "{1,#,2,3}" means? 
+> read more on how binary tree is serialized on OJ.
+
+
+
+我的解决方案，非常传统的两个队列的解决方案：
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) 
+    {
+        
+      
+	vector<vector<int>> result;
+	queue<TreeNode*> q;
+
+	if (root == NULL)
+	{
+		return result;
+	}
+	q.push(root);
+	vector<int> le_temp;
+
+	while(!q.empty())
+	{
+
+		le_temp.clear();
+		queue<TreeNode*> level;
+            
+        int size = q.size();    
+		for(int i = 0; i < size; ++i)
+		{
+			TreeNode* temp = q.front();
+			q.pop();
+			if(temp->left)
+			{
+				level.push(temp->left);
+			}
+			if(temp->right)
+			{
+				level.push(temp->right);
+				
+			}
+			le_temp.push_back(temp->val);
+		}
+
+		while(!level.empty())
+		{
+
+			q.push(level.front());   
+			level.pop();
+		}
+		result.push_back(le_temp);
+	}
+
+	return result;
+        
+    }
+};
+
+一个栈似乎也行：
+ vector<vector<int>> levelOrder(TreeNode* root) 
+    {
+        
+     vector<vector<int> >  result;
+        if (!root) return result;
+        queue<TreeNode*> q;
+        q.push(root);
+        q.push(NULL);
+        vector<int> cur_vec;
+        while(!q.empty()) {
+            TreeNode* t = q.front();
+            q.pop();
+            if (t==NULL) {
+                result.push_back(cur_vec);
+                cur_vec.resize(0);
+                if (q.size() > 0) {
+                    q.push(NULL);
+                }
+            } else {
+                cur_vec.push_back(t->val);
+                if (t->left) q.push(t->left);
+                if (t->right) q.push(t->right);
+            }
+        }
+        return result;
+
+        
+    }
+
+
+递归的解决方案：
+class Solution {
+public:
+    vector<vector<int>> result;
+    void buildVector(TreeNode* root, int depth)
+    {
+        if(root == NULL)return ;
+        if(result.size() == depth)
+        {
+            result.push_back(vector<int>());
+        }
+        
+        result[depth].push_back(root->val);
+        
+        buildVector(root->left,depth + 1);
+        buildVector(root->right, depth + 1);
+    }
+    vector<vector<int>> levelOrder(TreeNode* root) 
+    {
+        buildVector(root,0);
+        return result;
+    }
+};
+逆序排列把return 改一下就好了：  return 
+vector<vector<int> > (result.rbegin(), result.rend());
+}
+
+﻿﻿
+﻿﻿
+
+

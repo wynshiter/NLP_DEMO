@@ -1,0 +1,260 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/52204969				
+
+
+
+问题描述
+Given a string S, find the longest palindromic substring in S. You may assume that the maximum length of S is 1000, and there exists one unique longest palindromic substring. 
+所谓回文字符串，就是一个字符串，从左到右读和从右到左读是完全一样的。比如”a” , “aaabbaaa”
+之前去笔试了三星研究院，写算法题的时候限定了编程语言只能使用的头文件和库函数，这在很大程度上考察了一个程序员的单位时间生产力。比如java只能用util包，c/c++语言只能包含以下三个头文件: 
+stdio.h 
+malloc.h  //ANSI标准建议使用stdlib.h头文件 
+iostream.h // 非标准输入输出，不需要命名空间
+所以我想，针对这种高标准的要求，以后做leetcode系列时应该写三个版本，c语言版本不使用库函数，c++版本使用STL，python版本
+解决方案
+1.暴力方案(Brute Force)
+对于字符串的每一个子串，都判断一下是不是回文字符串，完后返回最长的那一个 
+(Brute Force) [Time Limit Exceeded] 
+时间复杂度分析：O（n3），空间复杂度O（n）,显然超时了。
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+using namespace std;
+char result[1000]={0};
+
+bool isHuiwen(int begin,int end,char* s)
+{
+    if (end==begin||end<begin)
+    {
+        return true;
+    }
+    if (s[begin]!=s[end])
+    {
+        return false;
+    }
+    return isHuiwen(begin+1,end-1,s);
+}
+
+char* longestHuiwen(int length,char* s)
+{
+    int begin = 0,end=0,sum=0;
+    for (int i=0;i<length;i++)
+    {
+        for (int j=0;j<=i;j++)
+        {
+            if (isHuiwen(j,i,s))
+            {
+                if (i-j>=sum)
+                {
+                    sum = i -j;
+                    begin = j;
+                    end = i;
+                }
+
+            }
+
+        }
+    }
+    strncpy(result,s+begin,sum+1);//由0开始计数
+    return result;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    char* s = "abcabaaaabbacabbaa";
+    char* r_s = longestHuiwen(18,s);
+    return 0;
+}
+2.问题转换为求最长相似子串
+Approach #1 (Longest Common Substring) [Accepted]
+Common mistake
+Some people will be tempted to come up with a quick solution, which is unfortunately flawed (however can be corrected easily):
+Reverse S and become S′.  
+Find the longest common substring between S and S​′, which must also be the longest palindromic substring.This seemed to work, let’s see some examples below.
+For example,  
+S=”caba” 
+S′=”abac”
+The longest common substring between S and S​′ is ”aba”, which is the answer. 
+Let’s try another example:  
+S=”abacdfgdcaba” 
+S′=”abacdgfdcaba”
+The longest common substring between S and S​′ is ”abacd” 
+ Clearly, this is not a valid palindrome.
+讨论帖子： http://bbs.csdn.net/topics/392005408
+其他三种解法
+Approach #3 (Dynamic Programming) [Accepted]
+To improve over the brute force solution, we first observe how we can avoid unnecessary re-computation while validating palindromes. Consider the case  
+”ababa” 
+”ababa”. If we already knew that  
+”bab” 
+”bab” is a palindrome, it is obvious that  
+”ababa” 
+”ababa” must be a palindrome since the two left and right end letters are the same.
+We define P(i,j)P(i,j) as following:
+P(i,j)={true, 
+if the substring Si…Sj is a palindrome 
+false, 
+otherwise.
+P(i,j)={true,if the substring Si…Sj is a palindromefalse,otherwise.  
+Therefore,
+P(i, j) = ( P(i+1, j-1) \text{ and } S_i == S_j ) P(i,j)=(P(i+1,j−1) and S​i==S​j)
+The base cases are:
+P(i, i) = true P(i,i)=true
+P(i, i+1) = ( S_i == S_{i+1} ) P(i,i+1)=(S​i ==Si+1)
+This yields a straight forward DP solution, which we first initialize the one and two letters palindromes, and work our way up finding all three letters palindromes, and so on…
+Complexity Analysis
+Time complexity : O(n^2)O(n​2). This gives us a runtime complexity of O(n^2)O(n2).
+Space complexity : O(n^2)O(n​2). It uses O(n^2)O(n2) space to store the table.
+Additional Exercise
+Could you improve the above space complexity further and how?
+Approach #4 (Expand Around Center) [Accepted]
+In fact, we could solve it in O(n^2)O(n​2 ) time using only constant space.
+We observe that a palindrome mirrors around its center. Therefore, a palindrome can be expanded from its center, and there are only 2n - 12n−1 such centers.
+You might be asking why there are 2n - 12n−1 but not nn centers? The reason is the center of a palindrome can be in between two letters. Such palindromes have even number of letters (such as  
+”abba””abba”) and its center are between the two ‘b”b’s.
+public String longestPalindrome(String s) { 
+    int start = 0, end = 0; 
+    for (int i = 0; i < s.length(); i++) { 
+        int len1 = expandAroundCenter(s, i, i); 
+        int len2 = expandAroundCenter(s, i, i + 1); 
+        int len = Math.max(len1, len2); 
+        if (len > end - start) { 
+            start = i - (len - 1) / 2; 
+            end = i + len / 2; 
+        } 
+    } 
+    return s.substring(start, end + 1); 
+}
+private int expandAroundCenter(String s, int left, int right) { 
+    int L = left, R = right; 
+    while (L >= 0 && R < s.length() && s.charAt(L) == s.charAt(R)) { 
+        L–; 
+        R++; 
+    } 
+    return R - L - 1; 
+} 
+Complexity Analysis
+Time complexity : O(n^2)O(n​2​​ ). Since expanding a palindrome around its center could take O(n)O(n) time, the overall complexity is O(n^2)O(n​2​​ ).
+Space complexity : O(1)O(1).
+Approach #5 (Manacher’s Algorithm) [Accepted]
+There is even an O(n)O(n) algorithm called Manacher’s algorithm, explained here in detail. However, it is a non-trivial algorithm, and no one expects you to come up with this algorithm in a 45 minutes coding session. But, please go ahead and understand it, I promise it will be a lot of fun.
+参考代码
+c代码
+char* longestPalindrome(char* s) {
+int i,length=strlen(s);
+char* new_s;
+new_s=malloc(sizeof(char)*(2*length + 2));
+new_s[0]='$';
+new_s[1]='#';
+
+for(i=0;i<length;i++)
+{
+    *(new_s+2*i+2)=s[i];
+    *(new_s+2*i+3)='#';
+
+}
+int len=2*length + 2;
+int* r;
+r=malloc(sizeof(int)*len);
+r[0]=0;
+int center=1;
+int max_right=0;
+for(i=1;i<len;i++)
+{
+if(i<max_right)
+{
+   if( (max_right-i)> r[2*center-i] )
+   r[i]=r[2*center-i];
+   else
+   r[i]=(max_right-i);
+}
+else r[i]=1;
+while(new_s[i-r[i]]==new_s[i+r[i]] && i-r[i]>0 && i+r[i]<len)
+    {
+        r[i]++;
+    }
+
+if(i+r[i] > max_right)
+        { 
+        center = i;
+        max_right = i+r[i];
+
+        } 
+
+}
+int max_r = 0;
+int j=0;
+for(i=1;i<len;i++)
+    {
+        if( max_r<r[i])
+        {   
+            j=i;
+            max_r= r[i];
+        }
+    }
+int m=(j-(max_r-2)-2)/2;
+int n=(j+(max_r-2)-2)/2;
+char *c;
+    c=malloc((max_r)*sizeof(char));
+
+int x=0;
+for(i=m;i<=n,x<max_r-1;i++)
+{
+    c[x]=s[i];
+    x++;
+}
+*(c+max_r-1)='\0';
+return c;
+free(r);
+free(new_s);
+free(c);
+
+}
+
+
+c++代码
+string longestPalindrome(string s) {
+    if (s.empty()) return"";
+    if (s.size() == 1) return s;
+    int min_start = 0, max_len = 1;
+    for (int i = 0; i < s.size();) {
+      if (s.size() - i <= max_len / 2) break;
+      int j = i, k = i;
+      while (k < s.size()-1 && s[k+1] == s[k]) ++k; // Skip duplicate characters.
+      i = k+1;
+      while (k < s.size()-1 && j > 0 && s[k + 1] == s[j - 1]) { ++k; --j; } // Expand.int new_len = k - j + 1;
+      if (new_len > max_len) { min_start = j; max_len = new_len; }
+    }
+    return s.substr(min_start, max_len);
+}
+python参考代码
+
+def longestPalindrome(self, s):
+    res = ""
+    for i in xrange(len(s)):
+        # odd case, like "aba"
+        tmp = self.helper(s, i, i)
+        if len(tmp) > len(res):
+            res = tmp
+        # even case, like "abba"
+        tmp = self.helper(s, i, i+1)
+        if len(tmp) > len(res):
+            res = tmp
+    return res
+
+# get the longest palindrome, l, r are the middle indexes  
+# from inner to outer
+def helper(self, s, l, r):
+    while l >= 0 and r < len(s) and s[l] == s[r]:
+        l -= 1; r += 1
+    return s[l+1:r]
+参考文献
+
+http://articles.leetcode.com/longest-palindromic-substring-part-ii/
+https://www.felix021.com/blog/read.php?2040
+https://leetcode.com/articles/longest-palindromic-substring/
+ 
+
+

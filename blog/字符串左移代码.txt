@@ -1,0 +1,82 @@
+content
+
+
+
+这两天，看到各大公司找工作的情况跟要求，准备开始每个星期做点算法小程序
+练习一下基础，今天先搞一个字符串左移
+原理:
+
+
+
+下面是代码：
+
+// StringLeft.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include "string.h"
+
+
+char * invert(char *start,char *end)
+{
+
+	char tmp,*ptmp = start;
+	while (start != NULL &&end != NULL && start < end)
+	{
+		tmp = (*start);
+		(*start) = (*end);
+		(*end) = tmp;
+		start++;
+		end--;
+
+	}
+	return ptmp;
+}
+
+char *left(char *s, int pos)
+{
+	int len = strlen(s);
+	invert(s,s + (pos - 1));
+	invert(s + pos, s + (len -1));
+	invert(s, s + (len - 1));
+	return s;
+}
+int _tmain()
+{
+	char s[] = "abcdef";//注意字符串常量的问题
+	///char *s = new char[10];
+	//s = "abcdef";
+	//strcmp(s,"abcdef");
+	printf(s);
+
+	printf("\n");
+
+	left(s,3);
+	printf(s);
+
+	printf("\n");
+
+
+	getchar();
+
+	return 0;
+}
+
+
+
+
+
+
+
+#pragma comment(linker,"/SECTION:.rdata,RW")
+//加这句可以让常量区可写，后果自负！
+//赵老师给的编译器设置，测试可以使用，char *s = "abcedf";都能改
+
+
+
+上述文章引用了大牛博客的内容：
+http://blog.csdn.net/v_JULY_v
+
+﻿﻿
+
+

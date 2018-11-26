@@ -1,0 +1,90 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50461054				
+
+
+﻿﻿
+摘要
+ 
+     OpenCV现在更新到了3.1版本，相对OpenCV2有了很大改进，其中对于硬件加速，移动开发（IOS，android）的支持成为亮点。
+     新版的OpenCV采用了内核+插件的架构模式，整体上更加易于扩展。
+     其中最与时俱进的特点就是 支持最新的 Windows 和 OS X 操作系统和最新的开发工具 (VS2015 和 Xcode 7)，支持 Andorid 5。软件的更新换代推动硬件更新，并进一步推动摩尔定律，相信OpenCV的新版会带动更多人更新Win10，vs2015等等革命性的产品，同时购买可以并行加速的N卡，在软硬件层面获取性能的提升从而产出科研成果或者优秀的应用。
+
+（一）google编程之夏
+ 
+OpenCV基础库的更新：得益于google summer of code更新了一大批有意思的项目
+
+google编程之夏的介绍：https://linuxtoy.org/archives/mentor-in-google-summer-of-code-1.html
+
+
+
+
+Omnidirectional Cameras Calibration and Stereo 3D Reconstruction – opencv_contrib/ccalib module (Baisheng Lai, Bo Li)Structure From Motion – opencv_contrib/sfm module (Edgar Riba, Vincent Rabaud)Improved Deformable Part-based Models – opencv_contrib/dpm module (Jiaolong Xu, Bence Magyar)Real-time Multi-object Tracking using Kernelized Correlation Filter – opencv_contrib/tracking module (Laksono Kurnianggoro, Fernando J. Iglesias Garcia)Improved and expanded Scene Text Detection – opencv_contrib/text module (Lluis Gomez, Vadim Pisarevsky)Stereo correspondence improvements – opencv_contrib/stereo module (Mircea Paul Muresan, Sergei Nosov)Structured-Light System Calibration – opencv_contrib/structured_light (Roberta Ravanelli, Delia Passalacqua, Stefano Fabri, Claudia Rapuano)Chessboard+ArUco for camera calibration – opencv_contrib/aruco (Sergio Garrido, Prasanna, Gary Bradski)Implementation of universal interface for deep neural network frameworks – opencv_contrib/dnn module (Vitaliy Lyudvichenko, Anatoly Baksheev)Recent advances in edge-aware filtering, improved SGBM stereo algorithm – opencv/calib3d and opencv_contrib/ximgproc (Alexander Bokov, Maksim Shabunin)Improved ICF detector, waldboost implementation – opencv_contrib/xobjdetect (Vlad Shakhuro, Alexander Bovyrin)Multi-target TLD tracking – opencv_contrib/tracking module (Vladimir Tyan, Antonella Cascitelli)3D pose estimation using CNNs – opencv_contrib/cnn_3dobj (Yida Wang, Manuele Tamburrano, Stefano Fabri)
+
+
+ 
+（二）社区的贡献
+
+社区的贡献我说几个我觉的比较有意思的：
+
+1.RGD-D格式图像的支持，众所周知这是现在三维重建领域的一大热门，带有深度信息的图像极大方便了三维重建步骤，相当于直接能够重建点云。
+
+2.cvpr历来是比较注重工程领域的应用，本次加入了cvpr2015的一篇新论文，可谓与时俱进，我们用上OpenCV就用上了最前沿的科研成果。（这篇是机器学习的相关内容）
+
+3.更新了python3的相关内容，使用python3重写了python的一些接口
+
+（三）其他一些改进
+ 
+1.IOS的更新，从2.4.3版本开始支持ios
+主要调用的是oc接口
+
+http://docs.opencv.org/3.1.0/d3/dc9/tutorial_table_of_content_ios.html#gsc.tab=0
+
+2.OpenCL（感觉这个比cuda靠谱）
+
+3.Intel芯片在性能上的提升
+
+4.硬件加速层：HAL (Hardware Acceleration Layer)，封装了一些常用矩阵加减法的硬件加速实现。后序3.2版本在这块会有比较大的改进，毕竟要用加速就得重新编译比较复杂。
+
+5.贡献了一个直接使用OpenCV处理图像的gui接口（应该说是程序更准确），如果你只是想处理一下图片不想写代码这个正好满足你的需求
+
+http://www.tsdconseil.fr/log/opencv/demo/index-en.html
+
+ 
+
+（四）3.0版本的主要更新
+ 
+1.直接集成了cuda模块
+ 
+    cuda模块的介绍：
+
+http://docs.opencv.org/3.0-last-rst/modules/cuda/doc/introduction.html
+
+看了一下文档，这玩意还得用cmake重新编译才能用，拉倒吧，老夫编译一次几个小时，各种附加依赖库错误层出不穷，有那gpu加速的那点时间，要么直接用cuda重写了，要么串行也算出来了。为啥就不能只能点，检测到是N卡加几个dll或者配置一下直接跑呢，还请过来人指点迷津。
+
+
+2.配置上更加方便
+
+
+
+
+ 
+3.架构的改进
+体会一下插件加扩展的架构
+
+
+
+
+ 
+参考文献
+OpenCV git上面的更新日志：
+
+https://github.com/Itseez/opencv/wiki/ChangeLog
+
+《OpenCV3编程入门》----感觉好像没介绍多少有关3的新特性，确实是入门书
+
+http://zhuanlan.zhihu.com/hacker-and-painter/19988205
+
+
+

@@ -1,0 +1,45 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45489069				
+
+
+
+Given an integer n, return the number of trailing zeroes in n!.
+Note: Your solution should be in logarithmic time complexity.
+解决思路： 
+决定阶乘末尾零的个数其实是数列中5出现的次数，比如5的阶乘一个零。1024的阶乘末尾到底有几个零呢？
+http://bbs.csdn.net/topics/380161955
+ 
+代码如下：
+int trailingZeroes(int n) 
+{
+    int total = 0;
+
+    while(n>=5)
+    {
+        n = (n-(n%5))/5;
+        total = total + n;
+    }
+
+    return total;
+
+}
+python 的解决方案：
+class Solution:
+    # @return an integer
+    def trailingZeroes(self, n):
+        factor, count = 5, 0
+
+        while True:
+            curCount = n // factor
+            if not curCount:
+                break
+
+            count += curCount
+            factor *= 5
+
+        return count
+ 
+
+

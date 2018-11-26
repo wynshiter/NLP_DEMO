@@ -1,0 +1,42 @@
+content
+
+
+
+ 
+出处：http://blog.csdn.net/euler1983/article/details/5959622
+算法优化algorithmgraphtree任务
+这篇文章说的是Yuri Boykov and Vladimir Kolmogorov在2004年提出的一种基于增广路径的求解最大流最小割的算法，号称大部分情况下会很快。而且在算完之后，会自动完成最小割集的构造。
+作者写了一个C的实现：http://vision.csd.uwo.ca/code/maxflow-v3.01.zip
+文章参考：《GRAPH BASED ALGORITHMS FOR SCENE RECONSTRUCTION FROM TWO OR MORE VIEWS》这是作者的博士论文，在最后的一章节里详细提到了这种算法的思路。
+这个算法的思路并不难懂，但是看起来有点难度。文中充满了q is children of p之类的表述，看着看着就混淆了。而且代码里的变量命名也很随意，花了3,4天的时间，终于搞定。
+算法的直观理解
+第一个改进：
+
+首先算法采用了两条增广路径，分别从source和sink出发，边搜索边标号，这样当所有的点都被搜索并标号后，最小割集也就形成了。
+所有在最前沿的点称为active node，这些点的任务是去发展新的node。而被active node包围起来的那些点，则称之为passive node。
+而没有被发掘出来的点则称之为free node。
+第二个改进：
+基于增广路径的算法都是遵循：找出一个可行流----》更新残留网络----》然后再找下一个可行流。
+此算法需要不断地去找可行流，而每次找都得从源点重新开始进行一个广度遍历或者深度遍历直到找到汇点。这篇文章的算法正是基于此来进行改进。
+找到一个可行流后，要进行augmention，然后必然会出现饱和的边，比如这样的一条路中：p1----->p2---->p3----->p4，p2->p3这条边饱和了。如果我们不管他，还是继续遍历去寻找汇点，那么当你再次找到一条路后，那么这条路中就有可能包含一些已经饱和路径，那就没法进行增广了。所以，我们必须要去调整那些饱和的边，使得在已经构建的路径中不存在饱和的边。在本例中，p3称之为orphan（孤点），那么接下来就得做一个adopt orphan的操作，呵呵，名字起得很有意思（养育孤儿），意思就是说给每个p3这样的孤儿点找一个新的parent，养育完就没有orphan存在了。方法如下：
+检查p3的neighbors，看看有没有一个neighbor, let's say node q，s.t.
+(1). q->p3满足容量大于0
+(2). q是已经被搜过的点，也就是说q已经在我们的span tree了，in another word，当我们沿着汇点逆流而上搜索到q时，可以顺利地找到q的father，从而最终可以顺藤摸瓜摸到source上。
+(3). 通过q最终能到达source或者sink这样的终点。这是因为有可能顺着q走着走着，最终走到一个free node去了。或者走到一个orphan去了，而这个orphan最终也无人抚养而变成free node。
+那么如果找不到这样的q，那么p3就不得不变成free node。然后再做以下两个调整：
+(4). 对于p3的邻居pk，如果pk到p3的边(pk-->p3)的容量大于0, 则将pk设为active。
+(5). 对于p3的邻居ph，如果p3=parent(ph)，那么把ph也设置为orphan，加入到orphan集合里。
+这是因为当有一条路从sink走到ph的时候，会发现无路可走了，因为parent(ph)是一个free node!
+所以我们必须对ph也做相同的处理，要么找一个新的parent，要么您老人家变成free node，先一边凉快会！
+orphan集合中在增广时建立，每次更新一个边后，如果发现改变后的边的残留流量=0，则把边指向的那个点加入orphan set。
+在adoption阶段，反复从orphan set中取点，每取出一个孤儿，首先看看能不能找到一个新的parent，如果找不到则令其变成free node，并把他的child变成orphan，加入到orphan集合中。循环往复，直到orphan set = 空集。
+细节：
+对上述的(3)可以进行优化。
+优化一：不必每次要追溯到source/sink才罢休。
+因为对于orphan的每一个邻居进行判断其是否originate from TERMINATE node时，都要逆流追溯至source / sink点。那么其中的一些点可能要被追溯多次，那么这是一个重复的操作。如果一个点，已经被证明了，他是可以到达source / sink的，那么下次当有点经过他的时候，他就可以直接告诉该点，OK，哥们歇歇吧，你是valid的，通过我可以追溯到source/sink。这就是在algorithm tunning里提到的mark的意思。
+优化二：选择离source/sink最近的那个neighbor，作为orphan的新parent.
+要实现这个优化，必须给每个节点附加一个属性：该节点到source/sink的最短距离。
+并且在growth阶段，当一个active node q1 遇到另一个active node q2时，要比较一下是否把parent(q2)=q1后，q2到source/sink的距离更短，如果是，那么就调整下q2，使得它变成q1的child。正所谓：
+人往高处走，水往低处流，节点都往终点凑！
+
+

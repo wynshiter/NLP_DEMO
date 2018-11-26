@@ -1,0 +1,77 @@
+content
+
+
+
+#include <list>
+#include <iostream>
+using namespace std;
+
+//list  链表的打印
+void print(list<int>& l)
+{
+	list<int>::iterator i,iend;
+	iend = l.end();
+
+	for (i=l.begin();i!=iend;i++)
+	{
+		cout<<*i<<' ';
+	}
+}
+
+int main()
+{
+
+	list<int> l;
+
+	for (int j = 1;j <=10;j++ )
+	{
+		l.push_back(j);
+	}
+
+	//splice()函数
+	/*
+	//void splice(iterator position , list& x)
+	将x的链表归并到当前list链表的position位置之前， list对象x将被清空
+
+	 void splice(iterator position , list& , iterator i)
+	 将一个list的迭代器i值所指的元素，归并到当前list链表中， 并将被归并元素从原链表中删除
+
+
+	//
+	*/
+
+	list<int> carry;
+	carry.splice(carry.begin(),l,l.begin());
+
+	cout<<"carry的链表元素为：";
+	print(carry);
+	cout<<endl;
+
+	cout<<"l 的链表元素为：";
+	print(l);
+	cout<<endl;
+
+
+	//merge()函数用法
+	/*
+
+	void merge()合并两个链表并使之默认升序(也可改)：
+	*/
+
+	list<int> x;
+	x.push_back(32);
+	x.push_back(33);
+	x.push_back(34);
+
+	l.merge(x);
+
+	cout<<"l 的链表元素为：";
+	print(l);
+	cout<<endl;
+
+
+	getchar();
+	return 0;
+
+} 
+

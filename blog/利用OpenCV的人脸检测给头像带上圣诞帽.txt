@@ -1,0 +1,319 @@
+content
+
+
+
+我们来看下效果原图： 效果：       原理其实很简单：采用一张圣诞帽的png图像作为素材，         利用png图像背景是透明的，贴在背景图片上就是戴帽子的效果了。人脸检测的目的主要是为了确定贴帽子的位置，类似ps中自由变换的功能，检测到人脸中间的位置，resize圣诞帽子和人脸大小匹配，确定位置，贴上去，ok！   代码：非常简洁，根据参考博客给出的代码，由OpenCV自带的人脸检测代码经过简单修改即可。// getheader.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include <iostream>
+#include <stdio.h>
+
+using namespace std;
+using namespace cv;
+
+
+#pragma comment(lib,"opencv_core2410d.lib")                
+#pragma comment(lib,"opencv_highgui2410d.lib")                
+#pragma comment(lib,"opencv_objdetect2410d.lib")   
+#pragma comment(lib,"opencv_imgproc2410d.lib")  
+
+/** Function Headers */
+void detectAndDisplay( Mat frame );
+
+/** Global variables */
+//-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
+String face_cascade_name = "D:\\Program Files\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml";
+String eyes_cascade_name = "D:\\Program Files\\opencv\\sources\\data\\haarcascades\\haarcascade_eye_tree_eyeglasses.xml";
+CascadeClassifier face_cascade;
+CascadeClassifier eyes_cascade;
+string window_name = "Capture - Face detection";
+RNG rng(12345);
+
+const int FRAME_WIDTH = 1280;
+const int FRAME_HEIGHT = 240;
+/**
+* @function main
+*/
+int main( void )
+{
+	CvCapture* capture;
+	//VideoCapture capture;
+	Mat frame;
+
+	//-- 1. Load the cascades
+	if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+	if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+
+			frame = imread("19.jpg");//背景图片
+
+			//-- 3. Apply the classifier to the frame
+			if( !frame.empty() )
+			{ detectAndDisplay( frame ); }
+			
+			waitKey(0);
+	
+	return 0;
+}
+
+void mapToMat(const cv::Mat &srcAlpha, cv::Mat &dest, int x, int y)
+{
+	int nc = 3;
+	int alpha = 0;
+
+	for (int j = 0; j < srcAlpha.rows; j++)
+	{
+		for (int i = 0; i < srcAlpha.cols*3; i += 3)
+		{
+			alpha = srcAlpha.ptr<uchar>(j)[i / 3*4 + 3];
+			//alpha = 255-alpha;
+			if(alpha != 0) //4通道图像的alpha判断
+			{
+				for (int k = 0; k < 3; k++)
+				{
+					// if (src1.ptr<uchar>(j)[i / nc*nc + k] != 0)
+					if( (j+y < dest.rows) && (j+y>=0) &&
+						((i+x*3) / 3*3 + k < dest.cols*3) && ((i+x*3) / 3*3 + k >= 0) &&
+						(i/nc*4 + k < srcAlpha.cols*4) && (i/nc*4 + k >=0) )
+					{
+						dest.ptr<uchar>(j+y)[(i+x*nc) / nc*nc + k] = srcAlpha.ptr<uchar>(j)[(i) / nc*4 + k];
+					}
+				}
+			}
+		}
+	}
+}
+
+/**
+* @function detectAndDisplay
+*/
+void detectAndDisplay( Mat frame )
+{
+	std::vector<Rect> faces;
+	Mat frame_gray;
+	Mat hatAlpha;
+
+	hatAlpha = imread("2.png",-1);//圣诞帽的图片
+
+	cvtColor( frame, frame_gray, COLOR_BGR2GRAY );
+	equalizeHist( frame_gray, frame_gray );
+	//-- Detect faces
+	face_cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+
+	for( size_t i = 0; i < faces.size(); i++ )
+	{
+
+		Point center( faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
+		// ellipse( frame, center, Size( faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar( 255, 0, 255 ), 2, 8, 0 );
+
+		// line(frame,Point(faces[i].x,faces[i].y),center,Scalar(255,0,0),5);
+
+		Mat faceROI = frame_gray( faces[i] );
+		std::vector<Rect> eyes;
+
+		//-- In each face, detect eyes
+		eyes_cascade.detectMultiScale( faceROI, eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+
+		for( size_t j = 0; j < eyes.size(); j++ )
+		{
+			Point eye_center( faces[i].x + eyes[j].x + eyes[j].width/2, faces[i].y + eyes[j].y + eyes[j].height/2 );
+			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+			// circle( frame, eye_center, radius, Scalar( 255, 0, 0 ), 3, 8, 0 );
+		}
+
+		// if(eyes.size())
+		{
+			resize(hatAlpha,hatAlpha,Size(faces[i].width, faces[i].height),0,0,INTER_LANCZOS4);
+			// mapToMat(hatAlpha,frame,center.x+2.5*faces[i].width,center.y-1.3*faces[i].height);
+			mapToMat(hatAlpha,frame,faces[i].x,faces[i].y-0.8*faces[i].height);
+		}
+	}
+	//-- Show what you got
+	imshow( window_name, frame );
+	imwrite("merry christmas.jpg",frame);
+}
+
+  下面是摄像头实时戴帽子，改下主函数就好了： int main( void )
+{
+	CvCapture* capture;
+	//VideoCapture capture;
+	Mat frame;
+
+	//-- 1. Load the cascades
+	if( !face_cascade.load( face_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+	if( !eyes_cascade.load( eyes_cascade_name ) ){ printf("--(!)Error loading\n"); return -1; };
+
+		//	frame = imread("19.jpg");//背景图片
+
+
+			VideoCapture cap(0); //打开默认的摄像头号
+			if(!cap.isOpened())  //检测是否打开成功
+				return -1;
+
+			Mat edges;
+			//namedWindow("edges",1);
+			for(;;)
+			{
+				Mat frame;
+				cap >> frame; // 从摄像头中获取新的一帧
+				detectAndDisplay( frame );
+				//imshow("edges", frame);
+				if(waitKey(30) >= 0) break;
+			}
+			//摄像头会在VideoCapture的析构函数中释放
+			waitKey(0);
+	
+	return 0;
+} 我的系统的是win10 64位的系统，之前摄像头出来都是黑的，发现需要用vs2010配置一下x64版本方可使用，查了半天还是自己之前写的博客靠谱：就是按照win7 x64来配置，完美运行 http://blog.csdn.net/wangyaninglm/article/details/16325283 效果：参考文献：http://blog.csdn.net/lonelyrains/article/details/50388999http://docs.opencv.org/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html我调试好的工程：点击打开链接﻿﻿一个python版本的代码：https://github.com/LiuXiaolong19920720/Add-Christmas-Hatimport numpy as np 
+import cv2
+import dlib
+
+# 给img中的人头像加上圣诞帽，人脸最好为正脸
+def add_hat(img,hat_img):
+    # 分离rgba通道，合成rgb三通道帽子图，a通道后面做mask用
+    r,g,b,a = cv2.split(hat_img) 
+    rgb_hat = cv2.merge((r,g,b))
+
+    cv2.imwrite("hat_alpha.jpg",a)
+
+    # ------------------------- 用dlib的人脸检测代替OpenCV的人脸检测-----------------------
+    # # 灰度变换
+    # gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)  
+    # # 用opencv自带的人脸检测器检测人脸
+    # face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")                       
+    # faces = face_cascade.detectMultiScale(gray,1.05,3,cv2.CASCADE_SCALE_IMAGE,(50,50))
+
+    # ------------------------- 用dlib的人脸检测代替OpenCV的人脸检测-----------------------
+
+    # dlib人脸关键点检测器
+    predictor_path = "shape_predictor_5_face_landmarks.dat"
+    predictor = dlib.shape_predictor(predictor_path)  
+
+    # dlib正脸检测器
+    detector = dlib.get_frontal_face_detector()
+
+    # 正脸检测
+    dets = detector(img, 1)
+
+    # 如果检测到人脸
+    if len(dets)>0:  
+        for d in dets:
+            x,y,w,h = d.left(),d.top(), d.right()-d.left(), d.bottom()-d.top()
+            # x,y,w,h = faceRect  
+            # cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2,8,0)
+
+            # 关键点检测，5个关键点
+            shape = predictor(img, d)
+            # for point in shape.parts():
+            #     cv2.circle(img,(point.x,point.y),3,color=(0,255,0))
+
+            # cv2.imshow("image",img)
+            # cv2.waitKey()  
+
+            # 选取左右眼眼角的点
+            point1 = shape.part(0)
+            point2 = shape.part(2)
+
+            # 求两点中心
+            eyes_center = ((point1.x+point2.x)//2,(point1.y+point2.y)//2)
+
+            # cv2.circle(img,eyes_center,3,color=(0,255,0))  
+            # cv2.imshow("image",img)
+            # cv2.waitKey()
+
+            #  根据人脸大小调整帽子大小
+            factor = 1.5
+            resized_hat_h = int(round(rgb_hat.shape[0]*w/rgb_hat.shape[1]*factor))
+            resized_hat_w = int(round(rgb_hat.shape[1]*w/rgb_hat.shape[1]*factor))
+
+            if resized_hat_h > y:
+                resized_hat_h = y-1
+
+            # 根据人脸大小调整帽子大小
+            resized_hat = cv2.resize(rgb_hat,(resized_hat_w,resized_hat_h))
+
+            # 用alpha通道作为mask
+            mask = cv2.resize(a,(resized_hat_w,resized_hat_h))
+            mask_inv =  cv2.bitwise_not(mask)
+
+            # 帽子相对与人脸框上线的偏移量
+            dh = 0
+            dw = 0
+            # 原图ROI
+            # bg_roi = img[y+dh-resized_hat_h:y+dh, x+dw:x+dw+resized_hat_w]
+            bg_roi = img[y+dh-resized_hat_h:y+dh,(eyes_center[0]-resized_hat_w//3):(eyes_center[0]+resized_hat_w//3*2)]
+
+            # 原图ROI中提取放帽子的区域
+            bg_roi = bg_roi.astype(float)
+            mask_inv = cv2.merge((mask_inv,mask_inv,mask_inv))
+            alpha = mask_inv.astype(float)/255
+
+            # 相乘之前保证两者大小一致（可能会由于四舍五入原因不一致）
+            alpha = cv2.resize(alpha,(bg_roi.shape[1],bg_roi.shape[0]))
+            # print("alpha size: ",alpha.shape)
+            # print("bg_roi size: ",bg_roi.shape)
+            bg = cv2.multiply(alpha, bg_roi)
+            bg = bg.astype('uint8')
+
+            cv2.imwrite("bg.jpg",bg)
+            # cv2.imshow("image",img)
+            # cv2.waitKey()
+
+            # 提取帽子区域
+            hat = cv2.bitwise_and(resized_hat,resized_hat,mask = mask)
+            cv2.imwrite("hat.jpg",hat)
+            
+            # cv2.imshow("hat",hat)  
+            # cv2.imshow("bg",bg)
+
+            # print("bg size: ",bg.shape)
+            # print("hat size: ",hat.shape)
+
+            # 相加之前保证两者大小一致（可能会由于四舍五入原因不一致）
+            hat = cv2.resize(hat,(bg_roi.shape[1],bg_roi.shape[0]))
+            # 两个ROI区域相加
+            add_hat = cv2.add(bg,hat)
+            # cv2.imshow("add_hat",add_hat) 
+
+            # 把添加好帽子的区域放回原图
+            img[y+dh-resized_hat_h:y+dh,(eyes_center[0]-resized_hat_w//3):(eyes_center[0]+resized_hat_w//3*2)] = add_hat
+
+            # 展示效果
+            # cv2.imshow("img",img )  
+            # cv2.waitKey(0)  
+
+            return img
+
+   
+# 读取帽子图，第二个参数-1表示读取为rgba通道，否则为rgb通道
+hat_img = cv2.imread("hat2.png",-1)
+
+# 读取头像图
+img = cv2.imread("test.jpg")
+output = add_hat(img,hat_img)
+
+# 展示效果
+cv2.imshow("output",output )  
+cv2.waitKey(0)  
+cv2.imwrite("output.jpg",output)
+# import glob as gb 
+
+# img_path = gb.glob("./images/*.jpg")
+
+# for path in img_path:
+#     img = cv2.imread(path)
+
+#     # 添加帽子
+#     output = add_hat(img,hat_img)
+
+#     # 展示效果
+#     cv2.imshow("output",output )  
+#     cv2.waitKey(0)  
+
+cv2.destroyAllWindows()   
+

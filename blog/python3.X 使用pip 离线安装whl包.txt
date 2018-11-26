@@ -1,0 +1,85 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/54177720				
+
+
+
+0. 绪论
+断网的环境下配置python开发环境非常讨厌，本文旨在优雅暴力的解决这一问题。
+
+生产环境 ： 
+  windows 7 windows10 
+  python 3.5.2 
+  pip 1.5.2
+
+友情提示：出现问题时候，看日志是王道！计算机不会犯错！
+机器上python2，3混用的问题，参考： 
+http://blog.csdn.net/wangyaninglm/article/details/53312606 
+第二小节：不同版本python混用（官方用法）其实主要就是前面加上py -3(或)2
+Windows离线断网环境下安装Python包，配置环境，准备用来生成word模版，需要用到一些win32com的python库，但是又没有网还想用pip方式傻瓜安装，怎么办呢，百度google探索了半天。姑且记录一下 
+linux下此方法应该同样可行。
+当然还有暴力的方法是，pip show 包名，然后python的版本一样的话直接copy目录（红线部分），import应该也是好使的。下面以numpy包为例。
+
+
+1.安装过程
+1.下载最新pip，更新pip版本
+新建packages文件夹放在目录中：c:\python35\packages
+py -3 –m pip install --upgrade pip
+2.在可以联网的开发机器上安装好需要的包 
+例如：
+
+py -3 –m pip install numpy 
+  py -3 –m pip install pandas
+
+3.打包已安装的包
+在c:\python35目录下新建packages文件夹用来存储下载下来的所需安装包。 
+在 c:\python35\Scripts下启动cmd窗口。
+pip list #查看安装的包
+pip freeze >requirements.txt
+py -3 –m pip install --download c:\python35\packages -r requirements.txt
+上述命令需要在一个联网机器上运行，不然会报错，不联网的机器似乎没法打包已经安装好的whl包，如果有方法求高手告知，报错如下（白色字体是联网后运行正常的）： 
+
+requirements.txt是这个样子：大概记载了每个包的版本号
+
+cycler==0.10.0 
+  jieba==0.38 
+  matplotlib==1.5.3 
+  nltk==3.2.1 
+  numpy==1.11.2 
+  pyparsing==2.1.10 
+  python-dateutil==2.6.0 
+  pytz==2016.10 
+  scikit-learn==0.18.1 
+  six==1.10.0
+
+4.离线情况安装其他机器打包好的包whl
+将packages文件夹和requirement.txt拷贝至离线机器上目录下， 
+packages文件夹放在c:\Python35下，requirement.txt放在c:\Python35\Scripts下。 
+requirements.txt文件放在pip.exe目录下。
+py -3 –m pip install --no-index --find-index=c:\python35\packages -r requirements.txt
+上述命令中的–find-index 这个命令在python27中似乎是对的，python35中需要换成–find-links
+
+正确的命令：
+py -3 -m pip install --no-index --find-links=c:\python35\packages -r requirements.txt
+3.原理
+
+这种whl包下载好后，放在上述位置，再修改下面文件 
+
+添加一行：
+
+包名=版本号
+
+来一个命令就行了！装过的pip就不装了，没装的pip会自动安装
+
+py -3 -m pip install –no-index –find-links=c:\python35\packages -r requirements.txt
+
+
+参考
+https://segmentfault.com/a/1190000006027207
+pip常用命令： 
+http://me.iblogc.com/2015/01/01/pip%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/
+pip documentation： 
+https://pip.pypa.io/en/latest/ 
+
+

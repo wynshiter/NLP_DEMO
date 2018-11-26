@@ -1,0 +1,81 @@
+content
+
+
+
+
+
+讨论帖：
+http://bbs.csdn.net/topics/391542633﻿﻿
+  在Matlab下，使用imfill可以很容易的完成孔洞填充操作，感觉这是一个极为常用的方法，然而不知道为什么Opencv里面却没有集成这个函数。在网上查了好多关于Opencv下的孔洞填充方法，大部分使用轮廓查找方法去做的，但对于这种方法，总感觉不是特别好。之前了解过冈萨雷斯那本书上的孔洞填充算法，所以想着手重新写一个。这里借鉴了冈萨雷斯书上的集合运算方法（并不完全一样）
+    大致思路如下：
+    0， 设原图像为 A。
+    1， 首先A向外延展一到两个像素，并将值填充为背景色（0）,标记为B。
+    2， 使用floodFill函数将B的大背景填充，填充值为前景色（255），种子点为（0，0）即可（步骤一可以确保（0，0）点位于大背景），标记为C。
+    3， 将填充好的图像裁剪为原图像大小（去掉延展区域），标记为D。
+    4， 将D取反与A相加即得填充的图像，E=A|（~D）。
+
+
+// fillhole.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+ 
+#include <opencv2/core/core.hpp>    
+#include <opencv2/highgui/highgui.hpp>  
+#include "opencv2/imgproc/imgproc.hpp"
+	 
+
+	#pragma comment(lib,"opencv_core2410d.lib")                  
+	#pragma comment(lib,"opencv_highgui2410d.lib")                  
+	#pragma comment(lib,"opencv_imgproc2410d.lib")     
+	  
+using namespace std;  
+using namespace cv;  
+
+
+
+
+void fillHole(const Mat srcBw, Mat &dstBw)
+{
+	Size m_Size = srcBw.size();
+	Mat Temp=Mat::zeros(m_Size.height+2,m_Size.width+2,srcBw.type());//延展图像
+	srcBw.copyTo(Temp(Range(1, m_Size.height + 1), Range(1, m_Size.width + 1)));
+
+	cv::floodFill(Temp, Point(0, 0), Scalar(255));
+
+	Mat cutImg;//裁剪延展的图像
+	Temp(Range(1, m_Size.height + 1), Range(1, m_Size.width + 1)).copyTo(cutImg);
+
+	dstBw = srcBw | (~cutImg);
+}
+
+int main()
+{
+Mat img=cv::imread("23.jpg");
+
+Mat gray;
+cv::cvtColor(img, gray, CV_RGB2GRAY);
+
+Mat bw;
+cv::threshold(gray, bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+
+Mat bwFill;
+fillHole(bw, bwFill);
+
+imshow("填充前", gray);
+imshow("填充后", bwFill);
+waitKey();
+return 0;
+}
+
+
+
+我调试好的工程：点击打开链接
+http://download.csdn.net/detail/wangyaninglm/9389329
+
+
+
+﻿﻿
+
+

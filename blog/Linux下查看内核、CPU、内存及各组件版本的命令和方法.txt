@@ -1,0 +1,137 @@
+content
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+查看内核版本： uname -a
+                         more /etc/*release 
+                         more /etc/redhat-release
+                         more /proc/version 
+查看CPU信息：grep "model name" /proc/cpuinfo
+                         more /proc/cpuinfo
+查看CPU位数：getconf LONG_BIT
+                         ls   如果在root下ls有lib64 文件夹说明系统64
+查看libc、gcc版本：ldd /sbin/mii-tool
+                                rpm -qa | grep glibc
+                                gcc –v
+查看内存信息：more /proc/meminfo
+    grep MemTotal /proc/meminfo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CentOS查看CPU、内存、版本等系统信息
+ 
+
+　　CentOS查看系统信息
+　　一：查看CPU
+　　more /proc/cpuinfo | grep "model name"
+　　grep "model name" /proc/cpuinfo
+　　如果觉得需要看的更加舒服
+　　grep "model name" /proc/cpuinfo | cut -f2 -d:
+ 
+
+　　
+　　怎么样，linux的命令就要这样熟悉。
+　　二：查看内存
+　　grep MemTotal /proc/meminfo
+　　grep MemTotal /proc/meminfo | cut -f2 -d:
+　　free -m |grep "Mem" | awk '{print $2}'
+　　三：查看cpu是32位还是64位
+　　查看CPU位数(32 or 64)
+　　#getconf LONG_BIT
+　　#echo $HOSTTYPE
+　　#uname -a
+　　四：查看当前linux的版本
+　　#more /etc/RedHat-release
+　　#cat /etc/redhat-release
+　　五：查看内核版本
+　　#uname -r
+　　#uname -a
+　　六：查看当前时间
+　　date
+　　七：查看硬盘和分区
+　　df -h
+　　
+　　fdisk -l
+　　也可以查看分区
+　　du -sh
+　　可以看到全部占用的空间
+　　du /etc -sh
+　　可以看到这个目录的大小
+ 
+
+　　八：查看安装的软件包
+　　查看系统安装的时候装的软件包
+　　cat -n /root/install.log
+　　more /root/install.log | wc -l
+　　查看现在已经安装了那些软件包
+　　rpm -qa
+　　rpm -qa | wc -l
+　　yum list installed | wc -l
+　　不过很奇怪，我通过rpm，和yum这两种方式查询的安装软件包，数量并不一样。没有找到原因。
+　　九：查看键盘布局
+　　cat /etc/sysconfig/keyboard
+　　cat /etc/sysconfig/keyboard | grep KEYTABLE | cut -f2 -d=
+　　十：查看selinux情况
+　　sestatus
+　　sestatus | cut -f2 -d:
+　　cat /etc/sysconfig/selinux
+　　十一：查看ip，mac地址
+　　在ifcfg-eth0 文件里你可以看到mac，网关等信息。
+　　ifconfig
+　　cat /etc/sysconfig/network-scripts/ifcfg-eth0 | grep IPADDR
+　　cat /etc/sysconfig/network-scripts/ifcfg-eth0 | grep IPADDR | cut -f2 -d=
+　　ifconfig eth0 |grep "inet addr:" |awk '{print $2}'|cut -c 6-
+　　ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'
+　　查看网关
+　　cat /etc/sysconfig/network
+　　查看dns
+　　cat /etc/nf
+　　十二：查看默认语言
+　　echo $LANG $LANGUAGE
+　　cat /etc/sysconfig/i18n
+　　十三：查看所属时区和是否使用UTC时间
+　　cat /etc/sysconfig/clock
+　　十四：查看主机名
+　　hostname
+　　cat /etc/sysconfig/network
+　　修改主机名就是修改这个文件，同时最好也把host文件也修改
+ 
+ 
+1. 内核版本：popen("uname -sr", "r");
+2.内存容量：/proc/meminfo ‘MemTotal:’字段
+3.操作系统版本：/etc/issue 或者 /etc/*ease
+4.当前用户名：a.getuid()获取当前用户的uid;b.getpwuid(uid)或者用户名
+5.cpu名称:/proc/cpuinfo ’model name‘字段
+6.cpu内核数：/proc/cpuinfo 'processor'字段最大值+1(逻辑核数)， 'physical id'字段最大值 + 1
+
+
+
+
+
+
+
+ 
+

@@ -1,0 +1,203 @@
+content
+
+
+
+识别算法概述：
+SIFT/SURF基于灰度图，
+一、首先建立图像金字塔，形成三维的图像空间，通过Hessian矩阵获取每一层的局部极大值，然后进行在极值点周围26个点进行NMS，从而得到粗略的特征点，再使用二次插值法得到精确特征点所在的层（尺度），即完成了尺度不变。
+ 
+二、在特征点选取一个与尺度相应的邻域，求出主方向，其中SIFT采用在一个正方形邻域内统计所有点的梯度方向，找到占80%以上的方向作为主方向；而SURF则选择圆形邻域，并且使用活动扇形的方法求出特征点主方向，以主方向对齐即完成旋转不变。
+ 
+三、以主方向为轴可以在每个特征点建立坐标，SIFT在特征点选择一块大小与尺度相应的方形区域，分成16块，统计每一块沿着八个方向占的比例，于是特征点形成了128维特征向量，对图像进行归一化则完成强度不变；而SURF分成64块，统计每一块的dx，dy，|dx|，|dy|的累积和，同样形成128维向量，再进行归一化则完成了对比度不变与强度不变。
+ 
+haar特征也是基于灰度图，
+首先通过大量的具有比较明显的haar特征（矩形）的物体图像用模式识别的方法训练出分类器，分类器是个级联的，每级都以大概相同的识别率保留进入下一级的具有物体特征的候选物体，而每一级的子分类器则由许多haar特征构成（由积分图像计算得到，并保存下位置），有水平的、竖直的、倾斜的，并且每个特征带一个阈值和两个分支值，每级子分类器带一个总的阈值。识别物体的时候，同样计算积分图像为后面计算haar特征做准备，然后采用与训练的时候有物体的窗口同样大小的窗口遍历整幅图像，以后逐渐放大窗口，同样做遍历搜索物体；每当窗口移动到一个位置，即计算该窗口内的haar特征，加权后与分类器中haar特征的阈值比较从而选择左或者右分支值，累加一个级的分支值与相应级的阈值比较，大于该阈值才可以通过进入下一轮筛选。当通过分类器所以级的时候说明这个物体以大概率被识别。
+ 
+广义hough变换同样基于灰度图，
+使用轮廓作为特征，融合了梯度信息，以投票的方式识别物体，在本blog的另一篇文章中有详细讨论，这里不再赘述。
+特点异同对比及其适用场合：
+ 
+三种算法都只是基于强度（灰度）信息，都是特征方法，但SIFT/SURF的特征是一种具有强烈方向性及亮度性的特征，这使得它适用于刚性形变，稍有透视形变的场合；
+haar特征识别方法带有一点人工智能的意味，对于像人脸这种有明显的、稳定结构的haar特征的物体最适用，只要结构相对固定即使发生扭曲等非线性形变依然可识别；
+广义hough变换完全是精确的匹配，可得到物体的位置方向等参数信息。前两种方法基本都是通过先获取局部特征然后再逐个匹配，只是局部特征的计算方法不同，SIFT/SURF比较复杂也相对稳定，haar方法比较简单，偏向一种统计的方法形成特征，这也使其具有一定的模糊弹性；
+广义hough变换则是一种全局的特征——轮廓梯度，但也可以看做整个轮廓的每一个点的位置和梯度都是特征，每个点都对识别有贡献，用直观的投票，看票数多少去确定是否识别出物体。
+ 
+SIFT/SURF算法的深入剖析——谈SIFT的精妙与不足
+SURF算法是SIFT算法的加速版，opencv的SURF算法在适中的条件下完成两幅图像中物体的匹配基本实现了实时处理，其快速的基础实际上只有一个——积分图像haar求导，对于它们其他方面的不同可以参考本blog的另外一篇关于SIFT的文章。
+ 
+    不论科研还是应用上都希望可以和人类的视觉一样通过程序自动找出两幅图像里面相同的景物，并且建立它们之间的对应，前几年才被提出的SIFT（尺度不变特征）算法提供了一种解决方法，通过这个算法可以使得满足一定条件下两幅图像中相同景物的某些点（后面提到的关键点）可以匹配起来，为什么不是每一点都匹配呢？下面的论述将会提到。
+ 
+     SIFT算法实现物体识别主要有三大工序，
+1、提取关键点；
+2、对关键点附加详细的信息（局部特征）也就是所谓的描述器；
+3、通过两方特征点（附带上特征向量的关键点）的两两比较找出相互匹配的若干对特征点，也就建立了景物间的对应关系。
+ 
+      日常的应用中，多数情况是给出一幅包含物体的参考图像，然后在另外一幅同样含有该物体的图像中实现它们的匹配。两幅图像中的物体一般只是旋转和缩放的关系，加上图像的亮度及对比度的不同，这些就是最常见的情形。基于这些条件下要实现物体之间的匹配，SIFT算法的先驱及其发明者想到只要找到多于三对物体间的匹配点就可以通过射影几何的理论建立它们的一一对应。首先在形状上物体既有旋转又有缩小放大的变化，如何找到这样的对应点呢？于是他们的想法是首先找到图像中的一些“稳定点”，这些点是一些十分突出的点不会因光照条件的改变而消失，比如角点、边缘点、暗区域的亮点以及亮区域的暗点，既然两幅图像中有相同的景物，那么使用某种方法分别提取各自的稳定点，这些点之间会有相互对应的匹配点，正是基于这样合理的假设，SIFT算法的基础是稳定点。
+ 
+SIFT算法找稳定点的方法是找灰度图的局部最值，由于数字图像是离散的，想求导和求最值这些操作都是使用滤波器，而滤波器是有尺寸大小的，使用同一尺寸的滤波器对两幅包含有不同尺寸的同一物体的图像求局部最值将有可能出现一方求得最值而另一方却没有的情况，但是容易知道假如物体的尺寸都一致的话它们的局部最值将会相同。SIFT的精妙之处在于采用图像金字塔的方法解决这一问题，我们可以把两幅图像想象成是连续的，分别以它们作为底面作四棱锥，就像金字塔，那么每一个截面与原图像相似，那么两个金字塔中必然会有包含大小一致的物体的无穷个截面，但应用只能是离散的，所以我们只能构造有限层，层数越多当然越好，但处理时间会相应增加，层数太少不行，因为向下采样的截面中可能找不到尺寸大小一致的两个物体的图像。有了图像金字塔就可以对每一层求出局部最值，但是这样的稳定点数目将会十分可观，所以需要使用某种方法抑制去除一部分点，但又使得同一尺度下的稳定点得以保存。有了稳定点之后如何去让程序明白它们之间是物体的同一位置？研究者想到以该点为中心挖出一小块区域，然后找出区域内的某些特征，让这些特征附件在稳定点上，SIFT的又一个精妙之处在于稳定点附加上特征向量之后就像一个根系发达的树根一样牢牢的抓住它的“土地”，使之成为更稳固的特征点，但是问题又来了，遇到旋转的情况怎么办？发明者的解决方法是找一个“主方向”然后以它看齐，就可以知道两个物体的旋转夹角了。下面就讨论一下SIFT算法的缺陷。
+ 
+      SIFT/SURT采用henssian矩阵获取图像局部最值还是十分稳定的，但是在求主方向阶段太过于依赖局部区域像素的梯度方向，有可能使得找到的主方向不准确，后面的特征向量提取以及匹配都严重依赖于主方向，即使不大偏差角度也可以造成后面特征匹配的放大误差，从而匹配不成功；另外图像金字塔的层取得不足够紧密也会使得尺度有误差，后面的特征向量提取同样依赖相应的尺度，发明者在这个问题上的折中解决方法是取适量的层然后进行插值。SIFT是一种只利用到灰度性质的算法，忽略了色彩信息，后面又出现了几种据说比SIFT更稳定的描述器其中一些利用到了色彩信息，让我们拭目以待。
+ 
+      最后要提一下，我们知道同样的景物在不同的照片中可能出现不同的形状、大小、角度、亮度，甚至扭曲；计算机视觉的知识表明通过光学镜头获取的图像，对于平面形状的两个物体它们之间可以建立射影对应，对于像人脸这种曲面物体在不同角度距离不同相机参数下获取的两幅图像，它们之间不是一个线性对应关系，就是说我们即使获得两张图像中的脸上若干匹配好的点对，还是无法从中推导出其他点的对应。
+ 
+ 
+opencv源码解析之(3)：特征点检查前言1
+     因为最近准备看特征点检查方面的源码，而其中最著名的算法就是sift和surf。因此这次主要是学会怎样使用opencv中的sift和surf函数来检测特征点和描述特征点，以及怎样使用其算法来进行特征点匹配。庆幸的是，sift算法虽然是专利，但是在opencv的努力下也获得了作者的允许，将其加入了新版本的opencv中了。
+使用环境：opencv2.3.1+vs2010
+功能：找出2幅图中特征点，并将其描述出来，且在2幅中进行匹配。2幅图内容相同，但是经过了曝光，旋转，缩放处理过。
+首先来看sift算法函数的使用。
+工程代码：
+
+// sift_test.cpp : 定义控制台应用程序的入口点。
+
+#include "stdafx.h"
+#include <stdio.h>
+#include <iostream>
+#include "opencv2/core/core.hpp"//因为在属性中已经配置了opencv等目录，所以把其当成了本地目录一样
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
+usingnamespace cv;
+usingnamespace std;
+
+void readme();
+
+int main(int argc,char* argv[])
+{
+    Mat img_1=imread("./image/query.png",CV_LOAD_IMAGE_GRAYSCALE);//宏定义时CV_LOAD_IMAGE_GRAYSCALE=0，也就是读取灰度图像
+    Mat img_2=imread("./image/rs_query.png",CV_LOAD_IMAGE_GRAYSCALE);//一定要记得这里路径的斜线方向，这与Matlab里面是相反的
+
+if(!img_1.data || !img_2.data)//如果数据为空
+    {
+        cout<<"opencv error"<<endl;
+return -1;
+    }
+    cout<<"open right"<<endl;
+
+//第一步，用SIFT算子检测关键点
+
+    SiftFeatureDetector detector;//构造函数采用内部默认的
+    std::vector<KeyPoint> keypoints_1,keypoints_2;//构造2个专门由点组成的点向量用来存储特征点
+
+    detector.detect(img_1,keypoints_1);//将img_1图像中检测到的特征点存储起来放在keypoints_1中
+    detector.detect(img_2,keypoints_2);//同理
+
+//在图像中画出特征点
+    Mat img_keypoints_1,img_keypoints_2;
+
+    drawKeypoints(img_1,keypoints_1,img_keypoints_1,Scalar::all(-1),DrawMatchesFlags::DEFAULT);//在内存中画出特征点
+    drawKeypoints(img_2,keypoints_2,img_keypoints_2,Scalar::all(-1),DrawMatchesFlags::DEFAULT);
+
+    imshow("sift_keypoints_1",img_keypoints_1);//显示特征点
+    imshow("sift_keypoints_2",img_keypoints_2);
+
+//计算特征向量
+    SiftDescriptorExtractor extractor;//定义描述子对象
+
+    Mat descriptors_1,descriptors_2;//存放特征向量的矩阵
+
+    extractor.compute(img_1,keypoints_1,descriptors_1);//计算特征向量
+    extractor.compute(img_2,keypoints_2,descriptors_2);
+
+//用burte force进行匹配特征向量
+    BruteForceMatcher<L2<float>>matcher;//定义一个burte force matcher对象
+    vector<DMatch>matches;
+    matcher.match(descriptors_1,descriptors_2,matches);
+
+//绘制匹配线段
+    Mat img_matches;
+    drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches,img_matches);//将匹配出来的结果放入内存img_matches中
+
+//显示匹配线段
+    imshow("sift_Matches",img_matches);//显示的标题为Matches
+    waitKey(0);
+return0;
+}
+
+运行结果如下：
+
+
+
+下面看surf算法函数的使用(和sift基本一样，就是函数名改了下而已)：
+工程代码：
+
+// surf_test.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <stdio.h>
+#include <iostream>
+#include "opencv2/core/core.hpp"//因为在属性中已经配置了opencv等目录，所以把其当成了本地目录一样
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
+usingnamespace cv;
+usingnamespace std;
+
+void readme();
+
+int main(int argc,char* argv[])
+{
+    Mat img_1=imread("./image/query.png",CV_LOAD_IMAGE_GRAYSCALE);//宏定义时CV_LOAD_IMAGE_GRAYSCALE=0，也就是读取灰度图像
+    Mat img_2=imread("./image/rs_query.png",CV_LOAD_IMAGE_GRAYSCALE);//一定要记得这里路径的斜线方向，这与Matlab里面是相反的
+
+if(!img_1.data || !img_2.data)//如果数据为空
+    {
+        cout<<"opencv error"<<endl;
+return -1;
+    }
+    cout<<"open right"<<endl;
+
+//第一步，用SURF算子检测关键点
+int minHessian=400;
+
+    SurfFeatureDetector detector(minHessian);
+    std::vector<KeyPoint> keypoints_1,keypoints_2;//构造2个专门由点组成的点向量用来存储特征点
+
+    detector.detect(img_1,keypoints_1);//将img_1图像中检测到的特征点存储起来放在keypoints_1中
+    detector.detect(img_2,keypoints_2);//同理
+
+//在图像中画出特征点
+    Mat img_keypoints_1,img_keypoints_2;
+
+    drawKeypoints(img_1,keypoints_1,img_keypoints_1,Scalar::all(-1),DrawMatchesFlags::DEFAULT);
+    drawKeypoints(img_2,keypoints_2,img_keypoints_2,Scalar::all(-1),DrawMatchesFlags::DEFAULT);
+
+    imshow("surf_keypoints_1",img_keypoints_1);
+    imshow("surf_keypoints_2",img_keypoints_2);
+
+//计算特征向量
+    SurfDescriptorExtractor extractor;//定义描述子对象
+
+    Mat descriptors_1,descriptors_2;//存放特征向量的矩阵
+
+    extractor.compute(img_1,keypoints_1,descriptors_1);
+    extractor.compute(img_2,keypoints_2,descriptors_2);
+
+//用burte force进行匹配特征向量
+    BruteForceMatcher<L2<float>>matcher;//定义一个burte force matcher对象
+    vector<DMatch>matches;
+    matcher.match(descriptors_1,descriptors_2,matches);
+
+//绘制匹配线段
+    Mat img_matches;
+    drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches,img_matches);//将匹配出来的结果放入内存img_matches中
+
+//显示匹配线段
+    imshow("surf_Matches",img_matches);//显示的标题为Matches
+    waitKey(0);
+return0;
+}
+
+其运行结果如下：
+
+
+
+      从这个实验可以知道，在opencv中使用这2个算法是多么的简单！只需要简单的几个参数就可以达到很好的效果。但这只是opencv的低级应用，我们应该在最好能用opencv一些内部函数来帮助实现自己的算法和想法。这就是分析opencv源码的主要目的。
+ 
+ 
+ 
+     另外，从实验的过程中可以感觉出来surf算法的运行时间比sift快很多，且特征点的数目检测得比较多，其它的暂时还没区别出来。欢迎交流，谢谢！
+作者：tornadomeet 出处：http://www.cnblogs.com/tornadomeet 欢迎转载或分享，但请务必声明文章出处。 （新浪微博：tornadomeet,欢迎交流！）
+
+

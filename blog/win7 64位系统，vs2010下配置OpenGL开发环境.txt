@@ -1,0 +1,141 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/41248347				
+
+
+glut下载地址: 
+http://www.opengl.org/resources/libraries/glut/glutdlls37beta.zip
+ 
+或者：http://user.xmission.com/~nate/glut.html
+ 
+ 
+ 
+1. 把解压得到的glut.h放到"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Include\gl"（与具体安装位置有关，应该是 安装目录\microsoft sdks\windows\v7.0A\include\gl）
+      2. 把解压得到的glut.lib和glut32.lib放到"“Programfiles(x86)\Microsoft Visual studio 10.0\VC\lib" 中（与具体安装位置有关，同上）
+      3. 把解压得到的glut.dll放到"C:\Windows\System32"
+      4. 把glut32.dll放到“Programfiles(x86)\Microsoft Visual studio 10.0\VC\bin”下(注意这个，网上有人说放到system32里，但是我试过，会报错)（与具体安装位置有关，同上）
+      5. 打开vs2010,随便打开或新建一个项目。 选择 project->project property-> Configuration Properties->Linker->Input->Additional Dependencies 在其中添加opengl32.lib glu32.lib glut32.lib
+ 
+// first_test.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include<Windows.h>
+#include <stdio.h>
+//#include "glut.h"//这种写法就把头文件dll,lib都放到本地文件就行了
+#include <gl/glut.h>
+
+void run()
+{
+	
+	
+	const GLubyte* name = glGetString(GL_VENDOR); //返回负责当前OpenGL实现厂商的名字
+	const GLubyte* biaoshifu = glGetString(GL_RENDERER); //返回一个渲染器标识符，通常是个硬件平台
+	const GLubyte* OpenGLVersion =glGetString(GL_VERSION); //返回当前OpenGL实现的版本号
+	const GLubyte* gluVersion= gluGetString(GLU_VERSION); //返回当前GLU工具库版本
+	printf("OpenGL实现厂商的名字：%s\n", name);
+	printf("渲染器标识符：%s\n", biaoshifu);
+	printf("OOpenGL实现的版本号：%s\n",OpenGLVersion );
+	printf("OGLU工具库版本：%s\n", gluVersion);
+	
+}
+
+
+
+//#include<gl/glu.h>　　//glut.h自动包含了glu.h 和 gl.h
+
+//#include<gl/gl.h>
+
+
+
+void renderScene(void)
+
+{
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glLoadIdentity();
+
+	glBegin(GL_TRIANGLES);
+
+	glVertex3f(-0.5,-0.5,0.0);
+
+	glVertex3f(0.5,0.0,0.0);
+
+	glVertex3f(0.0,0.5,0.0);
+
+	glEnd();
+
+	glutSwapBuffers();
+
+}
+
+
+
+int _tmain(int argc, _TCHAR* argv[])
+
+{
+
+	glutInit(&argc,(char** )argv);
+	//显示模式初始化
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
+	//定义窗口大小
+	glutInitWindowSize(300,300);
+	//定义窗口位置
+	glutInitWindowPosition(100,100);
+	//创建窗口
+		
+	glutCreateWindow("Hello OpenGL");
+
+	glutDisplayFunc(renderScene);
+
+	
+	run();
+	
+
+	glutMainLoop();//enters the GLUT event processing loop.
+
+	return 0;
+
+}
+
+
+
+ 
+ 
+
+首先，需要包含头文件#include <GL/glut.h>，这是GLUT的头文件。
+本来OpenGL程序一般还要包含<GL/gl.h>和<GL/glu.h>，但GLUT的头文件中已经自动将这两个文件包含了，不必再次包含。
+然后看main函数。
+int main(int argc, char *argv[])，这个是带命令行参数的main函数，各位应该见过吧？没见过的同志们请多翻翻书，等弄明白了再往下看。
+注意main函数中的各语句，除了最后的return之外，其余全部以glut开头。这种以glut开头的函数都是GLUT工具包所提供的函数，下面对用到的几个函数进行介绍。
+1、glutInit，对GLUT进行初始化，这个函数必须在其它的GLUT使用之前调用一次。其格式比较死板，一般照抄这句glutInit(&argc, argv)就可以了。
+2、 glutInitDisplayMode，设置显示方式，其中GLUT_RGB表示使用RGB颜色，与之对应的还有GLUT_INDEX（表示使用索引颜色）。GLUT_SINGLE表示使用单缓冲，与之对应的还有GLUT_DOUBLE（使用双缓冲）。更多信息，请自己Google。当然以后的教程也会有一些讲解。
+3、glutInitWindowPosition，这个简单，设置窗口在屏幕中的位置。
+4、glutInitWindowSize，这个也简单，设置窗口的大小。
+5、glutCreateWindow，根据前面设置的信息创建窗口。参数将被作为窗口的标题。注意：窗口被创建后，并不立即显示到屏幕上。需要调用glutMainLoop才能看到窗口。
+6、glutDisplayFunc，设置一个函数，当需要进行画图时，这个函数就会被调用。（这个说法不够准确，但准确的说法可能初学者不太好理解，暂时这样说吧）。
+7、glutMainLoop，进行一个消息循环。（这个可能初学者也不太明白，现在只需要知道这个函数可以显示窗口，并且等待窗口关闭后才会返回，这就足够了。）
+在glutDisplayFunc函数中，我们设置了“当需要画图时，请调用myDisplay函数”。于是myDisplay函数就用来画图。观察myDisplay中的三个函数调用，发现它们都以gl开头。这种以gl开头的函数都是OpenGL的标准函数，下面对用到的函数进行介绍。
+1、glClear，清除。GL_COLOR_BUFFER_BIT表示清除颜色，glClear函数还可以清除其它的东西，但这里不作介绍。
+2、glRectf，画一个矩形。四个参数分别表示了位于对角线上的两个点的横、纵坐标。
+3、glFlush，保证前面的OpenGL命令立即执行（而不是让它们在缓冲区中等待）。其作用跟fflush(stdout)类似。
+ 
+ 
+如果这样还报错的话应该注意以下几点:
+有时候在建console application 的时候添加的cpp文件将后缀句改为 .c
+有的程序需要glaux工具包，这个下载了，可以按上述步骤添加（操作基本相同）
+ 
+ 
+主要整合了下面两个帖子：
+ 
+http://www.cnblogs.com/moiyer/archive/2011/11/06/2316156.html
+ 
+http://lesmatines.blog.163.com/blog/static/17396142013113111934550/
+ 
+ 
+ 
+ 
+
+

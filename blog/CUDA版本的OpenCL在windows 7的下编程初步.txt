@@ -1,0 +1,301 @@
+content
+
+
+
+ 参考文献：
+http://blog.csdn.net/neoxmu/article/details/8866928
+我安装的是CUDA5.5,代码如下：
+ 
+//#include "stdafx.h"
+#include "CL\cl.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+#pragma comment(lib,"OpenCL.lib")
+
+#define CL_VERBOSE
+void openclRetTackle(cl_int retValue, char* processInfo){
+	if(retValue!=CL_SUCCESS){
+#if (defined CL_DEBUG) || (defined CL_VERBOSE)
+		printf("%s Error!\n",processInfo);
+#endif
+		exit(-1);
+	}else{
+#ifdef CL_VERBOSE
+		printf("%s Success!\n",processInfo);
+#endif
+	}
+}
+
+cl_platform_id cpPlatform;
+cl_device_id cdDevice;
+cl_context cxGPUContext;
+cl_command_queue cqCommandQueue;
+
+
+int openclInit()
+{
+	cl_int ret;
+	//得到平台ID
+	openclRetTackle( clGetPlatformIDs(1, &cpPlatform, NULL), "clGetPlatFormIDs");
+	//得到GPU设备ID
+	openclRetTackle( clGetDeviceIDs(cpPlatform, CL_DEVICE_TYPE_GPU,1,&cdDevice,NULL), "clGetDeviceIDs");
+	//获取GPU设备上下文
+	cxGPUContext = clCreateContext(0, 1, &cdDevice, NULL, NULL, &ret);
+	openclRetTackle( ret , "clCreateContext" );
+	//开辟任务队列
+	cqCommandQueue = clCreateCommandQueue(cxGPUContext, cdDevice, 0, &ret);
+	openclRetTackle( ret , "clCreateCommandQueue");
+	return CL_SUCCESS;
+}
+
+int run()
+{
+	openclInit();	
+	system("pause");
+	return 0;
+}
+
+
+ 
+<span style="font-family:Microsoft YaHei;font-size:18px;">//#include "stdafx.h"
+#include <stdio.h>
+#include <vector>
+#include <CL/cl.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+
+#pragma comment(lib,"OpenCL.lib")
+
+int print_device()
+{
+	cl_int err;
+	cl_uint num;
+	err = clGetPlatformIDs(0, 0, &num);
+	if(err != CL_SUCCESS) 
+	{
+		std::cerr << "Unable to get platforms\n";
+		return 0;
+	}
+	std::vector<cl_platform_id> platforms(num);
+	err = clGetPlatformIDs(num, &platforms[0], &num);
+	if(err != CL_SUCCESS)
+	{
+		std::cerr << "Unable to get platform ID\n";
+		return 0;
+	}
+
+	cl_context_properties prop[] = { CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>(platforms[0]), 0 };
+	cl_context context = clCreateContextFromType(prop, CL_DEVICE_TYPE_DEFAULT, NULL, NULL, NULL);
+	if(context == 0)
+	{
+		std::cerr << "Can't create OpenCL context\n";
+		return 0;
+	}
+
+	size_t cb;
+	clGetContextInfo(context, CL_CONTEXT_DEVICES, 0, NULL, &cb);
+	std::vector<cl_device_id> devices(cb / sizeof(cl_device_id));
+	clGetContextInfo(context, CL_CONTEXT_DEVICES, cb, &devices[0], 0);
+
+	clGetDeviceInfo(devices[0], CL_DEVICE_NAME, 0, NULL, &cb);
+	std::string devname;
+	devname.resize(cb);
+	clGetDeviceInfo(devices[0], CL_DEVICE_NAME, cb, &devname[0], 0);
+	std::cout << "Device: " << devname.c_str() << "\n";
+
+	clReleaseContext(context);
+	return 0;
+
+}
+
+cl_program load_program(cl_context context, const char* filename)
+{
+	std::ifstream in(filename, std::ios_base::binary);
+	if(!in.good()) 
+	{
+		return 0;
+
+	}// get file length
+	in.seekg(0, std::ios_base::end);
+	size_t length = in.tellg();
+	in.seekg(0, std::ios_base::beg);
+
+	// read program source
+	std::vector<char> data(length + 1);
+	in.read(&data[0], length);
+	data[length] = 0;
+
+	// create and build program 
+	const char* source = &data[0];
+	cl_program program = clCreateProgramWithSource(context, 1, &source, 0, 0);
+	if(program == 0) 
+	{
+		return 0;
+	}
+	if(clBuildProgram(program, 0, 0, 0, 0, 0) != CL_SUCCESS) 
+	{
+		return 0;
+	}
+	return program;
+}
+int main()
+{
+	print_device();
+	cl_int err;
+	cl_uint num;
+	err = clGetPlatformIDs(0, 0, &num);
+	if(err != CL_SUCCESS) 
+	{
+		std::cerr << "Unable to get platforms\n";
+		return 0;
+	}
+
+	std::vector<cl_platform_id> platforms(num);
+	err = clGetPlatformIDs(num, &platforms[0], &num);
+	if(err != CL_SUCCESS) 
+	{
+		std::cerr << "Unable to get platform ID\n";
+		return 0;
+	}
+	cl_context_properties prop[] = { CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>(platforms[0]), 0 };
+	cl_context context = clCreateContextFromType(prop, CL_DEVICE_TYPE_DEFAULT, NULL, NULL, NULL);
+	if(context == 0) 
+	{
+		std::cerr << "Can't create OpenCL context\n";
+		return 0;
+	}
+
+	size_t cb;
+	clGetContextInfo(context, CL_CONTEXT_DEVICES, 0, NULL, &cb);
+	std::vector<cl_device_id> devices(cb / sizeof(cl_device_id));
+	clGetContextInfo(context, CL_CONTEXT_DEVICES, cb, &devices[0], 0);
+
+	clGetDeviceInfo(devices[0], CL_DEVICE_NAME, 0, NULL, &cb);
+	std::string devname;
+	devname.resize(cb);
+	clGetDeviceInfo(devices[0], CL_DEVICE_NAME, cb, &devname[0], 0);
+	std::cout << "Device: " << devname.c_str() << "\n";
+
+	cl_command_queue queue = clCreateCommandQueue(context, devices[0], 0, 0);
+	if(queue == 0)
+	{
+		std::cerr << "Can't create command queue\n";
+		clReleaseContext(context);
+		return 0;
+	}
+
+	const int DATA_SIZE = 1048576;
+	std::vector<float> a(DATA_SIZE), b(DATA_SIZE), res(DATA_SIZE);
+	for(int i = 0; i < DATA_SIZE; i++) 
+	{
+		a[i] = std::rand();
+		b[i] = std::rand();
+	}
+
+	cl_mem cl_a = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * DATA_SIZE, &a[0], NULL);
+	cl_mem cl_b = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * DATA_SIZE, &b[0], NULL);
+	cl_mem cl_res = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(cl_float) * DATA_SIZE, NULL, NULL);
+	if(cl_a == 0 || cl_b == 0 || cl_res == 0)
+	{
+		std::cerr << "Can't create OpenCL buffer\n";
+		clReleaseMemObject(cl_a);
+		clReleaseMemObject(cl_b);
+		clReleaseMemObject(cl_res);
+		clReleaseCommandQueue(queue);
+		clReleaseContext(context);
+		return 0;
+	}
+
+	cl_program program = load_program(context, "..\\shader.txt");
+	if(program == 0) 
+	{
+		std::cerr << "Can't load or build program\n";
+		clReleaseMemObject(cl_a);
+		clReleaseMemObject(cl_b);
+		clReleaseMemObject(cl_res);
+		clReleaseCommandQueue(queue);
+		clReleaseContext(context);
+		return 0;
+	}
+	cl_kernel adder = clCreateKernel(program, "adder", 0);
+	if(adder == 0)
+	{
+		std::cerr << "Can't load kernel\n";
+		clReleaseProgram(program);
+		clReleaseMemObject(cl_a);
+		clReleaseMemObject(cl_b);
+		clReleaseMemObject(cl_res);
+		clReleaseCommandQueue(queue);
+		clReleaseContext(context);
+		return 0;
+	}
+
+	clSetKernelArg(adder, 0, sizeof(cl_mem), &cl_a);
+
+	clSetKernelArg(adder, 1, sizeof(cl_mem), &cl_b);
+
+	clSetKernelArg(adder, 2, sizeof(cl_mem), &cl_res);
+
+	size_t work_size = DATA_SIZE;
+
+	err = clEnqueueNDRangeKernel(queue, adder, 1, 0, &work_size, 0, 0, 0, 0);
+	if(err == CL_SUCCESS)
+	{
+
+		err = clEnqueueReadBuffer(queue, cl_res, CL_TRUE, 0, sizeof(float) * DATA_SIZE, &res[0], 0, 0, 0);
+	}
+	if(err == CL_SUCCESS)
+	{
+		bool correct = true;
+		for(int i = 0; i < DATA_SIZE; i++) 
+		{
+			if(a[i] + b[i] != res[i])
+			{
+				correct = false;
+				break;
+			}
+		}
+		if(correct) 
+		{
+
+			std::cout << "Data is correct\n";
+		}
+		else 
+		{
+
+			std::cout << "Data is incorrect\n";
+
+		}
+	}
+
+	else 
+	{
+		std::cerr << "Can't run kernel or read back data\n";
+	}
+
+
+	clReleaseKernel(adder);
+	clReleaseProgram(program);
+	clReleaseMemObject(cl_a);
+	clReleaseMemObject(cl_b);
+	clReleaseMemObject(cl_res);
+	clReleaseCommandQueue(queue);
+	clReleaseContext(context);	
+	return 0;
+
+}</span>
+ 
+ 
+需要使用的数据：
+ 
+shader.txt
+<span style="font-family:Microsoft YaHei;font-size:18px;">__kernel void adder(__global const float* a, __global const float* b, __global float* result)
+{
+    int idx = get_global_id(0);
+    result[idx] = a[idx] + b[idx];
+}</span>
+ 
+
+

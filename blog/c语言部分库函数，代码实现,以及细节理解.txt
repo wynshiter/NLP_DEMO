@@ -1,0 +1,138 @@
+content
+
+
+
+ 代码来自：
+ 
+http://blog.csdn.net/v_JULY_v
+ 
+ 
+//得9 分
+//为了实现链式操作，将目的地址返回，加2 分！
+char * strcpy( char *strDest, const char *strSrc )
+{
+assert( (strDest != NULL) && (strSrc != NULL) );
+char *address = strDest;
+while( (*strDest++ = * strSrc++) != '/0' );
+return address;
+}
+
+//得10 分，基本上所有的情况，都考虑到了
+//如果有考虑到源目所指区域有重叠的情况，加1 分！
+char * strcpy( char *strDest, const char *strSrc )
+{
+if(strDest == strSrc) { return strDest; }
+assert( (strDest != NULL) && (strSrc != NULL) );
+char *address = strDest;
+while((*strDest++ = *strSrc++)!='/0');
+return address;
+}
+
+
+ 
+ 
+strncpy 是 C语言的函数之一，来自 C语言标准库，定义于 string.h，char *strncpy(char *destin, char *source, int maxlen)，把src所指由NULL结束的字符串的前n个字节复制到dest所指的数组中。
+char *strncpy(char *strDes, const char *strSrc, unsigned int count)
+{
+assert(strDes != NULL && strSrc != NULL);
+char *address = strDes;
+while (count-- && *strSrc != '/0')
+*strDes++ = *strSrc++;
+*strDes = '/0';
+return address;
+}
+ 
+ 
+ 
+strcpy和memcpy都是标准C库函数，它们有下面特点：
+strcpy提供了字符串的复制。即strcpy只用于字符串复制，并且它不仅复制字符串内容外，还会复制字符串的结束符。
+strcpy的函数原型是：char* strcpy(char* dest, const char* src);
+ 
+memcpy只提供一般的内存复制，即memcpy对于需要复制的内容没有限制，因此用途更广。
+memcpy的函数原型是：void *memcpy(void *dest,  const char* src,  size_t count);
+ 
+  char *strcpy(char *dest, const char *src)  {     if((src == NULL) || (dest == NULL))      {          return NULL;     }
+      char *strdest = dest; // 保存目标字符串的首地址     while((*dest++ = *str) != '\0');
+     return strdest;
+ }
+
+
+ 
+ 
+
+
+void *memcpy(void *memTo, const char *memFrom, size_t size)
+{
+     if((memTo == NULL) || (memFrom == NULL))
+     {
+          return NULL;
+     }
+     char *tempFrom = (char *)memFrom; //保存memFrom的首地址     char *tempTo = (char *)memTo; //保存memTo的首地址      while(size-- > 0)
+     {
+          *tempTo++ = *tempFrom++;
+     }
+     return memTo;
+}
+
+
+ 
+strcpy 和 memcpy主要有以下三方面的区别：
+1、复制的内容不同。strcpy只能复制字符串，而memcpy可以复制任意内容，例如字符串、整型、结构体、类等。
+2、复制的方法不同。strcpy不需要指定长度，它遇到被复制字符串的结束符"\0”才结束，所以容易溢出。memcpy则是根据第3个参数决定复制的长度。
+3、用途不同。通常在复制字符串时用strcpy，而需要复制其它类型的数据是用memcpy。
+ 
+memcpy 和 memmove 都是C语言中的库函数，在库函数 string.h中，其原型相似，它们都是从src所指向的内存中复制count个字节到dest所指内存中。并返回dest的值。
+当源内存区域 和 目标内存区域无交叉重叠时，两者的结果是一样的，但如果有交叉呢？
+memcpy是从src的其实部分开始复制，所以虽然第一种情况下没有问题，但如果遇到第二种情况，则会发生错误，交叉部分的src内容就会被覆盖掉了。
+而memmove则由于采用不同的复制机制，所以可以正确处理第二种情况。
+ 
+ 
+
+
+void *memmove(void *dst,const void *src,int n)
+{
+     char *dp = (char *)dst;
+     char *sp = (char *)src; 
+     assert((src!=0)&&(dst!=0)&&(n>0));//not　null 
+     //非重叠 
+      //dp < sp 
+     //dp > (sp+n)     if(sp>dp||(sp+n)<dp)
+     { 
+         while(n--) 
+             *(dp++) = *(sp++);
+         *dp = '\0';
+     }
+     else if(sp<dp)//重叠 (此时条件 sp<dp<(sp+n))如果sp==dp则快速的返回     {//反向拷贝            sp += n; 
+         dp += n; 
+         *dp = '\0'; 
+         while(n--)
+            *(--dp) = *(--sp); 
+     }
+     return dst;
+}       
+
+
+ 
+在很多库函数上看到使用了assert()函数，assert函数的作用是计算表达式expression ，如果其值为假（即为0），那么它先向stderr打印一条错误信息，然后调用abort()来终止进程。
+函数名: abort
+功 能: 异常终止一个进程
+描述：abort()函数首先解除进程对SIGABRT信号的阻止，然后向调用进程发送该信号。abort()函数会导致进程的异常终止除非SIGABRT信号被捕捉并且信号处理句柄没有返回。
+abort()函数导致所有的流被关闭和冲洗。
+abort()函数没有返回值：void abort(void);
+用 法: void abort(void);
+程序例:
+#include <stdio.h>
+#include <stdlib.h>
+int main(void) 
+{ 
+printf("Calling abort()\n");
+abort();
+return 0; /* This is never reached */
+ }
+
+
+
+
+ 
+
+

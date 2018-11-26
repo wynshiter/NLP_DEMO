@@ -1,0 +1,727 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/56979166				
+
+
+
+第十三章 全文检索
+这一章开始介绍 全文检索 ：怎样对全文字段(full-text fields)进行检索以找到相关度最高的文档。
+全文检索最重要的两个方面是：
+
+相关度(Relevance)
+根据文档与查询的相关程度对结果集进行排序的能力。相关度可以使用TF/IDF、地理位置相近程度、模糊相似度或其他算法计算。
+分析(Analysis)
+将一段文本转换为一组唯一的、标准化了的标记(token)，用以(a)创建倒排索引，(b)查询倒排索引。
+
+注意，一旦提到相关度和分析，指的都是查询(queries)而非过滤器(filters)。
+基于短语 vs. 全文
+虽然所有的查询都会进行相关度计算，但不是所有的查询都有分析阶段。而且像bool或function_score这样的查询并不在文本字段执行。文本查询可以分为两大类：
+1. 基于短语(Term-based)的查询：
+像term或fuzzy一类的查询是低级查询，它们没有分析阶段。这些查询在单一的短语上执行。例如对单词'Foo'的term查询会在倒排索引里精确地查找'Foo'这个词，并对每个包含这个单词的文档计算TF/IDF相关度'_score'。
+牢记term查询只在倒排查询里精确地查找特定短语，而不会匹配短语的其它变形，如foo或FOO。不管短语怎样被加入索引，都只匹配倒排索引里的准确值。如果你在一个设置了'not_analyzed'的字段为'["Foo", "Bar"]'建索引，或者在一个用'whitespace'解析器解析的字段为'Foo Bar'建索引，都会在倒排索引里加入两个索引'Foo'和'Bar'。
+2. 全文(Full-text)检索
+match和query_string这样的查询是高级查询，它们会对字段进行分析：
+
+如果检索一个'date'或'integer'字段，它们会把查询语句作为日期或者整数格式数据。
+如果检索一个准确值('not_analyzed')字符串字段，它们会把整个查询语句作为一个短语。
+如果检索一个全文('analyzed')字段，查询会先用适当的解析器解析查询语句，产生需要查询的短语列表。然后对列表中的每个短语执行低级查询，合并查询结果，得到最终的文档相关度。 
+我们将会在后续章节讨论这一过程的细节。
+
+我们很少需要直接使用基于短语的查询。通常我们会想要检索全文，而不是单独的短语，使用高级的全文检索会更简单（全文检索内部最终还是使用基于短语的查询）。
+
+13.1 匹配查询
+不管搜索什么内容，match查询是首先需要接触的查询。它是一个高级查询，意味着match查询知道如何更好的处理全文检索和准确值检索。
+这也就是说，match查询的一个主要用途是进行全文搜索。通过一个小例子来看一下全文搜索是如何工作的。
+索引一些数据
+首先，我们使用bulk API来创建和索引一些文档：
+DELETE /my_index <1>
+
+PUT /my_index_second
+{ "settings": { "number_of_shards": 1 }} <2>
+
+POST /my_index/my_type/_bulk
+{ "index": { "_id": 1 }}
+{ "title": "The quick brown fox" }
+{ "index": { "_id": 2 }}
+{ "title": "The quick brown fox jumps over the lazy dog" }
+{ "index": { "_id": 3 }}
+{ "title": "The quick brown fox jumps over the quick dog" }
+{ "index": { "_id": 4 }}
+{ "title": "Brown fox brown dog" }
+
+<1> 删除已经存在的索引(如果索引存在) 
+<2> 然后，关联失效这一节解释了为什么我们创建该索引的时候只使用一个主分片。
+单词查询
+第一个例子解释了当使用match查询进行单词全文搜索时发生了什么：
+GET /my_index_second/my_type/_search
+{
+    "query": {
+        "match": {
+            "title": "QUICK!"
+        }
+    }
+}
+
+Elasticsearch通过下面的步骤执行match查询：
+
+检查field类型 
+title字段是一个字符串(analyzed)，所以该查询字符串也需要被分析(analyzed)
+分析查询字符串 
+查询词QUICK!经过标准分析器的分析后变成单词quick。因为我们只有一个查询词，因此match查询可以以一种低级别term查询的方式执行。
+找到匹配的文档 
+term查询在倒排索引中搜索quick，并且返回包含该词的文档。在这个例子中，返回的文档是1，2，3。
+为每个文档打分 
+term查询综合考虑词频（每篇文档title字段包含quick的次数）、逆文档频率（在全部文档中title字段包含quick的次数）、包含quick的字段长度（长度越短越相关）来计算每篇文档的相关性得分_score。（更多请见相关性介绍）
+
+这个过程之后我们将得到以下结果（简化后）：
+"hits": [
+ {
+    "_id":      "1",
+    "_score":   0.5, <1>
+    "_source": {
+       "title": "The quick brown fox"
+    }
+ },
+ {
+    "_id":      "3",
+    "_score":   0.44194174, <2>
+    "_source": {
+   "title": "The quick brown fox jumps over the quick dog"
+    }
+ },
+ {
+    "_id":      "2",
+    "_score":   0.3125, <2>
+    "_source": {
+       "title": "The quick brown fox jumps over the lazy dog"
+    }
+ }
+]
+
+<1> 文档1最相关，因为 title 最短，意味着quick在语义中起比较大的作用。 
+<2> 文档3比文档2更相关，因为在文档3中quick出现了两次。
+多词查询
+如果一次只能查询一个关键词，全文检索将会很不方便。幸运的是，用match查询进行多词查询也很简单：
+GET /my_index_second/my_type/_search
+{
+    "query": {
+        "match": {
+            "title": "BROWN DOG!"
+        }
+    }
+}
+
+上面这个查询返回以下结果集：
+{
+  "hits": [
+     {
+        "_id":      "4",
+        "_score":   0.73185337, <1>
+        "_source": {
+           "title": "Brown fox brown dog"
+        }
+     },
+     {
+        "_id":      "2",
+        "_score":   0.47486103, <2>
+        "_source": {
+           "title": "The quick brown fox jumps over the lazy dog"
+        }
+     },
+     {
+        "_id":      "3",
+        "_score":   0.47486103, <2>
+        "_source": {
+           "title": "The quick brown fox jumps over   the quick dog"
+        }
+     },
+     {
+        "_id":      "1",
+        "_score":   0.11914785, <3>
+        "_source": {
+           "title": "The quick brown fox"
+        }
+     }
+  ]
+}
+
+<1> 文档4的相关度最高，因为包含两个”brown”和一个”dog”。
+<2> 文档2和3都包含一个”brown”和一个”dog”，且’title’字段长度相同，所以相关度相等。
+<3> 文档1只包含一个”brown”，不包含”dog”，所以相关度最低。
+因为match查询需要查询两个关键词："brown"和"dog"，在内部会执行两个term查询并综合二者的结果得到最终的结果。match的实现方式是将两个term查询放入一个bool查询，bool查询在之前的章节已经介绍过。
+重要的一点是，'title'字段包含至少一个查询关键字的文档都被认为是符合查询条件的。匹配的单词数越多，文档的相关度越高。
+提高精度
+匹配包含任意个数查询关键字的文档可能会得到一些看似不相关的结果，这是一种霰弹策略(shotgun approach)。然而我们可能想得到包含所有查询关键字的文档。换句话说，我们想得到的是匹配'brown AND dog'的文档，而非'brown OR dog'。
+match查询接受一个'operator'参数，默认值为or。如果要求所有查询关键字都匹配，可以更改参数值为and：
+GET /my_index/my_type/_search
+{
+    "query": {
+        "match": {
+            "title": {      <1>
+                "query":    "BROWN DOG!",
+                "operator": "and"
+            }
+        }
+    }
+}
+
+<1> 为了加入'operator'参数，match查询的结构有一些不同。
+这个查询会排除文档1，因为文档1只包含了一个查询关键词。
+控制精度
+在 all 和 any 之间的选择有点过于非黑即白。如果用户指定了5个查询关键字，而一个文档只包含了其中的4个？将'operator'设置为'and'会排除这个文档。
+有时这的确是用户想要的结果。但在大多数全文检索的使用场景下，用户想得到相关的文档，排除那些不太可能相关的文档。换句话说，我们需要介于二者之间的选项。
+match查询有'minimum_should_match'参数，参数值表示被视为相关的文档必须匹配的关键词个数。参数值可以设为整数，也可以设置为百分数。因为不能提前确定用户输入的查询关键词个数，使用百分数也很合理。
+GET /my_index/my_type/_search
+{
+  "query": {
+    "match": {
+      "title": {
+        "query":                "quick brown dog",
+        "minimum_should_match": "75%"
+      }
+    }
+  }
+}
+
+当'minimum_should_match'被设置为百分数时，查询进行如下：在上面的例子里，'75%'会被下舍为'66.6%'，也就是2个关键词。不论参数值为多少，进入结果集的文档至少应匹配一个关键词。
+[提示]
+'minimum_should_match'参数很灵活，根据用户输入的关键词个数，可以采用不同的匹配规则。
+要全面理解match查询是怎样处理多词查询，我们需要了解怎样用bool查询合并多个查询。
+
+13.2 组合查询
+在《组合过滤》中我们讨论了怎样用布尔过滤器组合多个用and, or, and not逻辑组成的过滤子句，在查询中, 布尔查询充当着相似的作用，但是有一个重要的区别。
+过滤器会做一个判断: 是否应该将文档添加到结果集? 然而查询会做更精细的判断. 他们不仅决定一个文档是否要添加到结果集，而且还要计算文档的相关性（relevant）.
+像过滤器一样, 布尔查询接受多个用must, must_not, and should的查询子句.  例:
+GET /my_index/my_type/_search
+{
+  "query": {
+    "bool": {
+      "must":     { "match": { "title": "quick" }},
+      "must_not": { "match": { "title": "lazy"  }},
+      "should": [
+                  { "match": { "title": "brown" }},
+                  { "match": { "title": "dog"   }}
+      ]
+    }
+  }
+}
+
+在前面的查询中，凡是满足title字段中包含quick，但是不包含lazy的文档都会在查询结果中。到目前为止，布尔查询的作用非常类似于布尔过滤的作用。
+当should过滤器中有两个子句时不同的地方就体现出来了，下面例子就可以体现：一个文档不需要同时包含brown和dog，但如果同时有这两个词，这个文档的相关性就更高:
+{
+  "hits": [
+     {
+        "_id":      "3",
+        "_score":   0.70134366, <1>
+        "_source": {
+           "title": "The quick brown fox jumps over the quick dog"
+        }
+     },
+     {
+        "_id":      "1",
+        "_score":   0.3312608,
+        "_source": {
+           "title": "The quick brown fox"
+        }
+     }
+  ]
+}
+
+<1> 文档3的得分更高，是因为它同时包含了brown 和 dog。
+得分计算
+布尔查询通过把所有符合must 和 should的子句得分加起来，然后除以must 和 should子句的总数为每个文档计算相关性得分。
+must_not子句并不影响得分；他们存在的意义是排除已经被包含的文档。
+精度控制
+所有的 must 子句必须匹配, 并且所有的 must_not 子句必须不匹配, 但是多少 should 子句应该匹配呢? 默认的，不需要匹配任何 should 子句，一种情况例外：如果没有must子句，就必须至少匹配一个should子句。
+像我们控制match查询的精度一样，我们也可以通过minimum_should_match参数控制多少should子句需要被匹配，这个参数可以是正整数，也可以是百分比。
+GET /my_index/my_type/_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "title": "brown" }},
+        { "match": { "title": "fox"   }},
+        { "match": { "title": "dog"   }}
+      ],
+      "minimum_should_match": 2 <1>
+    }
+  }
+}
+
+<1> 这也可以用百分比表示
+结果集仅包含title字段中有"brown"和 "fox", "brown"和 "dog", 或 "fox" 和"dog"的文档。如果一个文档包含上述三个条件，那么它的相关性就会比其他仅包含三者中的两个条件的文档要高。
+
+13.3  match匹配怎么当成布尔查询来使用
+到现在为止，你可能已经意识到在一个布尔查询中多字段match查询仅仅包裹了已经生成的term查询。通过默认的or操作符，每个term查询都会像一个should子句一样被添加，只要有一个子句匹配就可以了。下面的两个查询是等价的：
+{
+    "match": { "title": "brown fox"}
+}
+
+
+{
+  "bool": {
+    "should": [
+      { "term": { "title": "brown" }},
+      { "term": { "title": "fox"   }}
+    ]
+  }
+}
+
+通过and操作符，所有的term查询会像must子句一样被添加，因此所有的子句都必须匹配。下面的两个查询是等价的：
+{
+    "match": {
+        "title": {
+            "query":    "brown fox",
+            "operator": "and"
+        }
+    }
+}
+
+
+{
+  "bool": {
+    "must": [
+      { "term": { "title": "brown" }},
+      { "term": { "title": "fox"   }}
+    ]
+  }
+}
+
+如果minimum_should_match参数被指定，match查询就直接被转换成一个bool查询，下面两个查询是等价的：
+{
+    "match": {
+        "title": {
+            "query":       "quick brown fox",
+            "minimum_should_match": "75%"
+        }
+    }
+}
+
+
+{
+  "bool": {
+    "should": [
+      { "term": { "title": "brown" }},
+      { "term": { "title": "fox"   }},
+      { "term": { "title": "quick" }}
+    ],
+    "minimum_should_match": 2      <1>
+  }
+}
+
+<1>因为只有三个子句，所以 minimum_should_match参数在match查询中的值75%就下舍到了2。3个should子句中至少有两个子句匹配。
+当然，我们通常写这些查询类型的时候还是使用match查询的，但是理解match查询在内部是怎么工作的可以让你在任何你需要使用的时候更加得心应手。有些情况仅仅使用一个match查询是不够的，比如给某些查询词更高的权重。这种情况我们会在下一节看个例子。
+
+13.4 提高查询得分
+当然，bool查询并不仅仅是组合多个简单的一个词的match查询。他可以组合任何其他查询，包括bool查询。bool查询通常会通过组合几个不同查询的得分为每个文档调整相关性得分。
+假设想查找关于”full-text search”的文档，但是我们又想给涉及到“Elasticsearch”或者“Lucene”的文档更高的权重。我们的用意是想涉及到”Elasticsearch” 或者 “Lucene”的文档的相关性得分会比那些没有涉及到的文档的得分要高，也就是说这些文档会出现在结果集更靠前的位置。
+一个简单的bool查询允许我们写出像下面一样的非常复杂的逻辑：
+GET /_search
+{
+    "query": {
+        "bool": {
+            "must": {
+                "match": {
+                    "content": { (1)
+                        "query":    "full text search",
+                        "operator": "and"
+                    }
+                }
+            },
+            "should": [ (2)
+                { "match": { "content": "Elasticsearch" }},
+                { "match": { "content": "Lucene"        }}
+            ]
+        }
+    }
+}
+
+
+content字段必须包含full,text,search这三个单词。
+如果content字段也包含了“Elasticsearch”或者“Lucene”，则文档会有一个更高的得分。
+
+匹配的should子句越多，文档的相关性就越强。到目前为止一切都很好。但是如果我们想给包含“Lucene”一词的文档比较高的得分，甚至给包含“Elasticsearch”一词更高的得分要怎么做呢？
+同时可以在任何查询子句中指定一个boost值来控制相对权重，默认值为1。一个大于1的boost值可以提高查询子句的相对权重。因此我们可以像下面一样重写之前的查询：
+GET /_search
+{
+    "query": {
+        "bool": {
+            "must": {
+                "match": {  (1)
+                    "content": {
+                        "query":    "full text search",
+                        "operator": "and"
+                    }
+                }
+            },
+            "should": [
+                { "match": {
+                    "content": {
+                        "query": "Elasticsearch",
+                        "boost": 3 (2)
+                    }
+                }},
+                { "match": {
+                    "content": {
+                        "query": "Lucene",
+                        "boost": 2 (3)
+                    }
+                }}
+            ]
+        }
+    }
+}
+
+
+这些查询子句的boost值为默认值1。
+这个子句是最重要的，因为他有最高的boost值。
+这个子句比第一个查询子句的要重要，但是没有“Elasticsearch”子句重要。
+
+
+注意：
+
+boost参数用于提高子句的相对权重（boost值大于1）或者降低子句的相对权重（boost值在0-1之间），但是提高和降低并非是线性的。换句话说，boost值为2并不能够使结果变成两倍的得分。
+另外，boost值被使用了以后新的得分是标准的。每个查询类型都会有一个独有的标准算法，算法的详细内容并不在本书的范畴。简单的概括一下，一个更大的boost值可以得到一个更高的得分。
+如果你自己实现了没有基于TF/IDF的得分模型，但是你想得到更多的对于提高得分过程的控制，你可以使用function_score查询来调整一个文档的boost值而不用通过标准的步骤。
+
+
+
+13.5 分析控制
+查询只能查找在倒排索引中出现的词，所以确保在文档索引的时候以及字符串查询的时候使用同一个分析器是很重要的，为了查询的词能够在倒排索引中匹配到。
+尽管我们说文档中每个字段的分析器是已经定好的。但是字段可以有不同的分析器，通过给那个字段配置一个指定的分析器或者直接使用类型，索引，或节点上的默认分析器。在索引的时候，一个字段的值会被配置的或者默认的分析器分析。
+举个例子，让我们添加一个字段到my_index：
+PUT /my_index/_mapping/my_type
+{
+    "my_type": {
+        "properties": {
+            "english_title": {
+                "type":     "string",
+                "analyzer": "english"
+            }
+        }
+    }
+}
+
+现在我们可以通过analyzeAPI分析Foxes词来比较english_title字段中的值以及title字段中的值在创建索引的时候是怎么被分析的：
+GET /my_index/_analyze?field=my_type.title   <1>
+Foxes
+
+GET /my_index/_analyze?field=my_type.english_title <2>
+Foxes
+
+<1> 使用standard分析器的title字段将会返回词foxes。
+<2> 使用english分析器的english_title字段将会返回词fox。
+这意味着，如果我们为精确的词fox执行一个低级别的term查询，english_title字段会匹 配而title字段不会。
+像match查询一样的高级别的查询可以知道字段的映射并且能够在被查询的字段上使用正确的分析器。我们可以在validate-query API的执行中看到这个：
+GET /my_index/my_type/_validate/query?explain
+{
+    "query": {
+        "bool": {
+            "should": [
+                { "match": { "title":         "Foxes"}},
+                { "match": { "english_title": "Foxes"}}
+            ]
+        }
+    }
+}
+
+它会返回explanation：
+(title:foxes english_title:fox)
+
+match查询为每个字段使用合适的分析器用来确保在那个字段上可以用正确的格式查询这个词。
+默认分析器
+虽然我们可以在字段级别指定一个分析器，但是如果我们在字段级别没有指定分析器的话，那要怎么决定某个字段使用什么分析器呢？
+分析器可以在好几个地方设置。Elasticsearch会查找每个级别直到找到它可以使用的分析器。在创建索引的时候，Elasticsearch查找分析器的顺序如下：
+
+在映射文件中指定字段的analyzer，或者
+在文档的_analyzer字段上指定分析器，或者
+在映射文件中指定类型的默认分析器analyzer
+在索引映射文件中设置默认分析器default
+在节点级别设置默认分析器default
+standard分析器
+
+查找索引的时候，Elasticsearch查找分析器的顺序稍微有点不一样：
+
+在查询参数中指定analyzer，或者
+在映射文件中指定字段的analyzer，或者
+在映射文件中指定类型的默认分析器analyzer
+在索引映射文件中设置默认分析器default
+在节点级别设置默认分析器default
+standard分析器
+
+
+提示：
+上面列表中用斜体字的两行突出了创建索引以及查询索引的时候Elasticsearch查找分析器的区别。_analyzer字段允许你为每个文档指定默认的分析器(比如, english, french, spanish)，虽然在查询的时候指定analyzer参数，但是在一个索引中处理多种语言这并不是一个好方法，因为在多语言环境下很多问题会暴露出来。
+
+有时候，在创建索引与查询索引的时候使用不同的分析器也是有意义的。举个例子：在创建索引的时候想要索引同义词 (比如, 出现quick的时候，我们也索引 fast, rapid, 和 speedy)。但是在查询索引的时候，我们不需要查询所有的同义词，我们只要查询用户输入的一个单词就可以了，它可以是quick, 
+fast, rapid, 或者 speedy。
+为了满足这种差异，Elasticsearch也支持index_analyzer 和 search_analyzer 参数，并且分析器被命名为default_index和default_search。
+把这些额外的参数考虑进去，Elasticsearch查找所有的分析器的顺序实际上像下面的样子：
+
+在映射文件中指定字段的index_analyzer，或者
+在映射文件中指定字段的analyzer，或者
+在文档的_analyzer字段上指定分析器，或者
+在映射文件中指定类型的创建索引的默认分析器index_analyzer
+在映射文件中指定类型的默认分析器analyzer
+在索引映射文件中设置创建索引的默认分析器default_index
+在索引映射文件中设置默认分析器default
+在节点级别设置创建索引的默认分析器default_index
+在节点级别设置默认分析器default
+standard分析器
+
+以及查询索引的时候:
+
+在查询参数中指定analyzer，或者
+在映射文件中指定字段的search_analyzer，或者
+在映射文件中指定字段的analyzer，或者
+在映射文件中指定类型的查询索引的默认分析器analyzer
+在索引映射文件中设置查询索引的默认分析器default_search
+在索引映射文件中设置默认分析器default_search
+在节点级别设置查询索引的默认分析器default_search
+在节点级别设置默认分析器default
+standard 分析器
+
+实际配置分析器
+可以指定分析器的地方实在是太多了，但实际上，指定分析器很简单。
+用索引配置，而不是用配置文件
+第一点要记住的是，尽管开始使用Elasticsearch仅仅只是为了一个简单的目的或者是一个应用比如日志，但很可能你会发现更多的案例，结局是在同一个集群中运行着好几个不同的应用。每一个索引都需要是独立的，并且可以被独立的配置。你不要想着给一个案例设置默认值，但是不得不重写他们来适配后面的案例。
+这个规则把节点级别的配置分析器方法排除在外了。另外，节点级别的分析器配置方法需要改变每个节点的配置文件并且重启每个节点，这将成为维护的噩梦。保持Elasticsearch持续运行并通过API来管理索引的设置是一个更好的方法。
+保持简便性
+大多数时间，你可以预先知道文档会包含哪些字段。最简单的方法是在你创建索引或者添加类型映射的时候为每一个全文检索字段设置分析器。虽然这个方法有点啰嗦，但是它可以很容易的看到哪个字段应用了哪个分析器。
+通常情况下，大部分的字符串字段是确切值not_analyzed字段（索引但不分析字段）比如标签，枚举，加上少数全文检索字段会使用默认的分析器，像standard 或者 english 或者其他语言。然后你可能只有一到两个字段需要定制分析：或许title字段需要按照你查找的方式去索引来支持你的查找。（指的是你查找的字符创用什么分析器，创建索引就用什么分析器）
+你可以在索引设置default分析器的地方为几乎所有全文检索字段设置成你想要的分析器，并且只要在一到两个字段指定专门的分析器。如果，在你的模型中，你每个类型都需要不同的分析器，那么在类型级别使用analyzer配置来代替。
+
+提示：
+一个普通的像日志一样的基于时间轴的工作流数据每天都得创建新的索引，忙着不断的创建索引。虽然这种工作流阻止你预先创建索引，但是你可以使用索引模板来指定新的索引的配置和映射。
+
+
+13.6 关联失效
+在讨论多字段检索中的更复杂的查询前，让我们顺便先解释一下为什么我们只用一个主分片来创建索引。
+有时有的新手会开一个问题说通过相关性排序没有效果，并且提供了一小段复制的结果：该用户创建了一些文档，执行了一个简单的查询，结果发现相关性较低的结果排在了相关性较高的结果的前面。
+为了理解为什么会出现这样的结果，我们假设用两个分片创建一个索引，以及索引10个文档，6个文档包含词 foo，这样可能会出现分片1中有3个文档包含 foo，分片2中也有三个文档包含 foo。换句话说，我们的文档做了比较好的分布式。
+在相关性介绍这一节，我们描述了Elasticsearch默认的相似算法，叫做词频率/反转文档频率（TF/IDF）。词频率是一个词在我们当前查询的文档的字段中出现的次数。出现的次数越多，相关性就越大。反转文档频率指的是该索引中所有文档数与出现这个词的文件数的百分比，词出现的频率越大，IDF越小。
+然而，由于性能问题，Elasticsearch不通过索引中所有的文档计算IDF。每个分片会为分片中所有的文档计算一个本地的IDF取而代之。
+因为我们的文档做了很好的分布式，每个分片的IDF是相同的。现在假设5个包含foo的文档在分片1中，以及其他6各文档在分片2中。在这个场景下，词foo在第一个分片中是非常普通的（因此重要性较小），但是在另一个分片中是很稀少的（因此重要性较高）。这些区别在IDF中就会产生不正确的结果。
+事实证明，这并不是一个问题。你索引越多的文档，本地IDF和全局IDF的区别就会越少。在实际工作的数据量下，本地IDF立刻能够很好的工作（With real-world 
+volumes of data, the local IDFs soon even out，不知道这么翻译合不合适）。所以问题不是因为关联失效，而是因为数据太少。
+为了测试的目的，对于这个问题，有两种方法可以奏效。第一种方法是创建一个只有一个主分片的索引，像我们介绍match查询那节一样做。如果你只有一个分片，那么本地IDF就是全局IDF。
+第二种方法是在你们请求中添加?search_type=dfs_query_then_fetch。dfs就是Distributed Frequency Search，并且它会告诉Elasticsearch检查每一个分片的本地IDF为了计算整个索引的全局IDF。
+
+第十四章 多字段搜索
+只有一个简单的match子句的查询是很少的。我们经常需要在一个或者多个字段中查询相同的或者不同的 查询字符串，意味着我们需要能够组合多个查询子句以及使他们的相关性得分有意义。
+或许我们在寻找列夫·托尔斯泰写的一本叫《战争与和平》的书。或许我们在Elasticsearch的文档中查找minimum should match，它可能在标题中，或者在一页的正文中。或许我们查找名为John，姓为Smith的人。
+在这一章节，我们会介绍用于构建多个查询子句搜索的可能的工具，以及怎么样选择解决方案来应用到你特殊的场景。
+
+14.1 多重查询字段
+在明确的字段中的词查询是最容易处理的多字段查询。如果我们知道War and Peace是标题，Leo Tolstoy是作者，可以很容易的用match查询表达每个条件，并且用布尔查询组合起来：
+GET /_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "title":  "War and Peace" }},
+        { "match": { "author": "Leo Tolstoy"   }}
+      ]
+    }
+  }
+}
+
+布尔查询采用越多匹配越好的方法，所以每个match子句的得分会被加起来变成最后的每个文档的得分。匹配两个子句的文档的得分会比只匹配了一个文档的得分高。
+当然，没有限制你只能使用match子句：布尔查询可以包装任何其他的查询类型，包含其他的布尔查询，我们可以添加一个子句来指定我们更喜欢看被哪个特殊的翻译者翻译的那版书：
+GET /_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { "title":  "War and Peace" }},
+        { "match": { "author": "Leo Tolstoy"   }},
+        { "bool":  {
+          "should": [
+            { "match": { "translator": "Constance Garnett" }},
+            { "match": { "translator": "Louise Maude"      }}
+          ]
+        }}
+      ]
+    }
+  }
+}
+
+为什么我们把翻译者的子句放在一个独立的布尔查询中？所有的匹配查询都是should子句，所以为什么不把翻译者的子句放在和title以及作者的同一级？
+答案就在如何计算得分中。布尔查询执行每个匹配查询，把他们的得分加在一起，然后乘以匹配子句的数量，并且除以子句的总数。每个同级的子句权重是相同的。在前面的查询中，包含翻译者的布尔查询占用总得分的三分之一。如果我们把翻译者的子句放在和标题与作者同级的目录中，我们会把标题与作者的作用减少的四分之一。
+优选子句
+在先前的查询中我们可能不需要使每个子句都占用三分之一的权重。我们可能对标题以及作者比翻译者更感兴趣。我们需要调整查询来使得标题和作者的子句相关性更重要。
+最简单的方法是使用boost参数。为了提高标题和作者字段的权重，我们给boost参数提供一个比1高的值：
+GET /_search
+{
+  "query": {
+    "bool": {
+      "should": [
+        { "match": { <1>
+            "title":  {
+              "query": "War and Peace",
+              "boost": 2
+        }}},
+        { "match": { <1>
+            "author":  {
+              "query": "Leo Tolstoy",
+              "boost": 2
+        }}},
+        { "bool":  { <2>
+            "should": [
+              { "match": { "translator": "Constance Garnett" }},
+              { "match": { "translator": "Louise Maude"      }}
+            ]
+        }}
+      ]
+    }
+  }
+}
+
+
+标题和作者的boost值为2。
+嵌套的布尔查询的boost值为默认的1。 
+
+给boost参数一个最好的值可以通过试验和犯错来很容易的决定：设置一个boost值，执行测试查询，重复上述过程。一个合理的boost值在1-10之间，也可能15。更高的boost值影响会很小，因为分数是标准化得。
+
+14.2 单个查询字符串
+布尔查询是多重查询的支柱，它在多数情况下有用，尤其是当你能够将不同查询字符串映射到对应的单一字段时。
+问题在于，用户期望把他们所有的搜索项放到一个单独字段中去查询。并且期望这个应用能够得出他们想要的正确的结果。讽刺的是，多字段查询形式是一个高级的——它给用户呈现的形式是高级的，但是执行起来却特别简单。
+对于多词，多字段查询，没有一种简单的一个通用的途径。要获得最适合的结果，你必须对你的数据有足够的了解，并且知道如何使用合适的工具。
+了解你的数据
+当你唯一的用户输入一个单个查询字符串，你可能经常会遇到下面三个情形： 
+* Best fields 
+    当搜索一个代表概念的词时，例如“brown fox”，这两个词在一起比它们单独更有意义。而像‘title’，‘body’这些字段，会被认为之间存在竞争。文档在同一个字段上会有许多值，所以得分应该来自最匹配的字段。 
+* Most fields 
+    一个常用的微调相关性的方法就是为同样的数据索引到多个字段，每一个都有自己的解析链
+主要的字段可能包含他们的词根，同义词，和去掉音符或者重音符的词。它用来匹配尽可能多的文档。
+
+同一个文本可能会在其他字段建立索引以提供更加精确的匹配。一个字段可能包含非词根的版本，另一个是带着重音符的原词，第三个可能使用小招牌来提供相似词的信息
+
+这些字段作为匹配文档的增加相关性得分标记，匹配的字段越多，越好。
+
+* Cross fields 
+    对于一些实体对象，标识的信息可能在多个字段之间分布，每个字段组成是其一部分。如下所示。 
+    * Person： ‘first_name’、‘last_name’ 
+    * Book：‘title’、‘author’、‘description’ 
+    * Address：‘street’、‘city’、‘country’、‘postcode’ 
+    在这种情况下，我们想要找到在任何一个所列字段中找到尽可能多的词。我们需要把多个字段当成一个大的字段，然后在这个字段进行搜索，所有这些都是多词的，多字段的查询，但是每种都使用不同的策略
+
+14.3 最好的字段（Best fields）
+假如我们有一个网站，允许用户搜索博客信息，例如下面这两个文档：
+PUT /my_index/my_type/1
+{
+    "title": "Quick brown rabbits",
+    "body":  "Brown rabbits are commonly seen."
+}
+
+PUT /my_index/my_type/2
+{
+    "title": "Keeping pets healthy",
+    "body":  "My quick brown fox eats rabbits on a regular basis."
+}
+
+用户输入‘Brown fox’，点击搜索。提前我们不知道用户的搜索选项会被宰‘title’或‘body’字段找到，但是用户很有可能在搜索相关的单词。就人眼观察，显然文档2似乎是更好的匹配，因为两个单词被搜索的单词文档2都包含。
+现在运行下面的布尔查询：
+GET /my_index/my_type_second/_search
+{
+    "query": {
+        "bool": {
+            "should": [
+                { "match": { "title": "Brown fox" }},
+                { "match": { "body":  "Brown fox" }}
+            ]
+        }
+    }
+}
+
+结果如下：
+ "hits" : [ {
+  "_index" : "my_index_sencond",
+  "_type" : "my_type",
+  "_id" : "1",
+  "_score" : 0.029836398,
+  "_source" : {
+    "title" : "Quick brown rabbits",
+    "body" : "Brown rabbits are commonly seen."
+  }
+}, {
+  "_index" : "my_index_sencond",
+  "_type" : "my_type",
+  "_id" : "2",
+  "_score" : 0.01989093,
+  "_source" : {
+    "title" : "Keeping pets healthy",
+    "body" : "My quick brown fox eats rabbits on a regular basis."
+  }
+} ]
+
+我们发现，这个查询给出文档1的得分更高。
+为了理解这是为什么，考虑布尔查询计算得分的步骤： 
+1.它在should子句里运行两个匹配查询 
+2.它将两者得分相加 
+3.乘以总的匹配子句个数 
+4.除以总的子句个数
+文档1在两个字段中都包含‘brown’，因此匹配查询成功获得得分。文档2在body字段中包含‘brown’和‘fox’，但title字段却一个单词都不包含。从body得到的高分，加上从title得到的0分，乘以1/2（它会乘以匹配到文档数目/总文档数目），所以得分就低。
+　dis_max match查询
+现在我们使用dis_max查询或者Disjunction Max Query。Disjunction意思是或（conjunction意思是and）所以Disjunction Max Query查询简单的意思就是：返回任意一个查询匹配成功的文档，并且该文档得分最高：
+GET /my_index/my_type_second/_search
+{
+    "query": {
+        "dis_max": {
+            "queries": [
+                { "match": { "title": "Brown fox" }},
+                { "match": { "body":  "Brown fox" }}
+            ]
+        }
+    }
+}
+
+这样就返回了我们期望返回的文档了。
+
+14.4 调整Best Field 查询
+当用户将搜索内容改成“quick pets”，会发生什么？两个文档中都包含了quick，但是只有文档2中包含了pets。两个文档都没有在同一个字段中全部包含两个搜索词。
+一个简单的dis_max查询会挑选出最匹配的字段，并且忽略另外一个：
+
+{
+    "query": {
+        "dis_max": {
+            "queries": [
+                { "match": { "title": "Quick pets" }},
+                { "match": { "body":  "Quick pets" }}
+            ]
+        }
+    }
+}
+
+这个执行结果中，会得出两个相同得分的文档。
+
+我们期望同时出现在title字段和body字段的文档比只在一个字段出现搜索词的文档的得分更高，但是，显示并非如此。你需要记住的是：dis_max查询只是简单地使用单个匹配得分最高的查询而已。
+tie_breaker
+然而，同时把其他匹配语句的分数考虑在内也是可行的。你可以通过制定tie_breaker参数来实现
+    {
+        "query": {
+            "dis_max": {
+                "queries": [
+                    { "match": { "title": "Quick pets" }},
+                    { "match": { "body":  "Quick pets" }}
+                ],
+                "tie_breaker": 0.3
+            }
+        }
+    }
+
+tie_breaker参数会使dis_max查询的行为更像dis_max和bool的结合。它会按照下面计算得分：
+
+先获得最匹配的得分
+用tie_breaker乘以每个匹配语句的得分
+把它们加在一起，然后标准化
+
+通过tie_breaker，所有的匹配语句都会计算，并且最匹配语句得分最高
+
+tie_breaker的值可以设为0-1之间
+
+样例格式 
+ 
+
+

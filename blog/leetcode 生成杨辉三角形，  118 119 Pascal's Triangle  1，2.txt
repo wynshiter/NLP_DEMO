@@ -1,0 +1,102 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/47070727				
+
+
+
+
+Given numRows, generate the first numRows of Pascal's triangle.
+For example, given numRows = 5,
+Return 
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+
+
+解决方案：
+
+vector<vector<int>> generate(int numRows) {
+         vector<vector<int>> res = {};
+        for (int i = 0; i < numRows; i++) {
+            res.push_back(vector<int>(i + 1, 1));
+            for(int j = 1; j < i; j++) {
+                res[i][j] = (res[i - 1][j] + res[i - 1][j - 1]);
+            }
+        }
+        return res;
+
+    }
+
+
+Pascal's Triangle II 
+Total Accepted: 46342 
+Total Submissions: 157260                                   
+
+
+
+
+
+Given an index k, return the kth row of the Pascal's triangle.
+For example, given k = 3,
+Return [1,3,3,1]. 
+Note:
+Could you optimize your algorithm to use only O(k) extra space?
+
+
+我的解决方案：
+从没一行的倒数第二个算起，往前面逆推：
+
+ vector<int> getRow(int rowIndex) 
+    {
+        vector<int> result(rowIndex + 1, 1);
+        
+        for(int i = 1; i <= rowIndex; ++i)
+        {
+            for(int j = i - 1; j > 0; --j)
+            {
+                result[j] = result[j] + result[j - 1];
+            }
+        }
+        
+        return result;
+    }
+
+
+递归的解决方案：
+
+vector<int> getRow(int rowIndex) {
+    vector<int> result;
+
+    if (rowIndex == 0) {
+        result.push_back(1);
+
+        return result;
+    } else {
+        vector<int> vec = getRow(rowIndex - 1);
+        result.push_back(1);
+        for (size_t i = 0; i < vec.size() - 1; i++) {
+            result.push_back(vec[i] + vec[i+1]);
+        }
+        result.push_back(1);
+    }
+}
+
+
+
+python 解决方案：
+class Solution:
+# @param {integer} rowIndex
+# @return {integer[]}
+def getRow(self, rowIndex):
+    row = [1]
+    for i in range(1, rowIndex+1):
+        row = list(map(lambda x,y: x+y, [0]+row, row + [0]))
+    return row
+
+
+

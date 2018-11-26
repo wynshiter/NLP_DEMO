@@ -1,0 +1,171 @@
+content
+
+
+
+
+最近做一些集群的测试的工作，做服务器测试最根本就是要安装系统，曾经我们用十几个光驱并行安装光驱的日子过去了，自从有了pxe一两天搭建好一个集群不是梦！当然做多了集群的搭建工作最多的感受就是，其实运维工作谁都能做，关键是效率高不高的问题，pxe装机这个东西就是能极高提升我们效率的工具，下面我来分享一下整个搭建过程。
+1. 基建工作
+1.关闭防火墙
+
+a)service iptables stop 
+  b)service ip6tables stop 
+  c)chkconfig iptables off 
+  d)chkconfig ip6tables off
+
+2.关闭SELinux
+a)临时关闭SELinux(重启失效)：
+
+setenforce 0
+
+b)
+
+/etc/selinux/cofig    disabled
+
+2. 配置dhcp服务
+1.将/usr/share/doc/dhcp-4.1.1/dhcpd.conf.sample拷贝至/etc/dhcp/dhcpd.conf：
+
+cp /usr/share/doc/dhcp-4.1.1/dhcpd.conf.sample /etc/dhcp/dhcpd.conf
+
+并修改dhcpd.conf的内容：
+
+
+dns服务可以不配置；
+
+2.确保开机启动dhcpd服务：
+
+chkconfig dhcpd on
+
+3.启动dhcpd服务：
+
+service dhcpd start
+
+4.检查dhcpd服务是否已启动：
+
+ss -nul
+
+如果发现67端口被监听，则表示成功；
+
+3. 配置tftp服务
+由于tftp是瞬时服务进程，不能进行自我管理，需要通过超级服务进程进行管理，所以安装tftp-server时，超级服务进程程序xinetd被依赖。
+1.设置并确保xinetd开机启动：
+
+chkconfig xinetd on
+
+p.s. 如果没有tftp的话需要安装一下，执行yum –y search tftp查看系统是否安装tftp软件包，若没有安装，则执行yum –y install tftp tftp-service
+2.启动xinetd服务：
+
+service xinetd start
+
+查看是否开机启动
+
+chkconfig –list xinetd
+
+
+3.检测xinetd服务是否已启动：
+
+ss -nul
+
+如果发现69端口被监听，则表示成功；
+4.编辑/etc/xinetd.d/tftp文件，将”disable=yes”改为”disable=no”;
+5.测试tftp服务：
+
+a)新建test.txt，放到/var/lib/tftpboot/目录下，并在服务器本机进行测试。 
+  b)切换到根目录下，执行 tftp 192.168.1.205(服务器地址): 
+  tftp > get test.txt; 
+  tftp > quit;
+
+如果根目录下出现test.txt，则tftp服务搭建成功，删除测试文件test.txt;
+4. 配置nfs服务
+1.创建nfs目录：
+
+mkdir /nfsroot
+
+2.配置nfs服务：在/etc/exports末尾行中加入
+
+/nfsroot *(rw,wdelay,crossmnt,insecure,root_squash,no_subtree_check,fsid=0) 
+  并运行 
+  exportfs –a #使配置生效；
+
+3.启动rpcbind服务：
+
+chkconfig rpcbind on 
+  service rpcbind start
+
+4.启动nfs服务：
+
+chkconfig nfs on 
+  service nfs start
+
+5. 搭建本地yum源
+1.挂在镜像文件rhel6.5.iso 到 /mnt:
+
+mount -o loop /opt/rhel6.5.iso /mnt
+
+2.cd 到/etc/yum.repos.d 目录下建立以”.repo”结尾的文件，这里我建立的是rhel65.repo，内容如下：
+
+[rhel65] 
+  name=rhel65 
+  baseurl=file:///mnt 
+  enabled=1 
+  gpgcheck = 0 
+   #gpgkey = http://yum.zb/rhel65/RPM-GPG-KEY-redhat-release
+
+3.配置完成后用命令：
+
+yum clean all #进行刷新
+
+4.常用命令：
+
+a)yum install package1 安装指定的安装包package1 
+  b)yum groupinsall group1 安装程序组group1 
+  c)yum update package1 更新指定程序包package1 
+  d)yum check-update 检查可更新的程序 
+  e)yum upgrade package1 升级指定程序包package1 
+  f)yum groupupdate group1 升级程序组group1 
+  g)yum info package1 显示安装包信息package1 
+  h)yum list 显示所有已经安装和可以安装的程序包 
+  i)yum list package1 显示指定程序包安装情况package1 
+  j)yum remove  package1 删除程序包package1 
+  k)yum groupremove group1 删除程序组group1
+
+6. 制作kickstart.cfg文件
+1.请先搭建本地yum源；
+2.执行
+
+system-config-kickstart
+
+弹出kickstart.cfg制作界面。
+3.Basic Configuration（基础配置）
+
+4.Installation Method 安装方式
+ 
+此处选择nfs方式： 
+NFS Serve：nfs服务器ip 
+NFS Directory：/nfsroot
+5.Boot Loader Options 默认
+6.配置分区信息
+ 
+要指定分区，使用sda，其中/boot大小为200M，/的大小为剩余空间
+7.Network Configuration 将网卡eth0 设置为dhcp模式
+
+8.Authentication默认
+9.Firewall Configuration 关闭防火墙，关闭selinux
+
+10.Display Configuration默认
+11.Package Selection 
+如果没有包显示，请先搭建本地yum源，然后在选包；
+12.Pre-Installation Script和Post-Installation Script均默认设置。
+13.点击File–>Save–>修改文件名为centos-6.5-ks.cfg保存至/opt/ks.cfg(本人自定义目录）下；
+7. 提供pxe工作环境
+1.找到/usr/share/syslinux/pxelinux.0文件，并将其复制到/var/lib/tftpboot/目录下;
+2.将系统镜像盘中pxe模式下专用的内核文件和initrd镜像文件复制到tftp服务器相应目录中:
+
+3.将系统光盘镜像中的isolinux/目录下的boot.msg splash.jpg vesamenu.c32复制到/var/lib/tftpboot/目录下
+
+4.将系统光盘镜像中的isolinux/目录下的isolinux.cfg文件拷贝至/var/lib/tftpboot/pxelinux.cfg/目录下，命名为default，用来引导客户端启动过程；并修改/var/lib/tftpboot/pxelinux/default文件，指定ks文件的加载位置；
+
+5.将安装光盘里的images目录复制到/nfsroot目录下，并将RHEl 6.5的ISO文件复制到/nfsroot目录下
+6.所需文件见文件夹。
+ps：重启后的可以使用gdm命令切换桌面 
+
+

@@ -1,0 +1,1726 @@
+content
+
+
+
+
+ 
+ 
+http://www.cnblogs.com/sleepwalker/p/3676600.html?utm_source=tuicool
+http://blog.csdn.net/carson2005/article/details/9502053
+ 
+ 
+Retinex理论
+Retinex理论始于Land和McCann于20世纪60年代作出的一系列贡献,其基本思想是人感知到某点的颜色和亮度并不仅仅取决于该点进入人眼的绝对光线，还和其周围的颜色和亮度有关。Retinex这个词是由视网膜(Retina)和大脑皮层(Cortex)两个词组合构成的.Land之所以设计这个词，是为了表明他不清楚视觉系统的特性究竟取决于此两个生理结构中的哪一个，抑或是与两者都有关系。
+Land的Retinex模型是建立在以下的基础之上的：
+一、真实世界是无颜色的，我们所感知的颜色是光与物质的相互作用的结果。我们见到的水是无色的，但是水膜—肥皂膜却是显现五彩缤纷，那是薄膜表面光干涉的结果；
+二、每一颜色区域由给定波长的红、绿、蓝三原色构成的；
+三、三原色决定了每个单位区域的颜色。
+Retinex 理论的基本内容是物体的颜色是由物体对长波（红）、中波（绿）和短波（蓝）光线的反射能力决定的，而不是由反射光强度的绝对值决定的；物体的色彩不受光照非均性的影响，具有一致性，即Retinex理论是以色感一致性（颜色恒常性）为基础的。如下图所示，观察者所看到的物体的图像S是由物体表面对入射光L反射得到的，反射率R由物体本身决定，不受入射光L变化。
+ 
+ 
+本来想把下面的代码改成opencv版本的，但是不太会把读出来的mat里面数据改成BYTE*里面，在主函数里面写的一点都注释了
+ 
+ 
+// Retinex.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>
+#include <cmath>
+#include <time.h>
+#include <iostream>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#pragma comment(lib,"opencv_core2410d.lib")                  
+#pragma comment(lib,"opencv_highgui2410d.lib")                  
+#pragma comment(lib,"opencv_imgproc2410d.lib")  
+
+
+using namespace std; 
+using namespace cv;
+
+#define EPSILON 1
+#define DELTA 1
+#define GAMMA 0.9	
+#define PI 3.1415926
+#define ALPHA_c 1
+
+//////////////////////////
+//  Read a 8 bit bmp File
+//////////////////////////
+BYTE *Read8BitBmpFile2Img(const char * filename,int *width,int *height)
+{   FILE * BinFile;
+BITMAPFILEHEADER FileHeader;
+BITMAPINFOHEADER BmpHeader;
+BYTE *img;
+int size;
+int Suc=1;
+// Open File
+*width=*height=0;
+if((BinFile=fopen(filename,"rb"))==NULL) return NULL;
+// Read Struct Info
+if (fread((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=-1;
+if (fread((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=-1;
+if (Suc==-1) { fclose(BinFile); return NULL; }
+// Read Image Data
+*width=(BmpHeader.biWidth+3)/4*4;
+*height=BmpHeader.biHeight;
+size=(BmpHeader.biWidth+3)/4*4*BmpHeader.biHeight;
+fseek(BinFile,FileHeader.bfOffBits,SEEK_SET);
+if ( (img=new BYTE[size+8])!=NULL)
+{   if(fread(img+8-int(img)%8,sizeof(BYTE),size,BinFile)!=(unsigned int)size)
+{ fclose(BinFile);
+delete img;
+img=NULL;
+return NULL;
+}
+}
+fclose(BinFile);
+return img;
+}
+
+/////////////////////////
+// Write a 8 bit bmp File
+/////////////////////////
+int Write8BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
+{   FILE * BinFile;
+BITMAPFILEHEADER FileHeader;
+BITMAPINFOHEADER BmpHeader;
+BYTE p[4];
+int i,Suc=1;
+
+// Open File
+if((BinFile=fopen(filename,"w+b"))==NULL) {  return -1; }
+//  Fill the FileHeade)
+FileHeader.bfType= ((WORD) ('M' << 8) | 'B');
+FileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BmpHeader)+256*4L;
+FileHeader.bfSize=FileHeader.bfOffBits+width*height ;
+FileHeader.bfReserved1=0;
+FileHeader.bfReserved2=0;
+if (fwrite((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=-1;
+// Fill the ImgHeader
+BmpHeader.biSize = 40;
+BmpHeader.biWidth = width;
+BmpHeader.biHeight = height;
+BmpHeader.biPlanes = 1 ;
+BmpHeader.biBitCount = 8 ;
+BmpHeader.biCompression = 0 ;
+BmpHeader.biSizeImage = 0 ;
+BmpHeader.biXPelsPerMeter = 0;
+BmpHeader.biYPelsPerMeter = 0;
+BmpHeader.biClrUsed = 0;
+BmpHeader.biClrImportant = 0;
+if (fwrite((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=-1;
+// write Pallete
+for (i=0,p[3]=0;i<256;i++) 
+{  
+	p[3]=0;
+	p[0]=p[1]=p[2]=i; // blue,green,red;
+	if (fwrite((void *)p,1,4,BinFile)!=4) { Suc=-1; break; }
+}
+// write image data
+if (fwrite((void *)img,1,width*height,BinFile)!=(unsigned int) width*height) Suc=-1;
+// return;
+fclose(BinFile);
+return Suc;
+}
+
+//////////////////////////
+//  Read a 24 bit bmp File
+//////////////////////////
+BYTE *Read24BitBmpFile2Img(const char * filename,int *width,int *height)
+{  
+	FILE * BinFile;
+	BITMAPFILEHEADER FileHeader;
+	BITMAPINFOHEADER BmpHeader;
+	BYTE *img;
+	int size;
+	int Suc=1;
+
+	// Open File
+	*width=*height=0;
+	if((BinFile=fopen(filename,"rb"))==NULL) return NULL;
+	// Read Struct Info
+	if (fread((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=-1;
+	if (fread((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=-1;
+	if (Suc==-1) { fclose(BinFile); return NULL; }
+	// Read Image Data
+	*width=(BmpHeader.biWidth+3)/4*4;
+	*height=BmpHeader.biHeight;
+	size=(*width)*(*height)*3;
+	fseek(BinFile,FileHeader.bfOffBits,SEEK_SET);
+	if ( (img=new BYTE[size+8])!=NULL)
+	{   
+		if(fread(img+8-int(img)%8,sizeof(BYTE),size,BinFile)!=(unsigned int)size)
+		{ 
+			fclose(BinFile);
+			delete img;
+			img=NULL;
+			return NULL;
+		}
+	}
+	fclose(BinFile);
+	return img;
+}
+//////////////////////////
+//  write a 24 bit bmp File
+//////////////////////////
+bool Write24BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
+{   
+	FILE * BinFile;
+	BITMAPFILEHEADER FileHeader;
+	BITMAPINFOHEADER BmpHeader;
+	bool Suc=true;
+	int y,i,extend;
+	BYTE *pCur;
+
+	// Open File
+	if((BinFile=fopen(filename,"w+b"))==NULL) {  return false; }
+	// Fill the FileHeader
+	FileHeader.bfType= ((WORD) ('M' << 8) | 'B');
+	FileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BmpHeader);
+	FileHeader.bfSize=FileHeader.bfOffBits+width*height*3L ;
+	FileHeader.bfReserved1=0;
+	FileHeader.bfReserved2=0;
+	if (fwrite((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=false;
+	// Fill the ImgHeader
+	BmpHeader.biSize = 40;
+	BmpHeader.biWidth = width;
+	BmpHeader.biHeight = height;
+	BmpHeader.biPlanes = 1 ;
+	BmpHeader.biBitCount = 24 ;
+	BmpHeader.biCompression = 0 ;
+	BmpHeader.biSizeImage = 0 ;
+	BmpHeader.biXPelsPerMeter = 0;
+	BmpHeader.biYPelsPerMeter = 0;
+	BmpHeader.biClrUsed = 0;
+	BmpHeader.biClrImportant = 0;
+	if (fwrite((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=false;
+	// write image data
+	extend=(width+3)/4*4-width;
+	if (extend==0)
+	{   
+		if (fwrite((void *)img,1,width*height*3,BinFile)!=(unsigned int)3*width*height) Suc=false;
+	}
+	else
+	{   
+		for(y=0,pCur=img;y<height;y++,pCur+=3*width)
+		{   
+			if (fwrite((void *)pCur,1,width*3,BinFile)!=(unsigned int)3*width) Suc=false; // 真实的数据
+			for(i=0;i<extend;i++) // 扩充的数据
+			{ 
+				if (fwrite((void *)(pCur+3*(width-1)+0),1,1,BinFile)!=1) Suc=false;
+				if (fwrite((void *)(pCur+3*(width-1)+1),1,1,BinFile)!=1) Suc=false;
+				if (fwrite((void *)(pCur+3*(width-1)+2),1,1,BinFile)!=1) Suc=false;
+			}
+		}
+	}
+	// return;
+	fclose(BinFile);
+	return Suc;
+}
+
+//////////////////////////
+// Logarithm Transform
+// OrgImg: point to original image
+// widht: the width of the image
+// height:the height of the image
+// LogImg: point to logarithm transform  of the image
+//////////////////////////
+void LogarithmTransform(int *OrgImg,int width,int height,int *LogImg)
+{
+	int *pLog=LogImg,*pCur=OrgImg;
+	int i,size,temp;
+	size=width*height;
+	for(i=0;i<size;i++)
+	{
+		temp=*pCur++;
+		if(temp==0) *pLog++=0;
+		else *pLog++=log(float(temp))*2048;
+	}
+	return;
+}
+////////////////////////////////
+//  计算窗口内像素灰度和
+////////////////////////////////
+void Ini(BYTE *pOrgImg,int width,int height,int *sum)
+{
+	int i,j;
+	BYTE *pCur;
+	pCur=pOrgImg;
+	*sum=*pCur;
+	for(i=1;i<height;i++)
+		*(sum+i*width)=*(sum+(i-1)*width)+*(pCur+i*width);
+	for(j=1;j<width;j++)
+		*(sum+j)=*(sum+j-1)+*(pCur+j);
+	for(i=1;i<height;i++)
+	{
+		for(j=1;j<width;j++) 
+		{
+			*(sum+i*width+j)=*(sum+(i-1)*width+j)+*(sum+i*width+j-1)-*(sum+(i-1)*width+j-1)+*(pCur+i*width+j); //卷积计算
+		}
+	}
+	return;
+}
+
+//////////////////////////
+// 局部非线性对比度增强
+//////////////////////////
+void LocalNonlinearStretch(BYTE *OrgImg,int width,int height,int *ResData)
+{
+	int i,j,k,s,size=width*height;
+	int *pData,*sum,sum1;
+	double avg,min,max,nor;
+	BYTE *pCur=OrgImg;
+	sum=new int[width*height];
+	pData=ResData+width+1;
+	//	Ini(OrgImg,width,height,sum);
+	for(i=0;i<height-2;i++,pCur+=2,pData+=2)
+	{
+		min=*pCur;
+		max=*pCur;
+		for(k=0;k<3;k++)
+		{
+			for(s=0;s<3;s++)
+			{
+				if(*(pCur+k*width+s)<min) min=*(pCur+k*width+s);
+				else if(*(pCur+k*width+s)>max) max=*(pCur+k*width+s);
+			}
+		}	
+		sum1=(*pCur+*(pCur+1)+*(pCur+2)+*(pCur+width)+*(pCur+width+1)+*(pCur+width+2)+*(pCur+width*2)+*(pCur+width*2+1)+*(pCur+width*2+2));
+		avg=(sum1-*(pCur+width+1))/8.0;
+		nor=(*(pCur+width+1)-min+1)/double(max-min+1);
+		*pData=(*(pCur+width+1)+(*(pCur+width+1)-avg)*pow((nor+EPSILON),DELTA)+0.5)*2048;
+		pCur++;
+		pData++;
+		for(j=1;j<width-2;j++,pCur++,pData++)
+		{
+			min=*pCur;
+			max=*pCur;
+			for(k=0;k<3;k++)
+			{
+				for(s=0;s<3;s++)
+				{
+					if(*(pCur+k*width+s)<min) min=*(pCur+k*width+s);
+					else if(*(pCur+k*width+s)>max) max=*(pCur+k*width+s);
+				}
+				sum1=sum1-*(pCur+k*width-1)+*(pCur+k*width+2);
+			}
+			//	avg=((*(sum+(i+3)*width+j+3)-*(sum+i*width+j+3)-*(sum+(i+3)*width+j)+*(sum+i*width+j))-*(pCur+width+1))/8.0;
+			//	avg=(*pCur+*(pCur+1)+*(pCur+2)+*(pCur+width)+*(pCur+width+2)+*(pCur+width*2)+*(pCur+width*2+1)+*(pCur+width*2+2))/8.0; //  s/8.0*256
+			avg=(sum1-*(pCur+width+1))/8.0;
+			nor=(*(pCur+width+1)-min+1)/double(max-min+1);
+			*pData=(*(pCur+width+1)+(*(pCur+width+1)-avg)*pow((nor+EPSILON),DELTA)+0.5)*2048;
+		}
+	}
+	delete sum;
+	return;
+}
+//////////////////////////
+//  Gaussian Template
+//////////////////////////
+void GaussianTemplate(int *Template,int Tsize,double c)
+{
+	int *pCur;
+	double Lemda,c1=c*c;
+	int i,j;
+	Lemda=0;
+	for(pCur=Template,i=-((Tsize-1)>>1);i<=((Tsize-1)>>1);i++)
+	{
+		for(j=-((Tsize-1)>>1);j<=((Tsize-1)>>1);j++,pCur++)
+		{
+			*pCur=(exp(-(i*i+j*j)/c1))*2048;
+			Lemda+=*pCur;
+		}
+	}
+	Lemda=2048.0/Lemda;
+	for(pCur=Template,i=0;i<Tsize*Tsize;i++,pCur++)
+	{
+		*pCur=Lemda*(*pCur);
+	}
+
+	return;
+}
+
+//////////////////////////
+//  3*3 Gaussian Template
+//////////////////////////
+void GaussianTemplate2(int *Template,double c)
+{
+	int *pCur;
+	double Lemda,c1=c*c;
+	int i,j;
+	Lemda=1.0/sqrt(c*c*PI)*0.7*2048;
+	for(pCur=Template,i=-1;i<=1;i++)
+	{
+		for(j=-1;j<=1;j++)
+		{
+			*pCur++=Lemda*exp(-(i*i+j*j)/c1);
+		}
+
+	}
+	return;
+}
+
+//////////////////////////
+// 单尺度Retinex
+// OrgImg: point to  original image
+// widht: the width of the image
+// height: the height of the image
+// ResImg: point to the result image
+//////////////////////////
+void SSR(int *LogImg,BYTE *OrgImg,int width,int height,int *ResData,int *Template,int Tsize)
+{
+	BYTE *pCur=OrgImg;
+	int i,j,k,s,size=width*height;
+	int temp,*pData,*pCtr,*ptmp,*pRes,temp2;
+	double r=1.0/GAMMA;
+	memset(ResData,0,sizeof(int)*width*height);
+	pRes=ResData+((Tsize-1)/2)*width+((Tsize-1)/2);
+	pCtr=LogImg+((Tsize-1)/2)*width+((Tsize-1)/2);
+	ptmp=Template;
+	for(i=(Tsize-1)/2;i<height-((Tsize-1)/2);i++,pRes+=Tsize-1,pCtr+=Tsize-1,pCur+=Tsize-1)
+	{
+		for(j=(Tsize-1)/2;j<width-((Tsize-1)/2);j++,pRes++,pCtr++,pCur++)
+		{
+			temp=0;
+			ptmp=Template;
+			for(k=0;k<Tsize;k++)
+			{
+				for(s=0;s<Tsize;s++)
+				{
+					temp+=(*(pCur+k*width+s)*(*ptmp++));
+				}
+			}
+			if(temp==0) *pRes=exp(pow(*pCtr>>11,r));
+			else 
+			{
+				temp2=(*pCtr)-(log(float(temp>>22)))*2048;
+				if(temp2>0) *pRes=(exp(pow((temp2>>11),r)))*2048+(temp>>11);
+				else if(temp2<0) *pRes=exp(0-pow(0-(temp2>>11),r))*2048+(temp>>11);
+				else *pRes=(temp>>11);
+			}
+		}
+	}
+	//四边不处理
+	for(i=0,pRes=ResData,pCur=OrgImg;i<width*(Tsize-1)/2;i++,pCur++,pRes++)
+	{
+		*pRes=*pCur;
+	}
+	for(i=(Tsize-1)/2;i<height-(Tsize-1)/2;i++)
+	{
+		for(j=0;j<(Tsize-1)/2;j++)
+		{
+			*pRes++=*pCur++;
+		}
+		pRes+=width-(Tsize-1);
+		pCur+=width-(Tsize-1);
+		for(j=0;j<(Tsize-1)/2;j++)
+		{
+			*pRes++=*pCur++;
+		}
+	}
+	for(i=0;i<width*(Tsize-1)/2;i++)
+	{
+		*pRes++=*pCur++;
+	}
+	return;
+}
+/////////////////////////
+//  Get Mean And Deviance
+/////////////////////////
+void GetMeanAndDeviance(int *Temp,int width,int height,int Tsize,int *mean,int *dev)
+{
+	int i,j,size;
+	size=(width-(Tsize-1))*(height-(Tsize-1));
+	int *t;
+	long double sum;
+	for(t=Temp+(Tsize-1)/2*width+(Tsize-1)/2,sum=0,i=(Tsize-1)/2;i<(height-(Tsize-1)/2);i++,t+=Tsize-1)
+	{
+		for(j=(Tsize-1)/2;j<width-(Tsize-1)/2;j++)
+		{
+			sum+=*t++;			
+		}
+	}
+	*mean=sum/size;
+	for(t=Temp+(Tsize-1)/2*width+(Tsize-1)/2,sum=0,i=(Tsize-1)/2;i<height-(Tsize-1)/2;i++,t+=Tsize-1)
+	{
+		for(j=(Tsize-1)/2;j<width-(Tsize-1)/2;j++)
+		{
+			sum+=pow(float(*t-*mean),2);
+		}
+	}
+	*dev=sqrt(sum/size);
+	return;
+}
+
+/////////////////////////
+//  Linear Stretch
+// Temp: point to the image before stratching
+// widht: the width of the image
+// height: the height of the image
+// ResImg: point to the resultant image
+/////////////////////////
+void LinearStretch(int *Temp,int width,int height,int *mean,int *dev,BYTE *ResImg)
+{
+	BYTE *pRes;
+	int *t,min,max,temp,c;
+	int i,size=width*height;
+	min=*mean-3*(*dev);
+	max=*mean+3*(*dev);
+	c=255.0/(max-min)*2048;
+	for(pRes=ResImg,t=Temp,i=0;i<size;i++,t++,pRes++)
+	{
+		temp=((*t-min)*c)>>11;
+		if(temp>255) *pRes=255;
+		else if(temp<0) *pRes=0;
+		else *pRes=temp;
+	}
+
+	return;
+}
+
+/*
+//////////////////////////
+// GAMMA Correction
+//////////////////////////
+void GammaCorrection(double *OrgData,int width,int heihgt,double *ResData)
+{
+int i,size;
+double *pOrg,*pRes;
+for(i=0,pOrg=OrgDat,pRes=ResData;i<size;i++)
+{
+*pRes++=pow(*pOrg++,1.0/GAMMA);
+} 
+}
+*/
+//////////////////////////
+// Contrast
+//////////////////////////
+void Contrast(BYTE *OrgImg,int x,int y,int width,int height,int blockw,int blockh,double &wcontrast,double &mcontrast)
+{
+	BYTE *pCur=OrgImg+x*blockw+y*width*blockh;
+	double min=10000,max=-1;
+	int i,j;
+
+	for(i=0;i<blockh;i++,pCur=pCur+width-blockw)
+	{
+		for(j=0;j<blockw;j++,pCur++)
+		{
+			if(*pCur<min) min=*pCur;
+			if(*pCur>max) max=*pCur;
+		}
+	}
+	mcontrast=(max-min+1)/(max+min+1);
+	if(min==0) wcontrast=(max+5)/(min+5);
+	else wcontrast=max/min;
+
+	return;
+}
+
+//////////////////////////
+//  Measure of Performance
+//////////////////////////
+void Measure(BYTE *ResImg,int width,int height,double &emee,double &ame)
+{
+	int k1=8,k2=8,i,j,blockw,blockh;
+	double wcontrast,mcontrast;
+	blockw=width/k2;
+	blockh=height/k1;
+	emee=0;
+	ame=0;
+	for(i=0;i<k1;i++)
+	{
+		for(j=0;j<k2;j++)
+		{
+			Contrast(ResImg,i,j,width,height,blockw,blockh,wcontrast,mcontrast);
+			emee+=pow(wcontrast,ALPHA_c)*log(wcontrast);
+			ame+=pow(mcontrast,ALPHA_c)*log(mcontrast);
+		}
+	}
+	emee=ALPHA_c*emee/(k1*k2);
+	ame=ALPHA_c*ame/(k1*k2);
+	return ;
+}
+
+/////////////////////////
+// Gray Image Process
+/////////////////////////
+void GrayImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
+{
+	int *Data,*LogImg,*Template,mean,dev;
+	int Tsize;
+	double c;
+	Tsize=5;
+	c=20;
+	Template=new int[Tsize*Tsize];
+	Data=new int[width*height];
+	LogImg=new int[width*height];
+	LocalNonlinearStretch(OrgImg,width,height,Data);	
+	LogarithmTransform(Data,width,height,LogImg);
+	//GaussianTemplate(Template,Tsize,c);
+	GaussianTemplate2(Template,0.5);Tsize=3;
+	SSR(LogImg,OrgImg,width,height,Data,Template,Tsize);
+	GetMeanAndDeviance(Data,width,height,Tsize,&mean,&dev);
+	LinearStretch(Data,width,height,&mean,&dev,ResImg);
+	delete Template;
+	delete Data;
+	delete LogImg;
+	return;
+}
+
+/////////////////////////
+// Color Image Process
+/////////////////////////
+void ColorImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
+{
+	BYTE *Value;
+	int i,j,Tsize,temp;
+	int *Data,*LogImg,*Template,*Percent,mean,dev;
+	double c,emee,ame;
+	Tsize=5;
+	c=0.75;
+	Template=new int[Tsize*Tsize];
+	Data=new int[width*height];
+	LogImg=new int[width*height];
+	Percent=new int[width*height*3];
+	Value=new BYTE[width*height];
+	memset(Value,0,sizeof(BYTE)*width*height);
+	for(j=0;j<width*height;j++)
+	{  
+		temp=0;
+		for(i=0;i<3;i++)
+		{ 
+			temp+=*(OrgImg+j*3+i);
+		}
+		for(i=0;i<3;i++)
+		{ 
+			*(Percent+j*3+i)=*(OrgImg+j*3+i)/double(temp)*2048;
+			*(Value+j)+=(*(OrgImg+j*3+i)*(*(Percent+j*3+i)))>>11;
+		}
+	}
+	LocalNonlinearStretch(Value,width,height,Data);
+	LogarithmTransform(Data,width,height,LogImg);
+	//  GaussianTemplate(Template,Tsize,c);
+	GaussianTemplate2(Template,0.5);Tsize=3;
+	SSR(LogImg,Value,width,height,Data,Template,Tsize);
+	GetMeanAndDeviance(Data,width,height,Tsize,&mean,&dev);
+	LinearStretch(Data,width,height,&mean,&dev,Value);
+	for(j=0;j<width*height;j++)
+	{
+		for(i=0;i<3;i++)
+		{ 
+			temp=(*(Percent+j*3+i)*(*(Value+j))*3)>>11;
+			if(temp>255) *(ResImg+j*3+i)=255;
+			else *(ResImg+j*3+i)=temp;
+		}
+	}
+	printf("*****彩色图像三通道联合处理结果******************\n");
+	Measure(Value,width,height,emee,ame);
+	cout<<"EMEE:"<<emee<<endl;
+	delete Template;
+	delete Data;
+	delete LogImg;
+	delete Value;
+	delete Percent;
+	return;
+}
+
+
+//////////////////////////
+//  Color Image process 2
+//  三通道分别处理
+//////////////////////////
+void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
+{
+	BYTE *Value;
+	int i,j,Tsize;
+	int *Data,*LogImg,*Template,mean,dev;
+	double c,emee=0,ame=0,x1,x2;
+	Tsize=5;
+	c=0.5;
+	Template=new int[Tsize*Tsize];
+	Value=new BYTE[width*height];	
+	Data=new int[width*height];
+	LogImg=new int[width*height];
+	GaussianTemplate(Template,Tsize,c);
+	//      GaussianTemplate2(Template,0.5);	Tsize=3;
+	for(i=0;i<3;i++)
+	{
+		for(j=0;j<width*height;j++)
+		{
+			*(Value+j)=*(OrgImg+j*3+i);
+		}
+		LocalNonlinearStretch(Value,width,height,Data);
+		LogarithmTransform(Data,width,height,LogImg);
+		SSR(LogImg,Value,width,height,Data,Template,Tsize);	
+		GetMeanAndDeviance(Data,width,height,Tsize,&mean,&dev);
+		LinearStretch(Data,width,height,&mean,&dev,Value);
+		Measure(Value,width,height,x1,x2);
+		emee+=x1;
+		ame+=x2;
+		for(j=0;j<width*height;j++)
+		{
+			*(ResImg+j*3+i)=*(Value+j);
+		}
+	}
+	printf("*****彩色图像三通道分别处理结果******************\n");
+	cout<<"EMEE:"<<emee/3.0<<endl;		
+	delete Template;
+	delete Value;
+	delete Data;
+	delete LogImg;
+	return;
+}
+//////////////////////////
+//  main
+//////////////////////////
+int main()
+{   
+	BYTE *OrgImg,*ResImg,*p1,*p2;
+	int width,height,i,j,suc,area1,area2,Tsize;
+	bool isRGB,ret;
+	clock_t t1,t2;
+	double emee,ame;
+	char ch;
+	int *offsetdata=new int[2];
+	for(i=0;i<2;i++)
+	{
+		*(offsetdata+i)=0X80808080;
+	}    
+	system( "cls" );	
+	printf("******中心/环绕Retienx算法******************\n");
+	printf("       1.处理灰度图像\n");
+	printf("       2.处理彩色图像\n");
+	printf("*********************************************\n");
+	printf("请选择(1或2): ");	
+	do
+	{
+		cin>>ch; 
+	}while( ch != '1' && ch != '2');
+
+	//system ( "cls" );
+
+
+	if ( ch == '1')
+		isRGB=false;
+	else if ( ch == '2')
+		isRGB=true;
+	// open file
+
+	string image_name;
+	cout<<endl<<"输入图像名：";
+	cin>>image_name;
+
+	//Mat image_dst;
+
+	//if (!isRGB)
+	//{
+	//	image_dst = imread(image_name,0);
+	//}
+	//else
+	//{
+	//	image_dst = imread(image_name,1);
+	//}
+
+	//
+	//
+	//if(image_dst.empty())
+	//{
+	//	return -1;
+	//} //是否加载成功
+
+	//imshow(image_name,image_dst);
+	//
+
+	// width = image_dst.cols;  
+	// height = image_dst.rows;  
+	//int channel = image_dst.channels(); 
+	// int step = width * channel* 1;
+	//uchar* ps = NULL;
+	//
+	//p1 = new BYTE[width*height*channel+8];
+
+	//for (int i = 0; i < height; i++)  
+	//{  
+	//	ps = image_dst.ptr<uchar>(i);  
+	//	for (int j = 0; j < width; j++)  
+	//	{  
+	//		if (1 == channel)  
+	//		{  
+	//			*(p1 + i*step + j) = ps[j];  
+	//			
+	//		}  
+	//		else if (3 == channel)  
+	//		{  
+	//			*(p1 + i*step + j*3) = ps[j*3 + 2];  
+	//			*(p1 + i*step + j*3 + 1) = ps[j*3 + 1];  
+	//			*(p1 + i*step + j*3 + 2) = ps[j*3];  
+	//		}  
+	//	}  
+	//}  
+
+
+	if(!isRGB)
+	p1=Read8BitBmpFile2Img(image_name.c_str(),&width,&height);
+	else
+	p1=Read24BitBmpFile2Img(image_name.c_str(),&width,&height);
+	
+
+	if (p1==NULL)
+	{  
+		printf("*fopen err!\n");
+		delete p1;
+		return 0;
+	}
+	if(width%64!=0||height%64!=0)
+	{
+		cout<<"图像大小需是64的倍数"<<endl;
+		delete p1;
+		return 0;
+	}
+
+	area1=width*height;
+
+	if(!isRGB)
+	{
+		OrgImg=p1+8-int(p1)%8;	
+		p2=new BYTE[width*height+8];
+		ResImg=p2+8-int(p2)%8;
+		t2=clock();
+		GrayImageProcess(OrgImg,width,height,ResImg);
+		t1=clock();
+		printf("*****灰度图像处理结果******************\n");
+		cout<<"运行时间："<<t1-t2<<"ms"<<endl;
+		Measure(ResImg,width,height,emee,ame);
+		cout<<"EMEE:"<<emee<<endl;
+		suc=Write8BitImg2BmpFile(ResImg,width,height,"result_1.bmp");
+	}
+	else
+	{	
+		OrgImg=p1+8-int(p1)%8;	
+		p2=new BYTE[width*height*3+8];		
+		ResImg=p2+8-int(p2)%8;
+		t2=clock();
+		ColorImageProcess(OrgImg,width,height,ResImg);
+		t1=clock();
+		cout<<"运行时间："<<t1-t2<<"ms"<<endl;
+		t2=clock();
+		suc=Write24BitImg2BmpFile(ResImg,width,height,"result_1.bmp");
+		ColorImageProcess2(OrgImg,width,height,ResImg);
+		t1=clock();
+		cout<<"运行时间："<<t1-t2<<"ms"<<endl;
+		suc=Write24BitImg2BmpFile(ResImg,width,height,"result_2.bmp");
+	}
+	if(suc==-1)
+	{
+		printf("*fwrite err!\n");  
+	}
+
+	Mat result1 = imread("result_1.bmp",1);
+	Mat result2 = imread("result_2.bmp",1);
+
+	imshow("result1",result1);
+	imshow("result2",result2);
+	//release mem
+	delete p1;
+	delete p2;
+	
+
+	waitKey(0);
+	return 0;
+}
+
+
+
+
+
+ 
+ 
+后面用opencv改写了一下主要想把像素数据写到BYTE *指向的内存空间中，这样的话可以加载其他格式的图像文件了:但是出现了一些问题，可能跟之前作者代码里面的限制有关，必须是64的倍数。还写了一个功能实现把像素数据写到txt中保存下来，各位凑活看。
+参见帖子：
+http://bbs.csdn.net/topics/391005171
+http://bbs.csdn.net/topics/391004682
+ 
+代码如下：
+ 
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>
+#include <cmath>
+#include <time.h>
+#include <iostream>
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#pragma comment(lib,"opencv_core2410d.lib")                  
+#pragma comment(lib,"opencv_highgui2410d.lib")                  
+#pragma comment(lib,"opencv_imgproc2410d.lib")  
+
+
+using namespace std; 
+using namespace cv;
+
+#define EPSILON 1
+#define DELTA 1
+#define GAMMA 0.9	
+#define PI 3.1415926
+#define ALPHA_c 1
+
+int size_mem = 0;
+
+//////////////////////////
+//  Read a 8 bit bmp File
+//////////////////////////
+BYTE *Read8BitBmpFile2Img(const char * filename,int *width,int *height)
+{   FILE * BinFile;
+BITMAPFILEHEADER FileHeader;
+BITMAPINFOHEADER BmpHeader;
+BYTE *img;
+int size;
+int Suc=1;
+// Open File
+*width=*height=0;
+if((BinFile=fopen(filename,"rb"))==NULL) return NULL;
+// Read Struct Info
+if (fread((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=-1;
+if (fread((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=-1;
+if (Suc==-1) { fclose(BinFile); return NULL; }
+// Read Image Data
+*width=(BmpHeader.biWidth+3)/4*4;
+*height=BmpHeader.biHeight;
+size=(BmpHeader.biWidth+3)/4*4*BmpHeader.biHeight;
+fseek(BinFile,FileHeader.bfOffBits,SEEK_SET);
+if ( (img=new BYTE[size+8])!=NULL)
+{   if(fread(img+8-int(img)%8,sizeof(BYTE),size,BinFile)!=(unsigned int)size)
+{ fclose(BinFile);
+delete img;
+img=NULL;
+return NULL;
+}
+}
+fclose(BinFile);
+return img;
+}
+
+/////////////////////////
+// Write a 8 bit bmp File
+/////////////////////////
+int Write8BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
+{   FILE * BinFile;
+BITMAPFILEHEADER FileHeader;
+BITMAPINFOHEADER BmpHeader;
+BYTE p[4];
+int i,Suc=1;
+
+// Open File
+if((BinFile=fopen(filename,"w+b"))==NULL) {  return -1; }
+//  Fill the FileHeade)
+FileHeader.bfType= ((WORD) ('M' << 8) | 'B');
+FileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BmpHeader)+256*4L;
+FileHeader.bfSize=FileHeader.bfOffBits+width*height ;
+FileHeader.bfReserved1=0;
+FileHeader.bfReserved2=0;
+if (fwrite((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=-1;
+// Fill the ImgHeader
+BmpHeader.biSize = 40;
+BmpHeader.biWidth = width;
+BmpHeader.biHeight = height;
+BmpHeader.biPlanes = 1 ;
+BmpHeader.biBitCount = 8 ;
+BmpHeader.biCompression = 0 ;
+BmpHeader.biSizeImage = 0 ;
+BmpHeader.biXPelsPerMeter = 0;
+BmpHeader.biYPelsPerMeter = 0;
+BmpHeader.biClrUsed = 0;
+BmpHeader.biClrImportant = 0;
+if (fwrite((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=-1;
+// write Pallete
+for (i=0,p[3]=0;i<256;i++) 
+{  
+	p[3]=0;
+	p[0]=p[1]=p[2]=i; // blue,green,red;
+	if (fwrite((void *)p,1,4,BinFile)!=4) { Suc=-1; break; }
+}
+// write image data
+if (fwrite((void *)img,1,width*height,BinFile)!=(unsigned int) width*height) Suc=-1;
+// return;
+fclose(BinFile);
+return Suc;
+}
+
+//////////////////////////
+//  Read a 24 bit bmp File
+//////////////////////////
+BYTE *Read24BitBmpFile2Img(const char * filename,int *width,int *height)
+{  
+	FILE * BinFile;
+	BITMAPFILEHEADER FileHeader;
+	BITMAPINFOHEADER BmpHeader;
+	BYTE *img;
+	int size;
+	int Suc=1;
+
+	// Open File
+	*width=*height=0;
+	if((BinFile=fopen(filename,"rb"))==NULL) return NULL;
+	// Read Struct Info
+	if (fread((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=-1;
+	if (fread((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=-1;
+	if (Suc==-1) { fclose(BinFile); return NULL; }
+	// Read Image Data
+	*width=(BmpHeader.biWidth+3)/4*4;
+	*height=BmpHeader.biHeight;
+	size=(*width)*(*height)*3;
+	fseek(BinFile,FileHeader.bfOffBits,SEEK_SET);
+	if ( (img=new BYTE[size+8])!=NULL)
+	{   
+		//size_mem = *((int *)img - 1);
+		if(fread(img+8-int(img)%8,sizeof(BYTE),size,BinFile)!=(unsigned int)size)
+		{ 
+			fclose(BinFile);
+			delete img;
+			img=NULL;
+			return NULL;
+		}
+	}
+	fclose(BinFile);
+	return img;
+}
+//////////////////////////
+//  write a 24 bit bmp File
+//////////////////////////
+bool Write24BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
+{   
+	FILE * BinFile;
+	BITMAPFILEHEADER FileHeader;
+	BITMAPINFOHEADER BmpHeader;
+	bool Suc=true;
+	int y,i,extend;
+	BYTE *pCur;
+
+	// Open File
+	if((BinFile=fopen(filename,"w+b"))==NULL) {  return false; }
+	// Fill the FileHeader
+	FileHeader.bfType= ((WORD) ('M' << 8) | 'B');
+	FileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BmpHeader);
+	FileHeader.bfSize=FileHeader.bfOffBits+width*height*3L ;
+	FileHeader.bfReserved1=0;
+	FileHeader.bfReserved2=0;
+	if (fwrite((void *)&FileHeader,1,sizeof(FileHeader),BinFile)!=sizeof(FileHeader)) Suc=false;
+	// Fill the ImgHeader
+	BmpHeader.biSize = 40;
+	BmpHeader.biWidth = width;
+	BmpHeader.biHeight = height;
+	BmpHeader.biPlanes = 1 ;
+	BmpHeader.biBitCount = 24 ;
+	BmpHeader.biCompression = 0 ;
+	BmpHeader.biSizeImage = 0 ;
+	BmpHeader.biXPelsPerMeter = 0;
+	BmpHeader.biYPelsPerMeter = 0;
+	BmpHeader.biClrUsed = 0;
+	BmpHeader.biClrImportant = 0;
+	if (fwrite((void *)&BmpHeader,1,sizeof(BmpHeader),BinFile)!=sizeof(BmpHeader)) Suc=false;
+	// write image data
+	extend=(width+3)/4*4-width;
+	if (extend==0)
+	{   
+		if (fwrite((void *)img,1,width*height*3,BinFile)!=(unsigned int)3*width*height) Suc=false;
+	}
+	else
+	{   
+		for(y=0,pCur=img;y<height;y++,pCur+=3*width)
+		{   
+			if (fwrite((void *)pCur,1,width*3,BinFile)!=(unsigned int)3*width) Suc=false; // 真实的数据
+			for(i=0;i<extend;i++) // 扩充的数据
+			{ 
+				if (fwrite((void *)(pCur+3*(width-1)+0),1,1,BinFile)!=1) Suc=false;
+				if (fwrite((void *)(pCur+3*(width-1)+1),1,1,BinFile)!=1) Suc=false;
+				if (fwrite((void *)(pCur+3*(width-1)+2),1,1,BinFile)!=1) Suc=false;
+			}
+		}
+	}
+	// return;
+	fclose(BinFile);
+	return Suc;
+}
+
+//////////////////////////
+// Logarithm Transform
+// OrgImg: point to original image
+// widht: the width of the image
+// height:the height of the image
+// LogImg: point to logarithm transform  of the image
+//////////////////////////
+void LogarithmTransform(int *OrgImg,int width,int height,int *LogImg)
+{
+	int *pLog=LogImg,*pCur=OrgImg;
+	int i,size,temp;
+	size=width*height;
+	for(i=0;i<size;i++)
+	{
+		temp=*pCur++;
+		if(temp==0) *pLog++=0;
+		else *pLog++=log(float(temp))*2048;
+	}
+	return;
+}
+////////////////////////////////
+//  计算窗口内像素灰度和
+////////////////////////////////
+void Ini(BYTE *pOrgImg,int width,int height,int *sum)
+{
+	int i,j;
+	BYTE *pCur;
+	pCur=pOrgImg;
+	*sum=*pCur;
+	for(i=1;i<height;i++)
+		*(sum+i*width)=*(sum+(i-1)*width)+*(pCur+i*width);
+	for(j=1;j<width;j++)
+		*(sum+j)=*(sum+j-1)+*(pCur+j);
+	for(i=1;i<height;i++)
+	{
+		for(j=1;j<width;j++) 
+		{
+			*(sum+i*width+j)=*(sum+(i-1)*width+j)+*(sum+i*width+j-1)-*(sum+(i-1)*width+j-1)+*(pCur+i*width+j); //卷积计算
+		}
+	}
+	return;
+}
+
+//////////////////////////
+// 局部非线性对比度增强
+//////////////////////////
+void LocalNonlinearStretch(BYTE *OrgImg,int width,int height,int *ResData)
+{
+	int i,j,k,s,size=width*height;
+	int *pData,*sum,sum1;
+	double avg,min,max,nor;
+	BYTE *pCur=OrgImg;
+	sum=new int[width*height];
+	pData=ResData+width+1;
+	//	Ini(OrgImg,width,height,sum);
+	for(i=0;i<height-2;i++,pCur+=2,pData+=2)
+	{
+		min=*pCur;
+		max=*pCur;
+		for(k=0;k<3;k++)
+		{
+			for(s=0;s<3;s++)
+			{
+				if(*(pCur+k*width+s)<min) min=*(pCur+k*width+s);
+				else if(*(pCur+k*width+s)>max) max=*(pCur+k*width+s);
+			}
+		}	
+		sum1=(*pCur+*(pCur+1)+*(pCur+2)+*(pCur+width)+*(pCur+width+1)+*(pCur+width+2)+*(pCur+width*2)+*(pCur+width*2+1)+*(pCur+width*2+2));
+		avg=(sum1-*(pCur+width+1))/8.0;
+		nor=(*(pCur+width+1)-min+1)/double(max-min+1);
+		*pData=(*(pCur+width+1)+(*(pCur+width+1)-avg)*pow((nor+EPSILON),DELTA)+0.5)*2048;
+		pCur++;
+		pData++;
+		for(j=1;j<width-2;j++,pCur++,pData++)
+		{
+			min=*pCur;
+			max=*pCur;
+			for(k=0;k<3;k++)
+			{
+				for(s=0;s<3;s++)
+				{
+					if(*(pCur+k*width+s)<min) min=*(pCur+k*width+s);
+					else if(*(pCur+k*width+s)>max) max=*(pCur+k*width+s);
+				}
+				sum1=sum1-*(pCur+k*width-1)+*(pCur+k*width+2);
+			}
+			//	avg=((*(sum+(i+3)*width+j+3)-*(sum+i*width+j+3)-*(sum+(i+3)*width+j)+*(sum+i*width+j))-*(pCur+width+1))/8.0;
+			//	avg=(*pCur+*(pCur+1)+*(pCur+2)+*(pCur+width)+*(pCur+width+2)+*(pCur+width*2)+*(pCur+width*2+1)+*(pCur+width*2+2))/8.0; //  s/8.0*256
+			avg=(sum1-*(pCur+width+1))/8.0;
+			nor=(*(pCur+width+1)-min+1)/double(max-min+1);
+			*pData=(*(pCur+width+1)+(*(pCur+width+1)-avg)*pow((nor+EPSILON),DELTA)+0.5)*2048;
+		}
+	}
+	delete sum;
+	return;
+}
+//////////////////////////
+//  Gaussian Template
+//////////////////////////
+void GaussianTemplate(int *Template,int Tsize,double c)
+{
+	int *pCur;
+	double Lemda,c1=c*c;
+	int i,j;
+	Lemda=0;
+	for(pCur=Template,i=-((Tsize-1)>>1);i<=((Tsize-1)>>1);i++)
+	{
+		for(j=-((Tsize-1)>>1);j<=((Tsize-1)>>1);j++,pCur++)
+		{
+			*pCur=(exp(-(i*i+j*j)/c1))*2048;
+			Lemda+=*pCur;
+		}
+	}
+	Lemda=2048.0/Lemda;
+	for(pCur=Template,i=0;i<Tsize*Tsize;i++,pCur++)
+	{
+		*pCur=Lemda*(*pCur);
+	}
+
+	return;
+}
+
+//////////////////////////
+//  3*3 Gaussian Template
+//////////////////////////
+void GaussianTemplate2(int *Template,double c)
+{
+	int *pCur;
+	double Lemda,c1=c*c;
+	int i,j;
+	Lemda=1.0/sqrt(c*c*PI)*0.7*2048;
+	for(pCur=Template,i=-1;i<=1;i++)
+	{
+		for(j=-1;j<=1;j++)
+		{
+			*pCur++=Lemda*exp(-(i*i+j*j)/c1);
+		}
+
+	}
+	return;
+}
+
+//////////////////////////
+// 单尺度Retinex
+// OrgImg: point to  original image
+// widht: the width of the image
+// height: the height of the image
+// ResImg: point to the result image
+//////////////////////////
+void SSR(int *LogImg,BYTE *OrgImg,int width,int height,int *ResData,int *Template,int Tsize)
+{
+	BYTE *pCur=OrgImg;
+	int i,j,k,s,size=width*height;
+	int temp,*pData,*pCtr,*ptmp,*pRes,temp2;
+	double r=1.0/GAMMA;
+	memset(ResData,0,sizeof(int)*width*height);
+	pRes=ResData+((Tsize-1)/2)*width+((Tsize-1)/2);
+	pCtr=LogImg+((Tsize-1)/2)*width+((Tsize-1)/2);
+	ptmp=Template;
+	for(i=(Tsize-1)/2;i<height-((Tsize-1)/2);i++,pRes+=Tsize-1,pCtr+=Tsize-1,pCur+=Tsize-1)
+	{
+		for(j=(Tsize-1)/2;j<width-((Tsize-1)/2);j++,pRes++,pCtr++,pCur++)
+		{
+			temp=0;
+			ptmp=Template;
+			for(k=0;k<Tsize;k++)
+			{
+				for(s=0;s<Tsize;s++)
+				{
+					temp+=(*(pCur+k*width+s)*(*ptmp++));
+				}
+			}
+			if(temp==0) *pRes=exp(pow(*pCtr>>11,r));
+			else 
+			{
+				temp2=(*pCtr)-(log(float(temp>>22)))*2048;
+				if(temp2>0) *pRes=(exp(pow((temp2>>11),r)))*2048+(temp>>11);
+				else if(temp2<0) *pRes=exp(0-pow(0-(temp2>>11),r))*2048+(temp>>11);
+				else *pRes=(temp>>11);
+			}
+		}
+	}
+	//四边不处理
+	for(i=0,pRes=ResData,pCur=OrgImg;i<width*(Tsize-1)/2;i++,pCur++,pRes++)
+	{
+		*pRes=*pCur;
+	}
+	for(i=(Tsize-1)/2;i<height-(Tsize-1)/2;i++)
+	{
+		for(j=0;j<(Tsize-1)/2;j++)
+		{
+			*pRes++=*pCur++;
+		}
+		pRes+=width-(Tsize-1);
+		pCur+=width-(Tsize-1);
+		for(j=0;j<(Tsize-1)/2;j++)
+		{
+			*pRes++=*pCur++;
+		}
+	}
+	for(i=0;i<width*(Tsize-1)/2;i++)
+	{
+		*pRes++=*pCur++;
+	}
+	return;
+}
+/////////////////////////
+//  Get Mean And Deviance
+/////////////////////////
+void GetMeanAndDeviance(int *Temp,int width,int height,int Tsize,int *mean,int *dev)
+{
+	int i,j,size;
+	size=(width-(Tsize-1))*(height-(Tsize-1));
+	int *t;
+	long double sum;
+	for(t=Temp+(Tsize-1)/2*width+(Tsize-1)/2,sum=0,i=(Tsize-1)/2;i<(height-(Tsize-1)/2);i++,t+=Tsize-1)
+	{
+		for(j=(Tsize-1)/2;j<width-(Tsize-1)/2;j++)
+		{
+			sum+=*t++;			
+		}
+	}
+	*mean=sum/size;
+	for(t=Temp+(Tsize-1)/2*width+(Tsize-1)/2,sum=0,i=(Tsize-1)/2;i<height-(Tsize-1)/2;i++,t+=Tsize-1)
+	{
+		for(j=(Tsize-1)/2;j<width-(Tsize-1)/2;j++)
+		{
+			sum+=pow(float(*t-*mean),2);
+		}
+	}
+	*dev=sqrt(sum/size);
+	return;
+}
+
+/////////////////////////
+//  Linear Stretch
+// Temp: point to the image before stratching
+// widht: the width of the image
+// height: the height of the image
+// ResImg: point to the resultant image
+/////////////////////////
+void LinearStretch(int *Temp,int width,int height,int *mean,int *dev,BYTE *ResImg)
+{
+	BYTE *pRes;
+	int *t,min,max,temp,c;
+	int i,size=width*height;
+	min=*mean-3*(*dev);
+	max=*mean+3*(*dev);
+	c=255.0/(max-min)*2048;
+	for(pRes=ResImg,t=Temp,i=0;i<size;i++,t++,pRes++)
+	{
+		temp=((*t-min)*c)>>11;
+		if(temp>255) *pRes=255;
+		else if(temp<0) *pRes=0;
+		else *pRes=temp;
+	}
+
+	return;
+}
+
+/*
+//////////////////////////
+// GAMMA Correction
+//////////////////////////
+void GammaCorrection(double *OrgData,int width,int heihgt,double *ResData)
+{
+int i,size;
+double *pOrg,*pRes;
+for(i=0,pOrg=OrgDat,pRes=ResData;i<size;i++)
+{
+*pRes++=pow(*pOrg++,1.0/GAMMA);
+} 
+}
+*/
+//////////////////////////
+// Contrast
+//////////////////////////
+void Contrast(BYTE *OrgImg,int x,int y,int width,int height,int blockw,int blockh,double &wcontrast,double &mcontrast)
+{
+	BYTE *pCur=OrgImg+x*blockw+y*width*blockh;
+	double min=10000,max=-1;
+	int i,j;
+
+	for(i=0;i<blockh;i++,pCur=pCur+width-blockw)
+	{
+		for(j=0;j<blockw;j++,pCur++)
+		{
+			if(*pCur<min) min=*pCur;
+			if(*pCur>max) max=*pCur;
+		}
+	}
+	mcontrast=(max-min+1)/(max+min+1);
+	if(min==0) wcontrast=(max+5)/(min+5);
+	else wcontrast=max/min;
+
+	return;
+}
+
+//////////////////////////
+//  Measure of Performance
+//////////////////////////
+void Measure(BYTE *ResImg,int width,int height,double &emee,double &ame)
+{
+	int k1=8,k2=8,i,j,blockw,blockh;
+	double wcontrast,mcontrast;
+	blockw=width/k2;
+	blockh=height/k1;
+	emee=0;
+	ame=0;
+	for(i=0;i<k1;i++)
+	{
+		for(j=0;j<k2;j++)
+		{
+			Contrast(ResImg,i,j,width,height,blockw,blockh,wcontrast,mcontrast);
+			emee+=pow(wcontrast,ALPHA_c)*log(wcontrast);
+			ame+=pow(mcontrast,ALPHA_c)*log(mcontrast);
+		}
+	}
+	emee=ALPHA_c*emee/(k1*k2);
+	ame=ALPHA_c*ame/(k1*k2);
+	return ;
+}
+
+/////////////////////////
+// Gray Image Process
+/////////////////////////
+void GrayImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
+{
+	int *Data,*LogImg,*Template,mean,dev;
+	int Tsize;
+	double c;
+	Tsize=5;
+	c=20;
+	Template=new int[Tsize*Tsize];
+	Data=new int[width*height];
+	LogImg=new int[width*height];
+	LocalNonlinearStretch(OrgImg,width,height,Data);	
+	LogarithmTransform(Data,width,height,LogImg);
+	//GaussianTemplate(Template,Tsize,c);
+	GaussianTemplate2(Template,0.5);Tsize=3;
+	SSR(LogImg,OrgImg,width,height,Data,Template,Tsize);
+	GetMeanAndDeviance(Data,width,height,Tsize,&mean,&dev);
+	LinearStretch(Data,width,height,&mean,&dev,ResImg);
+	delete Template;
+	delete Data;
+	delete LogImg;
+	return;
+}
+
+/////////////////////////
+// Color Image Process
+/////////////////////////
+void ColorImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
+{
+	BYTE *Value;
+	int i,j,Tsize,temp;
+	int *Data,*LogImg,*Template,*Percent,mean,dev;
+	double c,emee,ame;
+	Tsize=5;
+	c=0.75;
+	Template=new int[Tsize*Tsize];
+	Data=new int[width*height];
+	LogImg=new int[width*height];
+	Percent=new int[width*height*3];
+	Value=new BYTE[width*height];
+	memset(Value,0,sizeof(BYTE)*width*height);
+	for(j=0;j<width*height;j++)
+	{  
+		temp=0;
+		for(i=0;i<3;i++)
+		{ 
+			temp+=*(OrgImg+j*3+i);
+		}
+		for(i=0;i<3;i++)
+		{ 
+			*(Percent+j*3+i)=*(OrgImg+j*3+i)/double(temp)*2048;
+			*(Value+j)+=(*(OrgImg+j*3+i)*(*(Percent+j*3+i)))>>11;
+		}
+	}
+	LocalNonlinearStretch(Value,width,height,Data);
+	LogarithmTransform(Data,width,height,LogImg);
+	//  GaussianTemplate(Template,Tsize,c);
+	GaussianTemplate2(Template,0.5);Tsize=3;
+	SSR(LogImg,Value,width,height,Data,Template,Tsize);
+	GetMeanAndDeviance(Data,width,height,Tsize,&mean,&dev);
+	LinearStretch(Data,width,height,&mean,&dev,Value);
+	for(j=0;j<width*height;j++)
+	{
+		for(i=0;i<3;i++)
+		{ 
+			temp=(*(Percent+j*3+i)*(*(Value+j))*3)>>11;
+			if(temp>255) *(ResImg+j*3+i)=255;
+			else *(ResImg+j*3+i)=temp;
+		}
+	}
+	printf("*****彩色图像三通道联合处理结果******************\n");
+	Measure(Value,width,height,emee,ame);
+	cout<<"EMEE:"<<emee<<endl;
+	delete Template;
+	delete Data;
+	delete LogImg;
+	delete Value;
+	delete Percent;
+	return;
+}
+
+
+//////////////////////////
+//  Color Image process 2
+//  三通道分别处理
+//////////////////////////
+void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
+{
+	BYTE *Value;
+	int i,j,Tsize;
+	int *Data,*LogImg,*Template,mean,dev;
+	double c,emee=0,ame=0,x1,x2;
+	Tsize=5;
+	c=0.5;
+	Template=new int[Tsize*Tsize];
+	Value=new BYTE[width*height];	
+	Data=new int[width*height];
+	LogImg=new int[width*height];
+	GaussianTemplate(Template,Tsize,c);
+	//      GaussianTemplate2(Template,0.5);	Tsize=3;
+	for(i=0;i<3;i++)
+	{
+		for(j=0;j<width*height;j++)
+		{
+			*(Value+j)=*(OrgImg+j*3+i);
+		}
+		LocalNonlinearStretch(Value,width,height,Data);
+		LogarithmTransform(Data,width,height,LogImg);
+		SSR(LogImg,Value,width,height,Data,Template,Tsize);	
+		GetMeanAndDeviance(Data,width,height,Tsize,&mean,&dev);
+		LinearStretch(Data,width,height,&mean,&dev,Value);
+		Measure(Value,width,height,x1,x2);
+		emee+=x1;
+		ame+=x2;
+		for(j=0;j<width*height;j++)
+		{
+			*(ResImg+j*3+i)=*(Value+j);
+		}
+	}
+	printf("*****彩色图像三通道分别处理结果******************\n");
+	cout<<"EMEE:"<<emee/3.0<<endl;		
+	delete Template;
+	delete Value;
+	delete Data;
+	delete LogImg;
+	return;
+}
+
+ 
+ 
+ 
+ 
+// Retinex.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+
+#include "Retinex.h"
+//////////////////////////
+//  main
+//////////////////////////
+int main()
+{   
+	BYTE *OrgImg,*ResImg,*p1,*p2;
+	int width,height,i,j,suc,area1,area2,Tsize;
+	bool isRGB,ret;
+	clock_t t1,t2;
+	double emee,ame;
+	char ch;
+	int *offsetdata=new int[2];
+	for(i=0;i<2;i++)
+	{
+		*(offsetdata+i)=0X80808080;
+	}    
+	system( "cls" );	
+	printf("******中心/环绕Retienx算法******************\n");
+	printf("       1.处理灰度图像\n");
+	printf("       2.处理彩色图像\n");
+	printf("*********************************************\n");
+	printf("请选择(1或2): ");	
+	do
+	{
+		cin>>ch; 
+	}while( ch != '1' && ch != '2');
+
+	//system ( "cls" );
+
+
+	if ( ch == '1')
+		isRGB=false;
+	else if ( ch == '2')
+		isRGB=true;
+	// open file
+
+	string image_name;
+	cout<<endl<<"输入图像名：";
+	cin>>image_name;
+
+	Mat image_dst;
+
+	if (!isRGB)
+	{
+		image_dst = imread(image_name,0);
+	}
+	else
+	{
+		image_dst = imread(image_name,1);
+	}
+
+	
+	
+	if(image_dst.empty())
+	{
+		return -1;
+	} //是否加载成功
+
+	imshow(image_name,image_dst);
+	
+
+	 width = image_dst.cols;  
+	 height = image_dst.rows;  
+	int channel = image_dst.channels(); 
+	 int step = width * channel* 1;
+	uchar* ps = NULL;
+	
+	p1 = new BYTE[width*height*channel+8];
+
+	for (int i = 0; i < height; i++)  
+	{  
+		ps = image_dst.ptr<uchar>(i); 
+		int bmp_i = height -1 -i;//图片上下倒置
+		for (int j = 0; j <width; j++)  
+		{  
+			if (1 == channel)  
+			{  
+				*(p1 + i*step + j) = ps[j];  
+				
+			}  
+			else if (3 == channel)  
+			{  //opencv的顺序是bgr,bmp本来是grb？
+				*(p1 + bmp_i*step + j*3) = ps[j*3];  //b
+				*(p1 + bmp_i*step + j*3 + 1) = ps[j*3 + 1];  //g
+				*(p1 + bmp_i*step + j*3 + 2) = ps[j*3 + 2];  //r
+			}  
+		}  
+	}  
+
+	BYTE* px;
+	
+
+	if(!isRGB)
+		px = Read8BitBmpFile2Img(image_name.c_str(),&width,&height);
+	else
+		px = Read24BitBmpFile2Img(image_name.c_str(),&width,&height);
+
+
+	int len = width*height*channel;
+	int huanhang = width *channel;
+
+
+	FILE *pFile1 = fopen("out_opencv.txt",     "w"); // 文件打开方式 如果原来有内容也会销毁
+	FILE *pFile2 = fopen("out_ori.txt",     "w"); // 文件打开方式 如果原来有内容也会销毁
+
+	for (int i = 1;i <=len;i++)
+	{
+		fprintf(pFile1,"%d\t",(int)*(p1+i));
+		if (i % (huanhang)==0)
+		{
+			fprintf(pFile1,"\n");
+		
+		}
+
+	}
+	cout<<"下面是正常的"<<endl;
+
+	for (int i = 1;i <=len;i++)
+	{
+		fprintf(pFile2,"%d\t",(int)*(px+i));
+
+		if (i % huanhang==0)
+		{
+			fprintf(pFile2,"\n");
+		}
+
+	}
+
+	fclose(pFile1);
+	fclose(pFile2);
+	fflush(pFile1);
+	fflush(pFile2);
+
+	if (p1==NULL)
+	{  
+		printf("*fopen err!\n");
+		delete p1;
+		return 0;
+	}
+	if(width%64!=0||height%64!=0)
+	{
+		cout<<"图像大小需是64的倍数"<<endl;
+		delete p1;
+		return 0;
+	}
+
+	area1=width*height;
+
+	if(!isRGB)
+	{
+		OrgImg=p1+8-int(p1)%8;	
+		p2=new BYTE[width*height+8];
+		ResImg=p2+8-int(p2)%8;
+		t2=clock();
+		GrayImageProcess(OrgImg,width,height,ResImg);
+		t1=clock();
+		printf("*****灰度图像处理结果******************\n");
+		cout<<"运行时间："<<t1-t2<<"ms"<<endl;
+		Measure(ResImg,width,height,emee,ame);
+		cout<<"EMEE:"<<emee<<endl;
+		suc=Write8BitImg2BmpFile(ResImg,width,height,"result_1.bmp");
+	}
+	else
+	{	
+		OrgImg=p1;//+8-int(p1)%8;	
+		p2=new BYTE[width*height*3+8];		
+		ResImg=p2;//+8-int(p2)%8;
+		t2=clock();
+		ColorImageProcess(OrgImg,width,height,ResImg);
+		t1=clock();
+		cout<<"运行时间："<<t1-t2<<"ms"<<endl;
+		t2=clock();
+		suc=Write24BitImg2BmpFile(ResImg,width,height,"result_1.bmp");
+		ColorImageProcess2(OrgImg,width,height,ResImg);
+		t1=clock();
+		cout<<"运行时间："<<t1-t2<<"ms"<<endl;
+		suc=Write24BitImg2BmpFile(ResImg,width,height,"result_2.bmp");
+	}
+	if(suc==-1)
+	{
+		printf("*fwrite err!\n");  
+	}
+
+	Mat result1 = imread("result_1.bmp",1);
+	Mat result2 = imread("result_2.bmp",1);
+
+	imshow("result1",result1);
+	imshow("result2",result2);
+	//release mem
+	delete p1;
+	delete p2;
+
+
+	waitKey(0);
+	return 0;
+}
+
+
+
+
+
+ 
+ 
+ 
+   
+ 
+
+

@@ -1,0 +1,53 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/49330293				
+
+
+
+
+其实挺坑爹的一个题目：
+也不知道考察的重点是啥，大体思路是从2个人分开始算起，自己找到规律了，写代码实现。
+
+讨论帖：
+http://bbs.csdn.net/topics/391835433?page=1#post-400493630
+
+
+
+
+
+实现代码一：
+
+#include <stdio.h>
+#include <math.h>
+size_t apple(size_t b)
+{
+    return b>0?pow(b,b)-(b-1):0;
+}
+int main()
+{
+    printf("%d\n",apple(8));
+    return 0;
+}
+
+
+
+实现代码2：a题比较好，面试估计不能这么写：
+int main()
+ {
+ switch (getchar() - '0')
+ {
+ case 2: puts("3"); break;
+ case 3: puts("25"); break;
+ case 4: puts("253"); break;
+ case 5: puts("3121"); break;
+ case 6: puts("46651"); break;
+ case 7: puts("823537"); break;
+ case 8: puts("16777209"); break;
+ }
+
+
+﻿﻿
+﻿﻿
+
+

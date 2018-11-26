@@ -1,0 +1,228 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/38945419				
+
+
+之前看到
+﻿﻿
+http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/segbench/
+提供的人工图像分割的.seg格式的文件，他们提供了linux系统下面的matlab代码，什么的，但是我们要在windows平台下面用就比较麻烦，就心血来潮写一个试试，还请大牛们指点一二啊，嘿嘿嘿
+
+下面是SegHuman.h
+
+/*
+// # Reload me!
+// 
+// SEGMENTATION FILE FORMAT
+// 	David Martin
+// 	8/2/2001
+// 
+// 	This document describes the segmentation file format.  Segmentation
+// 	files end in ".seg".
+// 
+// 	The overall structure of the file is as follows:
+// 
+// <header>
+// 	data
+// 	<data>
+// 
+// 	The first part of the file is the header.  The header is ascii text,
+// 	and can contain comments.  The comment character is '#'.  The header
+// 	is separated from the data with a line containing the literal text
+// 	"data".
+// 
+// 	The header can contain the following information, in any order:
+// 
+// format {*ascii|binary} {*cr|map}
+// date <date string>
+// 	image <int>	# image ID number
+// 	user <int>	# user ID number
+// 	width <int>	# width of image
+// 	height <int>	# height of image
+// 	segments <int>	# number of segments
+// 	gray {*0|1}	# image presented in grayscale?
+// 	invert {*0|1}	# image presented with pixel values inverted?
+// 	flipflop {*0|1}	# image presented upside-down and backwards?
+// 
+// 	The {width,height,segments} lines are required.  All others lines are
+// 	optional.  Default values are marked with a '*'.
+// 
+// 	The format line describes the format of the data section of the file.
+// 	The default and recommended format is 'ascii cr' (cr = compressed
+// 	row).  This document does not describe the other formats, as they are
+// 	probably superfluous.
+// 
+// 	The 'ascii cr' format is designed to be very easy to parse; it is not
+// 	optimized for space.  Use gzip if you want smaller files!  Each line
+// 	in the data section contains 4 integers:
+// 
+// <s> <r> <c1> <c2>
+// 
+// 	All values start counting at 0.  <s> is the segment number; <r> is the
+// 	row; <c1> and <c2> are column numbers.  The line means that columns
+// 	[<c1>..<c2>] of row <r> belong to segment <s>.  Lines of this sort can
+// 	appear in any order, and can be reordered without harm.  The only
+// 	restriction is that each pixel must be named exactly once.
+// 
+// 	END
+// 
+// 
+*/
+
+
+#ifndef SEG_HUMAN
+#define SEG_HUMAN
+
+
+
+#include "stdafx.h"
+#include "stdio.h"
+#include <map>
+#include <vector>
+#include <queue>
+#include <set>
+#include <string>
+#include <list>
+
+#include <iostream>
+using namespace std;
+
+struct SEG
+{
+	int segment_number;
+	int row;
+	int column_number1;
+	int column_number2;
+};
+
+class SegHuman
+{
+public:
+	SegHuman(const char* path);
+	bool LoadSEG(const char* path);
+
+private:
+	string name;
+	int image_index;
+	int segments_index;
+	int height;
+	int width;
+	int gray;
+	vector<SEG> MySeg;
+};
+
+
+#endif // SEGHMAN
+
+
+
+下面是：SegHuman.cpp
+#include "stdafx.h"
+#include "SegHuman.h"
+
+#include <iostream>
+using namespace std;
+
+SegHuman::SegHuman(const char* path)
+{
+	LoadSEG(path);
+}
+
+bool SegHuman::LoadSEG(const char* path)
+{
+int st = 0;
+FILE* pfile = fopen(path, "r");
+if (pfile)
+{
+	fseek(pfile,0,SEEK_END);
+	int dwsize = ftell(pfile);
+	rewind(pfile);
+
+	char* filebuffer = new char[dwsize];
+	fread(filebuffer, 1, dwsize, pfile);
+
+
+	char* pBegin = filebuffer;
+	char* pEnd = strchr(filebuffer, '\n');
+	int uiIndex = 1;
+
+	int st = 0;
+
+	while (pEnd != NULL)
+	{
+
+		std::string strbuff;
+		strbuff.insert(0, pBegin, pEnd-pBegin);
+		if (strbuff.empty())
+		{
+			return false;
+		}
+
+		if (st==0) 
+		{
+		if (1 == sscanf(strbuff.c_str(),"image %d",&image_index)) st=1;
+		} 
+		else if (st==1)
+		{
+			if (1 == sscanf(strbuff.c_str(),"width %d",&width)) st=2;
+		}
+		else if (st==2)
+		{
+			if (1 == sscanf(strbuff.c_str(),"height %d",&height)) st=3;
+		}
+		else if (st==3)
+		{
+			if (1 == sscanf(strbuff.c_str(),"segments %d",&segments_index)) st=4;
+		}
+		else if (st==4)
+		{
+			if (1 == sscanf(strbuff.c_str(),"gray %d",&gray)) st=5;
+		}
+		else if (st==5)
+		{
+			if (0==strcmp(strbuff.c_str(),"data")) st=6;
+		}
+		else if (st==6)
+		{
+			SEG temp = { -1, -1, -1, -1};
+if (4 == sscanf(strbuff.c_str(),"%d %d %d %d",&temp.segment_number, &temp.row, &temp.column_number1 , &temp.column_number2)) 
+			{
+				++uiIndex;
+				MySeg.push_back(temp);
+					
+			}
+	}
+
+
+			pBegin = pEnd + 1;
+			pEnd = strchr(pEnd + 1, '\n');
+			
+		}
+		delete[] filebuffer;
+		fclose(pfile);
+
+		vector<SEG>::iterator iter = MySeg.begin();
+		for (;iter !=MySeg.end(); ++iter)
+		{
+			cout<<iter->segment_number<<' ';
+			cout<<iter->row<<' ';
+			cout<<iter->column_number1 <<' ';
+			cout<<iter->column_number2<<' ';
+			cout<<endl;
+
+		}
+		getchar();
+
+		return true;
+	}
+
+	return false;
+}
+
+
+下面的任务就是修改代码，把它用在OpenCV中，来显示人工分割的图像啦!
+
+
+
+

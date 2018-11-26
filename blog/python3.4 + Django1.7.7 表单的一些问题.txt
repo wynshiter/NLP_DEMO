@@ -1,0 +1,217 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45172383				
+
+
+
+上面是没有调用cleaned_data的提交结果，可见模版直接把form里面的整个标签都接收过来了
+
+
+
+下面是调用cleaned_data 的结果
+
+
+
+
+
+
+django 的表单，提交上来之后是这样的：
+#coding： gb2312
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=10,label='subject')#设置最大长度为10
+    email = forms.EmailField(required=False,label='Email')#非必要字段
+    message = forms.CharField(widget=forms.Textarea,label='message')#指定form中组件的类型
+
+    #自定义校验规则，该方法在校验时被系统自动调用，次序在“字段约束”之后
+    def clean_message(self):
+        message = self.cleaned_data['message']#能到此处说明数据符合“字段约束”要求
+        num_words = len(message.split())
+        if num_words < 1:#单词个数
+            raise forms.ValidationError("your word is too short!")
+        return message
+
+比如下面这句：
+
+email = forms.EmailField(required=False,label='Email')#非必要字段
+其实可以作为非必要字段，required=False
+
+由于调用form.cleaned_data#只有各个字段都符合要求时才有对应的cleaned_data，之前好像必须得：
+if form.is_valid():#说明各个字段的输入值都符合要求
+所以上述字段required=False，在测试东西或者自己写东西，等安全性不高的场合就比较必要了
+
+#coding： gb2312
+from django.http import HttpResponse
+import datetime,calendar
+import time
+from django.http import HttpResponse
+from django.template import Context
+from django.template.loader import get_template
+from django.http import HttpResponse, Http404
+from django.contrib.auth.models import User
+from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
+from django.contrib.auth import logout
+from django.template import RequestContext
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+
+#from django import form
+
+from django.shortcuts import render 
+from .forms import ContactForm 
+#from django.shortcuts import render_to_response
+#from django_manage_app.forms import ContactForm
+
+def current_datetime(request):
+    now = time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime(time.time()))
+    html = '<html><body>It is now %s.</body></html>' %now
+    return HttpResponse(html)
+    
+def show_readme(request):
+    if request.method == 'POST':#提交请求时才会访问这一段，首次访问页面时不会执行
+        form = ContactForm(request.POST)
+    
+       
+    print (form['subject'])
+    print (form['email'])
+    print (form['message'])
+    print ("show ----------------")
+     
+    
+    #“首次访问”和“提交的信息不符合要求”时被调用
+    return render_to_response('show.html', {'form': form})
+    
+    
+def contact_author(request):
+    if request.method == 'POST':#提交请求时才会访问这一段，首次访问页面时不会执行
+        form = ContactForm(request.POST)
+        if form.is_valid():#说明各个字段的输入值都符合要求
+            cd = form.cleaned_data#只有各个字段都符合要求时才有对应的cleaned_data
+            #print (form.cleaned_data())
+            
+            print (cd['subject'])
+            print (cd['email'])
+            print (cd['message'])
+            #return render_to_response('contact_author.html', {'form': form})
+            #return redirect(reverse('','show_readme.html'))
+            #return HttpResponseRedirect('/thanks/') 
+            return render_to_response('show_readme.html', {'form': cd})
+            #此处逻辑应该是先生成新的预览页面，再保存为txt
+            
+            #return response
+            
+        
+    else:#首次访问该url时没有post任何表单
+        form = ContactForm()#第一次生成的form里面内容的格式
+        print (form)
+        print (form.is_valid())
+    
+    #“首次访问”和“提交的信息不符合要求”时被调用
+    return render_to_response('contact_author.html', {'form': form})
+    #return render_to_response('show.html', {'form': form})
+
+
+
+def thanks(request):
+
+    return render_to_response('thanks.html')
+    
+    
+def download_file(request):   
+    #from django.http import HttpResponse          
+    ## CSV  
+    #import csv      
+    #response = HttpResponse(mimetype='text/csv')  
+    #response['Content-Disposition'] = 'attachment; filename=my.csv'  
+    #writer = csv.writer(response)  
+    #writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])  
+    #writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])  
+ 
+    # Text file  
+    response = HttpResponse(content_type='text/plain')                                
+    response['Content-Disposition'] = 'attachment; filename=my.txt'                
+    response.write("aa\n")  
+    response.write("bb")   
+     
+    # PDF file   
+    #http://code.djangoproject.com/svn/django/branches/0.95-bugfixes/docs/outputting_pdf.txt  
+    #from reportlab.pdfgen import canvas  #need pip ind
+    #response = HttpResponse()#)mimetype='application/pdf')  
+    #response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'  
+    #p = canvas.Canvas(response)  
+    #p.drawString(100, 100, "Hello world.")  
+    #p.showPage()  
+    #p.save()  
+    
+    
+    #response = HttpResponse()
+    fout=open("mysite//test.txt","wt") 
+    str = "hello world"
+    fout.write(str)
+    fout.close()     
+    #response['Content-Disposition'] = 'attachment; filename=test.txt' 
+    data = open("mysite//test.txt", "rb").read()
+
+    html = '<html><body>%s</body></html>' %str
+    return response#HttpResponse(data, content_type="text/plain")
+    
+
+
+
+提交给模版的html：
+
+<html>
+<style type="text/css">
+    
+    .field{
+        background-color:#BCD8F5;
+    }
+</style>
+<head>
+    <title>show readme</title>
+</head>
+<body>
+
+    
+    
+        <!<div class="field">
+	
+             {{ form.subject }}
+             {{ form.email }}
+             {{ form.message }}
+            
+        <!</div>
+        
+   
+</body>
+</html>
+
+
+Django本身内建有一些app，例如注释系统和自动管理界面。 
+app的一个关键点是它们是很容易移植到其他project和被多个project复用。
+对于如何架构Django代码并没有快速成套的规则。
+如果你只是建造一个简单的Web站点，那么可能你只需要一个app就可以了；
+但如果是一个包含许多不相关的模块的复杂的网站，
+例如电子商务和社区之类的站点，那么你可能需要把这些模块划分成不同的app，以便以后复用。
+ 
+ 数据库模型有有效性验证
+C:\Python27\Lib\site-packages\Django-1.7.1-py2.7.egg\django\bin\mysite>python manage.py sqlall books
+CommandError: App 'books' has migrations. Only the sqlmigrate and sqlflush commands can be used when an app has migrations.
+此时需要输入如下部分即可
+C:\Python27\Lib\site-packages\Django-1.7.1-py2.7.egg\django\bin\mysite>python manage.py makemigrations
+C:\Python27\Lib\site-packages\Django-1.7.1-py2.7.egg\django\bin\mysite>python manage.py migrate
+
+若上述问题依旧：
+Since there is still a bit of backwards compatibility with django 1.6 and below you can still use the sql commands from django-admin. However, you have to delete the migrations folder first.
+To get the create statements you need to remove the migrations folder
+直接删除books app下面的migrations文件夹
+
+
+
+﻿﻿
+﻿﻿
+
+

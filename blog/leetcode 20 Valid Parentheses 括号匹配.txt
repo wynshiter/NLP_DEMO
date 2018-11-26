@@ -1,0 +1,179 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46701673				
+
+
+
+
+Given a string containing just the characters 
+'(', ')', '{', '}', '[' and']', determine if the input string is valid.
+The brackets must close in the correct order, 
+"()" and "()[]{}" are all valid but "(]" and 
+"([)]" are not.
+
+写了一个0ms 的代码：
+
+
+// 20150630.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+bool isValid(string s)
+{
+	if (s=="")return false;
+
+	stack<char> Parentheses;
+	int size =s.size();
+
+	Parentheses.push(s[0]);
+
+
+	for(int i = 1;i < size ;++i)
+	{
+
+		if(Parentheses.top()=='('&&s[i]==')'||Parentheses.top()=='['&&s[i]==']'||Parentheses.top()=='{'&&s[i]=='}')
+		{
+			Parentheses.pop();
+			if (Parentheses.empty()&&(i+1)!=size)
+			{
+				Parentheses.push(s[i+1]);
+				i++;
+			}
+		}
+
+		else
+		{
+			Parentheses.push(s[i]);
+		}
+
+
+	}
+
+	if(Parentheses.empty())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+int _tmain(int argc, _TCHAR* argv[])
+{
+	string s = "()[]{}";
+	isValid(s);
+	return 0;
+}
+
+
+
+
+另外一个看着好看点的：
+class Solution {
+    public:
+        bool isValid(string s)
+        {
+            std::stack<char> openStack;
+            for(int i = 0; i < s.length(); i++)
+            {
+                switch(s[i])
+                {
+                    case '(':
+                    case '{':
+                    case '[':
+                        openStack.push(s[i]);
+                        break;
+                    case ')':
+                        if(!openStack.empty() && openStack.top() == '(' )
+                            openStack.pop();
+                        else
+                            return false;
+                        break;
+                    case '}':
+                        if(!openStack.empty() && openStack.top() == '{' )
+                            openStack.pop();
+                        else
+                            return false;
+                        break;
+                    case ']':
+                        if(!openStack.empty() && openStack.top() == '[' )
+                            openStack.pop();
+                        else
+                            return false;
+                        break;
+
+                    default:
+                        return false;
+                }
+            }
+
+            if(openStack.empty())
+                return true;
+            else
+                return false;
+        }
+    };
+
+
+
+python代码：
+class Solution:
+    # @return a boolean
+    def isValid(self, s):
+        stack = []
+        dict = {"]":"[", "}":"{", ")":"("}
+        for char in s:
+            if char in dict.values():
+                stack.append(char)
+            elif char in dict.keys():
+                if stack == [] or dict[char] != stack.pop():
+                    return False
+            else:
+                return False
+        return stack == []
+</pre><pre class="python" name="code">class Solution:
+    # @param s, a string
+    # @return a boolean
+    def isValid(self, s):
+        paren_map = {
+            '(': ')',
+            '{': '}',
+            '[': ']'
+        }
+        stack = []
+
+        for p in s:
+            if p in paren_map:
+                stack.append(paren_map[p])
+            else:
+                if not stack or stack.pop() != p:
+                    return False
+
+        return not stack
+
+class Solution:
+    # @param s, a string
+    # @return a boolean
+    def isValid(self, s):
+        d = {'(':')', '[':']','{':'}'}
+        sl = []
+        for i in s:
+            if i in d:
+                sl.append(i)
+            else:
+                if not sl or d[sl.pop()] != i:
+                    return False
+
+        if sl:
+            return False
+        return True
+
+﻿﻿
+
+

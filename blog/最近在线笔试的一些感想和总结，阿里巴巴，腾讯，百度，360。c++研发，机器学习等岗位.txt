@@ -1,0 +1,188 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/48560461				
+
+
+持续更新中。。。
+
+
+
+1.编程界牛人太多了，还是要好好a题，好好弄清楚基础算法，并且用代码实现
+
+2.c/c++方向其实来回来去那么几道题，做好了记到脑子里。
+
+
+下面就是我打算把不会的，不清楚的都贴上来然后好好解析做一下：
+
+
+1
+
+
+2
+
+3
+
+
+
+
+
+
+
+
+
+4
+
+
+
+360还有一个题挺难的，下面是bbs 的解法：
+
+
+5
+
+
+
+输出结果：
+
+
+
+
+// jingdongtest.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+
+int getHigh(int x)
+{
+	int result  = x;
+	while(x>0)
+	{
+		x = x/2;
+	result = x*2 + result;
+	
+	}
+
+	return result;
+}
+
+
+class MyClass
+{
+public:
+	MyClass(int i = 0)
+	{
+		cout<<i;
+	}
+	MyClass(const MyClass &x)
+	{
+		cout<<2;
+	}
+	MyClass& operator=(const MyClass &x)
+	{//断点都不能打进来，说明输出没用
+		cout<<3;
+		return *this;
+	}
+	~MyClass()
+	{
+		cout<<4;
+	}
+};
+
+class ClassA
+{
+	friend double func(const ClassA & obj1,const ClassA& obj2)
+	{
+		double da = obj1.i_ - obj2.i_;
+		double db = obj1.j_ - obj2.j_;
+		return (da*da + db*db);
+	}
+public:
+	ClassA(int i,int j):i_(i),j_(j){}
+protected:
+private:
+	int i_;
+	int j_;
+};
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+/*
+	int x = 0;
+	int result = 0;
+	
+
+	while(cin>>x)
+	{
+		result = result + getHigh(x);
+		cout<<result<<endl;
+	}
+	
+	cout<<x<<endl;*/
+
+	struct  
+	{
+		union
+		{
+			char a;
+			int b;
+			int c;
+		};
+		/*union
+		{
+	     char r;
+		 char o;
+		};*/
+		
+		int e;
+		char q;
+		char w;
+		
+	} a;
+
+	int x = sizeof(a);
+
+	//int yichu = -1;
+	//unsigned int feifu = yichu;
+	//cout<<feifu;
+
+	MyClass obj1(1),obj2(2);
+	MyClass obj3 = obj1;
+
+
+
+	ClassA obj11(1,2);
+	ClassA obj21(3,4);
+	cout<< func(obj11,obj21)<<endl;
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+这个是西安一个小公司机器学习的题目：
+
+
+
+
+
+
+
+
+
+﻿﻿
+
+

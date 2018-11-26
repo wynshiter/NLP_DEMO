@@ -1,0 +1,63 @@
+content
+
+
+
+#include <vector>
+#include <iostream>
+
+using namespace std;
+
+void print(vector<int>& v)//打印函数
+{
+	cout<<"-----------------------------------------------------"<<endl;
+	cout<<"empty = "<<v.empty()<<endl;
+	cout<<"size = "<<v.size()<<endl;
+	cout<<"max_size = "<<v.max_size()<<endl;
+	cout<<"capacity = "<<v.capacity()<<endl;
+}
+
+void reverse_print(vector<int>& v)//反向遍历vector元素
+{
+	vector<int>::reverse_iterator ri , riend;
+	riend = v.rend();
+
+	for (ri = v.rbegin();ri!=riend;ri++)
+	{
+		cout<<*ri<<endl;
+	}
+
+	
+}
+
+int main()
+{
+	vector<int> v;
+
+	print(v);
+
+	//添加5个元素
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	v.push_back(4);
+	v.push_back(5);
+	print(v);
+
+	// 再添加4个元素
+	v.push_back(6);
+	v.push_back(7);
+	v.push_back(8);
+	v.push_back(9);
+	print(v);
+
+	//调整vector数据空间大小
+	v.reserve(40);
+	print(v);
+
+	reverse_print(v);
+
+	getchar();
+	return 0;
+
+} 
+

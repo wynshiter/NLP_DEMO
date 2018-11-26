@@ -1,0 +1,476 @@
+content
+
+
+
+ VC调试(TC或BC用TD调试)时按Alt+8、Alt+6和Alt+5,打开汇编窗口、内存窗口和寄存器窗口看每句C对应的汇编、单步执行并观察相应内存和寄存器变化，这样过一遍不就啥都明白了吗。
+（Linux或Unix下可以在用GDB调试时,看每句C对应的汇编并单步执行观察相应内存和寄存器变化。）
+想要从本质上理解C指针，必须学习汇编以及C和汇编的对应关系。
+从汇编的角度理解和学习C语言的指针，原本看似复杂的东西就会变得非常简单！
+指针即地址。“地址又是啥？”“只能从汇编语言和计算机组成原理的角度去解释了。”
+提醒：
+“学习用汇编语言写程序”
+和
+“VC调试(TC或BC用TD调试)时按Alt+8、Alt+6和Alt+5,打开汇编窗口、内存窗口和寄存器窗口看每句C对应的汇编、单步执行并观察相应内存和寄存器变化，这样过一遍不就啥都明白了吗。
+（Linux或Unix下可以在用GDB调试时,看每句C对应的汇编并单步执行观察相应内存和寄存器变化。）
+想要从本质上理解C指针，必须学习C和汇编的对应关系。”
+不是一回事！
+不要迷信书、考题、老师、回帖；
+要迷信CPU、编译器、调试器、运行结果。
+并请结合“盲人摸太阳”和“驾船出海时一定只带一个指南针。”加以理解。
+ 
+做个可能不太恰当的比喻：
+人想让狗帮忙逮只兔子，可是人说话狗听不懂，于是人发明了一种介乎人言和狗语之间的语言，即口令。
+人想让电脑帮忙做计算，可是人话电脑听不懂，于是人发明了一种介乎人言和汇编机器码之间的语言，即C语言。
+人对狗的口令得让人容易学、也得让狗容易懂。
+C语言同样得让人容易学、也得让电脑容易懂。
+相比之下C++、Java就是人学得费劲、电脑也经常闹不懂。
+毛主席说：“决定战争胜负的关键因素是人不是武器。”
+不要使用
+while (条件)
+更不要使用
+while (组合条件)
+要使用
+while (1) {
+  if (条件1) break;
+  //...
+  if (条件2) continue;
+  //...
+  if (条件3) return;
+  //...
+}
+因为前两种写法在语言表达意思的层面上有二义性，只有第三种才忠实反映了程序流的实际情况。
+典型如：
+下面两段的语义都是当文件未结束时读字符
+whlie (!feof(f)) {
+  a=fgetc(f);
+  //...
+  b=fgetc(f);//可能此时已经feof了！
+  //...
+}
+而这样写就没有问题：
+whlie (1) {
+  a=fgetc(f);
+  if (feof(f)) break;
+  //...
+  b=fgetc(f);
+  if (feof(f)) break;
+  //...
+}
+类似的例子还可以举很多。
+检查是否资源泄漏的办法之一：
+在任务管理器 进程 查看 选择列 里面选择：内存使用、虚拟内存大小、句柄数、线程数、USER对象、GDI对象
+让你的程序(进程)不退出,循环执行主流程很多遍，越多越好，比如1000000次甚至无限循环，记录以上各数值，再隔至少一小时，越长越好，比如一个月，再记录以上各数值。如果以上两组数值的差较大或随时间流逝不断增加，则铁定有对应资源的资源泄漏！
+C++只是一种面向对象的编程思想。
+再抽象的编程语言，最后不都变成汇编代码了吗？我们完全可以说汇编语言是面向对象、脚本化、动态化、泛函化、并行化、分布化的语言。
+这个世界上最大的差别和最远的距离都存在于“说”和“做”之间。
+程序员要做的不是尽力避免错误，而是聚焦在快速发现并改正错误。真正以快速方式轻易解决错误，“快速的失败”远胜过“预防错误”。Fred George
+在Word2003中开始记录宏，手动完成所需功能，结束记录宏，按Alt+F11键，查看刚才记录的宏对应的VBA代码。
+system("dir /b /a-d c:\\*.* >d:\\allfiles.txt");
+//读文件d:\\allfiles.txt的内容即C:\\下所有文件的名字
+system("dir /b /ad c:\\*.* >d:\\alldirs.txt");
+//读文件d:\\alldirs.txt的内容即C:\\下所有子目录的名字
+请记住，能用shell命令获取文件、文件夹信息或者操作文件、文件夹最好用shell命令获取或者操作，而不要用各种API获取或者操作，因为当遇到非法文件夹名或非法文件名或非法文件长度、非法文件日期、压缩文件、链接文件、稀疏文件……等各种意料之外的情况时，API会处理的不全面或陷入死循环，而shell命令不会。
+在占用内存空间较大的局部数组声明的前面加static将其从堆栈数据段挪到全局数据段即可。
+要想在Windows环境下稳定运行tc.exe
+建一个批处理tc.bat,内容为下面两行，放在tc.exe同目录下，再将tc.bat发送到桌面快捷方式：
+del tc*.swp >NUL
+start command /c tc.exe
+如果想在IDE里面使用鼠标，还应将快捷方式属性中的快速编辑模式关掉。
+printf里面的%和变量的一一对应关系
+scanf里面的%和变量以及变量前加不加&的一一对应关系
+是C代码中非常容易出错的地方。
+所以在编译源代码之前值得专门仔细检查一遍甚至多遍。
+在每个最后不带\n的printf后面加fflush(stdout);
+在每个不想受接收缓冲区旧内容影响的scanf前面加rewind(stdin);
+另外请检查scanf的返回值。
+#pragma comment(linker,"/SECTION:.rdata,RW")
+#pragma comment(lib,"user32")
+#pragma warning(disable:4996)
+所谓修改删除文件a某位置的内容，其实是读打开文件a，再将‘a中修改删除位置之前的内容＋修改删除的内容＋a中修改删除位置之后的内容’保存到文件b，关闭文件a，删除文件a，将文件b改名为与之前文件a相同的名字，仅此而已。
+ 
+ 
+ 
+ 
+#include <iostream>
+#include <string>
+using namespace std;
+inline int compare(string str1,string str2) {//相等返回0，大于返回1，小于返回-1
+         if (str1.size()>str2.size()) return 1; //长度长的整数大于长度小的整数
+    else if (str1.size()<str2.size()) return -1;
+    else                              return str1.compare(str2); //若长度相等，则头到尾按位比较
+}
+string SUB_INT(string str1,string str2);
+string ADD_INT(string str1,string str2) {//高精度加法
+    int sign=1; //sign 为符号位
+    string str;
+    if (str1[0]=='-') {
+        if (str2[0]=='-') {
+            sign=-1;
+            str=ADD_INT(str1.erase(0,1),str2.erase(0,1));
+        } else {
+            str=SUB_INT(str2,str1.erase(0,1));
+        }
+    } else {
+        if (str2[0]=='-') {
+            str=SUB_INT(str1,str2.erase(0,1));
+        } else { //把两个整数对齐，短整数前面加0补齐
+            string::size_type L1,L2;
+            int i;
+            L1=str1.size();
+            L2=str2.size();
+            if (L1<L2) {
+                for (i=1;i<=L2-L1;i++) str1="0"+str1;
+            } else {
+                for (i=1;i<=L1-L2;i++) str2="0"+str2;
+            }
+            int int1=0,int2=0; //int2 记录进位
+            for (i=str1.size()-1;i>=0;i--) {
+                int1=(int(str1[i])-'0'+int(str2[i])-'0'+int2)%10;
+                int2=(int(str1[i])-'0'+int(str2[i])-'0'+int2)/10;
+                str=char(int1+'0')+str;
+            }
+            if (int2!=0) str=char(int2+'0')+str;
+        }
+    }
+    //运算后处理符号位
+    if ((sign==-1)&&(str[0]!='0')) str="-"+str;
+    return str;
+}
+string SUB_INT(string str1,string str2) {//高精度减法
+    int sign=1; //sign 为符号位
+    string str;
+    int i,j;
+    if (str2[0]=='-') {
+        str=ADD_INT(str1,str2.erase(0,1));
+    } else {
+        int res=compare(str1,str2);
+        if (res==0) return "0";
+        if (res<0) {
+            sign=-1;
+            string temp =str1;
+            str1=str2;
+            str2=temp;
+        }
+        string::size_type tempint;
+        tempint=str1.size()-str2.size();
+        for (i=str2.size()-1;i>=0;i--) {
+            if (str1[i+tempint]<str2[i]) {
+                j=1;
+                while (1) {//zhao4zhong1添加
+                    if (str1[i+tempint-j]=='0') {
+                        str1[i+tempint-j]='9';
+                        j++;
+                    } else {
+                        str1[i+tempint-j]=char(int(str1[i+tempint-j])-1);
+                        break;
+                    }
+                }
+                str=char(str1[i+tempint]-str2[i]+':')+str;
+            } else {
+                str=char(str1[i+tempint]-str2[i]+'0')+str;
+            }
+        }
+        for (i=tempint-1;i>=0;i--) str=str1[i]+str;
+    }
+    //去除结果中多余的前导0
+    str.erase(0,str.find_first_not_of('0'));
+    if (str.empty()) str="0";
+    if ((sign==-1) && (str[0]!='0')) str ="-"+str;
+    return str;
+}
+string MUL_INT(string str1,string str2) {//高精度乘法
+    int sign=1; //sign 为符号位
+    string str;
+    if (str1[0]=='-') {
+        sign*=-1;
+        str1 =str1.erase(0,1);
+    }
+    if (str2[0]=='-') {
+        sign*=-1;
+        str2 =str2.erase(0,1);
+    }
+    int i,j;
+    string::size_type L1,L2;
+    L1=str1.size();
+    L2=str2.size();
+    for (i=L2-1;i>=0;i--) { //模拟手工乘法竖式
+        string tempstr;
+        int int1=0,int2=0,int3=int(str2[i])-'0';
+        if (int3!=0) {
+            for (j=1;j<=(int)(L2-1-i);j++) tempstr="0"+tempstr;
+            for (j=L1-1;j>=0;j--) {
+                int1=(int3*(int(str1[j])-'0')+int2)%10;
+                int2=(int3*(int(str1[j])-'0')+int2)/10;
+                tempstr=char(int1+'0')+tempstr;
+            }
+            if (int2!=0) tempstr=char(int2+'0')+tempstr;
+        }
+        str=ADD_INT(str,tempstr);
+    }
+    //去除结果中的前导0
+    str.erase(0,str.find_first_not_of('0'));
+    if (str.empty()) str="0";
+    if ((sign==-1) && (str[0]!='0')) str="-"+str;
+    return str;
+}
+string DIVIDE_INT(string str1,string str2,int flag) {//高精度除法。flag==1时,返回商; flag==0时,返回余数
+    string quotient,residue; //定义商和余数
+    int sign1=1,sign2=1;
+    if (str2 == "0") {  //判断除数是否为0
+        quotient= "ERROR!";
+        residue = "ERROR!";
+        if (flag==1) return quotient;
+        else         return residue ;
+    }
+    if (str1=="0") { //判断被除数是否为0
+        quotient="0";
+        residue ="0";
+    }
+    if (str1[0]=='-') {
+        str1   = str1.erase(0,1);
+        sign1 *= -1;
+        sign2  = -1;
+    }
+    if (str2[0]=='-') {
+        str2   = str2.erase(0,1);
+        sign1 *= -1;
+    }
+    int res=compare(str1,str2);
+    if (res<0) {
+        quotient="0";
+        residue =str1;
+    } else if (res == 0) {
+        quotient="1";
+        residue ="0";
+    } else {
+        string::size_type L1,L2;
+        L1=str1.size();
+        L2=str2.size();
+        string tempstr;
+        tempstr.append(str1,0,L2-1);
+        for (int i=L2-1;i<L1;i++) { //模拟手工除法竖式
+            tempstr=tempstr+str1[i];
+            tempstr.erase(0,tempstr.find_first_not_of('0'));//zhao4zhong1添加
+            if (tempstr.empty()) tempstr="0";//zhao4zhong1添加
+            for (char ch='9';ch>='0';ch--) { //试商
+                string str;
+                str=str+ch;
+                if (compare(MUL_INT(str2,str),tempstr)<=0) {
+                    quotient=quotient+ch;
+                    tempstr =SUB_INT(tempstr,MUL_INT(str2,str));
+                    break;
+                }
+            }
+        }
+        residue=tempstr;
+    }
+    //去除结果中的前导0
+    quotient.erase(0,quotient.find_first_not_of('0'));
+    if (quotient.empty()) quotient="0";
+    if ((sign1==-1)&&(quotient[0]!='0')) quotient="-"+quotient;
+    if ((sign2==-1)&&(residue [0]!='0')) residue ="-"+residue ;
+    if (flag==1) return quotient;
+    else         return residue ;
+}
+string DIV_INT(string str1,string str2) {//高精度除法,返回商
+    return DIVIDE_INT(str1,str2,1);
+}
+string MOD_INT(string str1,string str2) {//高精度除法,返回余数
+    return DIVIDE_INT(str1,str2,0);
+}
+int main() {
+    char ch;
+    string s1,s2,res;
+
+    while (cin>>s1>>ch>>s2) {
+        switch (ch) {
+            case '+':res=ADD_INT(s1,s2);break;
+            case '-':res=SUB_INT(s1,s2);break;
+            case '*':res=MUL_INT(s1,s2);break;
+            case '/':res=DIV_INT(s1,s2);break;
+            case '%':res=MOD_INT(s1,s2);break;
+            default :                   break;
+        }
+        cout<<res<<endl;
+    }
+    return(0);
+}
+ 
+ 
+写日志文件：
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef WIN32
+    #include <windows.h>
+    #include <io.h>
+#else
+    #include <unistd.h>
+    #include <sys/time.h>
+    #include <pthread.h>
+    #define  CRITICAL_SECTION   pthread_mutex_t
+    #define  _vsnprintf         vsnprintf
+#endif
+//Log{
+#define MAXLOGSIZE 20000000
+#define MAXLINSIZE 16000
+#include <time.h>
+#include <sys/timeb.h>
+#include <stdarg.h>
+char logfilename1[]="MyLog1.log";
+char logfilename2[]="MyLog2.log";
+static char logstr[MAXLINSIZE+1];
+char datestr[16];
+char timestr[16];
+char mss[4];
+CRITICAL_SECTION cs_log;
+FILE *flog;
+#ifdef WIN32
+void Lock(CRITICAL_SECTION *l) {
+    EnterCriticalSection(l);
+}
+void Unlock(CRITICAL_SECTION *l) {
+    LeaveCriticalSection(l);
+}
+#else
+void Lock(CRITICAL_SECTION *l) {
+    pthread_mutex_lock(l);
+}
+void Unlock(CRITICAL_SECTION *l) {
+    pthread_mutex_unlock(l);
+}
+#endif
+void LogV(const char *pszFmt,va_list argp) {
+    struct tm *now;
+    struct timeb tb;
+
+    if (NULL==pszFmt||0==pszFmt[0]) return;
+    _vsnprintf(logstr,MAXLINSIZE,pszFmt,argp);
+    ftime(&tb);
+    now=localtime(&tb.time);
+    sprintf(datestr,"%04d-%02d-%02d",now->tm_year+1900,now->tm_mon+1,now->tm_mday);
+    sprintf(timestr,"%02d:%02d:%02d",now->tm_hour     ,now->tm_min  ,now->tm_sec );
+    sprintf(mss,"%03d",tb.millitm);
+    printf("%s %s.%s %s",datestr,timestr,mss,logstr);
+    flog=fopen(logfilename1,"a");
+    if (NULL!=flog) {
+        fprintf(flog,"%s %s.%s %s",datestr,timestr,mss,logstr);
+        if (ftell(flog)>MAXLOGSIZE) {
+            fclose(flog);
+            if (rename(logfilename1,logfilename2)) {
+                remove(logfilename2);
+                rename(logfilename1,logfilename2);
+            }
+        } else {
+            fclose(flog);
+        }
+    }
+}
+void Log(const char *pszFmt,...) {
+    va_list argp;
+
+    Lock(&cs_log);
+    va_start(argp,pszFmt);
+    LogV(pszFmt,argp);
+    va_end(argp);
+    Unlock(&cs_log);
+}
+//Log}
+int main(int argc,char * argv[]) {
+    int i;
+#ifdef WIN32
+    InitializeCriticalSection(&cs_log);
+#else
+    pthread_mutex_init(&cs_log,NULL);
+#endif
+    for (i=0;i<10000;i++) {
+        Log("This is a Log %04d from FILE:%s LINE:%d\n",i, __FILE__, __LINE__);
+    }
+#ifdef WIN32
+    DeleteCriticalSection(&cs_log);
+#else
+    pthread_mutex_destroy(&cs_log);
+#endif
+    return 0;
+}
+//1-78行添加到你带main的.c或.cpp的那个文件的最前面
+//81-85行添加到你的main函数开头
+//89-93行添加到你的main函数结束前
+//在要写LOG的地方仿照第87行的写法写LOG到文件MyLog1.log中
+
+
+控制台输出中文：
+#pragma comment(lib,"user32")
+#pragma comment(lib,"gdi32")
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <windows.h>
+HWND WINAPI GetConsoleWindow();
+void HideTheCursor() {
+    CONSOLE_CURSOR_INFO cciCursor;
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (GetConsoleCursorInfo(hStdOut, &cciCursor)) {
+        cciCursor.bVisible = FALSE;
+        SetConsoleCursorInfo(hStdOut, &cciCursor);
+    }
+}
+void ShowTheCursor() {
+    CONSOLE_CURSOR_INFO cciCursor;
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (GetConsoleCursorInfo(hStdOut, &cciCursor)) {
+        cciCursor.bVisible = TRUE;
+        SetConsoleCursorInfo(hStdOut, &cciCursor);
+    }
+}
+int main() {
+    HWND   hwnd;
+    HDC    hdc;
+    HFONT  hfont;
+    RECT   rect,wsize;
+    HBRUSH hbrush;
+    int    y,x,d,g;
+
+    system("color F0");
+    system("cls");
+    HideTheCursor();
+    hwnd  =GetConsoleWindow();
+    GetClientRect(hwnd,&wsize);
+    hdc   =GetDC(hwnd);
+    hfont =CreateFont(48,0,0,0,0,0,0,0,0,0,0,0,0,"华文楷体");
+    hbrush=CreateSolidBrush((COLORREF)0x00FFFFFF);
+    SelectObject(hdc,hfont);
+    y=10;x=30;d=4;g=3;
+    while (1) {
+        rect.left=x;
+        rect.top=y;
+        rect.right=x+300+d+1;
+        rect.bottom=y+60+d+1;
+        FillRect(hdc, &rect, hbrush);
+        TextOut(hdc,x+10,y+10,"地球人都知道！",14);
+        MoveToEx(hdc,x+5,y+5,NULL);
+        LineTo(hdc,x+300,y+  5);
+        LineTo(hdc,x+300,y+ 60);
+        LineTo(hdc,x+  5,y+ 60);
+        LineTo(hdc,x+  5,y+  5);
+        Sleep(15);
+        if (_kbhit()) {getch();break;}
+        switch (g) {
+        case 0:if (y>                d) y-=d; else g=2;if (x>                d) x-=d; else g=1;break;// ↖
+        case 1:if (y>                d) y-=d; else g=3;if (x<wsize.right-300-d) x+=d; else g=0;break;// ↗
+        case 2:if (y<wsize.bottom-60-d) y+=d; else g=0;if (x>                d) x-=d; else g=3;break;// ↙
+        case 3:if (y<wsize.bottom-60-d) y+=d; else g=1;if (x<wsize.right-300-d) x+=d; else g=2;break;// ↘
+        }
+    }
+    DeleteObject(hbrush);
+    DeleteObject(hfont);
+    ReleaseDC(hwnd,hdc);
+    system("color 07");
+    system("cls");
+    ShowTheCursor();
+    return 0;
+}
+
+ 
+            
+

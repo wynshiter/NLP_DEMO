@@ -1,0 +1,165 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/48739799				
+
+
+ 
+ 
+ 
+ 
+感谢赛码网，奇怪的A题设计，bat一轮大企业过去，没A上去几道。
+intel 笔试：
+1.单链表逆置，双向链表删除
+2.层次遍历二叉树
+3.rand4（）生成rand9（）
+4.非常多的各种指针操作。
+面试：完全的问项目
+
+1.stl boost c++中的智能指针，以及其实现原理？
+2.b 树的插入
+3.代码实现stack 的排序，只能用stack 的基本操作
+乐港面试：
+服务器实时排名？（和完美世界一个样子）
+为啥下午5点review code 的问题。
+
+// testofrecursive.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include "iostream"
+using namespace std;
+
+
+class A
+{
+	int a;
+	char c;
+public:
+	void foo(){cout<<"a foo"<<endl;}
+	virtual void fool(){cout<<"a fool"<<endl;}
+};
+class B:public A
+{
+	int a;
+	char c;
+public:
+	void foo(){cout<<"b foo"<<endl;}
+	void fool(){cout<<"b fool"<<endl;}
+};
+
+
+void func(int k)
+{
+	if (k>0)
+	{
+		cout<<k;
+		func(k-1);
+		cout<<endl;
+		func(k-1);
+		//func(k-1);
+	}
+}
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	func(4);
+	int size = sizeof(A);
+
+	A *a = new A;
+	B *b = new B;
+
+
+	b->fool();
+
+	b = (B *)a;
+	a->foo();
+	b->foo();
+	b->fool();
+	
+	return 0;
+}
+
+
+ 
+
+ 
+完美世界笔试，面试：
+1.c++强制类型转换：http://www.cnblogs.com/alexqdh/archive/2011/06/09/2075713.html
+2.inline函数优缺点：
+
+面试：滑动窗口，服务器实时排名，为什么想做服务器后台开发？数组中第k大的数，阻塞和非阻塞
+
+研究所：
+说说你的规划，走技术路线，成为一个T字形的人才（这个回答应该会能impressive 面试官）
+
+中移动物联网：
+1T数据的高效传输方案
+兆芯：
+ 
+ 
+ 
+ 
+ 
+滴滴出行，编程题，要求找到数组中连续和等于0的，最长子数列：
+你应该听说过分治法，正是：分而治之。我们有一个很复杂的大问题，很难直接解决它，但是我们发现可以把问题划分成子问题，如果子问题规模还是太大，并且它还可以继续划分，那就继续划分下去。直到这些子问题的规模已经很容易解决了，那么就把所有的子问题都解决，最后把所有的子问题合并，我们就得到复杂大问题的答案了。可能说起来简单，但是仍不知道怎么做，接下来分析这个问题：
+首先，我们可以把整个序列平均分成左右两部分，答案则会在以下三种情况中：
+1、所求序列完全包含在左半部分的序列中。
+2、所求序列完全包含在右半部分的序列中。
+3、所求序列刚好横跨分割点，即左右序列各占一部分。
+前两种情况和大问题一样，只是规模小了些，如果三个子问题都能解决，那么答案就是三个结果的最大值。我们主要研究一下第三种情况如何解决：
+我们只要计算出：以分割点为起点向左的最大连续序列和、以分割点为起点向右的最大连续序列和，这两个结果的和就是第三种情况的答案。因为已知起点，所以这两个结果都能在O(N)的时间复杂度能算出来。
+递归不断减小问题的规模，直到序列长度为1的时候，那答案就是序列中那个数字。
+
+// testdidi.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+#include<iostream>
+
+using namespace std;
+int result[10000] = {1,2,3,4,-1,-2,-3,-3,1,2};
+
+int main()
+{
+	
+	
+	
+	int length = 10;
+	int begin = 0;
+	int end = 0;
+	int max_length = 0;
+
+	int sum = 0;
+	for(int i = 0;i <length;++i)
+	{
+		sum = 0;
+		for(int j = i;j <length;++j)
+		{
+			sum = sum + result[j];
+			if ((sum == 0) && (max_length < j-i))
+			{
+				begin = i;
+				end = j;
+				max_length = end - begin;
+			}
+
+		}
+		
+	}
+
+		for(int i = begin;i<=end;++i)
+		{
+			cout<<result[i];
+			cout<<' ';
+		}
+		return 0;
+}
+ 
+
+ 
+ 
+﻿﻿ 
+

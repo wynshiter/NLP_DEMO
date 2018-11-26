@@ -1,0 +1,233 @@
+content
+
+
+
+
+下面是组合模式的UML类图：
+ 
+
+ 
+<span style="font-family:Microsoft YaHei;font-size:18px;"><span style="font-family:Microsoft YaHei;font-size:18px;">//composite.h
+
+#ifndef _COMPOSITE_H_
+#define _COMPOSITE_H_
+
+
+#include <vector>
+using namespace std;
+
+/*
+Component 抽象基类，为组合中的对象声明接口，声明了类共有接口的缺省行为
+（如这里的Add，Remove,GetChild函数），声明一个接口函数可以访问Component的子组件
+*/
+
+class Component
+{
+public:
+	//纯虚函数，只提供接口，没有默认实现
+	virtual void Operation() = 0;
+
+	// 虚函数，提供接口，有默认的实现就是什么都不做
+	virtual void Add(Component* com);
+	virtual void Remove(Component* com);
+	virtual Component* GetChild(int index);
+	virtual ~Component();
+
+protected:
+	Component();
+private:
+};
+
+//Leaf是叶子节点，也就是不含有子组件的节点类，所以不用实现Add，Remove，GetChild等方法
+
+class Leaf:public Component
+{
+public:
+	//只实现Operation接口
+	virtual void Operation();
+	Leaf();
+	~Leaf();
+
+protected:
+private:
+};
+
+//Composite:含有子组件的类
+class Composite:public Component
+{
+public:
+	Composite();
+	~Composite();
+	//实现所有接口
+	void Operation();
+	void Add(Component* com);
+	void Remove(Component* com);
+	Component* GetChild(int index);
+
+protected:
+private:
+	vector<Component* >m_ComVec;
+};
+
+#endif</span></span>
+ 
+ 
+<span style="font-family:Microsoft YaHei;font-size:18px;">//composite.cpp
+// composite.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include "composite.h"
+#include <iostream>
+#include <vector>
+using namespace std;
+
+Component::Component()
+{}
+
+Component::~Component()
+{}
+
+void Component::Add(Component* com)
+{
+	cout<<"Add"<<endl;
+}
+
+void Component::Remove(Component* com)
+{
+
+}
+
+void Component::Operation()
+{
+	cout<<"Component::Operarion"<<endl;
+}
+
+Component* Component::GetChild(int index)
+{
+	return NULL;
+}
+
+Leaf::Leaf()
+{
+
+}
+
+Leaf::~Leaf()
+{
+
+}
+
+void Leaf::Operation()
+{
+	cout<<"Leaf::Operation"<<endl;
+
+}
+
+Composite::Composite()
+{
+
+}
+
+Composite::~Composite()
+{
+
+}
+
+void Composite::Add(Component* com)
+{
+	this->m_ComVec.push_back(com);
+}
+
+void Composite::Remove(Component* com)
+{
+	vector<Component* >::iterator iter = this->m_ComVec.begin();
+	while (iter!=this->m_ComVec.end())
+	{
+		if (*iter == com)
+		{
+			iter = this->m_ComVec.erase(iter);
+		}
+	}
+	//this->m_ComVec.erase(com);
+}
+
+void Composite::Operation()
+{
+	cout<<"Composite::Operation"<<endl;
+	vector<Component*>::iterator iter = this->m_ComVec.begin();
+	for (;iter!= this->m_ComVec.end();iter++)
+	{
+		(*iter)->Operation();
+	}
+}
+
+Component* Composite::GetChild(int index)
+{
+	if (index < 0 ||index > this->m_ComVec.size())
+	{
+		return NULL;
+	}
+	return this->m_ComVec[index];
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	 /*
+      不管是叶子Leaf还是Composite对象pRoot、pCom都实现了Operation接口，所以可以一致对待，直接调用Operation()
+      体现了“使得用户对单个对象和组合对象的使用具有一致性。”
+    */
+    Composite* pRoot = new Composite();
+
+    //组合对象添加叶子节点
+    pRoot->Add(new Leaf());
+
+    Leaf* pLeaf1 = new Leaf();
+    Leaf* pLeaf2 = new Leaf();
+
+    //这里的叶子再添加叶子是没有意义的。
+    //由于叶子与组合对象继承了相同的接口，所以语法上是对的，实际上什么也没做(继承自基类Component的Add方法)。
+    //叶子节点只实现了Operation方法，其他Add、Remove、GetChild都继承自基类，没有实际意义。
+    pLeaf1->Add(pLeaf2);
+    pLeaf1->Remove(pLeaf2);
+    //执行叶子Operation操作
+    pLeaf1->Operation();
+
+    //组合对象实现了基类Component的所有接口，所以可以做各种操作(Add、Remove、GetChild、Operation)。
+    Composite* pCom = new Composite();
+    //组合对象添加叶子节点
+    pCom->Add(pLeaf1);
+    //组合对象添加叶子节点
+    pCom->Add(pLeaf2);
+    //执行组合对象Operation操作
+    pCom->Operation();
+
+    //组合对象添加组合对象
+   // pRoot->Add(pCom);
+
+    //执行组合对象Operation操作
+    //pRoot->Operation();
+
+    //Component* cp = pCom->GetChild(0);
+    //cp->Operation();
+
+    //pCom->Remove(pLeaf1);
+
+	getchar();
+	return 0;
+}
+
+</span>
+ 
+ 
+ 
+输出结果：
+ 
+
+ 
+ 
+文章来源：
+ 
+http://www.cnblogs.com/jiese/p/3168844.html
+
+

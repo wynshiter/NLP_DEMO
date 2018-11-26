@@ -1,0 +1,190 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/46688303				
+
+
+Write a function to find the longest common prefix string amongst an array of strings.
+ 
+
+ 
+分析】
+公共前缀指的是所有字符串的前缀都相同。显然，这个最长公共前缀的长度不会超过所有字符串中最短的那个。
+我们先求得最短串长minLen，然后遍历所有字符串中的前minLen是否相等。
+ 
+我的解决方案：
+ 
+ 
+
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs)
+    {
+        
+        if(strs.size() == 0) 
+        return "";
+        
+        sort(strs.begin(),strs.end());
+        int size = strs.size();
+        int min_size = strs[0].length();
+        string prefix = "";
+        for(int i =0;i< min_size;++i)
+        {
+            char temp = strs[0][i];
+            for(int j = 1;j<size;++j)
+            {
+                if(strs[j][i]!=temp)
+                {
+                    //break;
+                    return prefix;
+                }
+                
+            }
+            prefix.append(1,temp); //= prefix +temp;//const char*的话怎么加进去呢？
+        }
+        
+        return prefix;
+    }
+};
+ 
+ 
+ 
+ 
+ 
+ 
+c++解决方案：
+
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        if(strs.empty()) return "";
+        std::sort(strs.begin(),strs.end());
+        string ans=strs[0];
+        for (int i = 0; i < strs.size(); ++i)       
+            for (int j = 0; j < ans.length() ; ++j)
+            {
+                if(ans[j]!=strs[i][j]) { 
+                    ans=ans.substr(0,j);
+                    break;
+                } 
+            }
+        return ans;
+
+};
+
+//But when I changed the first loop initial value "int i=1",it cost 8ms. As it is easy to proof the i=0 don't need to compare. //The loop less one time,but cost more than 4ms.
+
+
+
+	string longestCommonPrefix(vector<string>& strs) {
+    if(strs.size() == 0) 
+        return "";
+
+    string result;
+    for(int i = 0; i<strs[0].length(); i++) {
+        char c = strs[0][i];
+        for(int j = 0; j<strs.size(); j++) {
+            if(strs[j][i] != c)
+                return result;
+        }
+
+        result += c;
+    }
+
+    return result;
+}
+
+
+
+//Divide-and-Conquer Approach, python, 44ms 
+ 
+
+
+
+   
+		
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        if (strs.empty()) return "";
+        for (int pos = 0; pos < strs[0].length(); pos++)
+            for (int i = 1; i < strs.size(); i++)
+                if (pos >= strs[i].length() || strs[i][pos] != strs[0][pos])
+                    return strs[0].substr(0, pos);
+        return strs[0];
+    }
+};
+
+
+class Solution {
+public:
+    string longestCommonPrefix(vector<string> &strs) {
+        int i, j, n = strs.size();
+        if (n == 0) return "";
+        sort(strs.begin() ,strs.begin() + n);
+        for (j = 0; j < strs[0].size() && j < strs[n - 1].size() && strs[0][j] == strs[n - 1][j]; j++);
+        return strs[0].substr(0, j);
+    }
+};
+
+
+
+
+ 
+ 
+python解决方案：
+ 
+ 
+
+class Solution:
+    # @return a string
+    def longestCommonPrefix(self, strs):
+        if not strs:
+            return ""
+
+        for i, letter_group in enumerate(zip(*strs)):
+            if len(set(letter_group)) > 1:
+                return strs[0][:i]
+        else:
+            return min(strs)
+
+
+def longestCommonPrefix(self, strs):
+    prefix = '';
+    # * is the unpacking operator, essential here
+    for z in zip(*strs):
+        bag = set(z);
+        if len(bag) == 1:
+            prefix += bag.pop();
+        else:
+            break;
+    return prefix;
+
+
+#Divide-and-Conquer Approach, python, 44ms 
+ 
+
+
+
+class Solution:
+    # @param {string[]} strs
+    # @return {string}
+
+    def longestCommonPrefix(self, strs):
+        if not strs: return ""
+        total = len(strs)
+        l = min([len(x) for x in strs])
+        g = 2
+        while g / 2 < total:
+            for i in xrange((total+g-1)/g):
+                if i*g+g/2 < total:
+                    while l and strs[i*g][:l] != strs[i*g+g/2][:l]: l-=1
+            g *= 2
+        return strs[0][:l]
+ 
+ 
+ 
+ 
+ 
+﻿﻿ 
+

@@ -1,0 +1,122 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/52431847				
+
+
+
+1.首先安装pip-install
+在使用centos7的软件包管理程序yum安装python-pip的时候会报一下错误：
+No package python-pip available. 
+Error: Nothing to do 
+说没有python-pip软件包可以安装。
+这是因为像centos这类衍生出来的发行版，他们的源有时候内容更新的比较滞后，或者说有时候一些扩展的源根本就没有。所以在使用yum来search  python-pip的时候，会说没有找到该软件包。 
+因此为了能够安装这些包，需要先安装扩展源EPEL。EPEL(http://fedoraproject.org/wiki/EPEL) 是由 Fedora 社区打造，为 RHEL 及衍生发行版如 CentOS、Scientific Linux 等提供高质量软件包的项目。 
+首先安装epel扩展源：
+sudo yum -y install epel-release
+
+然后安装python-pip：
+sudo yum -y install python-pip
+
+安装完之后别忘了清除一下cache：
+sudo yum clean all
+
+搞定！
+2.在隔离容器中安装TensorFlow
+推荐使用virtualenv 创建一个隔离的容器, 来安装 TensorFlow. 这是可选的, 但是这样做能使排查安装问 
+题变得更容易，照着敲命令就行了
+安装主要分成下面四个步骤： 
+  ● Install pip and Virtualenv.（这一步装过了） 
+  ● Create a Virtualenv environment. 
+  ● Activate the Virtualenv environment and install TensorFlow in it. 
+  ● After the install you will activate the Virtualenv environment each time you want to use TensorFlow. 
+Install pip and Virtualenv: 
+ # Ubuntu/Linux 64-bit
+$ sudo apt-get install python-pip python-dev python-virtualenv
+
+# Mac OS X
+$ sudo easy_install pip
+$ sudo pip install --upgrade virtualenv
+
+Create a Virtualenv environment in the directory ~/tensorflow:
+$ virtualenv --system-site-packages ~/tensorflow
+
+Activate the environment:
+$ source ~/tensorflow/bin/activate  # If using bash
+$ source ~/tensorflow/bin/activate.csh  # If using csh
+
+(tensorflow)$  # Your prompt should change
+Now, install TensorFlow just as you would for a regular Pip installation. First select the correct binary to install: 
+ # Ubuntu/Linux 64-bit, CPU only, Python 2.7
+    (tensorflow)$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.10.0rc0-cp27-none-linux_x86_64.whl
+
+Finally install TensorFlow: 
+ # Python 2
+(tensorflow)$ pip install --upgrade $TF_BINARY_URL
+
+出现了如下错误：
+InstallationError: Command python setup.py egg_info failed with error code 1 in /root/tensorflow/build/mock
+
+解决方案是： 
+Distribute has been merged into Setuptools as of version 0.7. If you are using a version <=0.6, upgrade using :
+pip install --upgrade setuptools 
+
+or 
+easy_install -U setuptools.
+
+其实就是安装的egg需要升级一下把，我猜测
+升级之后重新 ：
+(tensorflow)$ pip install --upgrade $TF_BINARY_URL
+
+等待一段时间，（我似乎看到tensorflow在用gcc编译c++，c，时间还挺长大概十来分钟） 
+看到 
+Successfully installed tensorflow protobuf six wheel mock numpy funcsigs pbr 
+Cleaning up… 
+就ok
+3.测试代码
+import tensorflow as tf
+import numpy as np
+# 使用 NumPy 生成假数据(phony data), 总共 100 个点.
+x_data = np.float32(np.random.rand(2, 100)) # 随机输入
+y_data = np.dot([0.100, 0.200], x_data) + 0.300
+
+# 构造一个线性模型
+b = tf.Variable(tf.zeros([1]))
+W = tf.Variable(tf.random_uniform([1, 2], -1.0, 1.0))
+y = tf.matmul(W, x_data) + b
+
+# 最小化方差
+loss = tf.reduce_mean(tf.square(y - y_data))
+optimizer = tf.train.GradientDescentOptimizer(0.5)
+train = optimizer.minimize(loss)
+# 初始化变量
+init = tf.initialize_all_variables()
+# 启动图 (graph)
+sess = tf.Session()
+sess.run(init)
+# 拟合平面
+for step in xrange(0, 201):
+        sess.run(train)
+if step % 20 == 0:
+        print step, sess.run(W), sess.run(b)
+
+在命令行输入：
+source ~/tensorflow/bin/activate
+
+激活tensorflow环境，运行上述代码
+(tensorflow)[root@www test]# python nihe.py
+
+# 得到最佳拟合结果
+  W: [[0.100 0.200]], b: [0.300]
+
+退出虚拟环境：
+(tensorflow)$ source deactivate
+
+参考文献
+
+https://github.com/tensorflow/tensorflow/blob/8cb0558da924e891aa1bb5d79a6c0c846301e4eb/tensorflow/g3doc/get_started/os_setup.md 
+https://github.com/jikexueyuanwiki/tensorflow-zh 
+http://www.tensorflow.org/（需要梯子）
+ 
+
+

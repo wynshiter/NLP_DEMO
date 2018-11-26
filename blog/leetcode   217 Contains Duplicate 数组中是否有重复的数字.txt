@@ -1,0 +1,112 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/47380453				
+
+
+﻿﻿
+Contains Duplicate 
+Total Accepted: 26477 
+Total Submissions: 73478 
+My Submissions
+
+
+
+
+
+Given an array of integers, find if the array contains any duplicates. Your function should return true if any value appears at least twice in the array, and it should return false if every element is distinct.
+
+我的解决方案：很显然不是最优的，记录每个插入的状态，看起来也不是很简洁，但是对于方案二的优势是在对于长数组时候，第一个有重复的数字就退出了
+
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums)
+    {
+        set<int> result;
+        
+         set<int>::iterator itor ;
+
+    for(int i = 0;i< nums.size();++i)
+    {
+        itor = result.find(nums[i]) ;
+
+        if(itor != result.end()) 
+        {
+            return true;
+        }
+        else
+        {
+            result.insert(nums[i]);
+        }
+    }
+    
+    return false;
+ 
+
+        
+    }
+};
+
+非常简洁的解决方案，类似python 了，但是stl 中的set是基于平衡树的，而python中是hash树，所以python可能会高效一些
+：
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        return nums.size() > set<int>(nums.begin(), nums.end()).size();        
+    }
+};
+python 的版本：
+class Solution:
+    def containsDuplicate(self, nums):
+        return len(nums) > len(set(nums))
+
+
+c++ 的hash版本：同类的hash code是相同的，这是一个非常重要的编程思想
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) {
+        unordered_set<int> hashset;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (hashset.find(nums[i]) != hashset.end()) {
+                return true;
+            }
+            else {
+                hashset.insert(nums[i]);
+            }
+        }
+        return false;
+    }
+};
+
+
+
+c++排序版本：
++2 votes
+942 views
+class Solution {
+public:
+    bool containsDuplicate(vector<int>& nums) 
+    {
+        int size=nums.size();
+        sort(nums.begin(),nums.end());
+        nums.erase(unique(nums.begin(),nums.end()),nums.end());
+        return (size!=nums.size());
+    }
+};
+
++4 votes
+Your running time is 28ms, if not use unique, it will be 24ms:
+class Solution {
+public:
+    bool containsDuplicate(std::vector<int>& nums) {
+        std::sort(nums.begin(), nums.end());
+        for (int i = 1; i < nums.size(); ++i)
+            if (nums[i] == nums[i - 1])
+                return true;
+        return false;
+    }
+};
+
+
+
+

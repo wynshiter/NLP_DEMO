@@ -1,0 +1,167 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45653065				
+
+
+
+Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.  
+• push(x) – Push element x onto stack.  
+• pop() – Removes the element on top of the stack.  
+• top() – Get the top element.  
+• getMin() – Retrieve the minimum element in the stack. 
+解决方案：
+ 
+可以看到STL的解决方案跟大多数的c语言解决方案还是有差距的，后序我找一找基于链表的整齐点的c语言实现
+The key idea is use a another stack to store the minimum value of the corresponding stack. Put differently, min[i] equals the minimum element where data[i] is the top of this sub-stack.
+We can use a full size of min where it’s size equals the data’s, but it’s not necessary.
+I have 2 main concerns about the algorithm:
+1  
+ We should pop the element in min IFF there’s match of data.top().
+2  
+ If we have multiple minima, for example [0, 1, 0] in data, then the min should be [0, 0].  
+ Otherwise, the the pop operation wouldn’t work properly. 
+ As a result, we should push the element if x <= min.top().
+class MinStack {
+public:
+    void push(int x) {
+        s.push(x);
+        if (mins.empty() || x<=mins.top()) {
+            mins.push(x);
+        }
+    }
+
+    void pop() {
+        int temp = s.top();
+        s.pop();
+        if (temp == mins.top()) {
+            mins.pop();
+        }
+    }
+
+    int top() {
+        return s.top();
+    }
+
+    int getMin() {
+        return mins.top();
+    }
+
+private:
+    stack<int> s;
+    stack<int> mins;
+};
+
+STL list实现：
+class MinStack {
+    private:
+        list<int> s;
+        int min;
+
+
+    public:
+
+        MinStack()
+        {
+            min=INT_MAX;
+        }
+
+        void push(int x) {
+            if(x<min) min=x;
+            s.push_back(x);
+
+        }
+
+        void pop() {
+            if(s.back()==min)
+            {
+                s.pop_back();
+                min=INT_MAX;
+                list<int>::iterator it=s.begin();
+                while(it!=s.end())
+                {
+                    if(*it<min) min=*it;
+                    it++;
+                }
+            }else
+                s.pop_back();
+        }
+
+        int top() {
+            return s.back();
+        }
+
+        int getMin() {
+            return min;
+        }
+    };
+
+python解决方案：
+class MinStack:
+# @param x, an integer
+def __init__(self):
+    # the stack it self
+    self.A = []
+    self.minS=[]
+# @return an integer
+def push(self, x):
+    n=len(self.A)
+    if n==0:
+        self.minS.append(x)
+    else:
+        lastmin=self.minS[-1]
+        if x<=lastmin:
+            self.minS.append(x)
+    self.A.append(x)
+# @return nothing
+def pop(self):
+    if len(self.A)>0 and self.A.pop()==self.minS[-1]:
+        self.minS.pop()
+# @return an integer
+def top(self):
+    return self.A[-1]
+
+
+# @return an integer
+def getMin(self):
+    return self.minS[-1]
+
+python解决方案2：
+
+class MinStack:
+
+def __init__(self):
+    self.q = []
+
+# @param x, an integer
+# @return an integer
+def push(self, x):
+    curMin = self.getMin()
+    if curMin == None or x < curMin:
+        curMin = x
+    self.q.append((x, curMin));
+
+# @return nothing
+def pop(self):
+    self.q.pop()
+
+
+# @return an integer
+def top(self):
+    if len(self.q) == 0:
+        return None
+    else:
+        return self.q[len(self.q) - 1][0]
+
+
+# @return an integer
+def getMin(self):
+    if len(self.q) == 0:
+        return None
+    else:
+        return self.q[len(self.q) - 1][1]
+
+  asked Apr 14  in Min Stack  by  charles8135 (180 points)    
+ 
+
+

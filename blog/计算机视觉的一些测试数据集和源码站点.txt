@@ -1,0 +1,480 @@
+content
+
+
+
+转自：http://blog.csdn.net/zhubenfulovepoem/article/details/7191794
+       以下是computer vision：algorithm and application计算机视觉算法与应用这本书中附录里的关于计算机视觉的一些测试数据集和源码站点，我整理了下，加了点中文注解。
+ComputerVision:
+Algorithms and Applications
+Richard Szeliski
+
+
+在http://szeliski.org/Book包含了更新的数据集和软件，请同样访问他。
+C.1 数据集
+一个关键就是用富有挑战和典型的数据集来测试你算法的可靠性。当有背景或者他人的结果是可行的,这种测试可能甚至包含更多的信息(和质量更好)。
+经过这些年，大量的数据集已经被提出来用于测试和评估计算机视觉算法。许多这些数据集和软件被编入了计算机视觉的主页。一些更新的网址，像CVonline
+(http://homepages.inf.ed.ac.uk/rbf/CVonline ), VisionBib.Com (http://datasets.visionbib.com/
+ ), and Computer Vision online (http://computervisiononline.com/ ), 有更多最新的数据集和软件。
+下面，我列出了一些用的最多的数据集，我将它们让章节排列以便它们联系更紧密。
+
+第二章：图像信息
+CUReT: Columbia-Utrecht 反射率和纹理数据库Reﬂectance and TextureDatabase,http://www1.cs.columbia.edu/CAVE/software/curet/
+ (Dana, van Ginneken, Nayaret al. 1999).
+
+Middlebury Color Datasets:不同摄像机拍摄的图像，注册后用于研究不同的摄像机怎么改变色域和彩色registeredcolor images taken by different cameras to study how they transform gamuts andcolors,http://vision.middlebury.edu/color/data/
+ Chakrabarti, Scharstein, and Zickler 2009).
+
+第三章：图像处理
+Middlebury test datasets forevaluating MRF minimization/inference algorithms评估隐马尔科夫随机场最小化和推断算法,
+http://vision.middlebury.edu/MRF/results/ (Szeliski, Zabih, Scharstein et al. 2008).
+
+第四章：特征检测和匹配
+Afﬁne Covariant Featuresdatabase（反射协变的特征数据集） for evaluating feature detector and descriptor matching quality andrepeatability（评估特征检测和描述匹配的质量和定位精度）,http://www.robots.ox.ac.uk/~vgg/research/affine/
+(Miko-lajczyk and Schmid 2005;Mikolajczyk, Tuytelaars, Schmid et al. 2005).
+
+Database of matched imagepatches for learning （图像斑块匹配学习数据库）and feature descriptor evaluation（特征描述评估数据库）,
+http://cvlab.epfl.ch/~brown/patchdata/patchdata.html
+(Winder and Brown 2007;Hua,Brown, and Winder 2007).
+
+第五章;分割
+BerkeleySegmentation Dataset（分割数据库） and Benchmark of 1000 images labeled by 30 humans,（30个人标记的1000副基准图像）along with an evaluation,http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/segbench/
+ (Martin, Fowlkes, Tal et al.2001).
+
+Weizmann segmentationevaluation database of 100 grayscale images with ground truth segmentations,
+http://www.wisdom.weizmann.ac.il/~vision/Seg EvaluationDB/index.html
+(Alpert, Galun, Basri et al. 2007).
+
+第八章：稠密运动估计
+TheMiddlebury optic ﬂow evaluation（光流评估） Web site,http://vision.middlebury.edu/flow/data/
+(Baker,Scharstein, Lewis et al. 2009).
+
+The Human-Assisted MotionAnnotation database,（人类辅助运动数据库）
+http://people.csail.mit.edu/celiu/motionAnnotation/ (Liu, Freeman, Adelson etal. 2008)
+
+第十章：计算机摄像学
+High DynamicRange radiance（辐射）maps, 
+http://www.debevec.org/Research/HDR/
+(De-bevecand Malik 1997).
+
+Alpha matting evaluation Website, http://alphamatting.com/ (Rhemann, Rother, Wang
+et al. 2009).
+
+第十一章：Stereo correspondence立体对应
+Middlebury Stereo Datasets andEvaluation, 
+http://vision.middlebury.edu/stereo/ (Scharstein
+and Szeliski 2002).
+
+StereoClassiﬁcation（立体分类） and Performance Evaluation（性能评估） of different aggregation（聚类） costs for stereo matching（立体匹配）,http://www.vision.deis.unibo.it/spe/SPEHome.aspx
+ (Tombari, Mat-
+toccia, Di Stefano et al.2008).
+
+Middlebury Multi-View StereoDatasets, 
+http://vision.middlebury.edu/mview/data/ (Seitz,Curless, Diebel etal. 2006).
+
+Multi-view and Oxford Collegesbuilding reconstructions,
+http://www.robots.ox.ac.uk/~vgg/data/data-mview.html .
+
+Multi-View Stereo Datasets, http://cvlab.epfl.ch/data/strechamvs/ (Strecha, Fransens,
+and Van Gool 2006).
+
+Multi-View Evaluation, http://cvlab.epfl.ch/~strecha/multiview/ (Strecha, von Hansen,
+Van Gool et al. 2008).
+
+第十二章：3D重建
+HumanEva: synchronized video（同步视频） and motion capture （动作捕捉）dataset for evaluation ofarticulated human motion,http://vision.cs.brown.edu/humaneva/
+ Sigal, Balan, and Black 2010).
+
+第十三章：图像渲染
+The (New) Stanford Light FieldArchive, http://lightfield.stanford.edu/
+(Wilburn, Joshi,Vaish et al.2005).
+
+Virtual Viewpoint Video:multi-viewpoint video with per-frame depth maps,
+http://research.microsoft.com/en-us/um/redmond/groups/ivm/vvv/ (Zitnick, Kang, Uytten-
+daele et al. 2004).
+
+第十四章：识别
+查找一系列的视觉识别数据库，在表14.1–14.2.除了那些，这里还有：
+Buffy pose classes, http://www.robots.ox.ac.uk/~vgg/data/ buffy pose classes/ andBuffy
+stickmen V2.1, http://www.robots.ox.ac.uk/~vgg/data/stickmen/index.html
+ (Ferrari,Marin-
+Jimenez, and Zisserman 2009;Eichner and Ferrari 2009).
+
+H3D database of pose/jointannotated photographs of humans,
+http://www.eecs.berkeley.edu/~lbourdev/h3d/ (Bourdev and Malik 2009).
+
+Action Recognition Datasets,http://www.cs.berkeley.edu/projects/vision/action, has point-
+ers toseveral datasets for action and activity recognition, as well as some papers.（有一些关于人活动和运动的数据库和论文） The humanaction database athttp://www.nada.kth.se/cvap/actions/
+ 包含更多的行动序列。
+
+C.2 软件资源
+一个对于计算机视觉算法最好的资源就是开源视觉图像库（opencv）(http://opencv.willowgarage.com/wiki/),他有在intel的Gary
+ Bradski和他的同事开发，现在由Willow Garage (Bradsky and Kaehler 2008)维护和扩展。一部分可利用的函数在http://opencv.willowgarage.com/documentation/cpp/中：
+图像处理和变换 (滤波，形态学，金字塔);
+图像几何学的变换 (旋转，改变大小);
+混合图像变换 (傅里叶变换，距离变换);
+直方图;
+分割 (分水岭, mean shift);
+特征检测 (Canny, Harris, Hough, MSER, SURF);
+运动分析和物体分析 (Lucas–Kanade, mean shift);
+相机矫正和3D重建
+机器学习 (k nearest neighbors, 支持向量机, 决策树, boost-
+ing, 随机树, expectation-maximization, 和神经网络).
+
+Intel的Performance Primitives (IPP)library,http://software.intel.com/en-us/intel-ipp/，包含
+各种各样的图像处理任务的最佳优化代码，许多opencv中的例子利用了这个库，加入他安装了，程序运行得更快。依据功能，他和Opencv有很多相同的运算处理，并且加上了额外的库针对图像视频压缩，信号语音处理和矩阵代数。
+
+MTALAB中的Image Processing Toolbox图像处理工具，http://www.mathworks.com/products/image/，包含常规的处理，空域变换（旋转，改变大小），常规正交，图像分析和统计学（变边缘，哈弗变换），图像增强（自适应直方图均衡，中值滤波），图像恢复（去模糊），线性滤波（卷积），图像变换（傅里叶，离散余弦变换）和形态学操作（连通域和距离变换）
+
+两个比较旧的库，它们没有被发展，但是包含了一些的有用的常规操作：
+VXL (C++Libraries for Computer Vision Research and Implemen-tation,http://vxl.sourceforge.net/)
+LTI-Lib 2 (http://www.ie.itcr.ac.cr/palvarado/ltilib-2/homepage/
+ ).
+
+图像编辑和视图包，例如Windows Live Photo Gallery, iPhoto, Picasa,GIMP, 和 IrfanView，它们对执行这些处理非常有用：常规处理任务，格式转换，观测你的结果。它们同样可以用于对图像处理算法有趣的实现参考，例如色调调整和去噪。
+
+这里他也有一些软件包和基础框架对你建一个实时视频处理的DEMOS很有用，Vision on Tap(http://www.visionontap.com/ )提供一个可以实时处理你的网络摄像头的网页服务(Chiu
+ and Raskar 2009）。Video-Man (VideoManager, http://videomanlib.sourceforge.net/处理实时的基于视频的DEMOS和应用非常有用，你也可以用MATLAB中的imread直接从任何URl（例如网络摄像头）中读取视频。
+下面，我列出了一些额外的网络资源，让章节排列以便它们看起来联系更紧密：
+
+第三章:图像处理
+matlabPyrTools—MATLAB 下的源码对于拉普拉斯变换，金字塔, QMF/小波, 和
+steerable pyramids, http://www.cns.nyu.edu/~lcv/software.php (Simoncelli and Adel-
+son 1990a; Simoncelli,Freeman, Adelson et al. 1992).
+
+BLS-GSM 图像去噪, http://decsai.ugr.es/~javier/denoise/ (Portilla, Strela,Wain-
+wright et al. 2003).
+
+Fast bilateral ﬁltering code（快速双边滤波）, http://people.csail.mit.edu/jiawen/#code (Chen,
+ Paris, and Durand 2007).
+
+C++ implementation of the fastdistance transform algorithm,
+http://people.cs.uchicago.edu/~pff/dt/ (Felzenszwalb andHuttenlocher 2004a).
+
+GREYC’s Magic Image Converter,including image restoration software using regularization and anisotropicdiffusion,http://gmic.sourceforge.net/gimp.shtml
+ (Tschumperl´ e and Deriche 2005).
+
+第四章：图像特征检测和匹配
+VLFeat, 一个开放便捷的计算机视觉算法库 
+http://vlfeat.org/ (Vedaldi and Fulkerson 2008).
+
+SiftGPU: A GPU Implementationof Scale Invariant Feature Transform (SIFT),
+GPU实现的尺度特征性变换
+http://www.cs.unc.edu/~ccwu/siftgpu/ (Wu 2010).
+
+SURF: Speeded Up RobustFeatures, http://www.vision.ee.ethz.ch/~surf/
+(Bay, Tuyte-laars, and VanGool 2006).
+
+FAST corner detection, http://mi.eng.cam.ac.uk/~er258/work/fast.html
+(Rosten and Drum-mond 2005, 2006).
+
+Linux binaries for afﬁneregion detectors and descriptors, as well as MATLAB ﬁles to
+compute repeatability andmatching scores, 
+
+http://www.robots.ox.ac.uk/~vgg/research/affine/
+
+Kanade–Lucas–Tomasi featuretrackers: KLT, 
+http://www.ces.clemson.edu/~stb/klt/ (Shi and Tomasi 1994);
+GPU-KLT, http://cs.unc.edu/~cmzach/opensource.html (Zach,Gallup, and
+ Frahm2008); Lucas–Kanade 20 Years On, http://www.ri.cmu.edu/projects/project 515.html (Baker and Matthews
+ 2004).
+第五章：分割
+高效的基于图形的分割http://people.cs.uchicago.edu/~pff/segment
+(Felzenszwalb and Huttenlocher2004b).
+
+EDISON, 边缘检测和图像追踪, 
+http://coewww.rutgers.edu/riul/research/code/EDISON/
+(Meer and Georgescu 2001; Comaniciu and Meer2002).
+
+Normalized cuts segmentationincluding intervening contours,
+http://www.cis.upenn.edu/~jshi/software/
+(Shi and Malik 2000; Malik,Belongie, Leung et al. 2001).
+
+Segmentation by weightedaggregation (SWA),利用加权集合的分割
+http://www.cs.weizmann.ac.il/~vision/SWA (Alpert, Galun, Basri et al.2007).
+
+第六章：基于特征的对齐和校准
+Non-iterative PnP algorithm,（非迭代PnP算法） 
+http://cvlab.epﬂ.ch/software/EPnP (Moreno-Noguer, Lep-etit, and Fua 2007).
+
+Tsai Camera Calibration（相机矫正） Software, 
+http://www-2.cs.cmu.edu/~rgw/TsaiCode.html (Tsai 1987).
+
+Easy CameraCalibration Toolkit,（简易相机校准工具包）http://research.microsoft.com/en-us/um/people/zhang/
+ Calib/ (Zhang 2000).
+
+Camera Calibration Toolbox forMATLAB, 
+http://www.vision.caltech.edu/bouguetj/calib doc/ ; a C version is included in OpenCV.
+
+MATLAB functions for multipleview geometry, 
+
+http://www.robots.ox.ac.uk/~vgg/hzbook/code/ (Hartley and Zisserman2004).
+
+第七章：运动重建
+SBA: A generic sparse bundle(稀疏束) adjustment C/C++ package basedon the Levenberg–
+Marquardt algorithm, http://www.ics.forth.gr/~lourakis/sba/ (Lourakis and Argyros 2009).
+
+Simple sparse bundleadjustment (SSBA), http://cs.unc.edu/~cmzach/opensource.html
+ .
+
+Bundler, structure from motionfor unordered image collections(无序图像集),
+http://phototour.cs.washington.edu/bundler/ (Snavely, Seitz, and Szeliski 2006).
+
+第八章:稠密运动估计
+光流, http://www.cs.brown.edu/~black/code.html (Black and Anan-
+dan 1996).
+
+Optical ﬂow（光流） using total variation（全变量差） and conjugate gradientdescent（共轭梯度下降）,http://people.csail.mit.edu/celiu/OpticalFlow/
+ (Liu 2009).
+
+TV-L1 optical ﬂow on the GPU, http://cs.unc.edu/~cmzach/opensource.html
+(Zach,Pock, and Bischof2007a).
+
+elastix: atoolbox for rigid（刚性） and nonrigid（非刚性） registration of images（配准图像）,http://elastix.isi.uu.nl/
+ (Klein, Staring, and Pluim 2007).
+
+Deformable image registration（可变形的配准图像） using discreteoptimization（离散最优化）,http://www.mrf-registration.net/deformable/index.html
+(Glocker, Komodakis, Tziritas et al. 2008).
+
+第九章：图像缝合
+Microsoft Research ImageCompositing Editor for stitching images,（图像拼接，图像合成）
+http://research.microsoft.com/en-us/um/redmond/groups/ivm/ice/ .
+
+第十章：计算机摄影学
+HDRShop software for combiningbracketed exposures（包围式曝光） into high-dynamic range radiance images,http://projects.ict.usc.edu/graphics/HDRShop/.
+
+Super-resolution（超分辨率） code, 
+http://www.robots.ox.ac.uk/~vgg/software/SR/ (Pickup 2007;Pickup, Capel,Roberts et al. 2007, 2009).
+
+第十一章：立体对应
+StereoMatcher, standalone C++stereo matching code,
+http://vision.middlebury.edu/stereo/code/ (Scharstein and Szeliski2002).
+
+Patch-based multi-view stereosoftware (PMVS Version 2),
+http://grail.cs.washington.edu/software/pmvs/ (Furukawa and Ponce 2011).
+
+第十二章：3D重建
+Scanalyze: a system foraligning and merging range data,
+http://graphics.stanford.edu/software/scanalyze/ (Curless and Levoy 1996).
+
+MeshLab: software forprocessing, editing, and visualizing unstructured 3D triangular
+meshes, http://meshlab.sourceforge.net/.
+
+VRML viewers (various) arealso a good way to visualize texture-mapped 3D models.
+
+节 12.6.4: Whole body modeling andtracking（全身建模和追踪）
+
+Bayesian 3D person tracking（贝叶斯3D人体追踪）, http://www.cs.brown.edu/~black/code.html (Sidenbladh,Black,
+ and Fleet2000; Sidenbladh and Black 2003).
+
+HumanEva: baseline code forthe tracking of articulated human motion,
+http://vision.cs.brown.edu/humaneva/ (Sigal, Balan, and Black 2010).
+
+节 14.1.1: Face detection（人脸检测）
+
+Sample face detection code andevaluation tools,
+http://vision.ai.uiuc.edu/mhyang/face-detection-survey.html.
+
+节 14.1.2: Pedestrian detection（行人追踪）
+
+A simple object detector withboosting, 
+http://people.csail.mit.edu/torralba/shortCourseRLOC/boosting/boosting.html
+(Hastie, Tibshirani, and Friedman 2001;Torralba, Murphy, and Freeman 2007).
+
+Discriminatively（有区别） trained deformable（可变形） part models,http://people.cs.uchicago.edu/~pff/latent/
+ (Felzenszwalb, Girshick,McAllester et al. 2010).
+
+Upper-body detector（上身检测）, 
+http://www.robots.ox.ac.uk/~vgg/software/UpperBody/ (Ferrari,Marin-Jimenez, andZisserman 2008).
+
+2D articulated human poseestimation software, 
+
+http://www.vision.ee.ethz.ch/~calvin/articulated_human_pose_estimation_code/ (Eichner
+ and Ferrari 2009).
+
+节 14.2.2: Active appearance and 3Dshape models
+
+AAMtools: An active appearancemodeling toolbox,
+http://cvsp.cs.ntua.gr/software/AAMtools/ (Papandreou and Maragos2008).
+
+节 14.3: Instance recognition
+
+FASTANN and FASTCLUSTER forapproximate k-means (AKM),
+http://www.robots.ox.ac.uk/~vgg/software/ (Philbin, Chum, Isard et al. 2007).
+
+Feature matching using fastapproximate nearest neighbors,
+http://people.cs.ubc.ca/~mariusm/index.php/FLANN/FLANN (Muja and Lowe 2009).
+
+
+节 14.4.1: Bag of words(词袋)
+
+Two bag of words classiﬁers, http://people.csail.mit.edu/fergus/iccv2005/bagwords.html
+(Fei-Fei and Perona 2005;Sivic, Russell, Efros et al. 2005).
+
+Bag of features andhierarchical（分层） k-means,http://www.vlfeat.org/
+ (Nist´ er and Stew´enius2006; Nowak, Jurie, and Triggs 2006).
+
+节 14.4.2: Part-based models
+
+A simple parts and structureobject detector, 
+
+http://people.csail.mit.edu/fergus/iccv2005/partsstructure.html
+(Fischler and Elschlager 1973; Felzenszwalband Huttenlocher 2005).
+
+节 14.5.1: Machine learning software
+
+Support vector machines (SVM)software (
+http://www.support-vector-machines.org/SVM soft.html )
+包含很多支持向量机的库, 
+SVMlight http://svmlight.joachims.org/ ;
+LIBSVM, http://www.csie.ntu.edu.tw/~cjlin/libsvm/(Fan, Chen,and Lin 2005);
+LIBLINEAR, http://www.csie.ntu.edu.tw/~cjlin/liblinear/ (Fan,Chang, Hsieh et al.2008).
+
+Kernel Machines: links to SVM,Gaussian processes, boosting, and other machine
+learning algorithms, http://www.kernel-machines.org/software .
+
+Multiple kernels for imageclassiﬁcation, 
+http://www.robots.ox.ac.uk/~vgg/software/MKL
+(Varma and Ray 2007; Vedaldi, Gulshan, Varmaet al. 2009).
+
+附录 A.1–A.2: Matrix decompositions（矩阵分解） and linear least squares（线性最小乘）
+
+BLAS (BasicLinear Algebra Subprograms基本线性代数子程序),
+http://www.netlib.org/blas/ (Blackford,Demmel, Dongarraet al. 2002).
+
+LAPACK (Linear Algebra（线性代数） PACKage), 
+http://www.netlib.org/lapack/ (Anderson, Bai,Bischof etal. 1999).
+
+GotoBLAS, http://www.tacc.utexas.edu/tacc-projects/.
+
+ATLAS (Automatically TunedLinear Algebra Software),
+http://math-atlas.sourceforge.net/ (Demmel, Dongarra, Eijkhoutet al. 2005).
+
+Intel Math Kernel Library(MKL), http://software.intel.com/en-us/intel-mkl/.
+
+AMD CoreMath Library (ACML), 
+http://developer.amd.com/cpu/Libraries/acml/Pages/default.aspx .
+
+Robust PCA code（鲁棒主成分分析）, http://www.salle.url.edu/~ftorre/papers/rpca2.html
+(De la Torre and Black 2003).
+
+Appendix A.3: Non-linear leastsquares非线性最小二乘
+
+MINPACK, http://www.netlib.org/minpack/.
+
+levmar: Levenberg–Marquardtnonlinear least squares algorithms, 非线性最小二乘
+http://www.ics.forth.gr/~lourakis/levmar/ (Madsen, Nielsen, andTingleff 2004).
+
+附录 A.4–A.5: Direct（直接） and iterative（迭代） sparse matrix（稀疏矩阵） solvers
+
+SuiteSparse (variousreordering algorithms, 各种各样的重排算法CHOLMOD) and SuiteSparse QR,http://www.cise.ufl.edu/research/sparse/SuiteSparse/
+ (Davis 2006, 2008).
+
+PARDISO (iterative and sparsedirect solution), 
+http://www.pardiso-project.org/.
+
+TAUCS (sparse direct,iterative, out of core, preconditioners),
+http://www.tau.ac.il/~stoledo/taucs/ .
+
+HSL Mathematical SoftwareLibrary, http://www.hsl.rl.ac.uk/index.html .
+
+Templatesfor the solution of linear systems（线性系统解决问题的模板）,http://www.netlib.org/linalg/html
+ templates/Templates.html (Barrett, Berry, Chan et al.1994). Download the PDF for instructions（说明） on how to get the software.
+
+ITSOL,MIQR, and other sparsesolvers,
+http://www-users.cs.umn.edu/~saad/software/ (Saad 2003).
+
+ILUPACK, http://www-public.tu-bs.de/~bolle/ilupack/ .
+
+附录 B: Bayesian modeling and inference（贝叶斯建模和推断）
+
+Middleburysource code for MRF minimization（隐马尔科夫随机场最小化）,http://vision.middlebury.edu/MRF/code/
+ (Szeliski, Zabih, Scharsteinet al. 2008).
+
+C++ code for efﬁcient beliefpropagation for early vision,
+http://people.cs.uchicago.edu/~pff/bp/ (Felzenszwalb andHuttenlocher 2006).
+
+FastPD MRF optimization（最优化） code, 
+http://www.csd.uoc.gr/~komod/FastPD (Komodakisand Tziritas2007a; Komodakis, Tziritas, and Paragios 2008)
+
+
+算法 C.1 Calgorithm for Gaussian random noise generation, using theBox–Mullertransform.
+C描述的利用Box–Muller 变换产生高斯随机噪声
+double urand()
+{
+return ((double)rand()) / ((double) RAND MAX);
+}
+void grand(double& g1, double& g2)
+{
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif // M_PI
+double n1 = urand();
+double n2 = urand();
+double x1 = n1 + (n1 == 0); /* guardagainst log(0) */
+double sqlogn1 = sqrt(-2.0 * log (x1));
+double angl = (2.0 * M PI) * n2;
+g1 = sqlogn1 * cos(angl);
+g2 = sqlogn1 * sin(angl);
+}
+
+
+高斯噪声的产生。许多基本的软件包产生一些不同的随机的噪声(例如 运行在unix上的rand())，但是并不是所有的都有高斯随机噪声发生器。计算一个离散随机常量，你可以用Box–Mullertransform (Box and Muller 1958)，他的c代码在算法C.1中给出了，注意这个运行结果是返回一对随机变量。相关的产生高斯随机变量的方由Thomas, Luk, Leong et al. (2007)提出。
+
+伪彩色产生。在很多应用中，很方便给图像加上标记（或者给图像特征比如线）。一个最简单的方式就是给不同的标记不同的颜色。在我的工作中，我发现用RGB立体色彩系给不同的标记赋予标准均匀的色彩是很方便的。
+对于每一个（非消极）标记值，considerthe bits as being split among the three color channel，例如对于一个比特值为9的值，
+这个值可以被标记为RGBRGBRGB，获得三基色中的每一种颜色值后，颠倒比特值，结果是低位的比特值变化的最快。
+实际上，对于一个八比特的颜色通道，这个比特值的颠倒可以被存在一个表或者一个存储提前计算好的记录有由标记值向伪彩色的改变的完整表。
+图 8.16 显示了这样一个伪彩色绘制的例子.
+
+GPU实现
+
+GPU的出现，可以处理像素着色和计算着色，导致了实时应用的快速计算机视觉算法的发展，例如，分割，追踪，立体和运动估计（(Pock, Unger, Cremerset al. 2008; Vineet and Narayanan 2008; Zach,Gallup, and Frahm 2008）。一个好的资源来学习这些算法就是CVPR 2008 上关于Visual Computer Visionon GPUs的workshop。
+http://www.cs.unc.edu/~jmf/Workshop_on_Computer_Vision_on_GPU.html他的论文可以在CVPR2008的会议集的DVD中找到。额外的关于GPU算法资源包括GPGPU网址和小组讨论http://gpgpu.org/还有OpenVIDIAWeb
+ site, http://openvidia.sourceforge.net/index.php/OpenVIDIA
+
+C.3 PPT和讲稿
+正如我在前言中提到的，我希望提供和书中材料相一致的PPT，直到这些全部准备好，你最好的方式去看我在华盛顿大学上课时的PPT，和一写相关课程中用到的教案。
+这里是一些这样的课程列表：
+UW 455:Undergraduate Computer Vision,
+http://www.cs.washington.edu/education/courses/455/.
+
+UW576:Graduate Computer Vision,
+http://www.cs.washington.edu/education/courses/576.
+
+StanfordCS233B: Introduction to Computer Vision,
+http://vision.stanford.edu/teaching/cs223b/.
+
+MIT6.869: Advances in Computer Vision,
+http://people.csail.mit.edu/torralba/courses/6.869/6.869.computervision.htm.
+
+Berkeley CS 280: Computer Vision, 
+http://www.eecs.berkeley.edu/~trevor/CS280.html
+
+UNC COMP776: Computer Vision, 
+http://www.cs.unc.edu/~lazebnik/spring10.
+
+Middlebury CS 453: Computer Vision,
+http://www.cs.middlebury.edu/~schar/courses/cs453-s10/.
+
+Related courses have also been taught onthe topic of Computational Photography, e.g.,
+
+CMU 15-463: Computational Photography, http://graphics.cs.cmu.edu/courses/15-463/.
+
+MIT 6.815/6.865: Advanced ComputationalPhotography,
+http://stellar.mit.edu/S/course/6/sp09/6.815
+
+Stanford CS 448A: Computational photographyon cell phones,
+http://graphics.stanford.edu/courses/cs448a-10/.
+
+SIGGRAPH courses on ComputationalPhotography, 
+
+http://web.media.mit.edu/~raskar/photo/.
+
+这里还有一些最好的关于各种计算机视觉主题的在线讲稿，例如：belief propagation and graph cuts，它们在UW-MSR Course of Vision Algo-rithmshttp://www.cs.washington.edu/education/courses/577/04sp/
+
+C.4 参考文献：
+这本的所有参考文献在这本书的网站上，一个几乎所有的计算机视觉的出版物都引用的更全面的部分注解书目由Keith Price维http://iris.usc.edu/Vision-Notes/bibliography/contents.html.
+这里还有一个可搜索的计算机图形学的参考书目http://www.siggraph.org/publications/bibliography/另外技术论文比较好的资源是GoogleScholar
+ 和 CiteSeerX。
+
+

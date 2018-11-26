@@ -1,0 +1,106 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45876489				
+
+
+
+Given a sorted linked list, delete all duplicates such that each element appear only once. 
+For example, 
+ Given 1->1->2, return 1->2. 
+ Given 1->1->2->3->3, return 1->2->3.  
+
+下面是我的解决方案，考虑测试用例： 
+1，1 
+1，1，1 
+1，2，2
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head)
+    {
+        if(head==NULL)return head;
+
+        ListNode* pre = head;
+        ListNode* cur = head->next;
+
+        while(cur!=NULL)
+        {
+            if(cur->val==pre->val)
+            {
+                pre->next = pre->next->next;
+                cur = cur->next;
+                if(cur==NULL)return head;
+                //free(cur)没有free是不对的，可能引起内存泄漏;
+            }
+            else if(cur->val!=pre->val)
+            {
+                pre = pre->next;
+                cur = cur->next;
+            }
+
+        }
+        return head;
+
+    }
+};
+c++：
+public class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null) return head;
+
+        ListNode cur = head;
+        while(cur.next != null) {
+            if (cur.val == cur.next.val) {
+                cur.next = cur.next.next;
+            }
+            else cur = cur.next;
+        }
+        return head;
+    }
+}
+
+c语言：
+struct ListNode* deleteDuplicates(struct ListNode* head) 
+{
+    if (head) {
+    struct ListNode *p = head;
+    while (p->next) {
+        if (p->val != p->next->val) {
+            p = p->next;
+        }
+        else {
+            struct ListNode *tmp = p->next;
+            p->next = p->next->next;
+            free(tmp);//这块在实际代码中，非常有必要
+        }
+    }
+}
+
+return head;
+
+
+}
+简洁的python解决方案：
+class Solution:
+    # @param head, a ListNode
+    # @return a ListNode
+    def deleteDuplicates(self, head):
+        node = head
+        while node:
+            while node.next and node.next.val == node.val:
+                node.next = node.next.next
+
+            node = node.next
+
+        return head
+ 
+
+

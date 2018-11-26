@@ -1,0 +1,35 @@
+content
+
+
+					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/45287027				
+
+
+
+
+ 
+
+一直找不到opencv stereo matching的根据和原理出处，下面这个文章贴了个链接，有时间看看：
+
+ 
+
+ 
+
+Basically OpenCV
+ provides 2 methods to calculate a dense disparity map:
+
+
+cvFindStereoCorrespondenceBM: Fast (can
+ process several images per second), but if parameters not tuned then the results are poor.
+cvFindStereoCorrespondenceGC: Really
+ Slow (takes several seconds, even minutes per image), but gets very
+ accurate results.
+
+In this post I willfocus on cvFindStereoCorrespondenceBM, this method is based on Konolige's
+ Block Matching Algorithm. 
+
+ 
+
+参考：
+http://blog.martinperis.com/2011/08/opencv-stereo-matching.html
+
+
