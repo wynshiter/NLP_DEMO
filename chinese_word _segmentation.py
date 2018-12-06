@@ -84,7 +84,7 @@ def segmentor(sentence=None):
 
 """词性标注"""
 def posttagger(words):
-    #LTP_DATA_DIR = 'E:\BaiduNetdiskDownload\ltp_data_v3.4.0'  # ltp模型目录的路径
+
 
     postagger = Postagger() # 初始化实例
     postagger.load(pos_model_path)  # 加载模型
