@@ -19,7 +19,7 @@ file_list = file_operator.all_Absolute_pathfile_name(file_path,'.txt')
 data = pd.DataFrame(file_list,columns=['file_name'])
 
 #分词，暂时没有去停用词
-def chinese_word_cut(file_name):
+def chinese_word_cut_by_jieba(file_name):
     mytext = ''
     with open(file_name,'r',encoding='utf-8') as f:
         mytext = f.read()
@@ -28,7 +28,7 @@ def chinese_word_cut(file_name):
 
 
 #新增分词后的字段内容
-data["content_cutted"] =data['file_name'].apply(chinese_word_cut)
+data["content_cutted"] =data['file_name'].apply(chinese_word_cut_by_jieba)
 
 data_head = data.content_cutted.head()
 
