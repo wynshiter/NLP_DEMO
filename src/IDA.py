@@ -12,11 +12,11 @@ import file_operator
 
 import  jieba
 import pandas as pd
-file_path = u'''blog'''
-file_list = file_operator.all_file_name_with_extension(file_path,'.txt')
+file_path = r'..\blog'
+file_list = file_operator.all_Absolute_pathfile_name(file_path,'.txt')
 
 
-data = pd.dataframe(file_list,columns=['file_name'])
+data = pd.DataFrame(file_list,columns=['file_name'])
 
 #分词，暂时没有去停用词
 def chinese_word_cut(file_name):
@@ -26,10 +26,9 @@ def chinese_word_cut(file_name):
     return " ".join(jieba.cut(mytext))
 
 
-#没有简介的医院替换句号
-data['summary'] = data['summary'].fillna('.').astype('str')
-#新增分词后的字段
-data["content_cutted"] =data['summary'].apply(chinese_word_cut)
+
+#新增分词后的字段内容
+data["content_cutted"] =data['file_name'].apply(chinese_word_cut)
 
 data_head = data.content_cutted.head()
 
@@ -46,10 +45,16 @@ tf = tf_vectorizer.fit_transform(data.content_cutted)
 from sklearn.decomposition import LatentDirichletAllocation
 
 n_topics = 5
-lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=50,
+
+lda = LatentDirichletAllocation(n_components=n_topics, max_iter=50,
                                 learning_method='online',
                                 learning_offset=50.,
                                 random_state=0)
+
+# lda = LatentDirichletAllocation(n_topics=n_topics, max_iter=50,
+#                                 learning_method='online',
+#                                 learning_offset=50.,
+#                                 random_state=0)
 
 
 lda.fit(tf)
@@ -70,10 +75,10 @@ print_top_words(lda, tf_feature_names, n_top_words)
 
 import pyLDAvis
 import pyLDAvis.sklearn
-pyLDAvis.enable_notebook()
-pyLDAvis.sklearn.prepare(lda, tf, tf_vectorizer)
+#pyLDAvis.enable_notebook()
+#pyLDAvis.sklearn.prepare(lda, tf, tf_vectorizer)
 
 
 data = pyLDAvis.sklearn.prepare(lda, tf, tf_vectorizer)
 pyLDAvis.show(data)
-#pyLDAvis.display()
+pyLDAvis.display()
