@@ -20,7 +20,7 @@ NLP Common Analytical Ideas
 
 ## LDA
 
-![LDA FOR MY BLOG](./image/LDA.gif)
+![LDA FOR MY BLOG](./image/lda.gif)
 
 ----
 
