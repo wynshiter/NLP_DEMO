@@ -15,5 +15,17 @@ NLP Common Analytical Ideas
 
 [简单NLP分析套路（3）---- 可视化展现与语料收集整理](https://blog.csdn.net/wangyaninglm/article/details/84901376)
 
-
+## wordcloud
 ![wordcloud](./image/word_cloud.jpg)
+
+## LDA
+
+![LDA FOR MY BLOG](./image/LDA.gif)
+
+----
+
+# 参考
+
+----
+
+# 致谢
