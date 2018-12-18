@@ -34,14 +34,13 @@ from pyltp import NamedEntityRecognizer
 from pyltp import Parser
 from pyltp import SementicRoleLabeller
 import re
-# import processHandler
-import pyltp
+
 
 #pyltp官方文档http://pyltp.readthedocs.io/zh_CN/develop/api.html#id15
 #http://blog.csdn.net/MebiuW/article/details/52496920
 #http://blog.csdn.net/lalalawxt/article/details/55804384
 
-LTP_DATA_DIR =  r'..\..\ltp_data_v3.4.0'  # ltp模型目录的路径
+LTP_DATA_DIR =  r'D:\code\python\csdn_nlp\ltp_data_v3.4.0'  # ltp模型目录的路径
 cws_model_path = os.path.join(LTP_DATA_DIR, 'cws.model')  # 分词模型路径，模型名称为`cws.model`
 pos_model_path = os.path.join(LTP_DATA_DIR, 'pos.model')  # 词性标注模型路径，模型名称为`pos.model`
 ner_model_path = os.path.join(LTP_DATA_DIR, 'ner.model')  # 命名实体识别模型路径，模型名称为`pos.model`
@@ -49,17 +48,6 @@ par_model_path = os.path.join(LTP_DATA_DIR, 'parser.model')  # 依存句法分�
 srl_model_path = os.path.join(LTP_DATA_DIR, 'pisrl_win.model')  # 语义角色标注模型目录路径，注意windows 和linux 使用不同模型
 print("======================>>>>"+srl_model_path)
 
-
-def main():
-    #sentence_splitter()
-    words = segmentor('我家在中科院，我现在在北京上学。中秋节你是否会想到李白？')
-    # print(words)
-    tags = posttagger(words)
-    netags=ner(words,tags)
-    arcs = parse(words,tags)
-    roles = role_label(words, tags, netags, arcs)
-
-    print(roles)
 
 
 
@@ -71,15 +59,21 @@ def sentence_splitter(sentence='你好，你觉得这个例子从哪里来的？
 
 """分词"""
 def segmentor(sentence=None):
-    segmentor = Segmentor()  # 初始化实例
-    segmentor.load(cws_model_path)  # 加载模型
-    words = segmentor.segment(sentence)  # 分词
+    try:
+        segmentor = Segmentor()  # 初始化实例
+        segmentor.load(cws_model_path)  # 加载模型
+        words = segmentor.segment(sentence)  # 分词
     #默认可以这样输出
-    print ('\t'.join(words))
+    #print ('\t'.join(words))
     # 可以转换成List 输出
-    words_list = list(words)
-    segmentor.release()  # 释放模型
-    return words_list
+        words_list = list(words)
+        segmentor.release()  # 释放模型
+        return words_list
+    except Exception as e:
+        print(e)
+        return ''
+    finally:
+        pass
 
 
 """词性标注"""
@@ -184,8 +178,22 @@ def role_label(words, postags, netags, arcs):
 #     command = "cd " + project_path + " & " + model_exe + threads_num + input_path + " > " + output_path
 #     os.system(command)
 
-if __name__ == '__main__':
-    main()
+
+
+# def main():
+#     #sentence_splitter()
+#     words = segmentor('我家在中科院，我现在在北京上学。中秋节你是否会想到李白？')
+#     # print(words)
+#     tags = posttagger(words)
+#     netags=ner(words,tags)
+#     arcs = parse(words,tags)
+#     roles = role_label(words, tags, netags, arcs)
+#
+#     print(roles)
+#
+
+# if __name__ == '__main__':
+#     main()
 
 
 
