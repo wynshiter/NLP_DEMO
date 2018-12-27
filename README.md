@@ -55,6 +55,8 @@ NLP Common Analytical Ideas
 
 # 知识图谱
 
+参考：[这是一份通俗易懂的知识图谱技术与应用指南](https://www.jiqizhixin.com/articles/2018-06-20-4)
+
 # 文本搜索
 
 ----
