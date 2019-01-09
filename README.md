@@ -49,6 +49,12 @@ NLP Common Analytical Ideas
 
 # 句法分析
 
+# 情感倾向性分析
+
+[如何用Python做情感分析？](https://www.jianshu.com/p/d50a14541d01)
+
+[SnowNLP: Simplified Chinese Text Processing](https://github.com/isnowfy/snownlp)
+
 # seq2seq
 
 # 问答机器人

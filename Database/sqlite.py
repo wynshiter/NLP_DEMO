@@ -23,22 +23,7 @@ DBSession = scoped_session(sessionmaker())
 engine = None
 
 
-# 定义blog 文章对象:
-class CSDN_Blog(Base):
-    # 表的名字:
-    __tablename__ = 'CSDN_Blog'
 
-    # 表的结构:
-    id = Column(String(20), primary_key=True,unique=True)
-    name = Column(String(20))
-    contend = Column(TEXT)
-    create_time = Column(String(20))
-    click_number = Column(String(20))
-    comment_number = Column(String(20))
-
-    def __repr__(self):
-        return "<CSDN_Blog(id='%s', name='%s', contend='%s', create_time='%s', click_number='%s',comment_number='%s')>" % (
-            self.id, self.name,self.contend,self.create_time,self.click_number,self.comment_number)
 
 
 str_path_sqlite = 'sqlite:///NLP_demo.db?check_same_thread=False'

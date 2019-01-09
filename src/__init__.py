@@ -10,3 +10,4 @@
 
 import file_operator
 import chinese_word_segmentation
+import assistance_tool
