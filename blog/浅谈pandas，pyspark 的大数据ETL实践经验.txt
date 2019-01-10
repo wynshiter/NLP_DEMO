@@ -1,13 +1,11 @@
-content
+
+
+                  					
+														
 
 
 
-
-作者：王雅宁
-转载自：
-https://blog.csdn.net/insightzen_xian/article/details/80659243
-
-文章目录0.序言1. 数据接入2. 脏数据的清洗2.1 文件转码2.2 指定列名3. 缺失值的处理4. 数据质量核查与基本的数据统计4.2 去重操作4.3 聚合操作与统计
+文章大纲0.序言1. 数据接入2. 脏数据的清洗2.1 文件转码2.2 指定列名2.3 pyspark dataframe 新增一列并赋值2.4 时间格式处理与正则匹配3. 缺失值的处理4. 数据质量核查与基本的数据统计4.1 统一单位4.1.1 年龄4.1.2 日期4.1.3 数字4.2 去重操作4.3 聚合操作与统计4.4 Top 指标获取5.数据导入导出参考文献大数据ETL 系列文章简介
 
 0.序言
 本文主要以基于AWS 搭建的EMR spark 托管集群，使用pandas pyspark 对合作单位的业务数据进行ETL ---- EXTRACT（抽取）、TRANSFORM（转换）、LOAD（加载） 等工作为例介绍大数据数据预处理的实践经验，很多初学的朋友对大数据挖掘，数据分析第一直观的印象，都只是业务模型，以及组成模型背后的各种算法原理。往往忽视了整个业务场景建模过程中，看似最普通，却又最精髓的数据预处理或者叫数据清洗过程。
@@ -69,7 +67,7 @@ if __name__=='__main__':
     main()
 
 
-![这里写图片描述](https://img-blog.csdn.net/20180612164910526?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0luc2lnaHR6ZW5feGlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
   pandas 加载的 result
 pyspark
 sdf = spark.read.option("header","true") \
@@ -107,6 +105,44 @@ convmv -f GBK -t UTF-8 -r --nosmart --notest /your_directory
 如何把别的dataframe已有的schame加到现有的dataframe 上呢？
 from pyspark.sql.types import *
 diagnosis_sdf_new = diagnosis_sdf.rdd.toDF(diagnosis_sdf_tmp.schema)
+
+2.3 pyspark dataframe 新增一列并赋值
+http://spark.apache.org/docs/latest/api/python/pyspark.sql.html?highlight=functions#module-pyspark.sql.functions
+统一值
+
+from pyspark.sql import functions
+df = df.withColumn('customer',functions.lit("eng_string"))
+
+#或者这么写
+df = df.select('*', (df.age + 10).alias('agePlusTen'))
+
+
+不同值，写udf
+from pyspark.sql.types import IntegerType
+from pyspark.sql.functions import udf
+
+def func(fruit1, fruit2):
+    if fruit1 == None or fruit2 == None:
+        return 3
+    if fruit1 == fruit2:
+        return 1
+    return 0
+
+func_udf = udf(func, IntegerType())
+df = df.withColumn('new_column',func_udf(df['fruit1'], df['fruit2']))
+
+
+2.4 时间格式处理与正则匹配
+
+#1.日期和时间的转码,神奇的任意时间识别转换接口
+
+import dateutil.parser
+d = dateutil.parser.parse('2018/11-27T12:00:00')
+print(d.strftime('%Y-%m-%d %H:%M:%S'))
+
+#如果本来这一列是数据而写了其他汉字，则把这一条替换为0，或者抛弃？，置空
+
+is_float = re.compile(r'^[-+]?[0-9]+\.[0-9]+$')
 
 
 3. 缺失值的处理
@@ -149,8 +185,114 @@ queshi_pdf
 
 4. 数据质量核查与基本的数据统计
 对于多来源场景下的数据，需要敏锐的发现数据的各类特征，为后续机器学习等业务提供充分的理解，以上这些是离不开数据的统计和质量核查工作，也就是业界常说的让数据自己说话。
-##4.1 统一单位
+4.1 统一单位
 多来源数据 ，突出存在的一个问题是单位不统一，比如度量衡，国际标准是米，然而很多北美国际习惯使用英尺等单位，这就需要我们使用自定义函数，进行单位的统一换算。
+比如，有时候我们使用数据进行用户年龄的计算，有的给出的是出生日期，有的给出的年龄计算单位是周、天，我们为了模型计算方便需要统一进行数据的单位统一，以下给出一个统一根据出生日期计算年龄的函数样例。
+4.1.1 年龄
+import datetime
+
+def CalculateAge(str_Date):
+    '''Calculates the age and days until next birthday from the given birth date'''
+    try:
+      Date = str_Date.split(' ')[0].split('-')
+      BirthDate = datetime.date(int(Date[0]), int(Date[1]), int(Date[2]))
+      Today = datetime.date.today()
+      if (Today.month > BirthDate.month):
+        NextYear = datetime.date(Today.year + 1, BirthDate.month, BirthDate.day)
+      elif (Today.month < BirthDate.month):
+        NextYear = datetime.date(Today.year, Today.month + (BirthDate.month - Today.month), BirthDate.day)
+      elif (Today.month == BirthDate.month):
+        if (Today.day > BirthDate.day):
+          NextYear = datetime.date(Today.year + 1, BirthDate.month, BirthDate.day)
+        elif (Today.day < BirthDate.day):
+          NextYear = datetime.date(Today.year, BirthDate.month, Today.day + (BirthDate.day - Today.day))
+        elif (Today.day == BirthDate.day):
+          NextYear = 0
+      Age = Today.year - BirthDate.year
+      return  Age
+      # if NextYear == 0: #if today is the birthday
+      #   return '%d, days until %d: %d' % (Age, Age+1, 0)
+      # else:
+      #   DaysLeft = NextYear - Today
+      #   return '%d, days until %d: %d' % (Age, Age+1, DaysLeft.days)
+    except:
+      return 'Wrong date format'
+## 如果用在spark 的udf 中
+
+from pyspark.sql.functions import udf
+CalculateAge = udf(CalculateAge, IntegerType())
+# Apply UDF function
+Member_df = Member_df.withColumn("AGE", CalculateAge(Member_df['date of birthday']))
+
+4.1.2 日期
+清洗日期格式字段
+from dateutil import parser
+
+
+def clean_date(str_date):
+    try:
+        if str_date:
+            d = parser.parse(str_date)
+            return d.strftime('%Y-%m-%d')
+        else:
+            return None
+    except Exception as e:
+         return None
+        
+
+        
+def clean_schema_date(spark_df,column_Date):
+
+    func_udf_clean_date = udf(clean_date, StringType())
+
+    for column in column_Date:
+          spark_df=spark_df.withColumn(column,  func_udf_clean_date(spark_df[column]))
+            
+    return spark_df
+
+
+
+
+
+4.1.3 数字
+#清洗数字格式字段
+
+#如果本来这一列是数据而写了其他汉字，则把这一条替换为0，或者抛弃？，置空
+
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+    return False
+
+def clean_number(str_number):
+
+    try:
+        if str_number:
+
+                if is_number(str_number):
+                    return str_number
+                else:
+                    return None
+        else:
+            return None
+    except Exception as e:
+        return None
+
+
+
+func_udf_clean_number = udf(clean_number, StringType())
+
+                 
+def clean_schema_number(spark_df,column_number):
+
+    for column in column_number:
+          spark_df=spark_df.withColumn(column,  func_udf_clean_number(spark_df[column]))
+    return spark_df
+
 4.2 去重操作
 pandas
 去重操作可以帮助我们统计业务的核心数据，从而迅速抓住主要矛盾。例如，对于互联网公司来说，每天有很多的业务数据，然而发现其中的独立个体的独立行为才是数据分析人员应该注意的点。
@@ -177,13 +319,33 @@ count_sdf_testnumber.show()
 
 4.3 聚合操作与统计
 pyspark 和pandas 都提供了类似sql 中的groupby 以及distinct 等操作的api，使用起来也大同小异，下面是对一些样本数据按照姓名，性别进行聚合操作的代码实例
+pyspark
 sdf.groupBy("SEX").agg(F.count("NAME")).show()
 
 labtest_count_sdf = sdf.groupBy("NAME","SEX","PI_AGE").agg(F.countDistinct("CODE").alias("tests_count"))
 
+spark sql
+
+filename = "*.csv"
+df = (spark
+                 .read
+                 .option("header","true")
+                 .csv(filename)
+                 .cache()
+                )
+
+df.createOrReplaceTempView("export")
+df_Parents = spark.sql("SELECT STATUS,count(1) shuliang  FROM export where  TYPE = 'Parents' group by STATUS order by count(1) desc")
+df_Parents.show()
+
+pdf_Parents= df_Parents.toPandas()
+pdf_Parents.plot(kind='bar')
+
+plt.show()
+
 顺带一句，pyspark 跑出的sql 结果集合，使用toPandas() 转换为pandas 的dataframe 之后只要通过引入matplotlib,  就能完成一个简单的可视化demo 了。
 
-![这里写图片描述](https://img-blog.csdn.net/20180613004423280?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0luc2lnaHR6ZW5feGlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
 样例数据
 d2 = pd.DataFrame({
     'label': [1,2,3],
@@ -195,18 +357,43 @@ d2.plot.pie(labels=['1', '2', '3'],subplots=True, figsize=(8, 4))
 plt.show()
 
 
-![这里写图片描述](https://img-blog.csdn.net/2018061300450667?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0luc2lnaHR6ZW5feGlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
-直方图，饼图
 
-#参考文献
+直方图，饼图
+4.4 Top 指标获取
+top 指标的获取说白了，不过是groupby 后order by 一下的sql 语句
+
+5.数据导入导出
+参考：数据库，云平台，oracle，aws，es导入导出实战
+
+参考文献
 做Data Mining，其实大部分时间都花在清洗数据
 http://www.raincent.com/content-10-8092-1.html
 基于PySpark大规模数据预处理
 https://www.jianshu.com/p/b7882e9616c7
+同时发表在：
+https://blog.csdn.net/insightzen_xian/article/details/80659243
+
+大数据ETL 系列文章简介
+本系列文章主要针对ETL大数据处理这一典型场景，基于python语言使用Oracle、aws、Elastic search 、Spark 相关组件进行一些基本的数据导入导出实战，如：
+
+oracle使用数据泵impdp进行导入操作。
+aws使用awscli进行上传下载操作。
+本地文件上传至aws es
+spark dataframe录入ElasticSearch
+
+等典型数据ETL功能的探索。
+系列文章：
+1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出
+2.大数据ETL实践探索（2）---- python 与aws 交互
+3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器
+4.大数据ETL实践探索（4）---- 之 搜索神器elastic search
+5.使用python对数据库，云平台，oracle，aws，es导入导出实战
+6.aws ec2 配置ftp----使用vsftp
+7.浅谈pandas，pyspark 的大数据ETL实践经验
 
 更多资讯，请关注公众号
 
-![这里写图片描述](https://img-blog.csdn.net/20180611233946592?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0luc2lnaHR6ZW5feGlhbg==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
 
 
 

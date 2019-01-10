@@ -1,0 +1,160 @@
+
+
+
+
+
+                  					
+														
+
+
+
+12 Integer to Roman 
+13 Roman to Integer      
+有可能不注意的结果： 
+
+class Solution {
+public:
+
+/*
+
+1、相同的数字连写，所表示的数等于这些数字相加得到的数，如：Ⅲ = 3；
+2、小的数字在大的数字的右边，所表示的数等于这些数字相加得到的数， 如：Ⅷ = 8；Ⅻ = 12；
+3、小的数字，（限于Ⅰ、X 和C）在大的数字的左边，所表示的数等于大数减小数得到的数，如：Ⅳ= 4；Ⅸ= 9；
+4、正常使用时，连写的数字重复不得超过三次。（表盘上的四点钟“IIII”例外）
+5、在一个数的上面画一条横线，表示这个数扩大1000倍。
+
+
+
+
+*/
+    int romanToInt(string s) 
+    {
+        int res=0;
+        int lastValue=0;
+        int digit;
+        for(int i=s.size()-1;i>=0;i--){
+            switch(s[i]){
+                case 'I': digit=1; break;
+                case 'V': digit=5; break;
+                case 'X': digit=10; break;
+                case 'L': digit=50; break;
+                case 'C': digit=100; break;
+                case 'D': digit=500; break;
+                case 'M': digit=1000; break;
+            }
+            if(digit>=lastValue){
+                res+=digit;
+                lastValue=digit;
+            }
+            else res-=digit;
+        }
+        return res;
+    }
+
+
+};
+罗马数字是阿拉伯数字传入之前使用的一种数码。罗马数字采用七个罗马字母作数字、即Ⅰ（1）、X（10）、C（100）、M（1000）、V（5）、L（50）、D（500）。记数的方法： 
+  1. 相同的数字连写，所表示的数等于这些数字相加得到的数，如 Ⅲ=3； 
+  2. 小的数字在大的数字的右边，所表示的数等于这些数字相加得到的数，如 Ⅷ=8、Ⅻ=12； 
+  3. 小的数字（限于 Ⅰ、X 和 C）在大的数字的左边，所表示的数等于大数减小数得到的数，如 Ⅳ=4、Ⅸ=9； 
+  4. 在一个数的上面画一条横线，表示这个数增值 1,000 倍，如 
+  5.  
+
+string intToRoman(int num)
+ {
+    string table[4][10] = {{"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"},
+                           {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"},
+                           {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"},
+                           {"", "M", "MM", "MMM"}
+                          };
+    string result;
+    int count = 0;
+    while(num > 0){
+        int temp = num % 10;
+        result = table[count][temp] + result;
+        num /= 10;
+        count++;
+    }
+    return result;
+}
+The basic idea is really simple: replace every digit in num by roman numerals. 
+For example, we have a num: 2438. 
+2 –> “MM” 
+4 –> “CD” 
+3 –> “XXX” 
+8 –> “VIII” 
+Then the result is “MMCDXXXVIII”.
+M = ["", "M", "MM", "MMM"];
+C = ["", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"];
+X = ["", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"];
+I = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"];
+return M[num/1000] + C[(num%1000)/100] + X[(num%100)/10] + I[num%10];
+Simple C solution 16ms 
+  ● 0 
+L
+ljbschen  
+Reputation:  10
+void helper (char* ans, int* curp, int step, int one, int five, int ten) {
+    char ch[]={'I','V','X','L','C','D','M'};
+    int offset=0;
+    if (step==1000) offset=6;
+    else if (step==100) offset=4;
+    else if (step==10) offset=2;
+    else offset=0;
+
+    if (one==-1) ans[(*curp)++] = ch[offset];
+    if (ten==1)  ans[(*curp)++] = ch[offset+2];
+    if (five==1) ans[(*curp)++] = ch[offset+1];
+    while (one-->0) ans[(*curp)++] = ch[offset];
+}
+
+char* intToRoman(int num) {
+    char *ans = malloc(sizeof(char)*16);
+    int i=0, step=1000, digit=0;
+    int one=0,five=0,ten=0;
+    int curp=0;
+    while (num>0) {
+        digit=num/step;
+        if (digit==9) {one=-1;five=0;ten=1;}
+        else if (digit>=5) {one=digit-5;five=1;ten=0;}
+        else if (digit==4) {one=-1;five=1;ten=0;}
+        else if (digit==0) {one=0;five=0;ten=0;}
+        else {one=digit;five=0;ten=0;}
+        helper(ans,&curp,step,one,five,ten);
+        num-=digit*step;
+        step/=10;
+    }
+    ans[curp]='\0';
+    return ans;
+}
+
+《架构大数据—-大数据技术及算法解析》
+绪论 
+2013年被称为大数据元年，据IDC预测，到2020年全球将拥有35ZB（1ZB = 1021字节）的数据，大数据涉及国家战略、区域及企业发展、社会民生的方方面面，掌握大数据的核心概念、模式和技术，就把握了新时代的脉搏。 
+1.大数据技术概述
+1.1大数据的概念 
+大数据指的是无法在规定时间内用现有的常规软件工具对其内容进行抓取、管理和处理的数据集合。 
+大数据技术则特指新一代的创新型的技术，能够突破常规软件的限制，是对大数据进行采集、存储和处理的技术的统称。 
+大数据（BigData）一词正式出现是在2011年麦肯锡全球研究院发布的《大数据：下一个创新、竞争和生产力的前沿》研究报告中。 
+大数据的4个根本特征： 
+1.Volume，数据量足够大 
+2.Variety，数据的种类多样 
+3.Velocity，数据的增长及处理速度快 
+4.Value，数据蕴藏价值大
+1.2 大数据的行业价值 
+1.分析用户行为，建立数据模型，并进行预测 
+WalMart将尿不湿和啤酒摆放在一起的销售策略。 
+2.提升企业的资产管理，优化企业的业务流程 
+UPS通过在货车上安装传感器，优化行车路线，2011年，其驾驶员少跑了将近4828万千米的路程。 
+3.大数据服务智慧城市，智慧交通 
+智能电表，升级智能电网，由原来的数据库架构升级为HBase，使用Hive进行相关的统计分析。 
+4.变革公共医疗卫生，对疾病进行预测 
+Google 的Flurend，百度的疾病预测 
+5.在金融行业利用大数据进行战略决策和精准营销 
+6.利用大数据保障公共安全 
+7.利用大数据促进教育行业变革 
+8.大数据在改善着每个人的生活
+ 
+p.s. 
+
+

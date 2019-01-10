@@ -23,9 +23,6 @@ DBSession = scoped_session(sessionmaker())
 engine = None
 
 
-
-
-
 str_path_sqlite = 'sqlite:///NLP_demo.db?check_same_thread=False'
 
 
@@ -44,7 +41,7 @@ def init_sqlalchemy(dbname = 'sqlite:///demo.db',Echo=True):
 if __name__ == '__main__':
     init_sqlalchemy(str_path_sqlite)
     #list_customer = ...
-    ed_user = CSDN_Blog(id='1', name='2', contend='3', create_time='4', click_number='5', comment_number='6')
+    ed_user = CSDN_Blog(id='1', name='2', content='3', create_time='4', click_number='5', comment_number='6')
     DBSession.add(ed_user)
     DBSession.commit()
     one_blog = DBSession.query(CSDN_Blog).filter_by(id='1').first()

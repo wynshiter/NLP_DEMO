@@ -24,3 +24,17 @@ def clean_csdn_date(str_date):
         str_date = str_date.replace('年','/').replace('月','/').replace('日','/')
         #timeStruct = time.strptime(str_date, "%Y/%m/%d %H:%M:%S")
         return str_date
+
+
+def set_starttime():
+    start = time.clock()
+
+    return start
+
+#当中是你的程序
+
+def get_runtime(start_time):
+
+
+    elapsed = (time.clock() - start_time)
+    print("Time used:",elapsed)

@@ -26,29 +26,29 @@ Base = declarative_base()
 class CSDN_Blog(Base):
     # 表的名字:
     __tablename__ = 'CSDN_Blog'
-    column_name = ['id','title','contend','create_time','click_number','comment_number','label']
+    column_name = ['id','title','content','create_time','click_number','comment_number','label']
 
     # 表的结构:
 
     id = Column(String(64), primary_key=True,unique=True)
     title = Column(String(256))
-    contend = Column(TEXT)
+    content = Column(TEXT)
     create_time = Column(String(64))
     click_number = Column(String(64))
     comment_number = Column(String(64))
-    label = Column(String(256))
+    label = Column(TEXT)
 
-    # def __int__(self, id, title,contend,create_time,click_number,comment_number,label):
-    #     self.id = id
-    #     self.title = title
-    #     self.contend = contend
-    #     self.create_time =create_time
-    #     self.click_number = click_number
-    #     self.comment_number = comment_number
-    #     self.label = label
+    def __int__(self, id, title,content,create_time,click_number,comment_number,label):
+        self.id = id
+        self.title = title
+        self.content = content
+        self.create_time =create_time
+        self.click_number = click_number
+        self.comment_number = comment_number
+        self.label = label
 
     def __repr__(self):
         return "<CSDN_Blog(id ='%s' , title = '%s', contend = '%s',create_time = '%s', click_number = '%s',comment_number = '%s',label = '%s' )>" % (
-            self.id, self.title,self.contend,self.create_time,self.click_number,self.comment_number,self.label)
+            self.id, self.title,self.content,self.create_time,self.click_number,self.comment_number,self.label)
 
 
