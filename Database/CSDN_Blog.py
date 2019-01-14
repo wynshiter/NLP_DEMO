@@ -23,7 +23,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 Base = declarative_base()
 # 定义blog 文章对象:
-class CSDN_Blog(Base):
+class Blog(Base):
     # 表的名字:
     __tablename__ = 'CSDN_Blog'
     column_name = ['id','title','content','create_time','click_number','comment_number','label']

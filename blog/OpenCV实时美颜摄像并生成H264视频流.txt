@@ -1,7 +1,7 @@
-content
 
 
-					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/50806051				
+                  					
+														
 
 
         为什么美颜摄像这么简单的功能，OpenCV这个开源项目网上很少有代码呢？对于在windows平台下，生成h264视频流也比价麻烦，没有现成的api可以使用，需要借助MinGw编译libx264，或者ffmpeg才能使用。

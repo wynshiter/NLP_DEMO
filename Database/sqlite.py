@@ -8,6 +8,13 @@
 @desc:  使用爬虫将数据缓存到本地数据库中，以便后续分析，可以只用pandas 直接加载数据库到dataframe
 '''
 
+import sys
+import os
+currentUrl = os.path.dirname(__file__)
+parentUrl = os.path.abspath(os.path.join(currentUrl, os.pardir))
+#print(parentUrl)
+sys.path.append(parentUrl)
+
 import sqlite3
 
 # 导入:
@@ -16,6 +23,7 @@ from sqlalchemy import Column, String, create_engine,TEXT, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import scoped_session, sessionmaker
+import CSDN_Blog
 
 # 创建对象的基类:
 Base = declarative_base()
@@ -36,21 +44,29 @@ def init_sqlalchemy(dbname = 'sqlite:///demo.db',Echo=True):
 
 
 
+def insert_list(list_obj):
+    try:
+        init_sqlalchemy(str_path_sqlite)
+        DBSession.add_all(list_obj)
+        DBSession.commit()
+    except:
+        DBSession.rollback()
+        raise
+    finally:
+        DBSession.close()
+
+
+
 
 
 if __name__ == '__main__':
+    # list_customer = ...
     init_sqlalchemy(str_path_sqlite)
-    #list_customer = ...
-    ed_user = CSDN_Blog(id='1', name='2', content='3', create_time='4', click_number='5', comment_number='6')
+    ed_user = CSDN_Blog.Blog(id = '1', title = '2', content = '3', create_time = '4', click_number = '5', comment_number = '6',label = '7')
     DBSession.add(ed_user)
-    DBSession.commit()
-    one_blog = DBSession.query(CSDN_Blog).filter_by(id='1').first()
-    print(one_blog)
-   # DBSession.add_all(list_customer)
-
-    #DBSession.commit()
-    DBSession.close()
-
+    one_blog = DBSession.query(CSDN_Blog.Blog()).filter_by(title='2').first()
+    # print(one_blog)
+#
 
 
 
