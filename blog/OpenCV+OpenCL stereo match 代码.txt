@@ -1,7 +1,7 @@
-content
 
 
-					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/40305093				
+                  					
+														
 
 
 之前配置cuda跟opencv 的混合编程，发现只要使用的东西多半还要用opencv的代码编译一次，加上cuda的编译太浪费时间了，我看了几个博客，觉的opencl这个可能会比较好整，就把opencv里面的opencl代码的部分编译了一下，这个比较少，用的时候也能直接检测出来i7 自带的集成显卡：

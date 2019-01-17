@@ -1,4 +1,3 @@
-content
 
 
 
@@ -42,7 +41,6 @@ http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/segbench/
 http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/resources.html
 
 
-content
 原文地址：http://blog.sina.com.cn/s/blog_53c74fa1010002pn.html
 做数字图像处理的，怎能没有一个图库？虽说自己可以建立，可是如果是比较知名的图库，做出来的实验结果才能比较让人信服。coral是很有名，可他要收费。我寻寻觅觅，还是找到了一些图库，有的是纯texture图库，比如著名的vistex，有的是faceimages，有的也有RGB真彩色图的。下面罗列了一些url，可以找到对应的。
  

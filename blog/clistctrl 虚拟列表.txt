@@ -1,4 +1,3 @@
-content
 
 
 
@@ -188,7 +187,6 @@ void CVirtualListDlg::OnClickList(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-content
 
 一、什么是虚拟列表控件
 虚拟列表控件是指带有LVS_OWNERDATA风格的列表控件。。

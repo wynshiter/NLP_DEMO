@@ -1,10 +1,9 @@
-content
 
 
 
 转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
 来自：shiter编写程序的艺术
-
+ 
  1.绪论
 图切割算法是组合图论的经典算法之一。近年来，许多学者将其应用到图像和视频分割中，取得了很好的效果。本文简单介绍了图切算法和交互式图像分割技术，以及图切算法在交互式图像分割中的应用。
  
@@ -15,24 +14,28 @@ content
 交互式图像分割是指，首先由用户以某种交互手段指定图像的部分前景与部分背景，然后算法以用户的输入作为分割的约束条件自动地计算出满足约束条件下的最佳分割。典型的交互手段包括用一把画刷在前景和背景处各画几笔（如[1][4]等）以及在前景的周围画一个方框（如[2]）等。
  
 基于图切算法的图像分割技术是近年来国际上图像分割领域的一个新的研究热点。该类方法将图像映射为赋权无向图，把像素视作节点，利用最小切割得到图像的最佳分割。
-
- 2.几种改进算法
-
  
-
+ 2.几种改进算法
+ 
+ 
+ 
 Graph Cut[1]算法是一种直接基于图切算法的图像分割技术。它仅需要在前景和背景处各画几笔作为输入，算法将建立各个像素点与前景背景相似度的赋权图，并通过求解最小切割区分前景和背景。
  
-
+ 
+ 
 Grabcut[2]算法方法的用户交互量很少，仅仅需要指定一个包含前景的矩形，随后用基于图切算法在图像中提取前景。
  
-
+ 
+ 
 Lazy Snapping[4]系统则是对[1]的改进。通过预计算和聚类技术，该方法提供了一个即时反馈的平台，方便用户进行交互分割。
+ 
  
 文档说明：
 http://download.csdn.net/detail/wangyaninglm/8484301
-
+ 
  
 3.代码实现效果
+说明：使用鼠标左键标注前景，右键标注背景，之后进行分割（程序问题欢迎加群探讨）
 
  
  
@@ -54,6 +57,7 @@ Graph Cut方法是基于颜色统计采样的方法，因此对前背景相差�
  
 grabcut代码：
  
+
 // Grabcut.cpp : 定义控制台应用程序的入口点。
 //
 
@@ -411,8 +415,10 @@ exit_main:
 	return 0;
 }
 
+
  lazy snapping代码实现：
  
+
 // LazySnapping.cpp : 定义控制台应用程序的入口点。
 //
 /* author: zhijie Lee
@@ -816,22 +822,16 @@ int main(int argc, char** argv)
  
  
 参考文献
-[1] Y. Boykov, and M. P. Jolly, “Interactive graph cuts for optimal boundary and region segmentation ofobjects in N-D images”,Proceeding ofIEEE International Conference on Computer
- Vision, 1:105~112, July 2001.
-[2] C. Rother, A. Blake, and V. Kolmogorov, “Grabcut – interactive foreground extractionusing iterated graph cuts”,Proceedingsof ACM SIGGRAPH 2004, 23(3):307~312, August
- 2004.
+[1] Y. Boykov, and M. P. Jolly, “Interactive graph cuts for optimal boundary and region segmentation ofobjects in N-D images”,Proceeding ofIEEE International Conference on Computer Vision, 1:105~112, July 2001.
+[2] C. Rother, A. Blake, and V. Kolmogorov, “Grabcut – interactive foreground extractionusing iterated graph cuts”,Proceedingsof ACM SIGGRAPH 2004, 23(3):307~312, August 2004.
 [3] A. Agarwala, M. Dontcheva, M. Agrawala,et al, “Interactive digital photomontage”,Proceedings of ACM SIGGRAPH 2004, 23(3):294~302, August 2004.
 [4] Y. Li, J. Sun, C. Tang,et al, “Interacting withimages: Lazy snapping”,Proceedingsof ACM SIGGRAPH 2004, 23(3):303~308, August 2004.
-[5] A. Blake, C. Rother, M. Brown,et al, “Interactive ImageSegmentation using an adaptive GMMRF model”.Proceedings of European Conference on Computer Vision, pp.
- 428~441,May 2004.
+[5] A. Blake, C. Rother, M. Brown,et al, “Interactive ImageSegmentation using an adaptive GMMRF model”.Proceedings of European Conference on Computer Vision, pp. 428~441,May 2004.
 [6] V. Kwatra, A. Schodl, I. Essa,et al, “Graphcut Textures:Image and Video Synthesis Using Graph Cuts”.Proceedings of ACM Siggraph 2003, pp.277~286, Augst 2003.
-
+ 
 部分代码与文档是早些时候收集的，出处找不到了，还请原作者看到后联系注明。
  
-
 转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
 来自：shiter编写程序的艺术
-
-
-
+  
 

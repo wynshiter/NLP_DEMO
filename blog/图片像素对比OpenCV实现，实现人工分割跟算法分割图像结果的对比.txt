@@ -1,7 +1,7 @@
-content
 
 
-					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/39276819				
+                  					
+														
 
 
 图片对比，计算不同像素个数，已经比率。实现人工分割跟算法分割图像结果的对比，但是只能用灰度图像作为输入

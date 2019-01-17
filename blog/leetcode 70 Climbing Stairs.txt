@@ -1,0 +1,81 @@
+
+
+
+
+
+                  					
+														
+
+
+﻿﻿
+Climbing Stairs
+                      
+
+
+
+You are climbing a stair case. It takes n steps to reach to the top.
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+Hide Tags
+Dynamic Programming
+
+
+
+这个题面试题还是比较常见的
+讨论的帖子：
+https://leetcode.com/discuss/2809/easy-solutions-for-suggestions
+
+
+原理：
+
+This problem is a Fibonacci problem. F(n)=F(n-1)+F(n-2); Solving this problem by recursion ,we will do a lot of same recursion. Example: F(10)=F(9)+F(8); F(9)=F(8)+F(7); we calculate F(8) twice,when n is large,this will increase as a rate of n's exponent.
+So a more efficient way to solve this problem is from Bottom to Top. Calculate F(0) ,F(1); then F(2).........
+
+
+
+
+
+
+
+人生ac最快的代码：
+class Solution {
+public:
+    int climbStairs(int n)
+    {
+        
+        int stepone = 0;
+        int steptwo = 1;
+        int sum = 0;
+        
+        for(int i = 0;i<n;i++)
+        {
+            sum = stepone + steptwo;
+            stepone = steptwo;
+            steptwo = sum;
+            
+            
+        }
+        
+        return sum;
+    }
+};
+
+
+
+DP算法求解：
+https://leetcode.com/discuss/16275/my-dp-solution-using-c-4-ms
+
+简洁的代码：
+https://leetcode.com/discuss/31848/1ms-in-c-and-2ms-in-c-optimal-space-no-temp-value
+
+递归：
+https://leetcode.com/discuss/28383/simple-and-clear-2ms-solution-in-c-without-recursion
+
+python：
+
+https://leetcode.com/discuss/25378/this-is-essentially-a-fibonacci-sequence
+
+
+﻿﻿
+
+

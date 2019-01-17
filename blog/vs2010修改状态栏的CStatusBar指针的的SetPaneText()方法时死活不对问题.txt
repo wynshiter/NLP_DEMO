@@ -1,7 +1,7 @@
-content
 
 
-					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/38471445				
+                  					
+														
 
 
 vs2010的mfc在有些地方不太一样不容易注意到，今天在修改状态栏的时候，就碰见了问题，死活修改不了。

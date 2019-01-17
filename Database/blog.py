@@ -15,15 +15,15 @@ parentUrl = os.path.abspath(os.path.join(currentUrl, os.pardir))
 #print(parentUrl)
 sys.path.append(parentUrl)
 
-from sqlalchemy import Column, String, create_engine,TEXT, Integer, String
+from sqlalchemy import Column,TEXT, String
 
 from sqlalchemy.ext.declarative import declarative_base
 
-from sqlalchemy.orm import scoped_session, sessionmaker
+# from sqlalchemy.orm import scoped_session, sessionmaker
 
 Base = declarative_base()
 # 定义blog 文章对象:
-class Blog(Base):
+class CSDN_Blog(Base):
     # 表的名字:
     __tablename__ = 'CSDN_Blog'
     column_name = ['id','title','content','create_time','click_number','comment_number','label']

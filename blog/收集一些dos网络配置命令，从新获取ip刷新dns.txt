@@ -1,7 +1,7 @@
-content
 
 
-					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/41051835				
+                  					
+														
 
 
 今天台式机插着无线网卡连接学校无线网，结果就要登录了，完后ip地址固定半天，换了mac地址重新分配还是不能改，ping了主机也不通，我想可能是dns没有刷新。现在收集几个dos命令用来配置网络：

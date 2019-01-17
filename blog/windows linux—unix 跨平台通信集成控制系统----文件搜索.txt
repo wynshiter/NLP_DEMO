@@ -1,7 +1,10 @@
-content
 
 
-					版权声明：本文为博主原创文章，未经博主允许不得转载。					https://blog.csdn.net/wangyaninglm/article/details/42333361				
+
+
+
+                  					
+														
 
 
 跨平台的网络通信，跟设备的集成控制，牵扯到在各种平台下的文件搜索问题，windows下面的已经有了。

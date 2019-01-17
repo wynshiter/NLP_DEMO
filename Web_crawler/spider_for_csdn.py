@@ -20,6 +20,12 @@ import re
 from lxml import etree
 import socket
 
+from sqlalchemy import Column, String, create_engine,TEXT, Integer, String
+
+from sqlalchemy.ext.declarative import declarative_base
+
+from sqlalchemy.orm import scoped_session, sessionmaker
+
 import sys
 import os
 
@@ -29,8 +35,9 @@ PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
 
 ###-----以下导入 其他文件夹的包
-from Database import CSDN_Blog
+from Database import blog
 from src import assistance_tool
+from Database import My_sqlite
 
 
 STR_PAGE_URL_PREFIX = 'https://blog.csdn.net/wangyaninglm/'
@@ -48,13 +55,6 @@ my_headers = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
     "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)"
 ]
-
-headers1 = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
-headers2 = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36'}
-headers3 = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'}
-
 
 
 # windows 创建文件替换特殊字符
@@ -91,8 +91,6 @@ def get_Content(blog_obj, contend_box_id, title_id, contend_id):
 
         label= label+','+','.join([obj.text for obj in bsObj.findAll(name='a', attrs={'class': 'tag-link'})])
 
-
-        print(str_title.encode('gbk'))
         f_blog = open(r'../blog/' + str_title, 'w', encoding='utf-8')
         str_content = ''
         for content_box in bsObj.findAll(name='div', attrs={'class': contend_box_id}):  # 正则表达式匹配博客包含框 标签
@@ -145,7 +143,7 @@ def getPage_AllBlogLinks(url, url_pattern):
                 click_number = page_obj.findAll(name='div')[0].findAll(name='span')[1].get_text().replace('阅读数：', '')
                 comment_number = page_obj.findAll(name='div')[0].findAll(name='span')[2].get_text().replace('评论数：', '')
                 # 构造博客类的对象
-                temp_blog = CSDN_Blog.CSDN_Blog(id=id, title='', content='', create_time=create_time,
+                temp_blog = blog.CSDN_Blog(id=id, title='', content='', create_time=create_time,
                                                 click_number=click_number, comment_number=comment_number, label='')
 
                 list_blog_obj.append(temp_blog)
@@ -186,11 +184,16 @@ def main():
 
     for blog_obj in list_blog_obj:
         # 参数分别 为,博客对象，博客，标题名，内容的div 名称
-
-
         get_Content(blog_obj, 'blog-content-box', 'title-article', 'article_content')
 
     print(len(list_blog_obj))
+
+    Base = declarative_base()
+    DBSession = scoped_session(sessionmaker())
+    engine = None
+
+    engine = My_sqlite.init_sqlalchemy('sqlite:///../Database/NLP_demo.db?check_same_thread=False', True, blog.CSDN_Blog(), DBSession)
+    My_sqlite.insert_list(list_blog_obj,DBSession)
 
     assistance_tool.get_runtime(start_time)
 
@@ -198,104 +201,6 @@ def main():
 if __name__ == '__main__':
     main()
 
-# 所有内容class：blog-content-box 标题class：title-article， 内容id： article_content
-
-
-# 需要改进的地方：title 中存在重复，
-# 报错：EOF occurred in violation of protocol (_ssl.c:777)
-
-
-# def getArticleLinks(pageUrl, articles):
-#     # 设置代理IP
-#     # 代理IP可以上http://ip.zdaye.com/获取
-#     proxy_handler = urllib.request.ProxyHandler({'post': '49.51.195.24:1080'})
-#     proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
-#     opener = urllib.request.build_opener(urllib.request.HTTPHandler, proxy_handler)
-#     urllib.request.install_opener(opener)
-#     # 获取网页信息
-#     req = request.Request(pageUrl, headers=headers1 or headers2 or headers3)
-#     html = urlopen(req)
-#     bsObj = BeautifulSoup(html.read(), "html.parser")
-#
-#     for articlelist in bsObj.findAll("h4"):  # 正则表达式匹配每一篇文章链接(比较硬编码h4 这个四级标题里面藏了所有链接)
-#         # print(articlelist)
-#         if 'href' in articlelist.a.attrs:
-#             if articlelist.a.attrs["href"] not in articles:
-#                 # 遇到了新界面
-#                 newArticle = articlelist.a.attrs["href"]
-#                 # print(newArticle)
-#                 articles.add(newArticle)
-#                 # print(newArticle)
-
-
-# # 得到CSDN博客每一篇文章的文字内容,title-article 为标题，id="article_content" 里面为文章内容
-# def getArticleText(articleUrl,articletitle):
-#     # 设置代理IP
-#     # 代理IP可以上http://ip.zdaye.com/获取
-#     proxy_handler = urllib.request.ProxyHandler({'https': '120.132.52.89:8888'})
-#     proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
-#     opener = urllib.request.build_opener(urllib.request.HTTPHandler, proxy_handler)
-#     urllib.request.install_opener(opener)
-#     # 获取网页信息
-#     req = request.Request(articleUrl, headers=headers1 or headers2 or headers3)
-#     print(articleUrl)
-#     html = urlopen(req)
-#     bsObj = BeautifulSoup(html.read(), "html.parser")
-#     # 获取文章的文字内容
-#     for textlist in bsObj.findAll(articletitle):  # 正则表达式匹配文字内容标签
-#         print(textlist.get_text())
-#         # data_out(textlist.get_text())
-
-
-# def getPageLinks(bokezhuye,pages):
-#     # 设置代理IP
-#     # 代理IP可以上http://ip.zdaye.com/获取
-#     proxy_handler = urllib.request.ProxyHandler({'post': '49.51.195.24:1080'})
-#     # proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
-#     opener = urllib.request.build_opener(urllib.request.HTTPHandler, proxy_handler)
-#     urllib.request.install_opener(opener)
-#     # 获取网页信息
-#     req = request.Request(bokezhuye, headers=headers1 or headers2 or headers3)
-#     html = urlopen(req)
-#     bsObj = BeautifulSoup(html.read(), "html.parser")
-#     # 获取当前页面(第一页)的所有文章的链接
-#     getArticleLinks(bokezhuye)
-#     # 去除重复的链接
-#
-#     for pagelist in bsObj.findAll("a", href=re.compile("^/([A-Za-z0-9]+)(/article)(/list)(/[0-9]+)*$")):  # 正则表达式匹配分页的链接
-#         if 'href' in pagelist.attrs:
-#             if pagelist.attrs["href"] not in pages:
-#                 # 遇到了新的界面
-#                 newPage = pagelist.attrs["href"]
-#                 # print(newPage)
-#                 pages.add(newPage)
-#                 # 获取接下来的每一个页面上的每一篇文章的链接
-#                 newPageLink = "http://blog.csdn.net/" + newPage
-#                 getArticleLinks(newPageLink)
-#                 # # 爬取每一篇文章的文字内容
-#                 # for articlelist in articles:
-#                 #     newarticlelist = "http://blog.csdn.net/" + articlelist
-#                 #     print(newarticlelist)
-#                 #     getArticleText(newarticlelist)
-
-
-# contend =
-# create_time =bsObj.findAll(name='div', attrs={'class': 'article-bar-top'})[0]
-# xpath_create_time = '''// *[ @ id = "mainBox"] / main / div[1] / div / div / div[2] / div[1] / span[1]'''
-#
-# create_time = assistance_tool.clean_csdn_date(etree_obj.xpath(xpath_create_time)[0].text)
-# xpath_click_number = '''//*[@id="mainBox"]/main/div[1]/div/div/div[2]/div[1]/span[2]'''
-# click_number = assistance_tool.clean_csdn_date(etree_obj.xpath(xpath_click_number)[0].text)
-# xpath_comment_number = '''//*[@id="mainBox"]/main/div[2]/div[2]/div[1]/p[3]/span'''
-# comment_number = assistance_tool.clean_csdn_date(etree_obj.xpath(xpath_comment_number)[0].text)
-
-# CSDN_Blog(id='', name='', contend='', create_time='', click_number='', comment_number='',label='')
-# CSDN_Blog()
-#articles = set()
-
-# 得到CSDN博客某个博客主页上所有分页的链接，根据分页链接得到每一篇文章的链接并爬取博客每篇文章的文字
-#pages = set()
-####获取到每一个分页列表的所有文章
 
 
 

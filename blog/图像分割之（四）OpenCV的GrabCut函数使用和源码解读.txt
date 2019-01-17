@@ -1,4 +1,3 @@
-content
 
 
 
@@ -742,7 +741,6 @@ void cv::grabCut( InputArray _img, InputOutputArray _mask, Rect rect,
 
 
 
-content
 
 图像分割之（四）OpenCV的GrabCut函数使用和源码解读
 zouxy09@qq.com

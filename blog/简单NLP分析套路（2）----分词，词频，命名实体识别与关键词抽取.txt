@@ -5,7 +5,7 @@
 
 
 
-文章大纲中文分词技术评测参考云服务哈工大语言云 ltp基于深度学习方法的中文分词信息检索与关键词提取TF-IDFTEXTRANKword2vectorgensim 训练词向量部分开源词向量未完待续
+文章大纲中文分词技术评测参考云服务哈工大语言云 ltp基于深度学习方法的中文分词一个领域细分的中文分词工具包（北大最新开源）信息检索与关键词提取TF-IDFTEXTRANKword2vectorgensim 训练词向量部分开源词向量未完待续
 
 google 近期发布了颠覆性的NLP模型–BERT ,大家有空可以了解一下，
 这是张俊林博士写的科普文章：
@@ -75,6 +75,9 @@ def segmentor(sentence=None):
 安装报错参考
 https://blog.csdn.net/weixin_40899194/article/details/79702468
 基于深度学习方法的中文分词
+https://github.com/rockyzhengwu/FoolNLTK
+一个领域细分的中文分词工具包（北大最新开源）
+https://github.com/lancopku/PKUSeg-python
 
 信息检索与关键词提取
 这个部分我们来介绍一些能够衡量文章中词汇重要性 的指标
