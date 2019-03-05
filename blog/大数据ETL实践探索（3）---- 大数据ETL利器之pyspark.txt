@@ -1,5 +1,8 @@
 
 
+
+
+
                   					
 														
 
@@ -112,7 +115,7 @@ print(df.count())
 数据清洗，增加一列，或者针对某一列进行udf 转换
 
 '''  
-#加一列yiyong ，如果是众城数据则为zhongcheng
+#加一列用户名，如果是xx数据则为xx
 '''
 
 from pyspark.sql.functions import udf

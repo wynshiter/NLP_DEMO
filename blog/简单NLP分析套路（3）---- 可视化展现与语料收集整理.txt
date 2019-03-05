@@ -1,11 +1,14 @@
 
 
+
+
+
                   					
 														
 
 
 
-文章大纲NLP 可视化wordCloudLDA 主题模型行业语料库保险行业语料库医学健康类语料库NLP系列文章
+文章大纲NLP 可视化wordCloudLDA 主题模型matplotlib seaborn 绘图加载中文字体行业语料库保险行业语料库医学健康类语料库NLP系列文章
 
 构思这个系列的初衷是很明显的，之前我是从图论起家搞起了计算机视觉，后来发现深度学习下的计算机视觉没的搞了，后来正好单位的语料很丰富就尝试了NLP 的一些东西，早期非常痴迷于分词等等的技术，后来发现NLP 里面是有广阔天地的。
 如果你现在打开微信，可能很多公众号都在推送从哪里爬取了一些语料数据如下图，
@@ -199,6 +202,64 @@ string self left cout include right def array result root push vector class endl
 
 
 具体代码详见：https://wynshiter.github.io/NLP_DEMO/
+
+matplotlib seaborn 绘图加载中文字体
+效果图：
+
+matplotlit可以采用设置字体的办法
+%load_ext autoreload
+%autoreload 2
+%matplotlib inline
+
+# ...
+# -*- coding: utf-8 -*-
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+
+font = FontProperties(fname=r"msyh.ttc", size=14)  
+
+plt.bar([1, 3, 5, 7, 9], [5, 4, 8, 12, 7], label='graph 1')
+
+plt.bar([2, 4, 6, 8, 10], [4, 6, 8, 13, 15], label='graph 2')
+
+# params
+
+# x: 条形图x轴
+# y：条形图的高度
+# width：条形图的宽度 默认是0.8
+# bottom：条形底部的y坐标值 默认是0
+# align：center / edge 条形图是否以x轴坐标为中心点或者是以x轴坐标为边缘
+
+plt.legend()
+
+plt.xlabel(u'中文',FontProperties=font)
+plt.ylabel('value')
+
+plt.title(u'测试例子——条形图', FontProperties=font)
+
+plt.show()
+
+seaborn就麻烦一点，先把matplotlib调试好，才有修改配置文件，并下载相关字体的办法进行配置
+参考链接：
+https://www.zhihu.com/question/25404709/answer/309784195
+
+#首先运行下面两行
+from matplotlib.font_manager import _rebuild
+_rebuild() 
+###########
+import matplotlib.pyplot as plt
+import seaborn as sns
+hospitalization_pdf = hospitalization_df.toPandas()
+
+sns.set_style('whitegrid',{'font.sans-serif':['SimHei','Arial']})
+sns.set_context("talk")
+
+%matplotlib inline
+
+
+sns.boxplot( y='年龄', data=hospitalization_pdf, palette="Set3")
+plt.show()
+
 
 行业语料库
 保险行业语料库

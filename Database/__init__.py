@@ -10,7 +10,7 @@
 
 import sys
 import os
-currentUrl = os.path.dirname(__file__)
-parentUrl = os.path.abspath(os.path.join(currentUrl, os.pardir))
-#print(parentUrl)
-sys.path.append(parentUrl)
+
+CURRENT_URL = os.path.dirname(__file__)
+PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
+sys.path.append(PARENT_URL)

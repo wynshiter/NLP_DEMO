@@ -49,13 +49,8 @@ def database_to_pandas_Dataframe(str_path_sqlite):
 
 
         return  frame
-    except:  # , e:
-        frame = pd.DataFrame()
-        # print e
-        # continue
-
-
-    return pdf
+    except Exception as e:
+        print(e)
 
 
 def main():
@@ -65,16 +60,18 @@ def main():
     DBSession = scoped_session(sessionmaker())
     engine = None
 
-    str_path_sqlite = 'sqlite:///../Database/NLP_demo.db?check_same_thread=False'
+    str_path_sqlite = r'../Database/NLP_demo.db'
 
-    DBSession = My_sqlite.get_conn('sqlite:///../Database/NLP_demo.db?check_same_thread=False', True, blog.CSDN_Blog())
+    #DBSession = My_sqlite.get_conn('sqlite:///../Database/NLP_demo.db?check_same_thread=False', True, blog.CSDN_Blog())
 
-    table_and_column_name = blog.CSDN_Blog
+    #table_and_column_name = blog.CSDN_Blog
     #filter = (blog.CSDN_Blog.title == '2')
 
-    all_blog = DBSession.query(table_and_column_name).all()
-    print(one_blog)
+    #all_blog = DBSession.query(table_and_column_name).all()
+    #print(one_blog)
 
+    dataframe = database_to_pandas_Dataframe(str_path_sqlite)
+    print(dataframe.head(1))
 
 if __name__ == '__main__':
     main()

@@ -11,28 +11,25 @@
 
 import sys
 import os
-currentUrl = os.path.dirname(__file__)
-parentUrl = os.path.abspath(os.path.join(currentUrl, os.pardir))
-#print(parentUrl)
-sys.path.append(parentUrl)
 
-import sqlite3
 
-# 导入:
-from sqlalchemy import Column, String, create_engine,TEXT, Integer, String
-
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy.orm import scoped_session, sessionmaker
 import blog
 
+CURRENT_URL = os.path.dirname(__file__)
+PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
+sys.path.append(PARENT_URL)
 
 
+STR_PATH_SQLITE = 'sqlite:///NLP_demo.db?check_same_thread=False'
 
-str_path_sqlite = 'sqlite:///NLP_demo.db?check_same_thread=False'
 
-
-def init_sqlalchemy(dbname = 'sqlite:///demo.db',Echo=True,Base= declarative_base(),DBSession = scoped_session(sessionmaker())):
+def init_sqlalchemy(dbname='sqlite:///demo.db',
+                    Echo=True,
+                    Base=declarative_base(),
+                    DBSession=scoped_session(sessionmaker())):
 
     engine = create_engine(dbname, echo=Echo)
     DBSession.remove()
@@ -43,7 +40,7 @@ def init_sqlalchemy(dbname = 'sqlite:///demo.db',Echo=True,Base= declarative_bas
 
 
 
-def insert_list(list_obj,DBSession):
+def insert_list(list_obj, DBSession):
     try:
         #init_sqlalchemy(str_path_sqlite)
         DBSession.add_all(list_obj)
@@ -57,7 +54,10 @@ def insert_list(list_obj,DBSession):
         DBSession.close()
 
 
-def get_conn(dbname = 'sqlite:///demo.db',Echo=True,Base= declarative_base(),DBSession = scoped_session(sessionmaker())):
+def get_conn(dbname='sqlite:///demo.db',
+             Echo=True,
+             Base=declarative_base(),
+             DBSession=scoped_session(sessionmaker())):
 
 
     try:
@@ -89,25 +89,17 @@ if __name__ == '__main__':
     # DBSession.flush()
     # DBSession.commit()
     # DBSession.close()
-
-    
     # print(one_blog)
     # sql = "select * from CSDN_Blog"
     #
     # # sqlalchemy使用execute方法直接执行SQL
     # records = DBSession.execute(sql).first()
     # print(records)
-    DBSession =  get_conn('sqlite:///NLP_demo.db?check_same_thread=False',True,blog.CSDN_Blog())
+    DBSession = get_conn(STR_PATH_SQLITE, True, blog.CsdnBlog())
 
 
-    table_and_column_name = blog.CSDN_Blog
-    filter = (blog.CSDN_Blog.title == '2')
+    table_and_column_name = blog.CsdnBlog
+    filter = (blog.CsdnBlog.title == 'TEST')
 
     one_blog = DBSession.query(table_and_column_name).filter(filter).all()
     print(one_blog)
-
-
-
-
-
-

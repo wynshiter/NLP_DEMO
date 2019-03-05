@@ -1,5 +1,8 @@
 
 
+
+
+
                   					
 														
 
@@ -266,6 +269,7 @@ https://github.com/facebookresearch/fastText/blob/master/pretrained-vectors.md
 未完待续
 NLP系列文章:
 
+自然语言处理简介（1）---- 服务梳理与传统汉语分词
 深度学习与中文短文本分析总结与梳理
 错误使用tf-idf的实例分享
 知识图谱技术分享会----有关知识图谱构建的部分关键技术简介及思考
