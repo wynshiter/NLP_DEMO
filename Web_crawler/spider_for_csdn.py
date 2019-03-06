@@ -16,6 +16,7 @@ import random
 import re
 import urllib
 import socket
+import time
 from datetime import datetime
 
 from bs4 import BeautifulSoup
@@ -31,6 +32,14 @@ CURRENT_URL = os.path.dirname(__file__)
 PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
 
+import logging
+
+logging.basicConfig(                                                                #通过具体的参数来更改logging模块默认行为；
+    level=logging.DEBUG,                                                            #设置告警级别为ERROR；
+    format="%(asctime)s---%(lineno)s----%(name)s: %(message)s",                     #自定义打印的格式；
+    filename="spider_log.txt",                                                      #将日志输出到指定的文件中；
+    filemode="a",                                                                   #以追加的方式将日志写入文件中，w是以覆盖写的方式哟;
+)
 
 
 
@@ -85,8 +94,8 @@ def get_content(blog_obj, contend_box_id, title_id, contend_id):
         # 下面代码使用了两种方法混合解析，后序还要探索更合适一些的办法
         bsObj = BeautifulSoup(page_content, "html.parser")
         etree_obj = etree.HTML(page_content)
-        # mainBox > main > div.blog-content-box > div > div > div.article-title-box > span
-        article_type = bsObj.findAll(name='span', attrs={'class': 'article-type type-1 float-left'}) [0].get_text()
+        # 找到和title 一个的div  找第一个span 的 内容,不能直接用span汇总的class ，原创，转载都不一样
+        article_type = bsObj.findAll(name='div', attrs={'class': 'article-title-box'}) [0].find_next().get_text()
 
         title = bsObj.findAll(name='h1', attrs={'class': title_id})
         str_title = validate_title(title[0].get_text() + '.txt')
@@ -121,6 +130,8 @@ def get_content(blog_obj, contend_box_id, title_id, contend_id):
         print(e.reason)
     except Exception as e:
         print(e)
+        print(str(blog_obj.article_id))
+        logging.error("error message:" + str(e))
 
 
 def getpage_all_bloglinks(url, url_pattern):
@@ -155,7 +166,7 @@ def getpage_all_bloglinks(url, url_pattern):
                 article_id = page_link.split('/')[-1]
                 create_time = page_obj.findAll(name='div')[0].findAll(name='span')[0].get_text()
                 click_number = page_obj.findAll(name='div')[0].findAll(name='span')[1].get_text().replace('阅读数', '')
-                comment_number = page_obj.findAll(name='div')[0].findAll(name='span')[2].get_text().replace('评论数', '')
+                comment_number = page_obj.findAll(name='div')[0].findAll(name='span')[4].get_text().replace('评论数', '')
 
                 date_format = '%Y-%m-%d %H:%M:%S'
                 create_time = datetime.strptime(create_time, date_format)
@@ -191,6 +202,7 @@ def getpage_all_bloglinks(url, url_pattern):
         print(e.reason)
     except Exception as e:
         print(e)
+        logging.error("error message:"+str(e))
 
 
 
@@ -204,7 +216,7 @@ def main():
     start_time = assistance_tool.set_starttime()
 
     # 得到CSDN博客某一个分页的所有文章的链接
-
+    logging.info("start time :"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
     list_page_str = STR_PAGE_URL_PREFIX + 'article/list/'
     # 装载博客类的所有对象
     list_blog_obj = []
@@ -220,11 +232,14 @@ def main():
         temp_blog_obj = getpage_all_bloglinks((list_page_str + str(i)), STR_PAGE_URL_PREFIX)
         list_blog_obj.extend(temp_blog_obj)
 
+    logging.info("获取所有博客链接完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
     for blog_obj in list_blog_obj:
         # 参数分别 为,博客对象，博客，标题名，内容的div 名称
         get_content(blog_obj, 'blog-content-box', 'title-article', 'article_content')
 
     print(len(list_blog_obj))
+    logging.info("获取所有博客内容完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
     Base = declarative_base()
     DBSession = scoped_session(sessionmaker())
@@ -238,6 +253,7 @@ def main():
     mySQLiteForblog.insert_list(list_blog_obj, DBSession)
 
     assistance_tool.get_runtime(start_time)
+    logging.info("数据库插入操作完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 
 if __name__ == '__main__':

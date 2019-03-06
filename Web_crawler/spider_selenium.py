@@ -7,7 +7,7 @@
 @time: 2019/1/7 22:40
 @desc:
 
-使用selenium 进行困难问题的爬取
+使用selenium 进行困难问题的爬取，部分网页内容为动态内容
 '''
 
 #
@@ -40,8 +40,8 @@ def get_csdn_page_index(url,class_name):
 
         return  page_number
 
-    except OSError as e:
-        print(e)
+    # except OSError as e:
+    #     print(e)
     except Exception as e:
         print(e)
         return 0

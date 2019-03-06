@@ -14,18 +14,20 @@
 
 import sys
 import os
-currentUrl = os.path.dirname(__file__)
-parentUrl = os.path.abspath(os.path.join(currentUrl, os.pardir))
-#print(parentUrl)
-sys.path.append(parentUrl)
-
 import pandas as pd
 import numpy as np
 
 import sqlite3
 
+
+CURRENT_URL = os.path.dirname(__file__)
+PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
+sys.path.append(PARENT_URL)
+
+
+
 # 导入:
-from sqlalchemy import Column, String, create_engine,TEXT, Integer, String
+
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -35,11 +37,16 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 ###-----以下导入 其他文件夹的包
 from Database import blog
 from src import assistance_tool
-from Database import My_sqlite
+from Database import mySQLiteForblog
 
 #可以使用pandas read_sql
-def database_to_pandas_Dataframe(str_path_sqlite):
-     # sql_order is a string
+def database_to_pandas_dataframe(str_path_sqlite):
+    '''
+
+    :param str_path_sqlite:  # sql_order is a string
+    :return:
+    '''
+
     try:
         conn = sqlite3.connect(str_path_sqlite)
         str_sql = '''select * from CSDN_Blog'''
@@ -51,6 +58,15 @@ def database_to_pandas_Dataframe(str_path_sqlite):
         return  frame
     except Exception as e:
         print(e)
+
+def add_feature_for_blog(dataframe):
+    '''
+
+    :param dataframe: 从sqlite 中查出所有列，放在pandas dataframe 中
+    :return:
+    '''
+
+
 
 
 def main():
@@ -70,7 +86,7 @@ def main():
     #all_blog = DBSession.query(table_and_column_name).all()
     #print(one_blog)
 
-    dataframe = database_to_pandas_Dataframe(str_path_sqlite)
+    dataframe = database_to_pandas_dataframe(str_path_sqlite)
     print(dataframe.head(1))
 
 if __name__ == '__main__':

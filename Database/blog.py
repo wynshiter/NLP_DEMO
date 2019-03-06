@@ -19,17 +19,7 @@ CURRENT_URL = os.path.dirname(__file__)
 PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
 
-Base = declarative_base()
-
-
-class CsdnBlog(Base):
-    '''
-    # 定义blog 文章对象:
-    文章id，标题，内容，创建时间，点击数，评论数，标签，文章类型，标签数，创建年份，创建月份，创建文章是星期几，
-    待增加的特征：摘要，文章字数，文章图片数
-    '''
-    __tablename__ = 'CSDN_Blog'
-    column_name = ['article_id',
+COLUMN_NAME = ['article_id',
                    'title',
                    'content',
                    'create_time',
@@ -43,6 +33,18 @@ class CsdnBlog(Base):
                    'create_time_week',
                    'create_time_hour'
                    ]
+
+
+Base = declarative_base()
+
+
+class CsdnBlog(Base):
+    '''
+    # 定义blog 文章对象:
+    文章id，标题，内容，创建时间，点击数，评论数，标签，文章类型，标签数，创建年份，创建月份，创建文章是星期几，
+    待增加的特征：摘要，文章字数，文章图片数
+    '''
+    __tablename__ = 'CSDN_Blog'
 
     # 表的结构:
 
@@ -59,33 +61,6 @@ class CsdnBlog(Base):
     create_time_month = Column(Integer)
     create_time_week = Column(Integer)
     create_time_hour = Column(Integer)
-
-    # def __init__(self,
-    #              article_id,
-    #              title, content,
-    #              create_time,
-    #              click_number,
-    #              comment_number,
-    #              label,
-    #              article_type,
-    #              number_of_labels,
-    #              create_time_year,
-    #              create_time_month,
-    #              create_time_week,
-    #              create_time_hour):
-    #     self.article_id = article_id
-    #     self.title = title
-    #     self.content = content
-    #     self.create_time = create_time
-    #     self.click_number = click_number
-    #     self.comment_number = comment_number
-    #     self.label = label
-    #     self.article_type = article_type
-    #     self.number_of_labels = number_of_labels
-    #     self.create_time_year = create_time_year
-    #     self.create_time_month = create_time_month
-    #     self.create_time_week = create_time_week
-    #     self.create_time_hour = create_time_hour
 
     def __repr__(self):
         return "<CSDN_Blog(article_id ='%s' ," \
@@ -115,3 +90,30 @@ class CsdnBlog(Base):
                    self.create_time_week,
                    self.create_time_hour
                )
+    #试了一下不用初始化函数也可以初始化类，这块的继承关系还不是很理解
+    # def __init__(self,
+    #              article_id,
+    #              title, content,
+    #              create_time,
+    #              click_number,
+    #              comment_number,
+    #              label,
+    #              article_type,
+    #              number_of_labels,
+    #              create_time_year,
+    #              create_time_month,
+    #              create_time_week,
+    #              create_time_hour):
+    #     self.article_id = article_id
+    #     self.title = title
+    #     self.content = content
+    #     self.create_time = create_time
+    #     self.click_number = click_number
+    #     self.comment_number = comment_number
+    #     self.label = label
+    #     self.article_type = article_type
+    #     self.number_of_labels = number_of_labels
+    #     self.create_time_year = create_time_year
+    #     self.create_time_month = create_time_month
+    #     self.create_time_week = create_time_week
+    #     self.create_time_hour = create_time_hour
