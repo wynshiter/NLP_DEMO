@@ -27,32 +27,11 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 ###-----以下导入 其他文件夹的包
 from Database import blog, mySQLiteForblog
 from src import assistance_tool
+import myLog
 
 CURRENT_URL = os.path.dirname(__file__)
 PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
-
-# import logging
-#
-# logging.basicConfig(                                                                #通过具体的参数来更改logging模块默认行为；
-#     level=logging.DEBUG,                                                            #设置告警级别为debug；
-#     format="%(asctime)s---%(lineno)s----%(name)s: %(message)s",                     #自定义打印的格式；
-#     filename="spider_log.txt",                                                      #将日志输出到指定的文件中；
-#     filemode="a",                                                                   #以追加的方式将日志写入文件中，w是以覆盖写的方式哟;
-# )
-#
-# logging.getLogger().setLevel(logging.DEBUG)
-#
-# logging.debug('debug 信息')
-#
-# logging.log(logging.DEBUG, "This is a debug log.")
-# logging.log(logging.INFO, "This is a info log.")
-# logging.log(logging.WARNING, "This is a warning log.")
-# logging.log(logging.ERROR, "This is a error log.")
-# logging.log(logging.CRITICAL, "This is a critical log.")
-import myLog
-
-
 
 
 

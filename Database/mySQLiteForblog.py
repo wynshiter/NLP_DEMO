@@ -3,7 +3,7 @@
 @author: season
 @contact: shiter@live.cn
 
-@file: sqlite.py
+@file: mySQLiteForblog.py
 @time: 2019/1/2 17:01
 @desc:  使用爬虫将数据缓存到本地数据库中，以便后续分析，可以只用pandas 直接加载数据库到dataframe
     参考：https://www.cnblogs.com/lsdb/p/9835894.html
