@@ -61,7 +61,7 @@ def database_to_pandas_dataframe(str_path_sqlite):
 
 def add_feature_for_blog(dataframe):
     '''
-
+    将文章内容分割，中文一列，英文字符一列，增加中文字数，英文字数，总字数
     :param dataframe: 从sqlite 中查出所有列，放在pandas dataframe 中
     :return:
     '''

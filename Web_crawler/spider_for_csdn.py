@@ -32,14 +32,27 @@ CURRENT_URL = os.path.dirname(__file__)
 PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
 
-import logging
+# import logging
+#
+# logging.basicConfig(                                                                #通过具体的参数来更改logging模块默认行为；
+#     level=logging.DEBUG,                                                            #设置告警级别为debug；
+#     format="%(asctime)s---%(lineno)s----%(name)s: %(message)s",                     #自定义打印的格式；
+#     filename="spider_log.txt",                                                      #将日志输出到指定的文件中；
+#     filemode="a",                                                                   #以追加的方式将日志写入文件中，w是以覆盖写的方式哟;
+# )
+#
+# logging.getLogger().setLevel(logging.DEBUG)
+#
+# logging.debug('debug 信息')
+#
+# logging.log(logging.DEBUG, "This is a debug log.")
+# logging.log(logging.INFO, "This is a info log.")
+# logging.log(logging.WARNING, "This is a warning log.")
+# logging.log(logging.ERROR, "This is a error log.")
+# logging.log(logging.CRITICAL, "This is a critical log.")
+import myLog
 
-logging.basicConfig(                                                                #通过具体的参数来更改logging模块默认行为；
-    level=logging.DEBUG,                                                            #设置告警级别为ERROR；
-    format="%(asctime)s---%(lineno)s----%(name)s: %(message)s",                     #自定义打印的格式；
-    filename="spider_log.txt",                                                      #将日志输出到指定的文件中；
-    filemode="a",                                                                   #以追加的方式将日志写入文件中，w是以覆盖写的方式哟;
-)
+
 
 
 
@@ -131,7 +144,7 @@ def get_content(blog_obj, contend_box_id, title_id, contend_id):
     except Exception as e:
         print(e)
         print(str(blog_obj.article_id))
-        logging.error("error message:" + str(e))
+        #logging.log(logging.ERROR,("error message:" + str(e)))
 
 
 def getpage_all_bloglinks(url, url_pattern):
@@ -202,7 +215,7 @@ def getpage_all_bloglinks(url, url_pattern):
         print(e.reason)
     except Exception as e:
         print(e)
-        logging.error("error message:"+str(e))
+        #logging.log(logging.ERROR,("error message:"+str(e)))
 
 
 
@@ -211,12 +224,18 @@ def main():
     主函数，运行逻辑为# 先获取所有博客的id 和链接，然后按照链接依次爬取
     :return:
     '''
-
+    log = myLog.Logger('all.log', level='debug')
+    # log.logger.debug('debug')
+    # log.logger.info('info')
+    # log.logger.warning('警告')
+    # log.logger.error('报错')
+    # log.logger.critical('严重')
+    myLog.Logger('error.log', level='error').logger.error('error')
 
     start_time = assistance_tool.set_starttime()
-
+    log.logger.debug('starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    #logging.log(logging.INFO, "start time :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     # 得到CSDN博客某一个分页的所有文章的链接
-    logging.info("start time :"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
     list_page_str = STR_PAGE_URL_PREFIX + 'article/list/'
     # 装载博客类的所有对象
     list_blog_obj = []
@@ -232,29 +251,30 @@ def main():
         temp_blog_obj = getpage_all_bloglinks((list_page_str + str(i)), STR_PAGE_URL_PREFIX)
         list_blog_obj.extend(temp_blog_obj)
 
-    logging.info("获取所有博客链接完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    log.logger.debug('获取所有博客链接完成')
+    #logging.log(logging.INFO,"获取所有博客链接完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
     for blog_obj in list_blog_obj:
         # 参数分别 为,博客对象，博客，标题名，内容的div 名称
         get_content(blog_obj, 'blog-content-box', 'title-article', 'article_content')
 
     print(len(list_blog_obj))
-    logging.info("获取所有博客内容完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
+    #logging.log(logging.INFO,"获取所有博客内容完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    log.logger.debug('获取所有博客内容完成')
     Base = declarative_base()
     DBSession = scoped_session(sessionmaker())
     engine = None
 
     engine = mySQLiteForblog.init_sqlalchemy('sqlite:///../Database/NLP_demo.db?check_same_thread=False',
-                                             True,
+                                             False,
                                              blog.CsdnBlog(),
                                              DBSession)
 
     mySQLiteForblog.insert_list(list_blog_obj, DBSession)
 
     assistance_tool.get_runtime(start_time)
-    logging.info("数据库插入操作完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
+    #logging.log(logging.INFO,"数据库插入操作完成 :" + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+    log.logger.debug('博客内容入库完成')
 
 if __name__ == '__main__':
     main()

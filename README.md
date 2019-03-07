@@ -59,6 +59,8 @@ NLP Common Analytical Ideas
 
 # 问答机器人
 
+[自己动手做聊天机器人](http://www.shareditor.com/bloglistbytag/?tagname=%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E5%81%9A%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA)
+
 # 知识图谱
 
 参考：[这是一份通俗易懂的知识图谱技术与应用指南](https://www.jiqizhixin.com/articles/2018-06-20-4)
@@ -68,7 +70,8 @@ NLP Common Analytical Ideas
 ----
 
 # 参考
-
+[做项目一定能用到的NLP资源](https://blog.csdn.net/wangyaninglm/article/details/88287283)
+[自然语言处理理论与实践](https://github.com/bainingchao/NLP-ML)
 ----
 
 # 致谢
