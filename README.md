@@ -72,8 +72,13 @@ NLP Common Analytical Ideas
 # 参考
 - [做项目一定能用到的NLP资源](https://blog.csdn.net/wangyaninglm/article/details/88287283)
 - [自然语言处理理论与实践](https://github.com/bainingchao/NLP-ML)
-![csdn_wordcloud](./image/自然语言处理理论与实战.jpg)
+![自然语言处理理论与实践](./image/自然语言处理理论与实战.jpg)
 
+- [Python自然语言处理实战-核心技术与算法](https://github.com/nlpinaction/learning-nlp)
+![Python自然语言处理实战-核心技术与算法](./image/Python自然语言处理实战-核心技术与算法.jpg)
+
+- NLP汉语自然语言处理原理与实践
+![NLP汉语自然语言处理原理与实践](./image/NLP汉语自然语言处理原理与实践.jpg)
 ----
 
 # 致谢
