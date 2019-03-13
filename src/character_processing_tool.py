@@ -9,15 +9,48 @@
 汉字处理的工具:
 判断unicode是否是汉字，数字，英文，或者其他字符。
 全角符号转半角符号。
+标点符号参考：https://www.cnblogs.com/arkenstone/p/6092255.html
+其他写法：
+判断是否是全数字：
+        str.encode('UTF-8').isdigit()
+
+ 判断是否是全英文：
+         str.encode('UTF-8').isalpha()
+
+print "孙".encode('UTF-8').isdigit()
+print "孙".encode('UTF-8').isalpha()
+print '123few'.encode('UTF-8').isdigit()
+print '123few'.encode('UTF-8').isalpha()
+print '123'.encode('UTF-8').isdigit()
+print 'few'.encode('UTF-8').isalpha()
+
+
+汉字，汉语拼音提取：https://zhon.readthedocs.io/en/latest/#
+这个库没有句号，不认为是一句话
+
 '''
 
 
-
+import os
+import sys
 import re
+import zhon
+import zhon.hanzi
 
+
+CURRENT_URL = os.path.dirname(__file__)
+PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
+sys.path.append(PARENT_URL)
+
+
+
+#PUNCTUATION_STRING= r'''＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､　、〃〈〉《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏﹑﹔·！？｡。'''
+
+UNICODECHINESESTRING = r'[\u4e00-\u9fff'+zhon.hanzi.punctuation+']'
 
 def is_chinese(uchar):
     '''
+    中文常用字符的范围是u'\u4e00' - u'\u9fff' 有的代码也用下面的这个
     判断一个unicode是否是汉字
     :param uchar:
     :return:
@@ -59,20 +92,43 @@ def get_all_english_string(temp_string):
     :param temp_string:
     :return:
     '''
-    unicodeEnglish = re.compile(r'[\u0041-\u005a,\u0061-\u007a,\u0020]')
+    unicodeEnglish = re.compile(r'[\u0041-\u005a\u0061-\u007a,\u0020]')
     english_string = "".join(unicodeEnglish.findall(temp_string))
     return  english_string
 
 def get_all_chinese_string(temp_string):
     '''
-    获取一个字符串的所有英文字符,包括空格
+    获取一个字符串的所有中文字,不包括标点
     :param temp_string:
     :return:
     '''
-    unicodeChinese = re.compile(r'[\u4e00-\u9fa5]')
-    english_string = "".join(unicodeChinese.findall(temp_string))
-    return  english_string
+    unicodeChinese = re.compile(r'[\u4e00-\u9fff]')
+    chinese_string = "".join(unicodeChinese.findall(temp_string))
+    return  chinese_string
 
+def get_all_chinese_string_and_punctuation(temp_string):
+    '''
+    获取一个字符串的所有中文字以及中文标点
+    :param temp_string:
+    :return:
+    '''
+
+    unicodeChinese = re.compile(UNICODECHINESESTRING)
+    chinese_string_list = re.findall(unicodeChinese, temp_string)
+    return   "".join(chinese_string_list)
+
+def contents_other_than_chinese_characters(temp_str):
+    '''
+    获取到除去汉字字符以外的内容（仅针对中英混合），这样可以获取到夹杂在中文中的英文
+    首先将中文及中文标点替换为空格，再将多个空格替换为一个
+    :param temp_str:
+    :return:
+    '''
+    unicodeChinese = re.compile(UNICODECHINESESTRING)
+
+    nonChineseString = re.sub(unicodeChinese, " ", temp_str)
+    nonChineseString = re.sub(' +', ' ', nonChineseString)
+    return nonChineseString
 
 def is_other(uchar):
     '''
@@ -86,52 +142,32 @@ def is_other(uchar):
         return False
 
 
+def strQ2B(ustring):
+    """全角转半角"""
+    rstring = ""
+    for uchar in ustring:
+        inside_code = ord(uchar)
+        if inside_code == 12288:  # 全角空格直接转换
+            inside_code = 32
+        elif (inside_code >= 65281 and inside_code <= 65374):  # 全角字符（除空格）根据关系转化
+            inside_code -= 65248
+
+        rstring += chr(inside_code)
+    return rstring
 
 
+def strB2Q(ustring):
+    """半角转全角"""
+    rstring = ""
+    for uchar in ustring:
+        inside_code = ord(uchar)
+        if inside_code == 32:  # 半角空格直接转化
+            inside_code = 12288
+        elif inside_code >= 32 and inside_code <= 126:  # 半角字符（除空格）根据关系转化
+            inside_code += 65248
 
-def B2Q(uchar):
-    '''
-    半角转全角
-    :param uchar:
-    :return:
-    '''
-    inside_code = ord(uchar)
-    if inside_code < 0x0020 or inside_code > 0x7e:  # 不是半角字符就返回原来的字符
-        return uchar
-    if inside_code == 0x0020:  # 除了空格其他的全角半角的公式为:半角=全角-0xfee0
-        inside_code = 0x3000
-    else:
-        inside_code += 0xfee0
-    return unichr(inside_code)
-
-
-"""全角转半角"""
-
-
-def Q2B(uchar):
-    inside_code = ord(uchar)
-    if inside_code == 0x3000:
-        inside_code = 0x0020
-    else:
-        inside_code -= 0xfee0
-    if inside_code < 0x0020 or inside_code > 0x7e:  # 转完之后不是半角字符返回原来的字符
-        return uchar
-    return unichr(inside_code)
-
-
-
-
-
-def stringQ2B(ustring):
-    '''
-    把字符串全角转半角
-    :param ustring:
-    :return:
-    '''
-    return "".join([Q2B(uchar) for uchar in ustring])
-
-
-
+        rstring += chr(inside_code)
+    return rstring
 
 
 def convert_toUnicode(string):
@@ -152,12 +188,18 @@ if __name__ == "__main__":
     string1 = 'Sky0天地Earth1*'
     string2 = "China's Legend Holdings will split its several business arms to go public on stock markets, " \
               "the group's president Zhu Linan said on Tuesday." \
-              "该集团总裁朱利安周二表示，中国联想控股将分拆其多个业务部门在股市上市。"
+              "该集团总裁朱利安周二表示，中国联想控股将分拆其多个业务opencv部门in在股市上市。我了歌曲: ： 这样不行？；‘“”’ "
 
     ustring1 = convert_toUnicode(ustring1)
     string1 = convert_toUnicode(string1)
-
-    print(get_all_english_string(string2))
+    print(strB2Q(string2))
+    # print(get_all_english_string(string2))
+    # print(get_all_chinese_string(string2))
+    # print(get_all_chinese_string_and_punctuation(string2))
+    # print(len(get_all_chinese_string_and_punctuation(string2)))
+    # print(zhon.hanzi.punctuation)
+    print(contents_other_than_chinese_characters(string2))
+    print(len(contents_other_than_chinese_characters(string2)))
     # for item in string1:
     #     print(is_chinese(item))
     #     print(is_number(item))
