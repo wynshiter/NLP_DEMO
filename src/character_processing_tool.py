@@ -130,6 +130,18 @@ def contents_other_than_chinese_characters(temp_str):
     nonChineseString = re.sub(' +', ' ', nonChineseString)
     return nonChineseString
 
+def get_all_english_word(temp_str):
+    '''
+    获取多语言中文档中的英文单词字符串，含有空格
+    :param temp_str:
+    :return:
+    '''
+    temp_str = contents_other_than_chinese_characters(temp_str)
+
+
+    return get_all_english_string(temp_str).lower()
+
+
 def is_other(uchar):
     '''
     判断是否是（汉字，数字和英文字符之外的）其他字符
@@ -193,7 +205,8 @@ if __name__ == "__main__":
     ustring1 = convert_toUnicode(ustring1)
     string1 = convert_toUnicode(string1)
     print(strB2Q(string2))
-    # print(get_all_english_string(string2))
+    print(get_all_english_string(string2))
+    print(get_all_english_word(string2))
     # print(get_all_chinese_string(string2))
     # print(get_all_chinese_string_and_punctuation(string2))
     # print(len(get_all_chinese_string_and_punctuation(string2)))
