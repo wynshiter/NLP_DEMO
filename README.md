@@ -18,6 +18,8 @@ NLP Common Analytical Ideas
 
 [简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站](https://blog.csdn.net/wangyaninglm/article/details/83479837)
 
+[《自然语言处理实战入门》 ---- 第2课 ：网络爬虫简介](https://blog.csdn.net/wangyaninglm/article/details/89007652)
+[《自然语言处理实战入门》 ---- 第3课 ：本人CSDN博客的爬取](https://blog.csdn.net/wangyaninglm/article/details/89440922)
 ---
 
 

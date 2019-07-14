@@ -87,7 +87,7 @@ def get_content(blog_obj, contend_box_id, title_id, contend_id):
         bsObj = BeautifulSoup(page_content, "html.parser")
         etree_obj = etree.HTML(page_content)
         # 找到和title 一个的div  找第一个span 的 内容,不能直接用span汇总的class ，原创，转载都不一样
-        article_type = bsObj.findAll(name='div', attrs={'class': 'article-title-box'}) [0].find_next().get_text()
+        article_type = bsObj.findAll(name='div', attrs={'class': 'article-title-box'})[0].find_next().get_text()
 
         title = bsObj.findAll(name='h1', attrs={'class': title_id})
         str_title = validate_title(title[0].get_text() + '.txt')
@@ -203,13 +203,13 @@ def main():
     主函数，运行逻辑为# 先获取所有博客的id 和链接，然后按照链接依次爬取
     :return:
     '''
-    log = myLog.Logger('all.log', level='debug')
+    log = myLog.Logger('./log/all.log', level='debug')
     # log.logger.debug('debug')
     # log.logger.info('info')
     # log.logger.warning('警告')
     # log.logger.error('报错')
     # log.logger.critical('严重')
-    myLog.Logger('error.log', level='error').logger.error('error')
+    myLog.Logger('./log/error.log', level='error').logger.error('error')
 
     start_time = assistance_tool.set_starttime()
     log.logger.debug('starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')

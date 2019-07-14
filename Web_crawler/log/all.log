@@ -1,0 +1,4 @@
+2019-04-22 10:16:03,066 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:215] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2019-04-22 10:16:04,035 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:233] - DEBUG: 获取所有博客链接完成
+2019-04-22 10:16:04,038 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:242] - DEBUG: 获取所有博客内容完成
+2019-04-22 10:16:04,801 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:256] - DEBUG: 博客内容入库完成
