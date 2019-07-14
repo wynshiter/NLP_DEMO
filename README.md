@@ -19,7 +19,10 @@ NLP Common Analytical Ideas
 [简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站](https://blog.csdn.net/wangyaninglm/article/details/83479837)
 
 [《自然语言处理实战入门》 ---- 第2课 ：网络爬虫简介](https://blog.csdn.net/wangyaninglm/article/details/89007652)
+
 [《自然语言处理实战入门》 ---- 第3课 ：本人CSDN博客的爬取](https://blog.csdn.net/wangyaninglm/article/details/89440922)
+
+
 ---
 
 
@@ -36,17 +39,22 @@ NLP Common Analytical Ideas
 ## wordcloud
 * 以下是使用结巴分词器TF-IDF 关键词抽取算法抽取的词云
 
-![wordcloud](./image/word_cloud.jpg)
+![wordcloud](./Resources/image/word_cloud.jpg)
 
 * 以下是使用mask 图像使用ltp 分词器跑出的分词结果生成的词云
 
-![csdn_wordcloud](./image/basic.png)
+![csdn_wordcloud](./Resources/image/basic.png)
 
 ## LDA
 
 
 
-![LDA FOR MY BLOG](./image/lda.gif)
+![LDA FOR MY BLOG](./Resources/image/lda.gif)
+
+
+## 综合可视化
+
+[卅年春秋，谁主沉浮？从400篇任正非演讲稿分析中，一探华为](https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651670909&idx=1&sn=d690d8efa7237594312c6ee7c3741312&chksm=bd4c6eee8a3be7f8f39240a6c4fd1d04f26dfb0a9af6644e1d5acd13974d0b5d2e79f025c33b&mpshare=1&scene=23&srcid=#rd)
 
 
 # 句法分析
@@ -74,13 +82,13 @@ NLP Common Analytical Ideas
 # 参考
 - [做项目一定能用到的NLP资源](https://blog.csdn.net/wangyaninglm/article/details/88287283)
 - [自然语言处理理论与实践](https://github.com/bainingchao/NLP-ML)
-![自然语言处理理论与实践](./image/自然语言处理理论与实战.jpg)
+![自然语言处理理论与实践](./Resources/image/自然语言处理理论与实战.jpg)
 
 - [Python自然语言处理实战-核心技术与算法](https://github.com/nlpinaction/learning-nlp)
-![Python自然语言处理实战-核心技术与算法](./image/Python自然语言处理实战-核心技术与算法.jpg)
+![Python自然语言处理实战-核心技术与算法](./Resources/image/Python自然语言处理实战-核心技术与算法.jpg)
 
 - NLP汉语自然语言处理原理与实践
-![NLP汉语自然语言处理原理与实践](./image/NLP汉语自然语言处理原理与实践.jpg)
+![NLP汉语自然语言处理原理与实践](./Resources/image/NLP汉语自然语言处理原理与实践.jpg)
 ----
 
 # 致谢

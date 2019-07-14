@@ -2,21 +2,350 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="426a83ec-e60d-4d48-bf44-efbbae312c7d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/NLP_DEMO.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Web_crawler/log/all.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Web_crawler/log/all.log.2019-04-20" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Web_crawler/log/error.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Web_crawler/log/error.log.2019-04-20" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/chinese_word_segmentation/pyhanlp_segmentation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Database/NLP_demo.db" beforeDir="false" afterPath="$PROJECT_DIR$/Database/NLP_demo.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web_crawler/all.log" beforeDir="false" afterPath="$PROJECT_DIR$/Web_crawler/log/all.log.2019-03-07" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web_crawler/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/Web_crawler/log/error.log.2019-03-07" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web_crawler/spider_for_csdn.py" beforeDir="false" afterPath="$PROJECT_DIR$/Web_crawler/spider_for_csdn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web_crawler/spider_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Web_crawler/log/spider_log.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/data_utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/extract_conv.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/fake_data.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/img/default - 副本 - 副本.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/img/default - 副本.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/img/default.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/img/default.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/img/del.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/img/loading.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/css/webiaoqing.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/001.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/002.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/13.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/0.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/1.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/10.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/100.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/101.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/102.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/103.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/104.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/11.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/12.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/13.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/14.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/15.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/16.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/17.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/18.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/19.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/2.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/20.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/21.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/22.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/23.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/24.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/25.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/26.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/27.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/28.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/29.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/3.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/30.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/31.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/32.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/33.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/34.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/35.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/36.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/37.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/38.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/39.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/4.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/40.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/41.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/42.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/43.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/44.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/45.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/46.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/47.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/48.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/49.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/5.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/50.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/51.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/52.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/53.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/54.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/55.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/56.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/57.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/58.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/59.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/6.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/60.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/61.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/62.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/63.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/64.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/65.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/66.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/67.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/68.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/69.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/7.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/70.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/71.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/72.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/73.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/74.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/75.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/76.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/77.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/78.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/79.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/8.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/80.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/81.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/82.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/83.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/84.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/85.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/86.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/87.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/88.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/89.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/9.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/90.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/91.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/92.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/93.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/94.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/95.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/96.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/97.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/98.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/99.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist - 副本/face.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/0.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/1.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/10.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/100.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/101.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/102.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/103.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/104.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/11.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/12.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/13.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/14.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/15.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/16.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/17.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/18.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/19.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/2.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/20.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/21.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/22.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/23.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/24.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/25.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/26.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/27.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/28.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/29.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/3.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/30.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/31.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/32.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/33.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/34.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/35.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/36.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/37.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/38.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/39.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/4.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/40.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/41.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/42.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/43.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/44.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/45.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/46.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/47.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/48.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/49.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/5.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/50.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/51.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/52.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/53.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/54.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/55.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/56.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/57.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/58.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/59.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/6.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/60.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/61.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/62.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/63.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/64.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/65.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/66.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/67.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/68.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/69.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/7.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/70.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/71.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/72.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/73.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/74.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/75.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/76.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/77.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/78.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/79.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/8.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/80.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/81.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/82.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/83.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/84.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/85.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/86.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/87.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/88.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/89.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/9.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/90.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/91.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/92.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/93.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/94.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/95.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/96.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/97.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/98.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/99.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/arclist/face.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/checkbox-o.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/checkbox.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/checked.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/dglvyou.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/help_btn.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/jp_btn.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/radio-o.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/radio.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/saying.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/tx.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/tx2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/yuyin_bg.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/images/yy_btn.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/js/jquery-1.11.1.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/js/jquery_min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/js/webiaoqin.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/0.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/1.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/10.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/11.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/12.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/13.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/14.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/15.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/16.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/17.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/18.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/19.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/2.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/20.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/21.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/22.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/23.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/24.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/25.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/26.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/27.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/28.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/29.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/3.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/30.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/31.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/32.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/33.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/34.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/35.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/36.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/37.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/38.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/39.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/4.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/40.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/41.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/42.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/43.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/44.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/45.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/46.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/47.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/48.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/49.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/5.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/50.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/51.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/52.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/53.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/54.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/55.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/56.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/57.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/58.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/59.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/6.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/7.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/78.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/8.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/81.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/face/9.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/imgs.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/kefu/wqpage/js/jquery.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model/checkpoint" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model/s2ss_chatbot.ckpt.data-00000-of-00001" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model/s2ss_chatbot.ckpt.index" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model/s2ss_chatbot.ckpt.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model3/checkpoint" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model3/s2ss_chatbot_anti.ckpt.data-00000-of-00001" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model3/s2ss_chatbot_anti.ckpt.index" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/model3/s2ss_chatbot_anti.ckpt.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/params.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/readme.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/seq_to_seq.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/test_anti.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/thread_generator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/train.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/train_anti.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/word_sequence.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/7-2 抗御模型训练说明.rar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/7-2 抗御模型训练说明/7-2 抗御模型训练说明.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/7-2 抗御模型训练说明/test_anti.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/7-2 抗御模型训练说明/train_anti.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/model3.rar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/model3/checkpoint" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/model3/s2ss_chatbot_anti.ckpt.data-00000-of-00001" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/model3/s2ss_chatbot_anti.ckpt.index" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/材料/model3/s2ss_chatbot_anti.ckpt.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/NLP汉语自然语言处理原理与实践.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/NLP汉语自然语言处理原理与实践.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/Python自然语言处理实战-核心技术与算法.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/Python自然语言处理实战-核心技术与算法.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/basic.png" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/basic.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/csdn.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/csdn.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/csdn_timg.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/csdn_timg.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/lda.gif" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/lda.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/word_cloud.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/word_cloud.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/流川枫.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/流川枫.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/image/自然语言处理理论与实战.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Resources/image/自然语言处理理论与实战.jpg" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -62,17 +391,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/chinese_word_segmentation/Assessment_of_Word_Segmentation_Effect.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
+            <state relative-caret-position="442">
               <caret line="26" column="10" selection-start-line="26" selection-start-column="10" selection-end-line="26" selection-end-column="10" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/chinese_word_segmentation/pyhanlp_segmentation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="295">
-              <caret line="37" column="61" lean-forward="true" selection-start-line="14" selection-end-line="37" selection-end-column="61" />
+            <state relative-caret-position="552">
+              <caret line="37" column="35" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/test_anti.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="238">
+              <caret line="18" column="28" selection-start-line="18" selection-start-column="28" selection-end-line="18" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -95,21 +433,21 @@
         <option value="$PROJECT_DIR$/Web_crawler/spider_for_csdn.py" />
         <option value="$PROJECT_DIR$/src/chinese_word_segmentation/Assessment_of_Word_Segmentation_Effect.py" />
         <option value="$PROJECT_DIR$/src/chinese_word_segmentation/pyhanlp_segmentation.py" />
+        <option value="$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/test_anti.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-10" />
-    <option name="y" value="-10" />
-    <option name="width" value="1940" />
-    <option name="height" value="1060" />
+    <option name="x" value="525" />
+    <option name="y" value="40" />
+    <option name="width" value="1320" />
+    <option name="height" value="850" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -120,28 +458,23 @@
             <path>
               <item name="NLP_DEMO" type="b2602c69:ProjectViewProjectNode" />
               <item name="NLP_DEMO" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="NLP_DEMO" type="b2602c69:ProjectViewProjectNode" />
               <item name="NLP_DEMO" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="chinese_word_segmentation" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="NLP_DEMO" type="b2602c69:ProjectViewProjectNode" />
-              <item name="NLP_DEMO" type="462c0819:PsiDirectoryNode" />
-              <item name="Web_crawler" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../chapter07.chat_robot" />
     <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
   <component name="RecentsManager">
@@ -229,14 +562,20 @@
       <option name="project" value="LOCAL" />
       <updated>1563022295988</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="修改 项目首页相关介绍">
+      <created>1563110285685</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1563110285685</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24768825" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24768825" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -257,7 +596,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="添加 评测语料" />
-    <option name="LAST_COMMIT_MESSAGE" value="添加 评测语料" />
+    <MESSAGE value="修改 项目首页相关介绍" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改 项目首页相关介绍" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/../../yiyong_join_with_member (1).ipynb">
@@ -270,6 +610,13 @@
           <folding>
             <element signature="e#118#128#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/ProgramData/Anaconda3/envs/NLP_DEMO/Lib/zipfile.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="1117" selection-start-line="1117" selection-end-line="1117" />
         </state>
       </provider>
     </entry>
@@ -302,22 +649,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/chinese_word_segmentation/Assessment_of_Word_Segmentation_Effect.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
+        <state relative-caret-position="442">
           <caret line="26" column="10" selection-start-line="26" selection-start-column="10" selection-end-line="26" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://D:/ProgramData/Anaconda3/envs/NLP_DEMO/Lib/zipfile.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="129">
-          <caret line="1117" selection-start-line="1117" selection-end-line="1117" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/chinese_word_segmentation/pyhanlp_segmentation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="37" column="61" lean-forward="true" selection-start-line="14" selection-end-line="37" selection-end-column="61" />
+        <state relative-caret-position="552">
+          <caret line="37" column="35" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Chatbot/A Comprehensive Chat Robot Based on Seq2seq and Attention Mechanism/test_anti.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="18" column="28" selection-start-line="18" selection-start-column="28" selection-end-line="18" selection-end-column="28" />
         </state>
       </provider>
     </entry>
