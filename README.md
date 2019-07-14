@@ -1,8 +1,22 @@
 
 
+
 # Contents  
+
 - [NLP_DEMO](#NLP_DEMO) 
 - [Corpus Accumulation--spider](#Corpus Accumulation--spider) 
+
+# Video Course
+
+免费视频课程链接：[自然语言处理实战入门](https://edu.csdn.net/course/detail/20769)
+
+随着人工智能的快速发展，自然语言处理和机器学习技术的应用愈加广泛。
+要想快速入门这些前沿技术总是存在着各种各样的困难.
+本教程力求为同学们对该领域整体概况有一个明晰的认识，并选择网络爬虫，汉语分词，可视化，文本分类等几个常见的应用领域和场景进行基于python语言的实战化入门介绍。
+
+With the rapid development of artificial intelligence, the application of natural language processing and machine learning technology is more and more extensive. 
+In order to get a quick start to these frontier technologies, there are always various difficulties. 
+This tutorial aims to give students a clear understanding of the overall situation in this field, and select several common application fields and scenarios, such as web crawler, Chinese word segmentation, visualization, text categorization and so on, for a practical introduction based on Python language. 
 
 
 # NLP_DEMO
@@ -30,6 +44,9 @@ NLP Common Analytical Ideas
 
 [简单NLP分析套路（2）----分词，词频，命名实体识别与关键词抽取](https://blog.csdn.net/wangyaninglm/article/details/84504101)
 
+[《自然语言处理实战入门》 ---- 第4课 ：中文分词原理及相关组件简介](https://season.blog.csdn.net/article/details/90587705)
+
+
 ---
 
 # Visual presentation and corpus collection
@@ -37,6 +54,7 @@ NLP Common Analytical Ideas
 [简单NLP分析套路（3）---- 可视化展现与语料收集整理](https://blog.csdn.net/wangyaninglm/article/details/84901376)
 
 ## wordcloud
+
 * 以下是使用结巴分词器TF-IDF 关键词抽取算法抽取的词云
 
 ![wordcloud](./Resources/image/word_cloud.jpg)
@@ -56,8 +74,17 @@ NLP Common Analytical Ideas
 
 [卅年春秋，谁主沉浮？从400篇任正非演讲稿分析中，一探华为](https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651670909&idx=1&sn=d690d8efa7237594312c6ee7c3741312&chksm=bd4c6eee8a3be7f8f39240a6c4fd1d04f26dfb0a9af6644e1d5acd13974d0b5d2e79f025c33b&mpshare=1&scene=23&srcid=#rd)
 
+## 语料库
+
+[《自然语言处理实战入门》 ---- 第5课 ：分词评测及语料库简介](https://season.blog.csdn.net/article/details/89820033)
+
+----
 
 # 句法分析
+
+----
+
+
 
 # 情感倾向性分析
 
@@ -70,6 +97,8 @@ NLP Common Analytical Ideas
 # 问答机器人
 
 - [自己动手做聊天机器人](http://www.shareditor.com/bloglistbytag/?tagname=%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E5%81%9A%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA)
+
+
 
 # 知识图谱
 
