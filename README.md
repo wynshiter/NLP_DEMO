@@ -98,7 +98,7 @@ NLP Common Analytical Ideas
 
 - [自己动手做聊天机器人](http://www.shareditor.com/bloglistbytag/?tagname=%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E5%81%9A%E8%81%8A%E5%A4%A9%E6%9C%BA%E5%99%A8%E4%BA%BA)
 
-
+- [《智能问答与深度学习》](https://github.com/111x0m7/book-of-qna-code/)
 
 # 知识图谱
 
@@ -121,6 +121,11 @@ NLP Common Analytical Ideas
 ----
 
 # 致谢
+
+排名不分先后，本github 参照了众多网上，书上，论文上的代码，图片，如有侵权请联系删除，非常感谢提供给资源的各个
+网站，公众号，老师。
+
+- [王树义老师](https://www.jianshu.com/u/7618ab4a30e4)
 
 ----
 # 最新热点跟踪

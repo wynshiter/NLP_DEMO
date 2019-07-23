@@ -19,9 +19,6 @@
 #安装 报错，调试方法：
 #https://blog.csdn.net/weixin_40899194/article/details/79702468
 
-import jieba
-import jieba.analyse
-import pandas
 
 
 
