@@ -189,7 +189,7 @@ class HMM(object):
 
 
 hmm = HMM()
-hmm.train('./data/trainCorpus.txt_utf8')
+#hmm.train('./data/trainCorpus.txt_utf8')
 
 text = '这是一个非常棒的方案！'
 res = hmm.cut(text)

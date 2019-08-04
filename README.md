@@ -102,7 +102,9 @@ NLP Common Analytical Ideas
 
 # 知识图谱
 
-参考：[这是一份通俗易懂的知识图谱技术与应用指南](https://www.jiqizhixin.com/articles/2018-06-20-4)
+- [这是一份通俗易懂的知识图谱技术与应用指南](https://www.jiqizhixin.com/articles/2018-06-20-4)
+
+- [以疾病为中心的医药领域知识图谱，并完成自动问答与分析服务](https://github.com/liuhuanyong/QASystemOnMedicalKG)
 
 # 文本搜索
 
@@ -133,3 +135,5 @@ NLP Common Analytical Ideas
 - [放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN/RNN/TF）比较](https://zhuanlan.zhihu.com/p/54743941)
 
 - [2018年自然语言处理值得关注的研究、论文和代码](https://mp.weixin.qq.com/s?__biz=MzI0NTE4NjA0OQ==&mid=2658359531&idx=1&sn=95301e271308417978314f3e70ce1c7d&chksm=f2d59385c5a21a93b73a267a1055f221c1a4cf53077a0b125a521386ce670a6b9747123af360&mpshare=1&scene=1&srcid=0114aVegwPmpQnjtXPBupwDa#rd)
+
+- [百度ERNIE](https://github.com/PaddlePaddle/ERNIE)
