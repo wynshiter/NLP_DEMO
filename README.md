@@ -100,6 +100,8 @@ NLP Common Analytical Ideas
 
 - [《智能问答与深度学习》](https://github.com/111x0m7/book-of-qna-code/)
 
+- [保险领域智能问答](https://github.com/Samurais/insuranceqa-corpus-zh)
+
 # 知识图谱
 
 - [这是一份通俗易懂的知识图谱技术与应用指南](https://www.jiqizhixin.com/articles/2018-06-20-4)
