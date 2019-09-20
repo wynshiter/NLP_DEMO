@@ -5,10 +5,13 @@
 
 @file: chinese_word _segmentation.py
 @time: 2018/11/27 10:33
-@desc:
+@desc: pyltp 分词样例程序
+
+由于pyltp 不支持conda  环境，故本 repo 没有安装及相关实验
+
 '''
 
-#jieba 分词的接口，百度的接口，还有一个
+
 
 #pyltp 使用文档
 #https://pyltp.readthedocs.io/zh_CN/latest/api.html
@@ -18,9 +21,6 @@
 
 #安装 报错，调试方法：
 #https://blog.csdn.net/weixin_40899194/article/details/79702468
-
-
-
 
 
 import os

@@ -73,6 +73,8 @@ NLP Common Analytical Ideas
 ## 综合可视化
 
 [卅年春秋，谁主沉浮？从400篇任正非演讲稿分析中，一探华为](https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651670909&idx=1&sn=d690d8efa7237594312c6ee7c3741312&chksm=bd4c6eee8a3be7f8f39240a6c4fd1d04f26dfb0a9af6644e1d5acd13974d0b5d2e79f025c33b&mpshare=1&scene=23&srcid=#rd)
+[天池可视化教程](https://tianchi.aliyun.com/course/courseDetail?spm=5176.12282042.0.0.5bb52042TuqOqk&courseId=261)
+
 
 ## 语料库
 
