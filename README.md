@@ -3,10 +3,18 @@
 
 # Contents  
 
-- [NLP_DEMO](#NLP_DEMO) 
-- [Corpus Accumulation--spider](#Corpus Accumulation--spider) 
 
-# Video Course
+- [简介](#简介) 
+- [Video_Course](#Video_Course)
+- [语料与爬虫](#语料与爬虫) 
+
+
+# 简介
+NLP_DEMO
+NLP Common Analytical Ideas
+
+# 视频课程
+Video_Course
 
 免费视频课程链接：[自然语言处理实战入门](https://edu.csdn.net/course/detail/20769)
 
@@ -19,28 +27,36 @@ In order to get a quick start to these frontier technologies, there are always v
 This tutorial aims to give students a clear understanding of the overall situation in this field, and select several common application fields and scenarios, such as web crawler, Chinese word segmentation, visualization, text categorization and so on, for a practical introduction based on Python language. 
 
 
-# NLP_DEMO
-NLP Common Analytical Ideas
+
+
+
+
+
+---
+
+# 前置技术
+
 
 
 
 ---
 
-# Corpus Accumulation--spider
+# 爬虫与语料积累
+Corpus_Accumulation--spider
 
 
+- [简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站](https://blog.csdn.net/wangyaninglm/article/details/83479837)
 
-[简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站](https://blog.csdn.net/wangyaninglm/article/details/83479837)
+- [《自然语言处理实战入门》 ---- 第2课 ：网络爬虫简介](https://blog.csdn.net/wangyaninglm/article/details/89007652)
 
-[《自然语言处理实战入门》 ---- 第2课 ：网络爬虫简介](https://blog.csdn.net/wangyaninglm/article/details/89007652)
-
-[《自然语言处理实战入门》 ---- 第3课 ：本人CSDN博客的爬取](https://blog.csdn.net/wangyaninglm/article/details/89440922)
+- [《自然语言处理实战入门》 ---- 第3课 ：本人CSDN博客的爬取](https://blog.csdn.net/wangyaninglm/article/details/89440922)
 
 
 ---
 
 
-# Basic Analysis Route of Chinese NLP
+# NLP基础分析
+Basic Analysis Route of Chinese NLP
 
 [简单NLP分析套路（2）----分词，词频，命名实体识别与关键词抽取](https://blog.csdn.net/wangyaninglm/article/details/84504101)
 
@@ -49,7 +65,8 @@ NLP Common Analytical Ideas
 
 ---
 
-# Visual presentation and corpus collection
+# 可视化与语料库
+Visual presentation and corpus collection
 
 [简单NLP分析套路（3）---- 可视化展现与语料收集整理](https://blog.csdn.net/wangyaninglm/article/details/84901376)
 
@@ -72,13 +89,13 @@ NLP Common Analytical Ideas
 
 ## 综合可视化
 
-[卅年春秋，谁主沉浮？从400篇任正非演讲稿分析中，一探华为](https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651670909&idx=1&sn=d690d8efa7237594312c6ee7c3741312&chksm=bd4c6eee8a3be7f8f39240a6c4fd1d04f26dfb0a9af6644e1d5acd13974d0b5d2e79f025c33b&mpshare=1&scene=23&srcid=#rd)
-[天池可视化教程](https://tianchi.aliyun.com/course/courseDetail?spm=5176.12282042.0.0.5bb52042TuqOqk&courseId=261)
+- [卅年春秋，谁主沉浮？从400篇任正非演讲稿分析中，一探华为](https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651670909&idx=1&sn=d690d8efa7237594312c6ee7c3741312&chksm=bd4c6eee8a3be7f8f39240a6c4fd1d04f26dfb0a9af6644e1d5acd13974d0b5d2e79f025c33b&mpshare=1&scene=23&srcid=#rd)
+- [天池可视化教程](https://tianchi.aliyun.com/course/courseDetail?spm=5176.12282042.0.0.5bb52042TuqOqk&courseId=261)
 
 
 ## 语料库
 
-[《自然语言处理实战入门》 ---- 第5课 ：分词评测及语料库简介](https://season.blog.csdn.net/article/details/89820033)
+- [《自然语言处理实战入门》 ---- 第5课 ：分词评测及语料库简介](https://season.blog.csdn.net/article/details/89820033)
 
 ----
 
