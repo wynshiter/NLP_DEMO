@@ -134,21 +134,27 @@ Visual presentation and corpus collection
 ----
 
 # 参考
+
 - [做项目一定能用到的NLP资源](https://blog.csdn.net/wangyaninglm/article/details/88287283)
 
 - [《自然语言处理理论与实践》](https://github.com/bainingchao/NLP-ML)
 
 [配套代码：https://github.com/bainingchao/NLP-ML](https://github.com/bainingchao/NLP-ML)
+
 ![自然语言处理理论与实践](./Resources/image/自然语言处理理论与实战.jpg)
 
 - [Python自然语言处理实战-核心技术与算法](https://github.com/nlpinaction/learning-nlp)
+
 [配套代码：https://github.com/nlpinaction/learning-nlp](https://github.com/nlpinaction/learning-nlp)
+
 ![Python自然语言处理实战-核心技术与算法](./Resources/image/Python自然语言处理实战-核心技术与算法.jpg)
 
 - NLP汉语自然语言处理原理与实践
+
 ![NLP汉语自然语言处理原理与实践](./Resources/image/NLP汉语自然语言处理原理与实践.jpg)
 
 - [自然语言处理入门](https://github.com/hankcs/pyhanlp/tree/master/tests/book)
+
 ![自然语言处理入门](./Resources/image/自然语言处理入门.png)
 
 
