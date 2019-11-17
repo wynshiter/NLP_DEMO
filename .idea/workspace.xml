@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="426a83ec-e60d-4d48-bf44-efbbae312c7d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chinese_word_segmentation/PyNLPIR_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/chinese_word_segmentation/PyNLPIR_segmentation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chinese_word_segmentation/ltp_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/chinese_word_segmentation/ltp_segmentation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chinese_word_segmentation/pyhanlp_segmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/chinese_word_segmentation/pyhanlp_segmentation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assistance_tool.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/assistance_tool.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,7 +24,7 @@
   <component name="ProjectId" id="1OYNfeeSXqgAXdOrR3cyqVXKMU7" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../evaluation-汉语分词评测" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
   <component name="RecentsManager">
@@ -50,7 +46,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.thulac_segmentation">
+  <component name="RunManager" selected="Python.segmentation">
     <configuration name="PyNLPIR_segmentation" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="NLP_DEMO" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -135,7 +131,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="thulac_segmentation" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="segmentation" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="NLP_DEMO" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -147,7 +143,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/chinese_word_segmentation/thulac_segmentation.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/chinese_word_segmentation/pkuseg_segmentation.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -156,9 +152,16 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.jieba_segmentation" />
+      <item itemvalue="Python.pyhanlp_segmentation" />
+      <item itemvalue="Python.PyNLPIR_segmentation" />
+      <item itemvalue="Python.segmentation" />
+      <item itemvalue="Python.Word_segmentation_evaluation" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.thulac_segmentation" />
+        <item itemvalue="Python.segmentation" />
         <item itemvalue="Python.PyNLPIR_segmentation" />
         <item itemvalue="Python.pyhanlp_segmentation" />
         <item itemvalue="Python.Word_segmentation_evaluation" />

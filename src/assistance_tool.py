@@ -38,3 +38,4 @@ def get_runtime(start_time):
 
     elapsed = (time.clock() - start_time)
     print("Time used:",elapsed)
+
