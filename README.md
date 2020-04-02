@@ -36,6 +36,10 @@ This tutorial aims to give students a clear understanding of the overall situati
 
 # 前置技术
 
+- 正则表达式
+- 网络爬虫
+- 传统机器学习算法
+- 深度学习算法
 
 
 
@@ -129,11 +133,19 @@ Visual presentation and corpus collection
 
 - [开放的中文知识图谱](http://openkg.cn/home)
 
+- [医学知识图谱](http://zstp.pcl.ac.cn:8002/)
+
 # 文本搜索
+
+# 智能问答
+
+# 文本生成
+
+[只需单击三次，让中文GPT-2为你生成定制故事](https://www.jiqizhixin.com/articles/2019-11-12-11)
 
 ----
 
-# 参考
+# 参考书籍与资源
 
 - [做项目一定能用到的NLP资源](https://blog.csdn.net/wangyaninglm/article/details/88287283)
 
@@ -168,6 +180,7 @@ Visual presentation and corpus collection
 - [王树义老师](https://www.jianshu.com/u/7618ab4a30e4)
 
 ----
+
 # 最新热点跟踪
  
 - [放弃幻想，全面拥抱Transformer：自然语言处理三大特征抽取器（CNN/RNN/TF）比较](https://zhuanlan.zhihu.com/p/54743941)
