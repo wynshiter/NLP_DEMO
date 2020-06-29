@@ -1,0 +1,11 @@
+
+
+
+
+
+
+
+文章大纲基于关键词的文本内容可视化标签云（Tag Cloud／Text Cloud／Word Cloud)标签词抽取--TF-IDF标签词抽取--TEXTRANK词云绘制文档散（DocuBurst)文档卡片时序性的文本内容可视化主题河流（ThemeRiver)历史流（History Flow）文本弧（TextArc）文献指纹（Literature Fingerprinting）文本特征透镜（Feature Lens)
+文本内容的可视化是以文本内 
+
+

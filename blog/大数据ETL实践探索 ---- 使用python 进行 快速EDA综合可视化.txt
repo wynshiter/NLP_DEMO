@@ -1,0 +1,187 @@
+
+
+
+
+
+
+
+文章大纲可视化处理的前置处理数据清洗使用pandas 对数据进行处理数据存储数据入库postgreSQL 安装数据入ESES 和 传统数据库  结构对比mapping大数据可视化非结构化数据可视化结构化数据可视化cubessuperset
+
+可视化处理的前置处理
+数据清洗
+对于可视化的过程，拿到一份数据，我们首先要做的是进行数据清洗。我在这篇博文：数据清洗的目的，方法
+介绍了数据清洗的一个通用步骤。
+
+针对这个通用流程，我们 准备了一份医疗领域 的通用 样例数据，准备进行分析探查以及基本的可视化工作。
+
+
+数据清洗小型 脚手架
+
+
+es 目前支持sql
+
+
+
+使用pandas 对数据进行处理
+我在系列博文中：大数据ETL实践探索（5）---- 大数据ETL利器之 pandas 介绍了pandas 的部分使用。
+通过文件加载，我们首先需要将文件中的数据转化为pandas 的dataframe ，
+假设我们有一个脱密后的HIS数据
+
+# 删除不需要的列
+medicalTest_Delete_list= ["序号"]
+
+medicalTest_str_list = [
+"诊断编码(ICD编码)"
+,"诊断名称"
+,"出院小结"
+,"出院小结"
+,"医院科室"]
+
+medicalTest_IntegerType_list = ["序号","实际住院天数"]
+
+medicalTest_category_list = ["诊断编码(ICD编码)","诊断名称","医院科室"]
+
+medicalTest_FloatType_list = ["基金支付金额","总金额"]
+medicalTest_DateType_list = ["入院日期","出院日期"]
+
+在线查看，本博客的样例 ：jupyter notebook 的 code
+多说两句，发现这个jupyter notebook 的分享还挺神奇的，把github 地址粘贴到：https://nbviewer.jupyter.org/ 就可以了，每次展示有10分钟左右的延迟，如果强制刷新，生成的链接地址加上： ?flush_cache=true
+
+数据存储
+数据入库
+postgreSQL 安装
+最近单位在研究开源的数据库，说实话他的官方文档真是烂，中文的文档版本滞后，下载个CentOS 7 内核版本还要找半天：Linux downloads (Red Hat family)
+yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+
+yum install postgresql12
+
+yum install postgresql12-server
+
+
+# postgresql-12-setup initdb 命令不支持后跟参数设置编码，但是查官网init 又可以，很迷惑
+/usr/pgsql-12/bin/postgresql-12-setup initdb 
+
+systemctl enable postgresql-12
+systemctl start postgresql-12
+
+
+之前在一些虚机上安装时候发现，如果没有在开始时候指定字符集，那么后来修改会比较麻烦：
+https://tutorials.technology/tutorials/How-to-change-postgresql-database-encoding-to-UTF8-from-SQL_ASCII.html
+强烈建议阅读下文：字符集修改：字符集修改
+其中提到，只要locale字符集正确，postgresql 默认字符集就ok ，
+
+
+
+修改配置文件
+
+修改登录及监听
+修改配置文件（非常关键），操作如下:
+cd /var/lib/pgsql/12/data/
+
+首先，修改postgresql.conf，将 listen_addresses 这一行的ip地址改为  listen_addresses =’*’，代表监听所有端口，如果不改后面会出错。
+其次，修改pg_hba.conf，将indent全部改为trust;
+另外，pg_hba.conf的#IPv4 local connections 下添加一列：
+host    all             all             0.0.0.0/0              md5      
+#//这是由于每台远程机器的ip都不统一，pgadmin登录的时候ip不一致将无法连接数据
+
+#之后重启服务。
+systemctl restart postgresql-12
+
+
+修改时区
+# 查找配置文件目录
+find / -name postgresql.conf
+vi /var/lib/pgsql/12/data/postgresql.conf
+# 找到此处并修改
+timezone = 'Asia/Shanghai'
+
+
+
+数据入库
+
+
+# coding:utf-8
+
+from sqlalchemy import create_engine
+
+class connet_databases:
+    def __init__(self):
+        '''
+        # 初始化数据库连接，使用pymysql模块
+        # MySQL的用户：root, 密码:147369, 端口：3306,数据库：mydb
+        '''
+        
+        _host = '39.108.131.88'
+        _port = 3306
+        _databases = 'san_jin_sq'  # 'produce' #
+
+        _username = 'wuzaipei'
+        _password = 'wuzaipei'
+
+        self._connect = r'mysql+pymysql://{username}:{password}@{host}:{port}/{databases}'.format(
+            username=_username,
+            password=_password,
+            host=_host,
+            port=_port,
+            databases=_databases)
+
+engine = create_engine(connet_databases()._connect, echo=True)
+
+数据入ES
+es 权威指南
+ES 和 传统数据库  结构对比
+
+mapping
+自动化创建mapping，虽然 es 可以动态推断es，但是不够准确，所以一般还是需要进行指定。
+es mapping 文档
+# 按照每一列的类型生成对应的 es index
+
+def set_mapper_field(list_name,s_type,mapper):
+    data = json.loads(json.dumps(mapper))
+    for item in list_name:
+        
+        data['properties'][item] = {"type":s_type}
+        
+    return data
+    
+## 生成一个字典 进行字段对应
+
+create_medicine_insurance_body = {
+    "properties": {
+        
+    }
+}
+
+### 简单的将 数值型 与字符型调出来
+
+dict_mapper = set_mapper_field(medicalTest_FloatType_list,'float',create_medicine_insurance_body)
+dict_mapper = set_mapper_field(medicalTest_IntegerType_list,'integer',dict_mapper)
+dict_mapper = set_mapper_field(medicalTest_category_list,'keyword',dict_mapper)
+dict_mapper = set_mapper_field(medicalTest_str_list,'keyword',dict_mapper)
+
+json_mapper = json.dumps(dict_mapper,ensure_ascii=False)
+
+
+大数据可视化
+大数据可视化的综合手段 如下图所示：最近刚出了一篇文章，我传到github 上面了：
+大数据可视化技术及应用.pdf
+
+
+非结构化数据可视化
+
+kibana 文档特性
+kibana 文档目录
+
+非结构化数据的可视化，我们可以使用elastic search  配套的kibana 进行可视化 的绘制。
+结构化数据可视化
+cubes
+
+cubes 官网
+cubes 文档
+
+superset
+superset 官网
+技术调研----BI工具对比及Surperset 之 docker安装与可视化
+
+
+

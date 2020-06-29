@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 《Effective large scale stereo matching》
 In this paper we propose a novel approach to binocular stereo for fast matching of high-resolution images. Our approach builds a prior on the disparities by forming a triangulation on a set of support points which can be robustly
  matched, reducing the matching ambiguities of the remaining points. This allows for efficient exploitation of the disparity search space, yielding accurate dense reconstruction without the need for global optimization.

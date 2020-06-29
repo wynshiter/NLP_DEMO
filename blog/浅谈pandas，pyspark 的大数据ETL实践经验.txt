@@ -1,7 +1,7 @@
 
 
-                  					
-														
+
+
 
 
 
@@ -223,6 +223,29 @@ from pyspark.sql.functions import udf
 CalculateAge = udf(CalculateAge, IntegerType())
 # Apply UDF function
 Member_df = Member_df.withColumn("AGE", CalculateAge(Member_df['date of birthday']))
+
+由身份证号获取年龄
+import datetime
+
+def get_age(id):
+    """通过身份证号获取年龄"""
+    birth_year = int(id[6:10])
+    birth_month = int(id[10:12])
+    birth_day = int(id[12:14])
+    
+    now = (datetime.datetime.now() + datetime.timedelta(days=1))
+    year = now.year
+    month = now.month
+    day = now.day
+
+    if year == birth_year:
+        return 0
+    else:
+        if birth_month > month or (birth_month == month and birth_day > day):
+            return year - birth_year - 1
+        else:
+            return year - birth_year
+
 
 4.1.2 日期
 清洗日期格式字段

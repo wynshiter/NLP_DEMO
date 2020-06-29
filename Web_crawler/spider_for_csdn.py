@@ -14,7 +14,7 @@ import os
 import io
 import random
 import re
-import urllib
+import urllib.request
 import socket
 import time
 from datetime import datetime
@@ -61,6 +61,17 @@ def validate_title(title):
     new_title = re.sub(rstr, "_", title)  # 替换为下划线
     return new_title.replace('\r', '').replace('\n', '').replace('\t', '')
 
+def validate_date(str_date):
+    """
+    正则表达式匹配日期：
+    匹配	00-00-00 00:00:00 | 0000-00-00 00:00:00 | 09-05-22 08:16:00 | 1970-00-00 00:00:00 | 20090522081600
+    不匹配	2009-13:01 00:00:00 | 2009-12-32 00:00:00 | 2002-12-31 24:00:00 | 2002-12-31 23:60:00 | 02-12-31 23:00:60
+    :param str_date:待匹配字符串
+    :return:
+    """
+    rstr = r'(\d{2}|\d{4})(?:\-)?([0]{1}\d{1}|[1]{1}[0-2]{1})(?:\-)?([0-2]{1}\d{1}|[3]{1}[0-1]{1})(?:\s)?([0-1]{1}\d{1}|[2]{1}[0-3]{1})(?::)?([0-5]{1}\d{1})(?::)?([0-5]{1}\d{1})'
+    pattern = re.compile(rstr)
+    return pattern.search(str_date)
 
 
 def get_content(blog_obj, contend_box_id, title_id, contend_id):
@@ -87,26 +98,28 @@ def get_content(blog_obj, contend_box_id, title_id, contend_id):
         bsObj = BeautifulSoup(page_content, "html.parser")
         etree_obj = etree.HTML(page_content)
         # 找到和title 一个的div  找第一个span 的 内容,不能直接用span汇总的class ，原创，转载都不一样
-        article_type = bsObj.findAll(name='div', attrs={'class': 'article-title-box'})[0].find_next().get_text()
+        article_type = bsObj.find_all(name='div', attrs={'class': 'article-title-box'})[0].find_next().get_text()
 
-        title = bsObj.findAll(name='h1', attrs={'class': title_id})
+        title = bsObj.find_all(name='h1', attrs={'class': title_id})
         str_title = validate_title(title[0].get_text() + '.txt')
 
         xpath_label = '''//*[@id="mainBox"]/main/div[1]/div/div/div[2]/div[1]/span[3]/span[1]'''
         label = ','.join([obj.text for obj in etree_obj.xpath(xpath_label)])
         #将标签和个人分类全部算成标签
-        label = label + ',' + ','.join([obj.text for obj in bsObj.findAll(name='a', attrs={'class': 'tag-link'})])
+        label = label + ',' + ','.join([obj.text for obj in bsObj.find_all(name='a', attrs={'class': 'tag-link'})])
 
         number_of_labels = label.count(',')
 
         f_blog = open(r'../blog/' + str_title, 'w', encoding='utf-8')
         str_content = ''
-        for content_box in bsObj.findAll(name='div', attrs={'class': contend_box_id}):  # 正则表达式匹配博客包含框 标签
+        # 下面两层循环的写法主要是为了逐次缩短定位
+        # for content_box in bsObj.findAll(name='div', attrs={'class': contend_box_id}):  # 正则表达式匹配博客包含框 标签
+        #
+        #     for content in bsObj.findAll(name='div', id=contend_id):  # 内容,注意此处用了bsobj 因为如果缩小范围可能找不到
 
-            for content in bsObj.findAll(name='div', id=contend_id):  # 内容,注意此处用了bsobj 因为如果缩小范围可能找不到
-
-                str_content = (content.get_text() + '\n').replace(COPYRIGHT_NOTICE, '').replace(blog_url, '')
-                f_blog.write(str_content)
+        for content in bsObj.find_all(name='div', id=contend_id):  # 内容,注意此处用了bsobj 因为如果缩小范围可能找不到
+            str_content = (content.get_text() + '\n').replace(COPYRIGHT_NOTICE, '').replace(blog_url, '')
+            f_blog.write(str_content)
 
         f_blog.close()
         blog_obj.title = title[0].get_text()
@@ -148,19 +161,21 @@ def getpage_all_bloglinks(url, url_pattern):
 
         list_blog_obj = []
 
-        list_page_title = bsObj.findAll(name='div', attrs={'class': 'article-item-box csdn-tracking-statistics'})
+        list_page_title = bsObj.find_all(name='div', attrs={'class': 'article-item-box csdn-tracking-statistics'})
         page_link_pattern = "(" + url_pattern + ")"
 
         for page_obj in list_page_title:
+
             page_link = page_obj.findAll(name='a')[0].attrs['href']
 
             if re.match(page_link_pattern, page_link):  # csdn 反爬虫机制，给分页中隐藏了一个不显示的博客链接，所以要进行剔除
                 article_id = page_link.split('/')[-1]
-                create_time = page_obj.findAll(name='div')[0].findAll(name='span')[0].get_text()
-                click_number = page_obj.findAll(name='div')[0].findAll(name='span')[1].get_text().replace('阅读数', '')
-                comment_number = page_obj.findAll(name='div')[0].findAll(name='span')[4].get_text().replace('评论数', '')
+                create_time = page_obj.find_all(name='span', attrs={'class': 'date'})[0].get_text()
+                click_number = page_obj.find_all(name='span', attrs={'class': 'read-num'})[0].get_text()
+                comment_number = page_obj.find_all(name='span', attrs={'class': 'read-num'})[1].get_text()
 
                 date_format = '%Y-%m-%d %H:%M:%S'
+                create_time = validate_date(create_time).group(0)
                 create_time = datetime.strptime(create_time, date_format)
                 create_time_year = create_time.year
                 create_time_month = create_time.month
@@ -181,7 +196,7 @@ def getpage_all_bloglinks(url, url_pattern):
                                           create_time_month=create_time_month,
                                           create_time_week=create_time_week,
                                           create_time_hour=create_time_hour)
-
+                print(temp_blog)
                 list_blog_obj.append(temp_blog)
             else:
                 pass
@@ -221,10 +236,10 @@ def main():
 
     # 获取分页数量, 由于这部分分页代码为自动生成 ，所以需要使用 selenium，如果觉的麻烦可以直接把分页数量作为输入
 
-    import spider_selenium
-    page_index = spider_selenium.get_csdn_page_index(STR_PAGE_URL_PREFIX, 'ui-pager')
+    # import spider_selenium
+    # page_index = spider_selenium.get_csdn_page_index(STR_PAGE_URL_PREFIX, 'ui-pager')
     #不需要这个太重型的selenium 工具的话，人肉写上分页数
-    #page_index = 18
+    page_index = 11
     # 输入分页数据量
     for i in range(1, page_index + 1):
         temp_blog_obj = getpage_all_bloglinks((list_page_str + str(i)), STR_PAGE_URL_PREFIX)

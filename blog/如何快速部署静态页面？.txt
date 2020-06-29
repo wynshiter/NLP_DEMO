@@ -1,0 +1,273 @@
+
+
+
+
+
+
+
+文章大纲静态页面静态页面发布的几种方式1.  httpd2. Nginx为何选用 NginxNginx 安装3. 云厂商 服务aws s34. github gitlab 代码仓库的静态页面服务自动化部署的几种方式python 调用gitlab api下载文件使用ci cd 流程的下载jenkins 持续集成自动化测试
+
+朋友圈大神胡老师说过，都2020年了，写代码实现不是实现的唯一方式，天下武功唯快不破。如何快速构建，持续交付才是王道。
+比如经常有这样的场景： 某领导要来视察，准备在大屏幕上展示一些demo 网站或者临时针对客户的推广或者自己手里的静态资源做一些发布。
+这样的需求往往来的快，去的快，而且中间还有修改的要求，如何快速部署这样类似的静态页面呢，下面罗列一些经常使用到的方法。
+静态页面
+静态页面发布的几种方式
+gitlab github 都支持 项目文件展示为静态页面
+甚至，jupyter 也可以 作为静态页面直接分享出去
+1.  httpd
+
+apache httpd
+httpd 文档 
+
+httpd是Apache超文本传输协议(HTTP)服务器的主程序。被设计为一个独立运行的后台进程，它会建立一个处理请求的子进程或线程的池。
+The Apache HTTP Server Project is an effort to develop and maintain an open-source HTTP server for modern operating systems including UNIX and Windows. The goal of this project is to provide a secure, efficient and extensible server that provides HTTP services in sync with the current HTTP standards.
+The Apache HTTP Server (“httpd”) was launched in 1995 and it has been the most popular web server on the Internet since April 1996. It has celebrated its 25th birthday as a project in February 2020.
+The Apache HTTP Server is a project of The Apache Software Foundation.
+2. Nginx
+Nginx 是俄罗斯人编写的十分轻量级的 HTTP 服务器, Nginx，它的发音为 “ engine X ”，是一个高性能的 HTTP 和 reverse proxy server，同时也是一个 IMAP/ POP3/ SMTP 服务器。Nginx 是由俄罗斯人 Igor Sysoev 为俄罗斯访问量第二的 Rambler.ru 站点开发的，它已经在该站点运行超过两年半了。Igor Sysoev 在建立的项目时,使用基于 BSD 许可。
+英文主页：http://nginx.net。
+nginx 入门 指南
+Nginx 作为 HTTP 服务器，有以下几项基本特性：
+处理静态文件，索引文件以及自动索引；打开文件描述符缓冲。
+无缓存的reverse proxy 加速，简单的负载均衡和容错。
+FastCGI，简单的负载均衡和容错。
+模块化的结构。包括 gzipping, byte ranges, chunked responses,以及 SSI-filter 等 filter。如果由 Fast CGI 或其它代理服务器处理单页中存在的多个 SSI，则这项处理可以并行运行，而不需要相互等待。
+支持 SSL 和 TLSSNI。
+即 Nginx 的优点：轻量、高性能、并发能力强。用来部署静态页面也是相当便捷。
+这种高性能得益于 Nginx 的框架。在 Nginx 启动后，会有一个 master 进程和多个 worker 进程。master 进程主要用来管理 worker 进程，包含：接收来自外界的信号，向各 worker 进程发送信号，监控 worker 进程的运行状态，当 worker 进程退出后(异常情况下)，会自动重新启动新的 worker 进程。而基本的网络事件，则是放在 worker 进程中来处理的。多个 worker 进程之间是对等的，他们同等竞争来自客户端的请求，各进程互相之间是独立的。一个请求，只可能在一个 worker 进程中处理，一个 worker 进程，不可能处理其它进程的请求。worker 进程的个数是可以设置的，一般我们会设置与机器 cpu 核数一致，这与 Nginx 的进程模型以及事件处理模型有关。
+为何选用 Nginx
+说到 Nginx，可能第一反应就是 reverse proxy  和 负载均衡 了。那么什么是 反向代理，什么又是 负载均衡 呢？
+
+reverse proxy
+
+首先了解一下什么是 前向代理 。(Proxy) 也称网络代理，是一种特殊的网络服务，通俗来讲，就是在客户端和目标服务器之间的充当中间人，接收客户端的请求，再根据客户端请求向目标服务器发起相应的请求，从目标服务器获得指定资源后返回给客户端。且代理服务器可以对目标服务器的资源下载至本地缓存，如果客户端所要获取的资源在代理服务器的缓存之中，则代理服务器并不会再向目标服务器发起请求，而是直接返回缓存的资源。
+而reverse proxy  则是在服务器端作为代理使用，而不是客户端。也就是说，前向代理 是代理内部网络用户访问 Internet 上服务器的连接请求，反向代理 是以代理服务器来接受 Internet 上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给 Internet 上请求连接的客户端，此时的代理服务器对外就表现为一个服务器。
+
+负载均衡
+
+反向代理负载均衡技术是把将来自 Internet 上的连接请求以反向代理的方式动态地转发给内部网络上的多台服务器进行处理，从而达到负载均衡的目的。
+Nginx 安装
+官方文档
+本人使用的是腾讯云的服务器，版本为： Ubuntu Server 14.04.1 LTS 32 位。
+Nginx 配置
+简单地配置 Nginx 的配置文件，以便在启动 Nginx 时去启用这些配置。而本文的重点也是于此。
+Nginx 的配置系统由一个主配置文件和其他一些辅助的配置文件构成。这些配置文件均是纯文本文件，一般地，我们只需要配置主配置文件就行了。例如在我的服务器上是在：/etc/nginx/nginx.conf 。
+指令上下文
+nginx.conf 中的配置信息，根据其逻辑上的意义，对它们进行了分类，也就是分成了多个作用域，或者称之为配置指令上下文。不同的作用域含有一个或者多个配置项。
+其中每个配置项由配置指令和指令参数构成，形成一个键值对，# 后面地为注释，理解起来也非常容易。
+一般配置文件的结构和通用配置如下：
+user www-data;  # 运行 nginx 的所属组和所有者
+worker_processes 1;  # 开启一个 nginx 工作进程,一般 CPU 几核就写几
+pid /run/nginx.pid;  # pid 路径
+ 
+events {
+    worker_connections 768;  # 一个进程能同时处理 768 个请求
+    # multi_accept on;
+}
+ 
+# 与提供 http 服务相关的配置参数，一般默认配置就可以，主要配置在于 http 上下文里的 server 上下文
+http {
+    ##
+    # Basic Settings
+    ##
+ 
+    ... 此处省略通用默认配置
+ 
+    ##
+    # Logging Settings
+    ##
+    ... 此处省略通用默认配置
+ 
+    ##
+    # Gzip Settings
+    ##
+ 
+    ... 此处省略通用默认配置
+ 
+    ##
+    # nginx-naxsi config
+    ##
+ 
+    ... 此处省略通用默认配置
+ 
+    ##
+    # nginx-passenger config
+    ##
+ 
+    ... 此处省略通用默认配置
+ 
+    ##
+    # Virtual Host Configs
+    ##
+ 
+    ... 此处省略通用默认配置
+ 
+    # 此时，在此添加 server 上下文，开始配置一个域名，一个 server 配置段一般对应一个域名
+    server {
+        listen 80;        # 监听本机所有 ip 上的 80 端口
+        server_name _;      # 域名：www.example.com 这里 "_" 代表获取匹配所有
+        root /home/filename/;  # 站点根目录
+ 
+        location / {       # 可有多个 location 用于配置路由地址
+            try_files index.html =404;
+        }
+}
+ 
+# 邮箱的配置，因为用不到，所以把这个 mail 上下文给注释掉
+#mail {
+#    # See sample authentication script at:
+#    # http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+#    
+#    # auth_http localhost/auth.php;
+#    # pop3_capabilities "TOP" "USER";
+#    # imap_capabilities "IMAP4rev1" "UIDPLUS";
+#   
+#    server {
+#        listen   localhost:110;
+#        protocol  pop3;
+#        proxy    on;
+#    }
+#
+#    server {
+#        listen   localhost:143;
+#        protocol  imap;
+#        proxy    on;
+#    }
+#}
+
+
+这里需要注意的是 http 上下文里的 server 上下文。
+server {
+    listen 80;        # 监听本机所有 ip 上的 80 端口
+    server_name _;      # 域名：www.example.com 这里 "_" 代表获取匹配所有
+    root /home/filename/;  # 站点根目录
+ 
+    location / {       # 可有多个 location 用于配置路由地址
+      try_files index.html =404;
+    }
+}
+
+这里的 root 字段最好写在 location 字段的外边，防止出现无法加载 css、js 的情况。因为 css、js 的加载并不是自动的，nginx 无法执行，需要额外的配置来返回资源，所以，对于静态页面的部署，这样做是最为方便的。
+这里对 root 作进一步解释，例如在服务器上有 /home/zhihu/ 目录，其下有 index.html 文件和 css/ 以及 img/ ， root /home/zhihu/; 就将指定服务器加载资源时是在 /home/zhihu/ 下查找。
+其次， location 后的匹配分多种，其各类匹配方式优先级也各不相同。这里列举一精确匹配例子：
+server {
+    listen 80;        
+    server_name _;      
+    root /home/zhihu/;  
+ 
+    location = /zhihu {
+      rewrite ^/.* / break;
+      try_files index.html =404;
+    }
+}
+
+
+此时，访问 www.example.com/zhihu 就会加载 zhihu.html 出来了。由于 location 的精确匹配，只有访问 www.example.com/zhihu 这个路由时才会正确响应，而且此时要通过 rewrite 正则匹配，把 /zhihu 解析替换成原来的 / 。关于更多 location 字段用法，可以在文章最后给出的参考资料中查看。
+关于使用 nginx 部署静态页面，最简单便捷的配置方法
+上面说了挺多关于配置的说明，下面推荐一种个人认为最为便捷的配置方法。（特此感谢 guyskk 学长的答疑解惑）
+首先创建一个目录，例如： /home/ubuntu/website 然后在这个 website 文件夹下可以放置你需要部署的静态页面文件，例如 website 下我有 google、zhihu、fenghuang 这三个文件夹，其中 server 字段配置如下：
+server {
+    listen 80;
+    server_name _;
+    root /home/ubuntu/website;
+    index index.html;
+}
+
+
+这里每个文件夹下面的静态页面文件名都是 index.html ，我以前有个很不好的习惯，比如 zhihu 页面就喜欢命名为 zhihu.html ，但就从前端来看，这也是不符合规范的。
+这样配置的话，例如当你访问 www.showzeng.cn/google/ 时，nginx 就会去 website 目录下的 google 文件夹下寻找到 index.html 并把 google 页面返回，同理，访问 www.showzeng.cn/zhihu/ 时，会寻找到 zhihu 文件夹下的 index.html 并把 zhihu 页面返回。
+而在 zhihu、google 、fenghuang 文件夹的同级目录上，再添加你的域名首页 index.html 时，访问 www.example.com 时就会返回了。
+这里唯一美中不足的是，访问域名中 www.showzeng.cn/zhihu 末尾会自动加上 / ，在浏览器中按 F12 调试会发现 www.showzeng.cn/zhihu 为 301 状态码，因为 index.html 是在 zhihu/ 文件夹下，所以在搜索过程中会重定向到 www.showzeng.cn/zhihu/ ，起初我是接受不了的，那一 / 看起来太难受了，但是只要一想到要一个一个 location 字段去匹配，我一下子就接受了。不知道你怎么看，反正我是接受了。
+Nginx 启动运行
+$ sudo nginx -s reload
+
+使用 reload 方法不用重启服务，直接重新加载配置文件，客户端感觉不到服务异常，实现平滑切换。当然你也可以重新启动 nginx 服务。
+$ sudo service nginx restart
+Nginx 停止运行
+
+$ sudo nginx -s stop
+
+3. 云厂商 服务
+aws s3
+文档参考：在 Amazon S3 上托管静态网站
+一个可提供服务的静态网站结构
+
+├─css
+├─images
+├─js
+├─wqpage
+└─index.html
+
+4. github gitlab 代码仓库的静态页面服务
+
+自动化部署的几种方式
+ci cd 的流程可以完成网站的自动化部署，比如安装 jenkins。
+或者使用python 或者shell 脚本调用api 拉下仓库的代码，进行部署。最快的方案是什么，git pull 直接覆盖本地代码
+python 调用gitlab api
+下载文件
+一直没有找到清洗的相当于git clone 这样的命令下载 整个仓库
+
+class gitlab.v4.objects.ProjectExport(manager, attrs)
+projects api
+
+使用ci cd 流程的下载
+利用单位已有的一些流程：https://docs.gitlab.com/ee/ci/runners/ 已经配置好了 gitlab ci cd 的runner
+
+cache:
+  paths:
+    - .cache/pip
+
+before_script:
+  - python3 -V
+  # Print out python version for debugging
+  # - flake8 .
+
+
+build:
+  script:
+
+  - ls
+  artifacts:
+    paths:
+    - ../项目名称
+  only:
+  - master
+
+
+整体打包一个 通过 ci cd 流程的 Artifacts 使用代码即可下载
+def down_artifacts(project_id, dist_path):
+    try:
+        project = get_projects(project_id)
+        job = get_last_success_job(project)
+        print(job)
+        if not job:
+            raise Exception("没有可用的版本")
+        zip_fn = "_artifacts.zip"
+        with open(zip_fn, "wb") as f:
+            job.artifacts(streamed=True, action=f.write)
+        rs = subprocess.run(["unzip", "-bo", zip_fn, "-d", dist_path])
+        if rs.returncode == 0:
+            os.unlink(zip_fn)
+            return True
+        else:
+            return False
+    except:
+        traceback.print_exc()
+        return False
+
+
+jenkins 持续集成
+Jenkins是一个开源的、提供友好操作界面的持续集成(CI)工具，起源于Hudson（Hudson是商用的），主要用于持续、自动的构建/测试软件项目、监控外部任务的运行（这个比较抽象，暂且写上，不做解释）。Jenkins用Java语言编写，可在Tomcat等流行的servlet容器中运行，也可独立运行。通常与版本管理工具(SCM)、构建工具结合使用。常用的版本控制工具有SVN、GIT，构建工具有Maven、Ant、Gradle。
+CI(Continuous integration，中文意思是持续集成)是一种软件开发时间。持续集成强调开发人员提交了新代码之后，立刻进行构建、（单元）测试。根据测试结果，我们可以确定新代码和原有代码能否正确地集成在一起。
+CD(Continuous Delivery， 中文意思持续交付)是在持续集成的基础上，将集成后的代码部署到更贴近真实运行环境(类生产环境)中。比如，我们完成单元测试后，可以把代码部署到连接数据库的Staging环境中更多的测试。如果代码没有问题，可以继续手动部署到生产环境。
+
+https://www.jenkins.io/zh/
+中文文档 
+
+
+
+自动化测试
+https://jmeter.apache.org/
+
+
+

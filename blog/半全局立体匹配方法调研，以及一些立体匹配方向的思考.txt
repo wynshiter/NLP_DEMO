@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 写大论文的时候看到了这篇文章，感叹到作者科研的创新
 《A Non-Local Cost Aggregation Method for Stereo Matching》
 一种非局部代价聚合立体匹配方法

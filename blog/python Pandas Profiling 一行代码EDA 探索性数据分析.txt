@@ -1,0 +1,69 @@
+
+
+
+
+
+
+
+文章大纲1. 探索性数据分析代码样例效果解决pandas profile 中文显示的问题
+
+1. 探索性数据分析
+数据的筛选、重组、结构化、预处理等都属于探索性数据分析的范畴，探索性数据分析是帮助数据分析师掌握数据结构的重要工具，也是奠定后续工作的成功基石。
+在数据的分析项目中，数据的收集和预处理往往占据整个项目工作量的十之八九，正式这些简单的工作决定了整个项目的成败。
+
+Generates profile reports from a pandas DataFrame. The pandas df.describe() function is great but a little basic for serious exploratory data analysis. pandas_profiling extends the pandas DataFrame with df.profile_report() for quick data analysis.
+For each column the following statistics - if relevant for the column type - are presented in an interactive HTML report:
+Essentials: type, unique values, missing values
+Quantile statistics like minimum value, Q1, median, Q3, maximum, range, interquartile range
+Descriptive statistics like mean, mode, standard deviation, sum, median absolute deviation, coefficient of variation, kurtosis, skewness
+Most frequent values
+Histogram
+Correlations highlighting of highly correlated variables, Spearman, Pearson and Kendall matrices
+Missing values matrix, count, heatmap and dendrogram of missing values
+官网：https://github.com/pandas-profiling/pandas-profiling
+
+代码样例
+一个完整的样例：
+https://nbviewer.jupyter.org/github/lksfr/TowardsDataScience/blob/master/pandas-profiling.ipynb
+# importing required packages
+import pandas as pd
+import pandas_profiling
+import numpy as np
+
+
+# importing the data
+df = pd.read_csv('/Users/lukas/Downloads/titanic/train.csv')
+
+profile = pandas_profiling.ProfileReport(tijian_pdf)
+profile.to_file("output_tijian_chinese.html")
+
+
+效果
+样例链接：https://pandas-profiling.github.io/pandas-profiling/examples/meteorites/meteorites_report.html
+
+在使用过程中发现，中文显示有问题，下面这块应该是调用seaborn 完成的。我们从源码配置文件可以看到
+
+
+解决pandas profile 中文显示的问题
+我们找到 pandas porfile 的配置文件，在conda 的环境中：
+路径为：
+D:\ProgramData\Anaconda3\envs\DATABASE\Lib\site-packages\pandas_profiling\view
+
+
+打开文件看到：
+## Credits for this style go to the ggplot and seaborn packages.
+##   I copied the style file to remove dependencies on the Seaborn package.
+##   Check it out, it's an awesome library for plotting!
+
+其实设置是参照seaborn ，但是pandas profile 的绘图设置是独立于seaborn 的。
+所以在字体设置（篮筐处），加上一个汉语字体，其他的字体干掉，注意前后空格，ok。
+
+以防万一，把字体文件在这个目录再放一份
+
+打完收工！
+思路参考：
+以 matplotlib 为基础的库的可视化库的中文显示问题，都可以这么设置
+
+
+
+

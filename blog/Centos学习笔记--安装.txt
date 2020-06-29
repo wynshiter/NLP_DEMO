@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
  
 centos6.0如果采用默认的最小化安装是没有安装桌面环境的，因此需要手动安装桌面环境。
 我们可以用 #yum grouplist 查看已经安装的组件，以及支持安装的组件 首先，安装 X window system# yum groupinstall "

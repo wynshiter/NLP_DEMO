@@ -1,0 +1,465 @@
+
+
+
+
+
+
+
+目录近期听课的思考语料库的记录3种爬虫urllib.request + BeautifulSoupscrapy 与xpath使用selenium 模拟浏览器行为新的改变相关链接未完待续
+近期听课的思考
+近期有机会听了听天善智能的课程《自然语言处理之AI深度学习顶级实战课程》慢慢的有一些心得，以后有机会慢慢给大家分享出来。
+为什么微软称NLP 为人工智能“皇冠上的明珠”？----认知智能
+深度学习在自然语言处理的通用步骤
+
+论文的阅读，最新算法的研究
+算法的大概方向的评估训练和确定
+训练数据的收集，清洗以及数据的预处理
+算法实现，系统设计，参数调优，模型升级
+模型效果评估与部署
+
+语料库的记录
+其实对于很多公司来说，要做NLP的一个最大的问题就是语料库的积累，包括词向量，知识库等等。这些东西最好的来源是什么呢？–爬虫。
+爬虫最常用的三种手段：
+1.urllib.request
+构造页面post 请求
+2.scrapy
+如果有非常详细的 网站树形结构，使用该框架爬取非常快捷方便
+3.selenium
+自动化测试利器，针对动态请求，url没有变化的网站类型有奇特疗效
+以下分别针对上述三种爬取方式给出实例代码
+3种爬虫
+urllib.request + BeautifulSoup
+主要思路，遍历分页列表–>获取每一页的博客链接–>依次爬取博客内容
+# encoding: utf-8
+'''
+@author: season
+@contact: 
+
+@file: spider_for_csdn.py
+@time: 2018/10/16 21:32
+@desc:
+'''
+import io
+import os
+import sys
+import urllib
+from urllib.request import urlopen
+from urllib import request
+from bs4 import BeautifulSoup
+import datetime
+import random
+import re
+import requests
+import socket
+
+socket.setdefaulttimeout(5000)  # 设置全局超时函数
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
+headers1 = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+headers2 = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36'}
+headers3 = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'}
+
+# 得到CSDN博客某一个分页的所有文章的链接
+articles = set()
+
+
+def getArticleLinks(pageUrl):
+    # 设置代理IP
+    # 代理IP可以上http://ip.zdaye.com/获取，此处不应该硬编码
+    proxy_handler = urllib.request.ProxyHandler({'post': '49.51.195.24:1080'})
+    proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
+    opener = urllib.request.build_opener(urllib.request.HTTPHandler, proxy_handler)
+    urllib.request.install_opener(opener)
+    # 获取网页信息
+    req = request.Request(pageUrl, headers=headers1 or headers2 or headers3)
+    html = urlopen(req)
+    bsObj = BeautifulSoup(html.read(), "html.parser")
+    global articles
+ # 正则表达式匹配每一篇文章链接(比较硬编码h4 这个四级标题里面藏了所有链接)
+    for articlelist in bsObj.findAll("h4"): 
+        # print(articlelist)
+        if 'href' in articlelist.a.attrs:
+            if articlelist.a.attrs["href"] not in articles:
+                # 遇到了新界面
+                newArticle = articlelist.a.attrs["href"]
+                # print(newArticle)
+                articles.add(newArticle)
+                #print(newArticle)
+
+
+# 得到CSDN博客某个博客主页上所有分页的链接，根据分页链接得到每一篇文章的链接并爬取博客每篇文章的文字
+pages = set()
+
+
+def getPageLinks(bokezhuye):
+    # 设置代理IP
+    # 代理IP可以上http://ip.zdaye.com/获取
+    proxy_handler = urllib.request.ProxyHandler({'post': '49.51.195.24:1080'})
+    proxy_auth_handler = urllib.request.ProxyBasicAuthHandler()
+    opener = urllib.request.build_opener(urllib.request.HTTPHandler, proxy_handler)
+    urllib.request.install_opener(opener)
+    # 获取网页信息
+    req = request.Request(bokezhuye, headers=headers1 or headers2 or headers3)
+    html = urlopen(req)
+    bsObj = BeautifulSoup(html.read(), "html.parser")
+    # 获取当前页面(第一页)的所有文章的链接
+    getArticleLinks(bokezhuye)
+    # 去除重复的链接
+    global pages
+    for pagelist in bsObj.findAll("a", href=re.compile("^/([A-Za-z0-9]+)(/article)(/list)(/[0-9]+)*$")):  # 正则表达式匹配分页的链接
+        if 'href' in pagelist.attrs:
+            if pagelist.attrs["href"] not in pages:
+                # 遇到了新的界面
+                newPage = pagelist.attrs["href"]
+                # print(newPage)
+                pages.add(newPage)
+                # 获取接下来的每一个页面上的每一篇文章的链接
+                newPageLink = "http://blog.csdn.net/" + newPage
+                getArticleLinks(newPageLink)
+                # 爬取每一篇文章的文字内容
+                for articlelist in articles:
+                    newarticlelist = "http://blog.csdn.net/" + articlelist
+                    print(newarticlelist)
+                    getArticleText(newarticlelist)
+
+
+
+####获取到每一个分页列表的所有文章
+str_page_url_prefix = 'https://blog.csdn.net/wangyaninglm/'
+
+list_page_str = str_page_url_prefix + 'article/list/'
+
+#输入分页数据量,我的博客17页
+for i in range(1,18):
+    getPageLinks(list_page_str+ str(i))
+
+page_url_list = []
+page_url_pattern = "(" + str_page_url_prefix + "article/details)(/[0-9]+)*$"
+
+# 把不符合的格式链接去除
+for page_link in articles:
+
+    if re.match(page_url_pattern,page_link):
+        page_url_list.append(page_link)
+    else:
+        pass
+
+
+print(len(page_url_list))
+
+dict_page_content = {'title':'','content':''}
+list_page_content = []
+
+import spider_for_403
+
+for url in page_url_list:
+    spider_for_403.get_Content(url,'blog-content-box','title-article','article_content')
+
+
+
+在爬取的过程中发现403报错，于是写了下面文件，更多的浏览器头
+import urllib
+import urllib.request
+import random
+from bs4 import BeautifulSoup
+
+import urllib.error
+
+my_headers = [
+    "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:30.0) Gecko/20100101 Firefox/30.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/537.75.14",
+    "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Win64; x64; Trident/6.0)"
+]
+
+import re
+
+#windows 创建文件替换特殊字符
+def validateTitle(title):
+    rstr = r"[\/\\\:\*\?\"\<\>\|]"  # '/ \ : * ? " < > |'
+    new_title = re.sub(rstr, "_", title)  # 替换为下划线
+    return new_title.replace('\r','').replace('\n','').replace('\t','')
+
+#csdn 的网页解析
+def get_Content(url,contend_box_id,title_id,contend_id):
+    try:
+        randdom_header = random.choice(my_headers)
+
+        req = urllib.request.Request(url)
+
+        req.add_header("User-Agent", randdom_header)
+        req.add_header("GET", url)
+
+        response = urllib.request.urlopen(req)
+
+        bsObj = BeautifulSoup(response.read(), "html.parser")
+    # 获取文章的文字内容
+    # 获取网页信息
+    #此处逻辑应为：首先获取文章box 的id 之后获取，title 的，之后是content 的
+    # 将每一篇博客分别保存为一个文件
+        title = bsObj.findAll(name='h1',attrs={'class':title_id})
+        str_title = validateTitle(title[0].get_text() + '.txt')
+        print(str_title.encode('gbk'))
+        f_blog = open('blog//' + str_title, 'w', encoding='utf-8')
+# 正则表达式匹配博客包含框 标签
+#内容,注意此处用了bsobj 因为如果缩小范围可能找不到（第二个循环）
+        for content_box in bsObj.findAll(name='div',attrs={'class':contend_box_id}):  
+
+            for contend in bsObj.findAll(name='div',id = contend_id):
+
+                str_content = 'content' + '\n'+ contend.get_text() + '\n'
+                f_blog.write(str_content)
+
+        f_blog.close()
+
+        response.close()  # 注意关闭response
+    except OSError as e:
+        print(e)
+    except urllib.error.URLError as e:
+        print(e.reason)
+
+# url = 'https://blog.csdn.net/wangyaninglm/article/details/45676169'
+# #
+# get_Content(url,'blog-content-box','title-article','article_content')
+
+效果：
+
+scrapy 与xpath
+在pycharm 中调试 scrapy
+from scrapy import cmdline
+cmdline.execute('scrapy crawl Hospital'.split())
+
+写好spider 的解析函数
+
+
+#
+
+class HospitalSpider(Spider):
+    i = 2;
+    name = 'Hospital'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
+    }
+    jianjie = 'jianjie.html'
+    base_url = 'https://yyk.99.com.cn'
+    def start_requests(self):
+        url = 'https://yyk.99.com.cn/city.html'
+        yield Request(url, headers=self.headers)
+
+    def parse(self, response):
+        # .re(r'[\u4e00-\u9fa5]{2,4}')匹配中文字符和长度，31为表格前31个后面的值包括了英文字母排序的值
+        hospitals_sub_url = response.xpath(
+            '//div[@class="m-clump"]//dt/a[@href]/@href').extract()[:31]
+
+        for url in hospitals_sub_url:
+                url = str(self.base_url + url)
+                yield Request(url, callback=self.parse_dir_urls)
+
+
+    def parse_dir_urls(self, response):
+        hospitals_sub_url = response.xpath(
+            '//div[@class="m-table-2"]//td/a[@href]/@href').extract()
+
+        for url in hospitals_sub_url:
+            url = str(self.base_url + url+ self.jianjie)
+            yield Request(url, callback=self.parse_dir_contents)
+
+    def parse_dir_contents(self, response):
+        item = HospitalspiderItem()
+
+        item.item_dict['更新日期'] = response.xpath('//div[@class="crumb"]//font/text()').extract()
+
+        #xpath：/html/body/div[6]/div[3]/div[1]/div[1]/table/tbody/tr[1]/td[4]/a
+        #此表格含有tbody 标签，不是很好处理，使用跳转语法.单双斜杠都可
+        item.item_dict['所在地区'] = response.xpath('//table[@class="present-table"]//tr[1]/td[4]/a/text()').extract()
+        item.item_dict['简介'] = response.xpath('//div[@class="present-wrap1"]//div[@id="txtintro"]').extract()
+
+
+        yield item
+
+
+pipeline 对于 依次爬取的item 进行处理，此处写成csv ，参照item 类进行数据持久化
+pipeline
+# -*- coding: utf-8 -*-
+
+# Define your item pipelines here
+#
+# Don't forget to add your pipeline to the ITEM_PIPELINES setting
+# See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+import re
+from HospitalSpider import items
+
+class HospitalspiderPipeline(object):
+    csv_head = items.HospitalspiderItem()
+#正则表达式去除html 标签（在scrapy 爬取过程中有些标签lxml 没法解析，带着标签爬下来了）
+    def clean_html(self,str):
+        reg = re.compile('<[^>]*>')
+        return reg.sub('', str)
+#csv 增加引号
+    def add_yinhao(self, str):
+        if str:
+            return '"' + str + '"'
+        else:
+            return ''
+#对每一项转换成str，去除html 标签,这块的参数应该怎么写
+    def write_csv_line(self, item):
+        str_row = ''
+        for i in item.item_list:
+            if item.item_dict[i]:
+                str_row = str_row + self.add_yinhao(self.clean_html(str(item.item_dict[i][0]))) + ','
+
+        str_row = str_row.strip(',').replace('\r','').replace('\n','').replace('\t','').replace(' ','') + '\n'
+
+        return str_row
+
+    def __init__(self):
+        pass
+
+    def open_spider(self, spider):
+        self.file = open('hospital.csv', 'w', encoding='utf-8')
+        str_row = ''
+        #写文件头
+        for i in self.csv_head.item_list:
+            str_row = str_row + '"' +i+'"'+','
+        self.file.write((str_row.strip(',')+'\n'))
+
+
+
+    def process_item(self, item, spider):
+
+
+        self.file.write(self.write_csv_line(item))
+
+
+
+    def close_spider(self, spider):
+        # 关闭爬虫时顺便将文件保存退出
+        self.file.close()
+
+
+修改 settings.py 文件
+ITEM_PIPELINES = {
+   'HospitalSpider.pipelines.HospitalspiderPipeline': 300,
+}
+
+使用selenium 模拟浏览器行为
+
+# encoding: utf-8
+'''
+@author: season
+@contact:
+
+@file: main.py
+@time: 2018/11/16 14:24
+@desc:
+'''
+
+import selenium
+
+from selenium import webdriver
+import file_operator
+
+
+
+#此处使用chrome 复制的xpath 非常准确，因为直接使用了chrome 的webdriver
+
+
+
+#获取每一页申请的登记号的详细信息
+#str_xpath  = '//tr[contains(@style, " color:#535353")]/td[2]'
+def get_Page_all_detail(handle_web_driver,str_xpath):
+    list_diag_test = handle_web_driver.find_elements_by_xpath(str_xpath)
+    list_Registration_number = []
+    #获取所有登记号
+    for element in list_diag_test:
+        list_Registration_number.append(element.text)
+
+    #已经爬取过的登记号就不爬了
+    list_already_have = file_operator.all_pure_file_name_without_extension(r'./html/','.html')
+
+    list_Registration_number = file_operator.sub_list(list_already_have,list_Registration_number)
+
+    #找到所有的登记号的细节
+    for Registration_number in list_Registration_number:
+        handle_web_driver.find_element_by_link_text(Registration_number).click()
+        handle_web_driver.implicitly_wait(1)
+        #保存html
+        with open(r'./html/'+Registration_number+'.html','w',encoding='utf-8') as html_file:
+            page_html = handle_web_driver.page_source
+            html_file.write(page_html)
+
+
+        handle_web_driver.back()
+
+
+#打开入口链接，设置相关疾病,逐页爬取，翻页
+def send_click(url):
+
+    browser = webdriver.Chrome()
+
+    browser.get(url)
+    browser.implicitly_wait(1)
+
+    str_xpath = '//tr[contains(@style, " color:#535353")]/td[2]'
+
+#找到共有多少页
+    #// *[ @ id = "searchfrm"] / div / div[4] / div[1] / a[3]
+    next_page_element_number = int(browser.find_element_by_xpath('// *[ @ id = "searchfrm"] / div / div[4] / div[1]/a[3]').text)
+
+    for index in range(0,next_page_element_number):
+        get_Page_all_detail(browser, str_xpath)
+        next_button = browser.find_element_by_xpath('//input[contains(@class, "page_next ui-button ui-widget ui-state-default ui-corner-all")]')
+        next_button.click()
+
+
+#函数返回本页没有被爬去的页面（断点续爬）
+
+
+def main():
+    #设置start url 搜索内容
+    str_url_base = 'http://www.search.keywords='
+    str_diagnosis = '***'
+    send_click(str_url_base+str_diagnosis)
+
+if __name__ == '__main__':
+    main()
+
+新的改变
+我还没写完程序，后序代码和过程逐步贴上来
+主要计划是，使用我自己的博客作为语料进行，词云，tf-idf ，textrank 等算法的分析
+
+相关链接
+NLP系列文章:
+
+自然语言处理简介（1）---- 服务梳理与传统汉语分词
+深度学习与中文短文本分析总结与梳理
+错误使用tf-idf的实例分享
+知识图谱技术分享会----有关知识图谱构建的部分关键技术简介及思考
+基于分布式的短文本命题实体识别之----人名识别（python实现）
+简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站
+简单NLP分析套路（2）----分词，词频，命名实体识别与关键词抽取
+简单NLP分析套路（3）---- 可视化展现与语料收集整理
+
+NLP 系列文章代码
+
+NLP_DEMO
+项目介绍页面
+pyltp分词模型
+
+NLP 下载资源
+
+
+pyltp分词模型下载（需要免费获取请加群探讨或直接官网下载）
+
+
+算法及概念说明
+
+
+
+未完待续
+
+
+

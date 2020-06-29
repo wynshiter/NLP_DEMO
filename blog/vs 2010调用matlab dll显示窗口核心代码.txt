@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
  matlab代码：
 figure('NumberTitle','off','menubar','none','toolbar','none','name','Topo Image'); 
 x=0:pi/100:2*pi;

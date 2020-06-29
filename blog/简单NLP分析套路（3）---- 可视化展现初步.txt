@@ -1,0 +1,425 @@
+
+
+
+
+
+
+
+文章大纲NLP 可视化wordCloudLDA 主题模型matplotlib seaborn 绘图加载中文字体CentOS 安装中文字体查看matplotlib 字体目录查看系统可用的中英文字体matplotlib  设置中文字体seaborn设置中文字体其他解决 matplotlib 中文显示的思路NLP系列文章
+
+构思这个系列的初衷是很明显的，之前我是从图论起家搞起了计算机视觉，后来发现深度学习下的计算机视觉没的搞了，后来正好单位的语料很丰富就尝试了NLP 的一些东西，早期非常痴迷于分词等等的技术，后来发现NLP 里面是有广阔天地的。
+如果你现在打开微信，可能很多公众号都在推送从哪里爬取了一些语料数据如下图，
+
+
+原文链接：透过评论看Runningman
+比如豆瓣电影的评论，对某某最新上映的电影做了如下一些分析，看起来花花绿绿很是高端，当然我们也能做，而且要做的更高端一些!!!
+
+NLP 可视化
+NLP 可视化有多种实现方案，包括我们熟知的词云就非常直观。当然还有主题模型，句子依存分析，知识图谱等等展现手段,下面我们分别就一些经典可视化手段进行介绍。
+wordCloud
+# encoding: utf-8
+'''
+@author: season
+@contact: shiter@live.cn
+
+@file: wordCloud.py
+@time: 2018/11/6 22:38
+@desc:
+'''
+
+
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+import jieba
+import jieba.analyse
+import pandas
+
+import os
+
+
+def file_name(file_dir,extension):
+    L = []
+    for root, dirs, files in os.walk(file_dir):
+        for file in files:
+            if os.path.splitext(file)[1] == extension:
+                L.append(os.path.join(root, file))
+    return L
+
+file_list = file_name('blog/','.txt')
+
+print(file_list)
+
+def get_all_strFromTxt(file_name):
+    str_blog = ''
+    with open(file_name,'r',encoding='utf-8') as f:
+        str_blog = f.read()
+    return str_blog
+
+
+# file_path = u'''0.csv'''
+# col_names = ["index","1","2"]
+# data = pandas.read_csv(file_path, names=col_names, header = 0,engine='python', dtype=str,encoding='utf-8')
+# # 返回前n行
+# # 返回前n行
+# first_rows = data.head(n=2)
+# print(first_rows)
+#
+# data.info()
+#
+#
+#
+
+top_word_dict = {}
+
+def getTopkeyWordsTFIDF(stop_word_file_path,topK=100,content = ''):
+    try:
+        jieba.analyse.set_stop_words(stop_word_file_path)
+        tags = jieba.analyse.extract_tags(content, topK, withWeight=True,allowPOS=('ns', 'n', 'vn', 'v'))
+        for v, n in tags:
+            print (v + '\t' + str((n )))
+            top_word_dict[v] = n*100
+    except Exception as e:
+        print(e)
+    finally:
+        pass
+
+def getTopkeyWordsTextRank(stop_word_file_path,topK=100,content = ''):
+    try:
+        jieba.analyse.set_stop_words(stop_word_file_path)
+        tags = jieba.analyse.textrank(content, topK, withWeight=True)
+        for v, n in tags:
+            print (v + '\t' + str(int(n )))
+    except Exception as e:
+        print(e)
+    finally:
+        pass
+
+str_summary = ''
+#
+# for i in range(0, len(data)):
+#     #print(data.iloc[i]['line_remark'])
+#     str_summary = str_summary+data.iloc[i]['line_remark']
+#
+
+for i in file_list:
+    str_summary = str_summary + get_all_strFromTxt(i)
+
+text_from_file_with_apath = str_summary
+
+
+getTopkeyWordsTFIDF('stop_words.txt',150,text_from_file_with_apath)
+
+
+stop_words = [' ','挂号']
+
+# 可以指定字体，或者按照词频生成
+def show_WordCloud(str_all):
+    wordlist_after_jieba = jieba.cut(str_all, cut_all=True)
+    wl_space_split = " ".join(wordlist_after_jieba)
+    my_wordcloud = WordCloud(background_color = "white",width = 1000,height = 860,font_path = "msyh.ttc",
+                # 不加这一句显示口字形乱码
+                margin = 2,
+    max_words=150, # 设置最大现实的字数
+    stopwords=stop_words,# 设置停用词
+    max_font_size=250,# 设置字体最大值
+    random_state=50# 设置有多少种随机生成状态，即有多少种配色方案
+
+    )
+    #my_wordcloud = my_wordcloud.generate(wl_space_split)
+    my_wordcloud = my_wordcloud.generate_from_frequencies(top_word_dict)
+
+    plt.imshow(my_wordcloud)
+    plt.axis("off")
+    plt.show()
+
+show_WordCloud(text_from_file_with_apath)
+
+
+词云结果：(值得一提的是我们可以分别用TFIDF  或者TEXTRANK 算法提取关键词)
+
+本人博客关键词 TF-IDF
+算法	0.08393536068790623
+图像	0.06798005803851344
+数据	0.05240655130424626
+文档	0.05059459998147416
+博主	0.05050301638484851
+使用	0.04356879903615233
+函数	0.042060415733978916
+查询	0.04005136456931241
+匹配	0.037386342706479996
+代码	0.03603846563455227
+方法	0.034559914773027035
+节点	0.033931860083514016
+特征	0.03291738415318488
+进行	0.031490540413372146
+排序	0.029646884115013712
+计算	0.029533756683699914
+需要	0.029447451266380476
+线程	0.02876913122420475
+像素	0.028464105792597654
+模型	0.027687724999548125
+文件	0.027195920887218235
+字段	0.026565494216139303
+结果	0.025830152697758277
+视差	0.024437895533599558
+信息	0.02390653201451686
+分片	0.02315742689824399
+文章	0.02157718425850839
+处理	0.02109550803266701
+学习	0.021005721546578465
+定义	0.02056261379145052
+实现	0.02039579088457056
+参数	0.02036164789518406
+问题	0.020284272744458855
+用户	0.019859257580053805
+返回	0.019832118152486682
+分词	0.019801132262955684
+创建	0.019597880527283076
+系统	0.019390564734465893
+版权	0.018984989081581773
+时候	0.018884022674800702
+转载	0.01866584359633088
+检测	0.018436606839486752
+包含	0.017926737352527033
+矩阵	0.017271551959541505
+安装	0.0171156281612187
+数据库	0.016960979586574783
+
+LDA 主题模型
+LDA 据说非常复杂，我看了半天好像也没有太懂
+不过有代码可以跑，这一点是很好的。 用我的所有博客跑出来的5个主题如下:
+Topic #0:
+我们 自己 如果 时候 就是 没有 数据 问题 进行 排序 选择 需要 函数 什么 学习 x2 工作 知道 这样 时间
+Topic #1:
+const char value doc xml node element file error bool void text str project true print code size buf false
+Topic #2:
+cv image include mat width size img height double lib void data opencv 图像 null std char src float max
+Topic #3:
+算法 数据 使用 特征 进行 方法 匹配 模型 www 文档 查询 图像 需要 信息 通过 系统 结果 所有 基于 com
+Topic #4:
+string self left cout include right def array result root push vector class endl void null sum size char end
+
+
+具体代码详见：NLP 学习仓库
+
+matplotlib seaborn 绘图加载中文字体
+如果系统，及matplotlib 本身有中文字体
+可以在代码中使用
+import matplotlib.pyplot as plt
+plt.rcParams['font.sans-serif']=['Microsoft YaHei'] 
+
+如果没有，那么windows 系统需要下载字体，linux 系统需要安装字体。
+CentOS 安装中文字体
+下载ttf 格式字体，如 黑体, msyh.ttf
+使用如下脚本安装：
+cd /usr/share/fonts/yourfontsdir
+#生成字体索引信息. 会显示字体的font-family
+sudo mkfontscale
+sudo mkfontdir
+#更新字体缓存：
+fc-cache
+
+查看matplotlib 字体目录
+import matplotlib
+matplotlib.matplotlib_fname()
+
+输出：
+'/home/hadoop/anaconda/envs/playground_py36/lib/python3.6/site-packages/matplotlib/mpl-data/matplotlibrc'
+
+查看系统可用的中英文字体
+
+centos linux 下查看中文字体
+
+fc-list  :lang=zh
+
+
+输出
+Microsoft YaHei,微软雅黑:style=Regular,Normal,obyčejné,Standard,Κανονικά,Normaali,Normál,Normale,Standaard,Normalny,Обычный,Normálne,Navadno,Arrunta
+Microsoft YaHei UI:style=Regular,Normal,obyčejné,Standard,Κανονικά,Normaali,Normál,Normale,Standaard,Normalny,Обычный,Normálne,Navadno,Arrunta
+
+
+
+
+matplotlib 可用字体
+
+from matplotlib.font_manager import FontManager
+import subprocess
+ 
+mpl_fonts = set(f.name for f in FontManager().ttflist)
+ 
+print ('all font list get from matplotlib.font_manager:')
+for f in sorted(mpl_fonts):
+    print('\t' + f)
+    
+# 仅在Linux下能够正常运行
+output = subprocess.check_output('fc-list :lang=zh -f "%{family}\n"', shell=True, encoding="utf8")
+ 
+zh_fonts = set(f.split(',',1)[0] for f in output.split('\n'))
+ 
+print('\n' +'Chinese font list get from fc-list:')
+for f in sorted(zh_fonts):
+    print('\t' + f)
+ 
+print('\n' +'the fonts we can use:')
+available = set(mpl_fonts) & set(zh_fonts)
+for f in available:
+    print('\t' + f)
+
+输出：
+all font list get from matplotlib.font_manager:
+	DejaVu Sans
+	DejaVu Sans Display
+	DejaVu Sans Mono
+	DejaVu Serif
+	DejaVu Serif Display
+	Microsoft YaHei
+	STIXGeneral
+	STIXNonUnicode
+	STIXSizeFiveSym
+	STIXSizeFourSym
+	STIXSizeOneSym
+	STIXSizeThreeSym
+	STIXSizeTwoSym
+	cmb10
+	cmex10
+	cmmi10
+	cmr10
+	cmss10
+	cmsy10
+	cmtt10
+
+Chinese font list get from fc-list:
+	
+	Microsoft YaHei
+	Microsoft YaHei UI
+
+the fonts we can use:
+	Microsoft YaHei
+
+matplotlib  设置中文字体
+效果图：
+
+matplotlit可以采用设置字体的办法
+%load_ext autoreload
+%autoreload 2
+%matplotlib inline
+
+# ...
+# -*- coding: utf-8 -*-
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+
+font = FontProperties(fname=r"msyh.ttc", size=14)  
+
+plt.bar([1, 3, 5, 7, 9], [5, 4, 8, 12, 7], label='graph 1')
+
+plt.bar([2, 4, 6, 8, 10], [4, 6, 8, 13, 15], label='graph 2')
+
+# params
+
+# x: 条形图x轴
+# y：条形图的高度
+# width：条形图的宽度 默认是0.8
+# bottom：条形底部的y坐标值 默认是0
+# align：center / edge 条形图是否以x轴坐标为中心点或者是以x轴坐标为边缘
+
+plt.legend()
+
+plt.xlabel(u'中文',FontProperties=font)
+plt.ylabel('value')
+
+plt.title(u'测试例子——条形图', FontProperties=font)
+
+plt.show()
+
+seaborn设置中文字体
+（以 matplotlib 为基础的库的可视化库的中文显示问题，都可以这么设置）
+seaborn就麻烦一点，先把matplotlib调试好，才有修改配置文件，并下载相关字体的办法进行配置
+配置方法：
+
+
+1.下载字体SimHei，放在matplotlib文件夹中
+
+
+
+2.修改配置文件，在matplotlib/mpl-data/目录下面matplotlibrc ，修改下面三项配置
+font.family  : sans-serif
+font.sans-serif   : SimHei, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
+axes.unicode_minus:False，#作用就是解决负号’-'显示为方块的问题
+
+
+3.命令行重新载入字体
+
+
+from matplotlib.font_manager import _rebuild
+
+_rebuild() #reload一下
+
+上述内容 参考链接：
+https://www.zhihu.com/question/25404709/answer/309784195
+那么设置完成matplotlib 后，seaborn 等依赖库，只要配置好如下对应代码即可
+#首先运行下面两行
+import pandas as pd
+from matplotlib.font_manager import _rebuild
+_rebuild() 
+########### 测试代码
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+data = {
+        '性别':['男','女','女','男','男'],
+        '姓名':['小明','小红','小芳','大黑','张三'],
+        '年龄':[20,21,25,24,29]}
+
+test_pdf = pd.DataFrame(data,index=['one','two','three','four','five'],
+               columns=['姓名','性别','年龄','职业'])
+
+
+
+
+sns.set_style('whitegrid',{'font.sans-serif':['SimHei','Arial']})
+sns.set_context("talk")
+
+%matplotlib inline
+
+
+sns.boxplot( y='年龄', data=test_pdf, palette="Set3")
+plt.show()
+
+其实核心就是这一句：设置字体
+sns.set_style('whitegrid',{'font.sans-serif':['SimHei','Arial']})
+
+效果：
+
+参考：  天池整体可视化教程
+其他解决 matplotlib 中文显示的思路
+安装包：
+#安装开源库pyplotz
+
+pip install pyplotz
+
+
+
+from pyplotz.pyplotz import PyplotZ
+from pyplotz.pyplotz import plt
+pltz=PyplotZ()
+pltz.enable_chinese()
+
+上述方案和这个方案都有一个最大的问题，就是pandas直接调用的时候还是出问题，现在还没有找到参数传递的口子。 猜想在pandas 中还有配置文件的目录，这个目录的配置文件优先级高于matplotlib的自带配置文件，有待进一步验证。
+
+NLP系列文章
+
+深度学习与中文短文本分析总结与梳理
+错误使用tf-idf的实例分享
+知识图谱技术分享会----有关知识图谱构建的部分关键技术简介及思考
+基于分布式的短文本命题实体识别之----人名识别（python实现）
+简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站
+简单NLP分析套路（2）----分词，词频，命名实体识别与关键词抽取
+简单NLP分析套路（3）---- 可视化展现初步
+
+
+
+
+

@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 首先参照下面这里进行opencv x64位机器下面的配置
 http://wiki.opencv.org.cn/index.php/VC_2010%E4%B8%8B%E5%AE%89%E8%A3%85OpenCV2.4.4
  

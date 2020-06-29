@@ -1,0 +1,15 @@
+
+
+
+
+
+
+
+文章大概matplotlib 可视化相关设置matplotlib seaborn 绘图加载中文字体CentOS 安装中文字体查看matplotlib 字体目录查看系统可用的中英文字体matplotlib  设置中文字体seaborn设置中文字体其他解决 matplotlib 中文显示的思路
+matplotlib 可视化相关设置
+matplotlib 文档：
+matplotlib api
+字体相关设置：matplotlib.font_manager
+ 
+
+

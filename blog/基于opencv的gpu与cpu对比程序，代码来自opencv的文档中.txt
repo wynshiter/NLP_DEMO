@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
  
 原文链接：
 http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/gpu/gpu-basics-similarity/gpu-basics-similarity.html

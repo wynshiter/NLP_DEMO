@@ -3,9 +3,6 @@
 
 
 
-                  					
-														
-
 
 
 文章大纲中文分词技术评测参考云服务哈工大语言云 ltp基于深度学习方法的中文分词一个领域细分的中文分词工具包（北大最新开源）信息检索与关键词提取TF-IDFTEXTRANKword2vectorgensim 训练词向量部分开源词向量未完待续
@@ -261,9 +258,8 @@ https://github.com/Embedding/Chinese-Word-Vectors
 2.Tencent AI Lab Embedding Corpus for Chinese Words and Phrases
 https://ai.tencent.com/ailab/nlp/embedding.html
 3.Pre-trained word vectors
-We are publishing pre-trained word vectors for 294 languages, trained on Wikipedia using fastText.
-These vectors in dimension 300 were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
-https://github.com/facebookresearch/fastText/blob/master/pretrained-vectors.md
+We distribute pre-trained word vectors for 157 languages, trained on Common Crawl and Wikipedia using fastText. These models were trained using CBOW with position-weights, in dimension 300, with character n-grams of length 5, a window of size 5 and 10 negatives. We also distribute three new word analogy datasets, for French, Hindi and Polish.
+https://github.com/facebookresearch/fastText/blob/master/docs/crawl-vectors.md
 
 
 未完待续

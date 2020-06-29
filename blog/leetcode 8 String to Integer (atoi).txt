@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 String to Integer (atoi)Total Accepted:52232
 Total Submissions:401038
 

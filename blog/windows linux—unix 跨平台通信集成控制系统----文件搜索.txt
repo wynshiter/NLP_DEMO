@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 跨平台的网络通信，跟设备的集成控制，牵扯到在各种平台下的文件搜索问题，windows下面的已经有了。
 地址如下：
 http://blog.csdn.net/wangyaninglm/article/details/8668132

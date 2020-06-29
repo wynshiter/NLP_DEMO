@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
  
 vs2010中调用openMP,并添加头文件#include<omp.h>
 

@@ -1,7 +1,7 @@
 
 
-                  					
-														
+
+
 
 
 
@@ -156,7 +156,12 @@ END;
 sql>create or replace directory OUT_PATH as 'D:\';
 
 运行以下sql
+---- 导出单个表
 SELECT 'EXEC sql_to_csv(''select * from ' ||T.TABLE_NAME ||''',''OUT_PATH''' || ',''ODS_MDS.' || T.TABLE_NAME ||'.csv'');' FROM user_TABLES T where t.TABLE_NAME='表名'
+
+---- 导出行数大于0 的表
+SELECT 'EXEC sql_to_csv(''select * from ' ||T.TABLE_NAME ||''',''OUT_PATH''' || ',''' || T.TABLE_NAME ||'.csv'');' FROM user_TABLES T where  T.num_rows >1
+
 
 得到以下的批量sql，导出来，生成.sql脚本,在命令行中执行即可.
 EXEC sql_to_csv('select * from table1','OUT_PATH','table1.csv');

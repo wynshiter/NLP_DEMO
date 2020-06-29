@@ -1,0 +1,286 @@
+
+
+
+
+
+
+
+文章大纲序言相关概念SOAweb servicesSOAPWSDLUDDI环境搭建我们使用 python 3.6 这个较新python 版本服务端开发客户端开发suds-jurkosuds-py3客户端样例代码参考文献
+
+序言
+web services 已经不再流行，但是，由于它的在接口技术中有着非常重要的地位，同时现在最主要的Web 服务设计模型REST其实也属于web services 技术范畴。所以我们还是有必要学习一下。
+其实 Web Serive 是一项不太容易讲清楚技术。他的相关概念包括：
+
+SOA Service-Oriented Architecture
+Web Services
+SOAP (Simple Object Access Protocol)
+WSDL (Web Services Description Language)
+UDDI (Universal Description Discovery and Integration)
+
+
+相关概念
+web services 这套复杂的技术如上文所述已经算是过时，但了解相关概念还是必要的
+SOA
+Service Oriented Ambiguity 中文一般理解为，面向服务架构，简称 SOA。
+SOA 的提出是在企业计算领域，就是要将紧耦合的系统，划分为面向业务的，粗粒度，松耦合，无状态的服务。
+SOA 的几个关键特性
+特性：
+
+一种粗粒度、松耦合服务架构，服务之间通过简单、精确定义接口进行通讯，不涉及底层编程接口和通讯模型。
+
+对于 SOA 来说，并不需要太过较真 SOA 到是一个怎样的架构。只要符合它的定义和规范的软件系统都可以认为是 SOA 架构。
+现在几乎所有的 SOA 应用场合都是和 Web Service 绑定的，所以不免有时候这两个概念混用。不可 否认 Web Service 是现在最适合实现 SOA 的技术，SOA 的走红在很大程度上归功于 Web Service 标准的成熟和 应用普及。
+web services
+Web Service 详细的描述： Web Service 是一个平台独立的，低耦合的，自包含的、基于可编程的 web 的应用程序，可使用开放的 XML（标准通用标记语言下的一个子集）标准来描述、发布、发现、协调和配置这些应用程序，用于开发分 布式的互操作的应用程序。
+在 Web Service 中所有的访问都通过 SOAP 访问进行，用 WSDL 定义的接口封装，通过 UDDI 进行目录查找所以SOAP、WSDL 和 UDDI 构成了 Web Service 的三要素。
+以下简略介绍这三要素。
+SOAP
+Simple Object Access Protocol，中文为简单对象访问协议，简称 SOAP。 SOAP 是基于 XML 在分散或分布式的环境中交换信息的简单的协议。允许服务提供者和服务客户经过防 火墙在 INTERNET 进行通讯交互。
+最多的情况还是还是绑定在HTTP 协议上面传输。所以，导致大多数人认为SOAP 就是HTTP + XML， 或者认为 SOAP 是 HTTP post 请求的一个专用版本，遵循一种特殊的 XML 消息格式。
+WSDL
+Web Services Description Language，网络服务描述语言，简称 WSDL。它是一门基于 XML 的语言，用 于描述 Web Services 以及如何对它们进行访问。
+UDDI
+UDDI Universal Description, Discovery and Integration"，可译为“通用描述、发现与集成服务”，简称 UDDI。 WSDL 用来描述了访问特定的 Web Service 的一些相关的信息，那么在互联网上，或者是在企业的不同 部门之间，如何来发现我们所需要的 Web Service 呢？而 Web Service 提供商又如何将自己开发的 Web Serivce 公布到因特网上呢？这就需要使用到 UDDI 了。
+
+环境搭建
+python 使用简单，第三方库丰富，我们搭建好环境，进行一整套web services 程序的开发。
+我们使用 python 3.6 这个较新python 版本
+python 环境管理的标准为conda 标准，我们使用conda 结合pip 进行开发环境的搭建。
+创建conda 环境
+conda create --name Web_Services python=3.6
+conda activate Web_Services 
+
+导出依赖包
+pip freeze > requirements.txt
+conda list -e > requirements.txt
+
+依赖包列表
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: win-64
+certifi=2019.6.16=py36_0
+lxml=4.3.4=pypi_0
+pip=19.1.1=py36_0
+python=3.6.8=h9f7ef89_7
+pytz=2019.1=pypi_0
+setuptools=41.0.1=py36_0
+spyne=2.12.16=pypi_0
+sqlite=3.28.0=he774522_0
+suds-py3=1.3.3.0=pypi_0
+vc=14.1=h0510ff6_4
+vs2015_runtime=14.15.26706=h3a45250_4
+wheel=0.33.4=py36_0
+wincertstore=0.2=py36h7fe50ca_0
+
+
+使用conda 或者pip 批量安装
+pip install -r requirements.txt
+conda install --yes --file requirements.txt
+
+
+但是注意，async=False ，这个参数问题在3.7版本中有问题，spyne 库会有报错。因为在Python3.7里async变成了关键字，关键字是不能做变量名的，只要把这个名字改成任意不是关键字的词就好了。
+
+服务端开发
+针对Python的WebService开发，最早开发者使用最多的库是soaplib
+（官方地址：http://soaplib.github.io/soaplib/2_0/index.html ），
+但从其官网可知，其最新版本“soaplib-2.0.0-beta2”从2011年3月发布后就不再进行更新了。
+通过阅读soaplib的官方文档，可知其不再维护后已经转向了一个新的项目：rpclib
+（官方地址：http://github.com/arskom/rpclib ）
+进行后续开发，但在rpclib的readme中，介绍了rpclib已经更名为spyne，并将持续进行更新。
+综上，所以选用spyne进行开发了。
+服务端样例代码:
+https://github.com/arskom/spyne/blob/master/examples/helloworld_soap.py
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+#-------------------------------------------------------------------------------
+'''
+@Author  :   {SEASON}
+@License :   (C) Copyright 2013-2022, {OLD_IT_WANG}
+@Contact :   {}
+@Software:   PyCharm
+@File    :   Web_Services_Test20190708 -- Web_Services
+@Time    :   2019/7/11 9:03
+@Desc    :
+
+'''
+#-------------------------------------------------------------------------------
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+preference:
+    http://spyne.io/docs/2.10/index.html
+    https://github.com/arskom/spyne/blob/master/examples/helloworld_soap.py
+
+This is a simple HelloWorld example to show the basics of writing
+a webservice using spyne, starting a server, and creating a service
+client.
+Here's how to call it using suds:
+
+#>>> from suds.client import Client
+#>>> hello_client = Client('http://localhost:8000/?wsdl')
+#>>> hello_client.service.say_hello('punk', 5)
+(stringArray){
+   string[] =
+      "Hello, punk",
+      "Hello, punk",
+      "Hello, punk",
+      "Hello, punk",
+      "Hello, punk",
+ }
+#>>>
+
+"""
+# Application is the glue between one or more service definitions, interface and protocol choices.
+from spyne import Application
+# @rpc decorator exposes methods as remote procedure calls
+# and declares the data types it accepts and returns
+from spyne import rpc
+# spyne.service.ServiceBase is the base class for all service definitions.
+from spyne import ServiceBase
+# The names of the needed types for implementing this service should be self-explanatory.
+from spyne import Iterable, Integer, Unicode
+
+from spyne.protocol.soap import Soap11
+# Our server is going to use HTTP as transport, It’s going to wrap the Application instance.
+from spyne.server.wsgi import WsgiApplication
+
+
+# step1: Defining a Spyne Service
+class HelloWorldService(ServiceBase):
+    @rpc(Unicode, Integer, _returns=Iterable(Unicode))
+    def say_hello(self, name, times):
+        """Docstrings for service methods appear as documentation in the wsdl.
+        <b>What fun!</b>
+        @param name: the name to say hello to
+        @param times: the number of times to say hello
+        @return  When returning an iterable, you can use any type of python iterable. Here, we chose to use generators.
+        """
+
+        for i in range(times):
+            yield u'Hello, %s' % name
+
+
+# step2: Glue the service definition, input and output protocols
+soap_app = Application([HelloWorldService], 'spyne.examples.hello.soap',
+                       in_protocol=Soap11(validator='lxml'),
+                       out_protocol=Soap11())
+
+# step3: Wrap the Spyne application with its wsgi wrapper
+wsgi_app = WsgiApplication(soap_app)
+
+if __name__ == '__main__':
+    import logging
+
+    from wsgiref.simple_server import make_server
+
+    # configure the python logger to show debugging output
+    logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
+
+    logging.info("listening to http://127.0.0.1:8000")
+    logging.info("wsdl is at: http://localhost:8000/?wsdl")
+
+    # step4:Deploying the service using Soap via Wsgi
+    # register the WSGI application as the handler to the wsgi server, and run the http server
+    server = make_server('127.0.0.1', 8000, wsgi_app)
+    server.serve_forever()
+
+
+客户端开发
+这方面有两个python 组件可以使用，分别是：
+
+suds-jurko
+suds-py3
+
+suds-jurko
+pip install suds-jurko
+文档
+https://bitbucket.org/jurko/suds/wiki/Original%20Documentation
+suds-py3
+https://github.com/cackharot/suds-py3
+pip3 install suds-py3
+客户端样例代码
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+#-------------------------------------------------------------------------------
+'''
+@Author  :   {SEASON}
+@License :   (C) Copyright 2013-2022, {OLD_IT_WANG}
+@Contact :   {shiter@live.cn}
+@Software:   PyCharm
+@File    :   Web_Services_Test20190708 -- test_client_suds-py3_eg
+@Time    :   2019/7/11 23:45
+@Desc    :
+
+'''
+#-------------------------------------------------------------------------------
+
+
+import sys
+import os
+suds_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(suds_path)
+
+from suds.client import Client
+
+def set_log():
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger('suds.client').setLevel(logging.DEBUG)
+    logging.getLogger('suds.transport').setLevel(logging.DEBUG)
+    # logging.getLogger('suds.xsd.schema').setLevel(logging.DEBUG)
+
+def call_service(url):
+    client = Client(url, username='bob', password='catbob')
+    do_call_service(client, url)
+
+def do_call_service(client, url):
+    print("Calling: sayHello()")
+    result = client.service.sayHello('Username')
+
+    print("Result: %s" % result)
+    a = 10.98
+    b = 98.83
+    print("Calling: add()")
+    sum = client.service.add(a, b)
+    print("Result: Sum of %f + %f = %f" % (a,b,sum))
+
+    print("Calling: addDate()")
+    from datetime import datetime
+    import time
+    inputDate = datetime.now()
+    dt = client.service.addDate(inputDate, 1)
+    print("Result: %s" % dt)
+
+def test(url):
+    client = Client(url)
+    for p in client.sd[0].ports:
+        for m, args in p[1]:
+            if len(args) == 0:
+                print(client.service[0][m]())
+
+if __name__ == '__main__':
+    # set_log()
+    url = 'http://localhost:8000/?wsdl'
+    if len(sys.argv) > 1:
+        url = sys.argv[1]
+
+    call_service(url)
+    # test('http://dati.meteotrentino.it/service.asmx?WSDL')
+    client1 = Client("http://127.0.0.1:8181/soap/infoservice?wsdl", username='bob', password='catbob')
+    print(client1.service.getInfo("Bob"))
+
+    # client2 = Client("http://127.0.0.1:8181/soap/infoservice?wsdl", username='bob', password='catbob')
+    # print(client2.service.getInfo("Test2"))
+    # 
+    # client3 = Client("http://127.0.0.1:8181/soap/infoservice?wsdl", username='bob', password='catbob')
+    # print(client3.service.getInfo("Test3"))
+
+
+参考文献
+1.《web 接口开发与自动化测试  基于Python语言》
+2. https://www.cnblogs.com/guanfuchang/p/5985070.html
+
+
+

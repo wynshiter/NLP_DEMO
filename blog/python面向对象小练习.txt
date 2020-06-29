@@ -2,12 +2,6 @@
 
 
 
-
-                  					
-														
-
-
-
 就是几个动物，自动排列生成什么的
 
 class Animal(object):

@@ -3,36 +3,294 @@
 
 
 
-                  					
-														
 
 
+文章大纲1. 正逆地理编码1.1 百度地图api正逆地理编码存在偏差1.1.1 百度地图 python地理位置编码1.1.2 百度地图 python逆地理位置编码1.2 高德地图接口2. 坐标系2.1 我们常说的坐标系2.2 坐标转码关键代码3. geohash3.1 python3 使用 geohash3.2 获取包围盒4.测试geohash查询接口5.结构化数据的处理入库部分参考文献
 
 
 最近想做一个简单的地理位置分析，比如获取一些城市公交站点对应的geohash，geohash其实是将平时常见的经纬度进行了降维，这样可以进行类似附近的餐馆等内容的分析。
 
 1. 正逆地理编码
 http://lbsyun.baidu.com/index.php?title=webapi/guide/webservice-geocoding
-正/逆地理编码服务（又名Geocoding API）是一类Web API接口服务； 
-正向地理编码服务提供将结构化地址数据（如：北京市海淀区上地十街十号）转换为对应坐标点（经纬度）功能； 
+正/逆地理编码服务（又名Geocoding API）是一类Web API接口服务；
+正向地理编码服务提供将结构化地址数据（如：北京市海淀区上地十街十号）转换为对应坐标点（经纬度）功能；
 逆向地理编码服务提供将坐标点（经纬度）转换为对应位置信息（如所在行政区划，周边地标点分布）功能。
 1.1 百度地图api正逆地理编码存在偏差
-百度地图坐标拾取 
+百度地图坐标拾取
 http://api.map.baidu.com/lbsapi/getpoint/index.html
 
 
 可以直接使用的百度url：后面直接跟地址就好如上图（key不知道是谁的），可以发现百度的搜索分词权重直接把雍和宫地铁站定位到了雍和宫，
 http://api.map.baidu.com/geocoder?key=f247cdb592eb43ebac6ccd27f796e2d2&output=json&address=
-url new key： 
+url new key：
 http://api.map.baidu.com/geocoder?key=xpKTc80ZnEGiy1elZCMtEepEYKj5tqQr&output=json&address=
 http://api.map.baidu.com/geocoder/v2/?address=&output=json&ak=xpKTc80ZnEGiy1elZCMtEepEYKj5tqQr
+1.1.1 百度地图 python地理位置编码
+请求样例：
+
+http://api.map.baidu.com/geocoder/v2/?address=北京市海淀区上地十街10号&output=json&ak=您的ak&callback=showLocation //GET请求
+
+
+import json
+from urllib.request import urlopen, quote
+import requests
+
+def getlnglat(address):
+    url = 'http://api.map.baidu.com/geocoder/v2/'
+    output = 'json'
+    ak = 'your ak'
+    add = quote(address) #由于本文城市变量为中文，为防止乱码，先用quote进行编码
+    uri = url + '?' + 'address=' + add  + '&output=' + output + '&ak=' + ak
+    req = urlopen(uri)
+    res = req.read().decode() #将其他编码的字符串解码成unicode
+    result = json.loads(res) #对json数据进行解析
+    lng=(result['result']['location']['lng'])
+    lat=(result['result']['location']['lat']) 
+    return result,lng,lat
+
+
+1.1.2 百度地图 python逆地理位置编码
+
+import urllib
+
+def inverse_geocoding(url, headers, data=None):
+    opener = urllib.request.build_opener()
+    request = urllib.request.Request(url, data=data, headers=headers)
+    response = opener.open(request, timeout=10)
+#很奇怪的是为啥返回值前面会有renderReverse&&renderReverse
+    result = response.read().decode('utf-8').replace('renderReverse&&renderReverse','').strip('(').strip(')')
+    result_json = json.loads(result)
+
+    return result_json
+
+
+    # ak 需自行注册
+ak = "your ak"
+location = '34.265725,108.95346'
+    
+url = "http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location="+location +"&output=json&pois=1&ak={}".format(ak)
+headers = {
+        'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"}
+inverse_geocoding(url, headers)
+
+
+
+
+返回值样例：这个坐标是西安钟楼的
+{'result': {'addressComponent': {'adcode': '610103',
+  'city': '西安市',
+  'city_level': 2,
+  'country': '中国',
+  'country_code': 0,
+  'country_code_iso': 'CHN',
+  'country_code_iso2': 'CN',
+  'direction': '北',
+  'distance': '77',
+  'district': '碑林区',
+  'province': '陕西省',
+  'street': '南大街',
+  'street_number': '111号',
+  'town': ''},
+ 'business': '钟楼,南院门,鼓楼',
+ 'cityCode': 233,
+ 'formatted_address': '陕西省西安市碑林区南大街111号',
+ 'location': {'lat': 34.265725030781496, 'lng': 108.95345999999995},
+ 'poiRegions': [{'direction_desc': '内',
+   'distance': '0',
+   'name': '钟楼',
+   'tag': '旅游景点;风景区',
+   'uid': '1bf85b2519cd8ea5a1a93414'}],
+ 'pois': [{'addr': '陕西省西安市莲湖区东大街和西大街交汇处',
+   'cp': '',
+   'direction': '内',
+   'distance': '0',
+   'name': '钟楼',
+   'parent_poi': {'addr': '',
+    'direction': '',
+    'distance': '',
+    'name': '',
+    'point': {'x': 0.0, 'y': 0.0},
+    'tag': '',
+    'uid': ''},
+   'poiType': '旅游景点',
+   'point': {'x': 108.95345409800872, 'y': 34.26572409662325},
+   'tag': '旅游景点;风景区',
+   'tel': '',
+   'uid': '1bf85b2519cd8ea5a1a93414',
+   'zip': ''},
+  {'addr': '西安西华门十字北大街宏府嘉会公寓A座13楼13051室',
+   'cp': ' ',
+   'direction': '附近',
+   'distance': '18',
+   'name': '西安钟楼驿站酒店公寓',
+   'parent_poi': {'addr': '',
+    'direction': '',
+    'distance': '',
+    'name': '',
+    'point': {'x': 0.0, 'y': 0.0},
+    'tag': '',
+    'uid': ''},
+   'poiType': '房地产',
+   'point': {'x': 108.95342714884342, 'y': 34.265858348934465},
+   'tag': '房地产;住宅区',
+   'tel': '',
+   'uid': '4ef5ddb21aed40545b109348',
+   'zip': ''},
+  {'addr': '北大街1号',
+   'cp': ' ',
+   'direction': '西南',
+   'distance': '104',
+   'name': '中国邮政储蓄银行(西安分行钟楼支行贷款营业部)',
+   'parent_poi': {'addr': '西一路街道东大街619号',
+    'direction': '西南',
+    'distance': '144',
+    'name': '西安市邮局钟楼支局办公楼',
+    'point': {'x': 108.95446918323499, 'y': 34.266402814423635},
+    'tag': '房地产;写字楼',
+    'uid': 'b3786172fb784d2536b06c09'},
+   'poiType': '金融',
+   'point': {'x': 108.9542985051881, 'y': 34.2660746438698},
+   'tag': '金融;银行',
+   'tel': '',
+   'uid': 'af0c814799ff1875d72ce2ea',
+   'zip': ''},
+  {'addr': '南大街110号',
+   'cp': ' ',
+   'direction': '东北',
+   'distance': '188',
+   'name': '钟楼饭店',
+   'parent_poi': {'addr': '',
+    'direction': '',
+    'distance': '',
+    'name': '',
+    'point': {'x': 0.0, 'y': 0.0},
+    'tag': '',
+    'uid': ''},
+   'poiType': '酒店',
+   'point': {'x': 108.95234918223144, 'y': 34.26466498747333},
+   'tag': '酒店;四星级',
+   'tel': '',
+   'uid': '0adce3e2c2e9387880a00c44',
+   'zip': ''},
+  {'addr': '西大街1号(钟楼西北角)',
+   'cp': ' ',
+   'direction': '南',
+   'distance': '116',
+   'name': '太平洋咖啡(钟楼店)',
+   'parent_poi': {'addr': '',
+    'direction': '',
+    'distance': '',
+    'name': '',
+    'point': {'x': 0.0, 'y': 0.0},
+    'tag': '',
+    'uid': ''},
+   'poiType': '美食',
+   'point': {'x': 108.95326545385163, 'y': 34.26658181599918},
+   'tag': '美食;咖啡厅',
+   'tel': '',
+   'uid': '7ccc1a1401313322bfa82251',
+   'zip': ''},
+  {'addr': '西一路街道东大街619号',
+   'cp': ' ',
+   'direction': '西南',
+   'distance': '144',
+   'name': '西安市邮局钟楼支局办公楼',
+   'parent_poi': {'addr': '',
+    'direction': '',
+    'distance': '',
+    'name': '',
+    'point': {'x': 0.0, 'y': 0.0},
+    'tag': '',
+    'uid': ''},
+   'poiType': '房地产',
+   'point': {'x': 108.95446918323499, 'y': 34.266402814423635},
+   'tag': '房地产;写字楼',
+   'tel': '',
+   'uid': 'b3786172fb784d2536b06c09',
+   'zip': ''},
+  {'addr': '新城区北大街1号',
+   'cp': ' ',
+   'direction': '西南',
+   'distance': '137',
+   'name': '中国邮政储蓄银行(钟楼支行)',
+   'parent_poi': {'addr': '西一路街道东大街619号',
+    'direction': '西南',
+    'distance': '144',
+    'name': '西安市邮局钟楼支局办公楼',
+    'point': {'x': 108.95446918323499, 'y': 34.266402814423635},
+    'tag': '房地产;写字楼',
+    'uid': 'b3786172fb784d2536b06c09'},
+   'poiType': '金融',
+   'point': {'x': 108.9543973187942, 'y': 34.26638789760832},
+   'tag': '金融;银行',
+   'tel': '',
+   'uid': '9eb487370346e799882fb584',
+   'zip': ''},
+  {'addr': '陕西省西安市莲湖区西大街27号西安世纪金花购物中心(钟楼店)1层',
+   'cp': ' ',
+   'direction': '东',
+   'distance': '143',
+   'name': '宜品生活(钟楼店)',
+   'parent_poi': {'addr': '陕西省西安市莲湖区西大街1号',
+    'direction': '东',
+    'distance': '212',
+    'name': '世纪金花(钟楼店)',
+    'point': {'x': 108.95160358865816, 'y': 34.26608956074118},
+    'tag': '购物;购物中心',
+    'uid': '05e2027baf3cf7105910930f'},
+   'poiType': '购物',
+   'point': {'x': 108.95218748723966, 'y': 34.26587326584458},
+   'tag': '购物;其他',
+   'tel': '',
+   'uid': '4370f9d2232f96cac51e51c3',
+   'zip': ''},
+  {'addr': '莲湖区西大街1号宜品超市附近',
+   'cp': ' ',
+   'direction': '东南',
+   'distance': '152',
+   'name': '星巴克(钟楼店)',
+   'parent_poi': {'addr': '陕西省西安市莲湖区西大街1号',
+    'direction': '东',
+    'distance': '212',
+    'name': '世纪金花(钟楼店)',
+    'point': {'x': 108.95160358865816, 'y': 34.26608956074118},
+    'tag': '购物;购物中心',
+    'uid': '05e2027baf3cf7105910930f'},
+   'poiType': '美食',
+   'point': {'x': 108.95265460610484, 'y': 34.26664148310557},
+   'tag': '美食;咖啡厅',
+   'tel': '',
+   'uid': '4eb3b5331af82e764302452f',
+   'zip': ''},
+  {'addr': '莲湖区西大街钟鼓楼广场社会路1号(德发长隔壁)',
+   'cp': ' ',
+   'direction': '东南',
+   'distance': '225',
+   'name': '锦江之星酒店(钟楼店)',
+   'parent_poi': {'addr': '',
+    'direction': '',
+    'distance': '',
+    'name': '',
+    'point': {'x': 0.0, 'y': 0.0},
+    'tag': '',
+    'uid': ''},
+   'poiType': '酒店',
+   'point': {'x': 108.95195392780705, 'y': 34.26685031764148},
+   'tag': '酒店;快捷酒店',
+   'tel': '',
+   'uid': '8fde79cc19ee3aa695ca0723',
+   'zip': ''}],
+ 'roads': [],
+ 'sematic_description': '钟楼内'},
+'status': 0}
+
 
 细心的读者可能发现，百度地图的api 有两个版本的接口，一个旧版本一个新版本（对应链接中的v2）。对于旧版本的api 请求过程中发现，似乎正逆地里编码的准确度和成功率没有新版本的高，但是免费配额用光了后居然还可以继续使用
 
 1.2 高德地图接口
-高德地图坐标拾取 
+高德地图坐标拾取
 http://lbs.amap.com/console/show/picker
-发送一个request请求，带上地理位置和api key 即可返回一个包含了经纬度str。 
+发送一个request请求，带上地理位置和api key 即可返回一个包含了经纬度str。
 地理编码接口：
 # -*- coding: utf-8 -*-
 import requests
@@ -44,18 +302,25 @@ def geocode_change_key(address,key):
     return str(answer['geocodes'][0]['location']).split(',')
 
 
+
 2. 坐标系
-谷歌地图采用的是WGS84地理坐标系（中国范围除外） 
- 谷歌中国地图、搜搜中国地图、高德地图采用的是GCJ02地理坐标系 
- 百度采用的是BD09坐标系。 
- 而设备一般包含GPS芯片或者北斗芯片获取的经纬度为WGS84地理坐标系。
+谷歌地图采用的是WGS84地理坐标系（中国范围除外）
+谷歌中国地图、搜搜中国地图、高德地图采用的是GCJ02地理坐标系
+百度采用的是BD09坐标系。
+而设备一般包含GPS芯片或者北斗芯片获取的经纬度为WGS84地理坐标系。
 所以我们要根据得到的经纬度的坐标类型和地图厂商类型在地图上标点，否则会出现获取的位置误差。为什么不统一用WGS84地理坐标系这就是国家地理测绘总局对于出版地图的要求，出版地图必须符合GCJ02坐标系标准，也就是国家规定不能直接使用WGS84地理坐标系。
 百度坐标系说明书：http://lbsyun.baidu.com/index.php?title=coordinate
 2.1 我们常说的坐标系
 
+
 WGS84：为一种大地坐标系，也是目前广泛使用的GPS全球卫星定位系统使用的坐标系。
+
+
 GCJ02：又称火星坐标系，是由中国国家测绘局制定的地理坐标系统，是由WGS84加密后得到的坐标系。
+
+
 BD09：为百度坐标系，在GCJ02坐标系基础上再次加密。其中bd09ll表示百度经纬度坐标，bd09mc表示百度墨卡托米制坐标。
+
 
 2.2 坐标转码关键代码
 # -*- coding: utf-8 -*-
@@ -191,7 +456,7 @@ def out_of_china(lng, lat):
 
 
 if __name__ == '__main__':
-
+  
     lng = 
     lat = 
     # result1 = gcj02_to_bd09(lng, lat)
@@ -204,23 +469,27 @@ if __name__ == '__main__':
     print (result4)
 
 
+
 3. geohash
 https://www.cnblogs.com/LBSer/p/3310455.html
 当geohash base32编码长度为8时，精度在19米左右，而当编码长度为9时，精度在2米左右，所以一般来说用八位就够用。
- 
- 
+
+
+3.1 python3 使用 geohash
 python3如何使用geohash呢，网上说使用pip install geohash后import geohash 会报错，当然同样的作者提供了geohash包的fix版geohash2，所以安装时候应该是：(改源码的方式有点太高大上，不太安全？)
 pip install geohash2
+
+github：https://github.com/dbarthe/geohash/
 我很纳闷的是python中能够生成geohash 的包实在是太多了：
 
- 
 
-3.1 获取包围盒
+
+3.2 获取包围盒
 可以看到7位geohash编码带上一个包围盒，相对于6位geohash编码准确许多
- 
 
-简单写了一个类，使用geohash2（作者居然没有提供），我只好复制了mzgeohash的部分代码 
-https://gitee.com/wangyaning/python/tree/master/geohash 
+
+简单写了一个类，使用geohash2（作者居然没有提供），我只好复制了mzgeohash的部分代码
+https://gitee.com/wangyaning/python/tree/master/geohash
 可以直接这么用：
 #e.g
 import geohash2
@@ -238,19 +507,23 @@ if __name__=='__main__':
     #wx4g340
     print(myTestGeohash.getneighbors('wx4g340'))
 
-输出如下：    
+
+#输出如下：    
 {'ne': 'wx4g343', 'n': 'wx4g342', 'w': 'wx4g2fp', 'c': 'wx4g340', 'sw': 'wx4g2cz', 'se': 'wx4g31c', 'nw': 'wx4g2fr', 'e': 'wx4g341', 's': 'wx4g31b'}
 
 
-测试geohash查询接口
-https://cevin.net/geohash/
+
+4.测试geohash查询接口
+https://cevin.net/geohash/（已经失效）
+上述网址已经失效，可以使用 http://geohash.org/ 测试
 
 
-结构化数据的处理
+5.结构化数据的处理入库
 爬好数据的后处理，入库
 新学了sqlldr命令，挺快，连python代码都不用写了
 sqlldr userid='username/password@serverip/instance' control=./xxx.ctl errors=99999999 rows=20000 direct=true
 data=xxxxxxx.txt
+
 xxx.ctl文件如下
 
 LOAD DATA
@@ -267,17 +540,19 @@ xxxxxx
 )
 
 
+
 部分参考文献
-简单的城市名转换成经纬度： 
+简单的城市名转换成经纬度：
 https://www.cnblogs.com/zle1992/p/7209932.html
-批量获取经纬度： 
-https://www.cnblogs.com/reboot777/p/7124010.html 
-用Python计算北京地铁的两站间最短换乘路线： 
+批量获取经纬度：
+https://www.cnblogs.com/reboot777/p/7124010.html
+用Python计算北京地铁的两站间最短换乘路线：
 http://blog.csdn.net/myjiayan/article/details/45954679
-使用爬虫获取获取所有的 站点名 
+使用爬虫获取获取所有的 站点名
 http://blog.csdn.net/wenwu_both/article/details/70168760
 高德地图地理编码服务
 http://blog.csdn.net/u013250416/article/details/71178156
-https://www.cnblogs.com/xautxuqiang/p/6241561.html 
+https://www.cnblogs.com/xautxuqiang/p/6241561.html
+
 
 

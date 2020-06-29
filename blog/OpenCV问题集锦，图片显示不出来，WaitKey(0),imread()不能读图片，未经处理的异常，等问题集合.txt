@@ -1,8 +1,5 @@
 
 
-                  					
-														
-
 
 昨天根据uc伯克利的人工图像分割文件.seg,显示图像的时候调用了OpenCV的库函数，图片都能用imwrite写好，但是imshow死活显示不出来。
 今天早上发现原来是imshow()后面应该加上：cvWaitKey(0);

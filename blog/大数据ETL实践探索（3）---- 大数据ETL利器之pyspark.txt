@@ -3,12 +3,9 @@
 
 
 
-                  					
-														
 
 
-
-文章大纲大数据ETL 系列文章简介pyspark Dataframe ETLspark dataframe 数据导入Elasticsearchdataframe 及环境初始化清洗及写入数据到Elastic search列式数据存储格式parquet参考
+文章大纲大数据ETL 系列文章简介pyspark Dataframe ETLspark dataframe 数据导入Elasticsearchdataframe 及环境初始化清洗及写入数据到Elastic searchspark SQLDataframe 操作加载大文件遍历增删改查空值处理更改dataframe 列 类型wherejoin 及聚集函数列式数据存储格式parquet参考
 
 大数据ETL 系列文章简介
 本系列文章主要针对ETL大数据处理这一典型场景，基于python语言使用Oracle、aws、Elastic search 、Spark 相关组件进行一些基本的数据导入导出实战，如：
@@ -191,6 +188,159 @@ option("es.nodes", "IP").\
 option("es.port","9002").\
 mode("Overwrite").\
 save("is/doc")
+
+
+spark SQL
+SPARK 的spark 写起来对于 经常写sql 的人来说还是很友好的
+一份代码样例如下，参考：update a dataframe column with new values
+
+
+data1 = [
+  (1, "a"),
+  (2, "b"),
+  (3, "c")
+]
+df1 = spark.createDataFrame(data1, ["id", "value"])
+
+data2 = [
+  (1, "x"), 
+  (2, "y")
+]
+
+df2 = spark.createDataFrame(data2, ["id", "value"])
+
+df1.registerTempTable('df1')
+df2.registerTempTable('df2')
+
+query = """SELECT l.id, 
+CASE WHEN r.value IS NOT NULL THEN r.value ELSE l.value END AS value 
+FROM df1 l LEFT JOIN df2 r ON l.id = r.id"""
+spark.sql(query.replace("\n", "")).show()
+
+# 样例输出
+#+---+-----+
+#| id|value|
+#+---+-----+
+#|  1|    x|
+#|  3|    c|
+#|  2|    y|
+#+---+-----+
+
+
+spark SQL 中，语句包含中文列名怎么处理呢，以下给出一个样例：
+    query = """SELECT df1.`体检ID`,df1.`体检编号`,df1.`性别`,df1.`年龄`,df1.`检查日期`,"""+str_sql_column+"""
+    CASE WHEN df2.`结果` IS NOT NULL THEN df2.`结果` ELSE df1."""+'`'+jieguo+'`'+""" END AS """+'`'+jieguo+'`'+""" ,
+    CASE WHEN df2.`异常与否` IS NOT NULL THEN df2.`异常与否` ELSE df1."""+'`'+yichangyufou+'`'+"""  END AS """+'`'+yichangyufou+'`'+""" 
+    FROM df1 LEFT JOIN df2 ON df1.`体检ID` = df2.`体检ID`"""
+
+Dataframe 操作
+http://spark.apache.org/docs/latest/api/python/pyspark.sql.html
+加载大文件
+遍历
+按行遍历
+
+# DataFrame转list
+rows=df.collect()
+cols=df.columns
+
+cols_len=len(cols)
+all_list=[]
+
+for row in rows:
+	'do your job'
+
+
+这样遍历获取到的 row 是<class ‘pyspark.sql.types.Row’> 类型。 我们可以通过 (row[key]) 获取到对应的键值。
+http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.Row
+增
+删
+改
+查
+空值处理
+dataframe 的空值可以直接使用 fillna 函数进行处理
+Replace null values, alias for na.fill(). DataFrame.fillna() and DataFrameNaFunctions.fill() are aliases of each other.
+# 计算dataframe 每一列缺失值的百分比
+from pyspark.sql import functions as F
+df.agg(*[(1-(F.count(c) /F.count('*'))).alias(c+'_missing') for c in df.columns]).show()
+
+输出：
++----------+---------------+------------------------+
+|id_missing|disease_missing|           label_missing|
++----------+---------------+------------------------+
+|       0.0|            0.0|                     0.0|
++----------+---------------+------------------------+
+
+更改dataframe 列 类型
+# 可以这么写
+from pyspark.sql.types import DoubleType
+
+changedTypedf = joindf.withColumn("label", joindf["show"].cast(DoubleType()))
+
+# 或者这么写：
+
+changedTypedf = joindf.withColumn("label", joindf["show"].cast("double"))
+
+至于每种类型怎么对应
+
+where canonical string names (other variations can be supported as well) correspond to simpleString value. So for atomic types:
+
+from pyspark.sql import types 
+
+for t in ['BinaryType', 'BooleanType', 'ByteType', 'DateType', 
+          'DecimalType', 'DoubleType', 'FloatType', 'IntegerType', 
+           'LongType', 'ShortType', 'StringType', 'TimestampType']:
+    print(f"{t}: {getattr(types, t)().simpleString()}")
+
+
+BinaryType: binary
+BooleanType: boolean
+ByteType: tinyint
+DateType: date
+DecimalType: decimal(10,0)
+DoubleType: double
+FloatType: float
+IntegerType: int
+LongType: bigint
+ShortType: smallint
+StringType: string
+TimestampType: timestamp
+
+说实话，spark 的文档 cast api 的介绍 写的还没人家这个回答好
+参考：https://stackoverflow.com/questions/32284620/how-to-change-a-dataframe-column-from-string-type-to-double-type-in-pyspark
+where
+like 操作怎么写都不对, 原来是对象的方法
+like(other)
+SQL like expression. Returns a boolean Column based on a SQL LIKE match.
+Parameters:	other – a SQL LIKE pattern
+See rlike() for a regex version
+>>>
+df.filter(df.name.like('Al%')).collect()
+[Row(age=2, name='Alice')]
+
+join 及聚集函数
+join:
+groupBy：https://spark.apache.org/docs/latest/api/python/pyspark.sql.html?highlight=groupby#pyspark.sql.DataFrame.groupby
+
+df.groupBy('name').agg({'age': 'mean'})
+
+下面给出一个 简单使用聚集函数统计 的样例代码：
+# 以下代码实现，和代码表碰撞获取代码中文名称，并统计不同项目的占比功能
+
+门诊住院分布_df = df.groupby("TYPE"
+				).agg(F.count(df.OID).alias('个数'))
+
+门诊住院分布_df =门诊住院分布_df.orderBy(F.desc("个数")
+				).join(code_lang_df,code_lang_df.SCMA_OID == 门诊住院分布_df.TYPE
+					).select(门诊住院分布_df.TYPE,门诊住院分布_df.个数,code_lang_df.CODE_DESC)
+
+门诊住院分布_pdf = 门诊住院分布_df.toPandas()
+
+门诊住院分布_pdf['比例'] = 门诊住院分布_pdf['个数']/门诊住院分布_pdf['个数'].sum()
+
+#取前十个
+门诊住院分布_pdf[0:10]
+
+
 
 
 列式数据存储格式parquet

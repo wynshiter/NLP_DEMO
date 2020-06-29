@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 #include <iostream> // for standard I/O
 #include <string>   // for strings
 #include <iomanip>  // for controlling float print precision 

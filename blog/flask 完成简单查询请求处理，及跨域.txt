@@ -1,0 +1,157 @@
+
+
+
+
+
+
+
+文章大纲flask通用项目结构flask 简介主体代码逻辑flask 跨域问题的处理flask 日志flask 微服务Flask-RESTful启动服务命令
+
+flask通用项目结构
+| - projectName
+	| - app  //程序包
+		| - templates //jinjia2模板
+		|- static //css,js 图片等静态文件
+		| - main  //py程序包 ，可以有多个这种包，每个对应不同的功能
+			| - __init__.py
+			|- errors.py
+			|- forms.py
+			|- views.py
+		|- __init__.py
+		|- email.py //邮件处理程序
+		|- models.py //数据库模型
+	|- migrations //数据迁移文件夹
+	| - tests  //单元测试
+		|- __init__.py
+		|- test*.py //单元测试程序，可以包含多个对应不同的功能点测试
+	|- venv  //虚拟环境
+	|- requirements.txt //列出了所有依赖包以及版本号，方便在其他位置生成相同的虚拟环境以及依赖
+	|- config.py //全局配置文件，配置全局变量
+	|- manage.py //启动程序
+	
+
+flask 简介
+http://docs.jinkan.org/docs/flask/quickstart.html#a-minimal-application
+主体代码逻辑
+一个最简单的查询服务样例
+
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+#-------------------------------------------------------------------------------
+'''
+@Author  :   {SEASON}
+@License :   (C) Copyright 2013-2022, {OLD_IT_WANG}
+@Contact :   {shiter@live.cn}
+@Software:   PyCharm
+@File    : 
+@Time    :   2019/4/25 14:57
+@Desc    :
+
+'''
+#-------------------------------------------------------------------------------
+
+import json
+import random
+import logging
+
+from flask import Flask
+
+from flask_sqlalchemy import SQLAlchemy
+from flask import request,Response
+from flask_cors import CORS
+
+
+log_file_str = 'shuanghe_demo.log'
+log_level = logging.INFO
+app = Flask(__name__)
+CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://username:password@ip:3306/database'
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
+db = SQLAlchemy(app)
+
+english_chinese_dict = {'id':'身份证号',
+'name':'姓名',
+'sex':'性别',
+'age':'年龄',
+}
+
+
+class neihuang_underwriting_search_result(db.Model):
+    __tablename__ = 'neihuang_underwriting_search_result'
+
+    id = db.Column(db.String(32),primary_key=True)
+    name = db.Column(db.String(32))
+    sex = db.Column(db.String(32))
+    age = db.Column(db.String(32))
+    
+
+
+    def __repr__(self):
+        return '<neihuang_underwriting_search_result %r>' % self.id
+
+def convert_to_dict(obj):
+    '''把Object对象转换成Dict对象'''
+    result_dict = {}
+    result_dict.update(obj.__dict__)
+    result_dict.pop('_sa_instance_state', None)
+    result_dict = random_value_of_labels(result_dict)
+    return result_dict
+
+
+
+
+def get_id_result(id):
+    result = neihuang_underwriting_search_result.query.filter_by(id=id).one()
+
+    result_dict = convert_to_dict(result)
+    # result_list = database_name_conversion(result_dict)
+    result_json = json.dumps(result_dict,ensure_ascii=False)
+    return result_json
+
+
+@app.route('/api/search',methods=['POST','GET'])
+def search():
+
+    #result_json  = get_id_result(id)
+    if request.method == 'GET':
+        user_id = json.loads(''.join(x for x in request.args))['id']
+        print(user_id)
+        app.logger.info(user_id + ' is search ING .......')
+        result_json  = get_id_result(user_id)
+
+    return Response(result_json)
+
+
+if __name__ == '__main__':
+
+    handler = logging.FileHandler(log_file_str, encoding='UTF-8')
+    handler.setLevel(log_level)
+    logging_format = logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
+    handler.setFormatter(logging_format)
+    app.logger.addHandler(handler)
+
+
+    app.run(debug=True, host='0.0.0.0', port=18081)
+    #放在这里是不对的
+    # CORS(app, supports_credentials=True)
+
+flask 跨域问题的处理
+在处理跨域问题时候，应该把下列代码弄成全局的，也就是放
+app = Flask(name)
+cors = CORS(app)
+否则跨域问题依然存在，报错信息为：
+Access to XMLHttpRequest at ‘-----’ from origin ‘http://localhost:63342’ has been blocked by CORS policy: Response to preflight request doesn’t pass access control check: No ‘Access-Control-Allow-Origin’ header is present on the requested resource.
+flask 日志
+https://blog.csdn.net/iszhenyu/article/details/56846551
+flask 微服务Flask-RESTful
+写完了发现
+https://flask-restful.readthedocs.io/en/latest/
+启动服务命令
+参考：https://www.cnblogs.com/zzyoucan/p/7764590.html
+nohup command > myout.file 2>&1 &
+
+
+

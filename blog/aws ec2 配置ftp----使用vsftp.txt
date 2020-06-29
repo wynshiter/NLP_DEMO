@@ -3,10 +3,9 @@
 
 
 
-                  					
-														
 
 
+文章大纲ssh登录设置并安装vsftp使用本地用户模式 配置vsftp conf编辑允许访问ftp服务器的用户列表：非受限用户启动ftp服务ec2 权限设置客户端安装与说明报错处理530 Login incorrect. Login failed.参考文献
 
 ssh登录
 pem 文件下载：
@@ -16,24 +15,46 @@ pem 文件下载：
 ssh -i "xxx.pem" ec2-user@ec2-xxx.cn-north-1.compute.amazonaws.com.cn
 
 
+
 设置并安装vsftp
-$sudo yum install vsftpd
+sudo yum install vsftpd
 
-$useradd -d /dir username 
+useradd -d /dir username 
 
-$sudo passwd username
+sudo passwd username
 
-$sudo chmod 777 /dir/upload/ -R
-配置vsftp conf
+sudo chmod 777 /dir/upload/ -R
+
+#限制用户仅能通过 FTP 访问
+#限制用户 ftpuser只能通过 FTP 访问服务器，而不能直接登录服务器：
+sudo usermod -s /sbin/nologin username
+
+#设置为用户的主目录：
+sudo usermod -d /data/ username
+
+
+#开放ftp 21 端口 或者 关闭防火墙
+#关闭SELinux服务
+setenforce 0
+#关闭防火墙
+iptables -F
+
+
+
+使用本地用户模式 配置vsftp conf
 修改vsftpd配置文件：
 
-sudo vi /etc/vsftpd.conf  
+sudo vi /etc/vsftpd/vsftpd.conf  
+
 修改后的内容如下：
+
 # Allow anonymous FTP? (Beware - allowed by default if you comment this out).
 anonymous_enable=NO
 #
 # Uncomment this to allow local users to log in.
+# When SELinux is enforcing check for SE bool ftp_home_dir
 local_enable=YES
+local_root=/your_dir
 #
 # Uncomment this to enable any form of FTP write command.
 write_enable=YES
@@ -43,69 +64,90 @@ write_enable=YES
 local_umask=022
 #
 
-
 # Activate directory messages - messages given to remote users when they
 # go into a certain directory.
 dirmessage_enable=YES
 #
-# The target log file can be vsftpd_log_file or xferlog_file.
-# This depends on setting xferlog_std_format parameter
+# Activate logging of uploads/downloads.
 xferlog_enable=YES
 #
 # Make sure PORT transfer connections originate from port 20 (ftp-data).
 connect_from_port_20=YES
+#
 
-# Switches between logging into vsftpd_log_file and xferlog_file files.
-# NO writes to vsftpd_log_file, YES to xferlog_file
+# If you want, you can have your log file in standard ftpd xferlog format.
+# Note that the default log file location is /var/log/xferlog in this case.
 xferlog_std_format=YES
+#
 
-
+# You may specify an explicit list of local users to chroot() to their home
+# directory. If chroot_local_user is YES, then this list becomes a list of
+# users to NOT chroot().
+# (Warning! chroot'ing can be very dangerous. If using chroot, make sure that
+# the user does not have write access to the top level directory within the
+# chroot)
+chroot_local_user=YES
+chroot_list_enable=YES
+# (default follows)
+chroot_list_file=/etc/vsftpd/chroot_list
+#
+# You may activate the "-R" option to the builtin ls. This is disabled by
+# default to avoid remote users being able to cause excessive I/O on large
+# sites. However, some broken FTP clients such as "ncftp" and "mirror" assume
+# the presence of the "-R" option, so there is a strong case for enabling it.
+ls_recurse_enable=YES
+#
 # When "listen" directive is enabled, vsftpd runs in standalone mode and
 # listens on IPv4 sockets. This directive cannot be used in conjunction
 # with the listen_ipv6 directive.
 listen=YES
+#
 
+# Make sure, that one of the listen options is commented !!
+#listen_ipv6=YES
 
 pam_service_name=vsftpd
 userlist_enable=YES
 tcp_wrappers=YES
-userlist_enable=YES
+
+#############
 userlist_deny=NO
 userlist_file=/etc/vsftpd/user_list
-#只有写入vsftpd.chroot_list的帐户不被chroot
-chroot_local_user=YES
-chroot_list_enable=YES
-#vsftpd.chroot_list需要手动建立
-chroot_list_file=/etc/vsftpd/chroot_list
-#允许文本模式下载
+
+##vsftpd.chroot_list需要手动建立
+##允许文本模式下载
 ascii_download_enable=YES
-#允许文本模式上传
+##允许文本模式上传
 ascii_upload_enable=YES
-#允许文本模式下载
-ascii_download_enable=YES
-#允许文本模式上传
-ascii_upload_enable=YES
-#启用被动模式
+
+
+##启用被动模式
 pasv_enable=YES
 pasv_promiscuous=YES
 pasv_min_port=60000
 pasv_max_port=60020
+
+
 由于该配置使用了被动模式，所以需要在linux防火墙配置中，开放路由器转发端口
 
 sudo iptables -A INPUT -p tcp --dport 60000:60020 -j ACCEPT
 
+
 编辑允许访问ftp服务器的用户列表：
 sudo vi /etc/vsftpd/user_list  
+
 把不需要的注释掉，最后加上一行ftpUserName
 非受限用户
 凡是加在文件vsftpd/chroot_list中的用户都是不受限止的用户,即, 可以浏览其主目录的上级目录。在这里默认为空：
 sudo vi /etc/vsftpd/chroot_list 
+
 直接保存退出
 启动ftp服务
 sudo service vsftpd start  
+
 ec2 权限设置
 最后，需要在EC2控制台中设置Security Group，增加ftp所需端口
-20，21以及60000-60020 
+20，21以及60000-60020
 
 客户端安装与说明
 https://filezilla-project.org/
@@ -125,13 +167,44 @@ local: test.txt remote: test.txt
 425 Failed to establish connection.
 ftp> bye
 421 Timeout.
-有可能是windows 本地防火墙的问题，可以关闭防火墙 
-或者首先使用被动模式 
+
+有可能是windows 本地防火墙的问题，可以关闭防火墙
+或者首先使用被动模式
 quote PASV
 解决问题的思路如下：
 1、防火墙（本机、客户机）
 2、FTP目录的权限
 3、客户机是否是IPv6网络
-4、客户机的网关限制了外网ftp 
+4、客户机的网关限制了外网ftp
+
+报错处理
+530 Login incorrect. Login failed.
+在客户端登录vsftpd时报530 login incorret 错误，发现是PAM鉴权造成的，解决方法如下：
+方法（1）：注释掉/etc/pam.d/vsftpd文件里这后一行：
+auth    required        pam_shells.so，这样不去鉴权
+方法（2）：在/etc/shells文件里面增加一行：
+/sbin/nologin,这样允许不能登录系统的用户通过鉴权
+按照方法（1）操作
+
+#备份：
+
+cp /etc/pam.d/vsftpd /etc/pam.d/vsftpd.bak
+
+#修改：
+
+vim /etc/pam.d/vsftpd
+
+#注释掉以下这一行：
+
+#auth   required        pam_shells.so
+
+#然后再次登陆，就可以了。
+
+
+
+参考文献
+userlist_enable和userlist_deny两个配置项的解释
+Linux_vsftpd服务安装及配置（三种登陆方式）
+
 
 

@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 首先,我们知道VC的三种Dll分别是
 1.non_MFC Dll
 2.MFC Regular Dll

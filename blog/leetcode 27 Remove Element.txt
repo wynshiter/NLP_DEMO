@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 ﻿﻿
 Remove Element 
 Total Accepted: 60351 

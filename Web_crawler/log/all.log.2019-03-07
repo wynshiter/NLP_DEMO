@@ -1,9 +1,0 @@
-2019-03-07 16:30:54,087 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:228] - DEBUG: debug
-2019-03-07 16:30:54,087 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:229] - INFO: info
-2019-03-07 16:30:54,088 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - WARNING: 警告
-2019-03-07 16:30:54,088 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:231] - ERROR: 报错
-2019-03-07 16:30:54,088 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:232] - CRITICAL: 严重
-2019-03-07 16:41:02,924 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:236] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2019-03-07 16:41:19,649 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:254] - DEBUG: 获取所有博客链接完成
-2019-03-07 16:51:47,735 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:263] - DEBUG: 获取所有博客内容完成
-2019-03-07 16:51:56,135 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:277] - DEBUG: 获取所有博客内容完成

@@ -2,12 +2,6 @@
 
 
 
-
-                  					
-														
-
-
-
 Remove Duplicates from Sorted ArrayTotal Accepted:
 66627 Total Submissions:
 212739 

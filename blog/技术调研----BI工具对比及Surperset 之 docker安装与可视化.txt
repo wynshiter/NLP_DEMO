@@ -1,7 +1,7 @@
 
 
-                  					
-														
+
+
 
 
 
@@ -199,10 +199,20 @@ chmod 777 (superset的当前目录及上一级目录)
 2.3 使用其他人制作好的docker
 还是用别人搞好的吧，参考：
 https://www.jianshu.com/p/d5978b439080
+首先搜索并下载一个别人搞好的docker 文件
+docker search superset
+# 指定版本
+docker pull amancevice/superset:0.20.0
+# 拉去最新版
+docker pull amancevice/superset
+
 命令如下
 # 0e9131be7e49    为docker ps 中的id
 # 先建一个/data文件夹方便映射
 docker run -d -p 8088:8088 -v /data:/home/superset amancevice/superset:0.28.1
+# 或者不指定版本
+docker run -d -p 8088:8088 -v /data:/home/superset amancevice/superset
+
 
 docker exec -it 0e9131be7e49  fabmanager create-admin --app superset
 docker exec -it 0e9131be7e49  superset db upgrade

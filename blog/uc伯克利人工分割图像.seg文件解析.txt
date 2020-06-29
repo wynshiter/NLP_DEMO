@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 之前看到
 ﻿﻿
 http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/segbench/

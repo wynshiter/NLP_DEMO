@@ -3,12 +3,6 @@
 
 
 
-                  					
-														
-
-
-
-
 ﻿﻿
 
 1.Intel Parallel Studio 环境下的并行程序设计

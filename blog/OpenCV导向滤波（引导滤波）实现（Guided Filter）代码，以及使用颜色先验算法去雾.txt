@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
  论文下载地址：http://research.microsoft.com/en-us/um/people/jiansun/papers/GuidedFilter_ECCV10.pdf
 本文主要介绍导向滤波，但是在网上看这算法还能去雾，不知道是具体是怎么利用导向滤波实现去雾的，希望过来人指点迷津，这块主要是重写了导向滤波应用于彩色图像的部分代码，希望与大家共同交流。
  

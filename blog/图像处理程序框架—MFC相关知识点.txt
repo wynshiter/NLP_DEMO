@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 CDC：Windows使用与设备无关的图形设备环境(DC :Device Context) 进行显示 。
 MFC基础类库定义了设备环境对象类----CDC类。  CDC与CGdiObject的关系  说道CDC类就不能不提一下GdiObject---图形对象类。 在Windows应用程序中，设备环境与图形对象共同工作，协同完成绘图显示工作。就像画家绘画一样，设备环境好比是画家的画布，图形对象好比是画家的画笔。用画笔在画布上绘画，不同的画笔将画出不同的画来。选择合适的图形对象和绘图对象，才能按照要求完成绘图任务。  有关CDC类的继承
   父类：从 CObject 直接继承而来。继承了CObject类的各种特性，如动态创建等等。  子类：CClientDC-------代表操作窗口的DC ，是比较常用的一个子类  CMetaFileDC ------响应Meta File的DC ，Meta File是一些GDI消息。  CPaintDC-------响应WM_PAINT消息的DC。  CWindowDC ------代表整个屏幕的DC

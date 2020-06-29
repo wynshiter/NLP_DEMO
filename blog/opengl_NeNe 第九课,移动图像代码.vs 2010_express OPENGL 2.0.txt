@@ -1,8 +1,5 @@
 
 
-                  					
-														
-
 
 // NeNe_lesson_object.cpp : Defines the entry point for the console application.
 //

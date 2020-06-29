@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 2012-4-23
 2.The Fingerprint Contrast and Analysis System
 3.参照书上代码将程序背景图片处理好。

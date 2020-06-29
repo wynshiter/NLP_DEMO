@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 代码如下：
 #include "stdafx.h"
 #include "stdlib.h"

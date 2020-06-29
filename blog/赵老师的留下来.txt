@@ -23,7 +23,9 @@
 人对狗的口令得让人容易学、也得让狗容易懂。
 C语言同样得让人容易学、也得让电脑容易懂。
 相比之下C++、Java就是人学得费劲、电脑也经常闹不懂。
-毛主席说：“决定战争胜负的关键因素是人不是武器。”
+说：“决定战争胜负的关键因素是人不是武器。”
+
+
 不要使用
 while (条件)
 更不要使用
@@ -90,6 +92,7 @@ scanf里面的%和变量以及变量前加不加&的一一对应关系
  
  
  
+
 #include <iostream>
 #include <string>
 using namespace std;
@@ -297,6 +300,7 @@ int main() {
  
  
 写日志文件：
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -399,6 +403,8 @@ int main(int argc,char * argv[]) {
 
 
 控制台输出中文：
+ 
+
 #pragma comment(lib,"user32")
 #pragma comment(lib,"gdi32")
 #include <stdio.h>
@@ -471,5 +477,9 @@ int main() {
 }
 
  
-            
+
+ 
+ 
+ 
+
 

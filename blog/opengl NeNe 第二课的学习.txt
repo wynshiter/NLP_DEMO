@@ -1,12 +1,6 @@
 
 
 
-
-
-                  					
-														
-
-
 编译环境:Microsoft Visual c++ 2010 Express
  
 将上一课中的代码做如下修改:
