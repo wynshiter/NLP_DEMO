@@ -5,7 +5,7 @@
 
 
 
-文章大纲1. 探索性数据分析代码样例效果解决pandas profile 中文显示的问题
+文章大纲1. 探索性数据分析2.代码样例3.效果4.解决pandas profile 中文显示的问题
 
 1. 探索性数据分析
 数据的筛选、重组、结构化、预处理等都属于探索性数据分析的范畴，探索性数据分析是帮助数据分析师掌握数据结构的重要工具，也是奠定后续工作的成功基石。
@@ -22,7 +22,7 @@ Correlations highlighting of highly correlated variables, Spearman, Pearson and 
 Missing values matrix, count, heatmap and dendrogram of missing values
 官网：https://github.com/pandas-profiling/pandas-profiling
 
-代码样例
+2.代码样例
 一个完整的样例：
 https://nbviewer.jupyter.org/github/lksfr/TowardsDataScience/blob/master/pandas-profiling.ipynb
 # importing required packages
@@ -38,13 +38,13 @@ profile = pandas_profiling.ProfileReport(tijian_pdf)
 profile.to_file("output_tijian_chinese.html")
 
 
-效果
+3.效果
 样例链接：https://pandas-profiling.github.io/pandas-profiling/examples/meteorites/meteorites_report.html
 
 在使用过程中发现，中文显示有问题，下面这块应该是调用seaborn 完成的。我们从源码配置文件可以看到
 
 
-解决pandas profile 中文显示的问题
+4.解决pandas profile 中文显示的问题
 我们找到 pandas porfile 的配置文件，在conda 的环境中：
 路径为：
 D:\ProgramData\Anaconda3\envs\DATABASE\Lib\site-packages\pandas_profiling\view

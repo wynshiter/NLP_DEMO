@@ -5,8 +5,6 @@
 
 
 
-文章大纲简介TensorFlow 2.0 升级的主要内容升级的主要内容1. API  清理2. Eager execution3. 没有更多的全局变量4. Functions, not sessions如何升级代码参考文档官方基础性材料TensorFlow 2.0 相关资料
-简介
-TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开源软件库。节点（Nodes）在图中表示数学操作，图中的线（edges）则表示在节点间相互联系的多维数据数组，即张量（tensor）。它灵活的架构让你可以在多种平台上展开计算，例如台式计算机中的一个或多个CPU（或GPU），服务器，移动设备等等。TensorFlow 最初由Google大脑小组 
+文章大纲简介基本概念张量计算图自动微分基本操作数据加载TensorFlow 2.0 升级的主要内容升级的主要内容1. API  清理2. Eager execution3. 没有更多的全局变量4. Functions, not sessions如何升级代码参考文档官方基础性材料 
 
 

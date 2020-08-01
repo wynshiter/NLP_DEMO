@@ -1,0 +1,10 @@
+
+
+
+
+
+
+
+文章大纲numpywhat is numpyArray objectTricks and TipspandasWhat kind of data does pandas handle?常见问题与使用技巧索引与sql 的类比参考本人文章sklearn机器学习的正确解决路径处理文本数据特征抽取常见问题与实用技巧 
+
+

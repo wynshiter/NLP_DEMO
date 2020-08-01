@@ -13,7 +13,6 @@ Python2 和python3 是一个神一般的存在，如何让他们共存呢，直�
 插播一个广告，想修改pycharm中python注释的颜色找了半天居然得这么搞：
 
 当大家搜索如何在系统中混合使用python2和python3，国内网站经常会让大家把其中一个python.exe改个名字，这样区分开两个可执行文件的名字，但是这样做有一个重大的隐患，就是修改了名字的那个python对应的pip将无法使用。有时候还是需要用用命令行的，怎么办？
-
 官方用法为： 
 　　在安装Python3（>=3.3）时，Python的安装包实际上在系统中安装了一个启动器py.exe，默认放置在文件夹C:\Windows\下面。这个启动器允许我们指定使用Python2还是Python3来运行代码（当然前提是你已经成功安装了Python2和Python3）。 
 　　 
@@ -67,7 +66,6 @@ py -3 -m pip install XXXX
 　　有了这些技巧，Python2和Python3就可以愉快地在一起玩耍了～ 
 　　 
 　　Python标准：https://www.python.org/dev/peps/pep-0397/
-
 信息检索概述
 信息检索是当前应用十分广泛的一种技术，论文检索、搜索引擎都属于信息检索的范畴。通常，人们把信息检索问题抽象为：在文档集合D上，对于由关键词w[1] … w[k]组成的查询串q，返回一个按查询q和文档d匹配度 relevance (q, d)排序的相关文档列表D。
 对于这一基问题，先后出现了布尔模型、向量模型等各种经典的信息检索模型，它们从不同的角度提出了自己的一套解决方案。
@@ -80,27 +78,18 @@ Tf-idf算法公式以及说明:
 
 具体实现如下所示，公式分成两项，词频*逆词频，逆词频取log值。
 
- 
 注意分母中的+1，在很多文献中并没有出现，这个可能引发异常。
 本人写了一份代码近期正在修改，后续传到github 上，再贴出来。文章末尾贴出了两份我认为比较好的代码，一份是面向对象的实现一份是分布式的。
 tfidf源代码实现及相关博客资料：
-python scikit-learn计算tf-idf词语权重（scikit-learn包中提供了tfidf的矩阵实现，缺点是词数量过大可能溢出） 
-http://www.tuicool.com/articles/U3uiiu
-http://www.cnblogs.com/chenbjin/p/3851165.html 
-http://blog.csdn.net/liuxuejiang158blog/article/details/31360765?utm_source=tuicool&utm_medium=referral 
-http://blog.csdn.net/lsldd/article/details/41520953 
-http://blog.csdn.net/zhb_bupt/article/details/40985831 
-http://www.tuicool.com/articles/feIji2
+python scikit-learn计算tf-idf词语权重（scikit-learn包中提供了tfidf的矩阵实现，缺点是词数量过大可能溢出） http://www.tuicool.com/articles/U3uiiu
+http://www.cnblogs.com/chenbjin/p/3851165.html http://blog.csdn.net/liuxuejiang158blog/article/details/31360765?utm_source=tuicool&utm_medium=referral http://blog.csdn.net/lsldd/article/details/41520953 http://blog.csdn.net/zhb_bupt/article/details/40985831 http://www.tuicool.com/articles/feIji2
 参考文献
-
 http://www.ruanyifeng.com/blog/2013/03/tf-idf.html
 https://news.cnblogs.com/n/161240/ （tf-idf的概率解释）
 https://www.python.org/dev/peps/pep-0397/  （python不同版本共存官方文档）
 http://mt.sohu.com/20160416/n444499895.shtml （python版本混用中文翻译）
-
 github代码：
-https://github.com/mirsamantajbakhsh/TFIDF 
-https://github.com/laertispappas/mapreduce_python 
+https://github.com/mirsamantajbakhsh/TFIDF https://github.com/laertispappas/mapreduce_python 
 (分布式版本) 
 
 

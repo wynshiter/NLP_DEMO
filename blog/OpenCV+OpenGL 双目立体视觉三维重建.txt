@@ -13,7 +13,6 @@
 由双目立体视觉进行三位重建的第一步是立体匹配，通过寻找两幅图像中的对应点获取视差。OpenCV 中的features2d库中包含了很多常用的算法，其中特征点定位的算法有FAST, SIFT, SURF ,MSER, HARRIS等，特征点描述算法有SURF, SIFT等，还有若干种特征点匹配算法。这三个步骤的算法可以任选其一，自由组合，非常方便。经过实验，选择了一种速度、特征点数量和精度都比较好的组合方案：FAST角点检测算法+SURF特征描述子+FLANN(Fast Library for Approximate Nearest Neighbors) 匹配算法。
 在匹配过程中需要有一些措施来过滤误匹配。一种比较常用的方法是比较第一匹配结果和第二匹配结果的得分差距是否足够大，这种方法可以过滤掉一些由于相似造成的误匹配。还有一种方法是利用已经找到的匹配点，使用RANSAC算法求得两幅视图之间的单应矩阵，然后将左视图中的坐标P用单应矩阵映射到右视图的Q点，观察与匹配结果Q’的欧氏距离是否足够小。当然由于图像是具有深度的，Q与Q’必定会有差距，因此距离阈值可以设置的稍微宽松一些。我使用了这两种过滤方法。
 另外，由于图像有些部分的纹理较多，有些地方则没有什么纹理，造成特征点疏密分布不均匀，影响最终重建的效果，因此我还采取了一个措施：限制特征点不能取的太密。如果新加入的特征点与已有的某一特征点距离太小，就舍弃之。最终匹配结果如下图所示，精度和均匀程度都较好。 
-
 代码：
 // choose the corresponding points in the stereo images for 3d reconstruction
 void GetPair( Mat &imgL, Mat &imgR, vector<Point2f> &ptsL, vector<Point2f> &ptsR ) 
@@ -92,7 +91,6 @@ void GetPair( Mat &imgL, Mat &imgR, vector<Point2f> &ptsL, vector<Point2f> &ptsR
     waitKey();
 }
 p.s. 源代码中的基于特征点的视差计算有点问题，还在调试中，希望有经验的大牛共同解决一下。
-
 最新回复，特别鸣谢大神：G3fire(update 20180718)
 代码在opencv2.4.9版本下运行的，由于SIFT和SURF的专利约束需要nofree的引用.
 
@@ -103,19 +101,15 @@ p.s. 源代码中的基于特征点的视差计算有点问题，还在调试中
 就可以运行基于特征点的视差计算了 
 
 楼24的修改特征点检测的创建方法没有运行通
-
 特别感谢24楼的回复
 博主的特征点匹配这边运行时会崩溃，我用VS2013+opencv2.4.10版本，然后修改特征点检测的创建方法就可以用了。
 例如：
 SurfFeatureDetector detector;
 detector.detect(imgL1, keypointsL); 
 detector.detect(imgR1, keypointsR);
-
 1.2基于块匹配的视差计算
 上面提取特征点的过程中实际上忽略了一个辅助信息：对应点应当是取在对应极线上的一个区间内的。利用这个信息可以大幅简化对应点的匹配，事实上只要用L1距离对一个像素周围的block计算匹配距离就可以了，也就是OpenCV中实现的块匹配算法的基本思路。比起特征点匹配，这是一种“稠密”的匹配算法，精度也可以接受。下图中浅色表示视差较大，对应深度较浅。左侧有一块区域是左右视图不相交的部分，因此无法计算视差。 
- 
 可以发现视差计算结果中有很多噪声。事实上在纹理平滑的区域，还有左右视图中不同遮挡的区域，是很难计算视差的。因此我利用最近邻插值和数学形态学平滑的方法对视差图进行了修复（见cvFuncs2.cpp中的FixDisparity函数）： 
-
 // roughly smooth the glitches on the disparity map
 void FixDisparity( Mat_<float> & disp, int numberOfDisparities ) 
 {
@@ -140,13 +134,10 @@ void FixDisparity( Mat_<float> & disp, int numberOfDisparities )
 对应点的选取 
 上面提到，为了获得较好的重构效果，特征点最好取在深度变化较大的区域。基于这种猜想，我首先对上面的视差图求梯度，然后找到梯度最大的点，观察梯度的方向，如果是偏x方向，就在该点左右若干像素各取一个点；否则就在上下若干像素各取一个点。然后根据这两个点的视差值就可以计算出另外一个视图中的对应点的坐标。特征点还不能分布过密，因此我取完一对特征点后，将其周围一圈像素的梯度置零，然后在寻找下一个梯度最大值，这样一直下去，直到取够特征点数。 
 特征点也不能全取在深度变化剧烈的区域，在平坦的区域也可以取一些。最终我取的特征点如下图： 
- 
 其中紫色的点是在较平坦的区域取到的，其他颜色是在边界区域取到的。这些算法实现在ChooseKeyPointsBM函数中。
 2.计算世界坐标
 一般双目立体视觉中使用的实验图像都是经过外极线矫正的，计算3D坐标也比较方便，其实利用外极线约束（以及其他的约束条件）可以极大的降低立体匹配的计算量。见下图： 
- 
 如果(x1,y1),(x2,y2)用各自图像上的像素坐标表示，L和(X,Y,Z)用毫米表示，f用像素表示的话，用相似三角形的知识就可以推出： 
- 
 其中W和H是图像的宽高（像素数），y是y1和y2的均值，Z加负号是为了保持右手坐标系，而Y加负号是由于图像成像过程中上下发生了倒转。三维世界原点取为左摄像机的焦点。计算的代码见cvFunc.cpp中的StereoTo3D函数。
  // calculate 3d coordinates.
 // for rectified stereos: pointLeft.y == pointRight.y
@@ -214,9 +205,9 @@ void StereoTo3D( vector<Point2f> ptsL, vector<Point2f> ptsR, vector<Point3f> &pt
 3.三角剖分
 3.1 三角剖分简介
 三角剖分是为了之后的纹理贴图，我用了OpenCV中的Delaunay三角剖分函数，这种剖分算法的可以使所形成的三角形的最小角最大。剖分的示例如下：
- 
+
 OpenCV使用Delaunay算法将平面分割成小的三角形区域（该三角形确保包括所有的分割点）开始不断迭代完成。在这种情况下，对偶划分就是输入的二维点集的Voronoi图表。这种划分可以用于对一个平面进行三维分段变换、形态变换、平面点的快速 定位以及建立特定的图结构（如NNG,RNG）。
- 
+
 同时由表可以看出，三角网生成法的时间效率最低，分治算法的时间效率最高，逐点插入法效率居中。
 3.2 Bowyer-Watson算法
 目前采用逐点插入方式生成的Delaunay三角网的算法主要基于Bowyer-Watson算法，Bowyer-Watson算法的主要步骤如下：
@@ -225,7 +216,6 @@ OpenCV使用Delaunay算法将平面分割成小的三角形区域（该三角形
 3）删除辅助窗口R:重复步骤2）,当点集V中所有点都已经插入到三角形网格中后，将顶点包含辅助窗口R的三角形全部删除。
 在这些步骤中，快速定位点所在的三角形、确定点的影响并构建Delaunay腔的过程是每插入一个点都会进行的。随着点数的增加，三角形数目增加很快，因此缩短这两个过程的计算时间，是提高算法效率的关键。 
 算法执行图示如下： 
-
 3.3 三角剖分代码分析
 三角剖分的代码见cvFuncs.cpp中的TriSubDiv函数，我将特征点存储到一个vector变量中，剖分结果存储到一个vector变量中，Vec3i中存储的是3个表示顶点编号的整数。
 我们需要存储Delaunay的内存空间和一个外接矩形（该矩形盒子用来确定虚拟三角形）
@@ -448,15 +438,11 @@ Cloth图像是重构效果比较好的一组：
 参考文献：
 
 立体匹配原理：
-http://blog.csdn.net/wangyaninglm/article/details/51533549 
-http://blog.csdn.net/wangyaninglm/article/details/51531333 
+http://blog.csdn.net/wangyaninglm/article/details/51533549 http://blog.csdn.net/wangyaninglm/article/details/51531333 
   三维重建原理：
-http://blog.csdn.net/wangyaninglm/article/details/51558656 
-http://blog.csdn.net/wangyaninglm/article/details/51558310 
+http://blog.csdn.net/wangyaninglm/article/details/51558656 http://blog.csdn.net/wangyaninglm/article/details/51558310 
   三角剖分原理：
-http://blog.csdn.net/newthinker_wei/article/details/45598769 
-http://www.learnopencv.com/delaunay-triangulation-and-voronoi-diagram-using-opencv-c-python/ 
-这篇文章其实主要是针对早期下到的一个代码和文档的总结，和一些个人资料的总结，由于时间比较早，找不到出处了，如果原作者看到了觉的不妥，那我就把它改成转载啦，嘿嘿嘿。
+http://blog.csdn.net/newthinker_wei/article/details/45598769 http://www.learnopencv.com/delaunay-triangulation-and-voronoi-diagram-using-opencv-c-python/ 这篇文章其实主要是针对早期下到的一个代码和文档的总结，和一些个人资料的总结，由于时间比较早，找不到出处了，如果原作者看到了觉的不妥，那我就把它改成转载啦，嘿嘿嘿。
 
 代码下载
 

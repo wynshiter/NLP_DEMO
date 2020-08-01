@@ -1,0 +1,16 @@
+2020-07-30 09:35:18,742 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2020-07-30 09:35:27,815 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:248] - DEBUG: 获取所有博客链接完成
+2020-07-30 09:42:31,338 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:257] - DEBUG: 获取所有博客内容完成
+2020-07-30 09:42:33,213 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:271] - DEBUG: 博客内容入库完成
+2020-07-30 10:25:34,827 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2020-07-30 10:25:42,537 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:248] - DEBUG: 获取所有博客链接完成
+2020-07-30 10:32:23,402 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:257] - DEBUG: 获取所有博客内容完成
+2020-07-30 10:32:24,434 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:271] - DEBUG: 博客内容入库完成
+2020-07-30 15:06:08,676 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2020-07-30 15:06:15,905 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:248] - DEBUG: 获取所有博客链接完成
+2020-07-30 15:13:49,901 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:257] - DEBUG: 获取所有博客内容完成
+2020-07-30 15:13:50,644 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:271] - DEBUG: 博客内容入库完成
+2020-07-30 15:52:59,459 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2020-07-30 15:53:06,547 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:248] - DEBUG: 获取所有博客链接完成
+2020-07-30 15:59:09,760 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:257] - DEBUG: 获取所有博客内容完成
+2020-07-30 15:59:10,439 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:271] - DEBUG: 博客内容入库完成
