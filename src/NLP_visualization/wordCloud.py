@@ -94,7 +94,7 @@ def show_WordCloud(stop_words,top_word,img_name,str_font_path):
     # wordlist_after_jieba = jieba.cut(str_all, cut_all=True)
     # wl_space_split = " ".join(wordlist_after_jieba)
     my_wordcloud = WordCloud(background_color = "white",width = 1000,height = 860,font_path = str_font_path,
-                # 不加这一句显示口字形乱码
+                # 设置中文字体
                 margin = 2,
     max_words=150, # 设置最大现实的字数
     stopwords=stop_words,# 设置停用词

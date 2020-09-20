@@ -12,7 +12,7 @@ import file_operator
 
 import  jieba
 import pandas as pd
-file_path = r'..\blog'
+file_path = r'..\..\blog'
 file_list = file_operator.all_Absolute_pathfile_name(file_path,'.txt')
 
 
@@ -44,7 +44,7 @@ tf = tf_vectorizer.fit_transform(data.content_cutted)
 
 from sklearn.decomposition import LatentDirichletAllocation
 
-n_topics = 5
+n_topics = 10
 
 lda = LatentDirichletAllocation(n_components=n_topics, max_iter=50,
                                 learning_method='online',
@@ -58,7 +58,14 @@ lda = LatentDirichletAllocation(n_components=n_topics, max_iter=50,
 
 
 lda.fit(tf)
+#显示主题数 model.topic_word_
+print(lda.components_)
+#几个主题就是几行 多少个关键词就是几列
+print(lda.components_.shape)
 
+#计算困惑度
+print(u'困惑度：')
+print(lda.perplexity(tf,sub_sampling = False))
 #
 def print_top_words(model, feature_names, n_top_words):
     for topic_idx, topic in enumerate(model.components_):
