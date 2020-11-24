@@ -25,12 +25,12 @@ import matplotlib.pyplot as plt
 num=20
 G=nx.Graph()
 
-plt.figure(figsize=(20,14))
+plt.figure(figsize=(100,70))
 plt.rcParams['axes.unicode_minus'] = False    # 用来正常显示负号
 plt.rcParams['font.sans-serif'] = ['SimHei']   # 用来正常显示中文标签
 
 # 读取文件
-fn = open(r'../../blog/50.txt',encoding='utf-8') # 打开文件
+fn = open(r'../../blog/1000.txt',encoding='utf-8') # 打开文件
 string_data = fn.read() # 读出整个文件
 fn.close() # 关闭文件
 
@@ -125,8 +125,8 @@ print(G.edges())
 
 print('开始进行绘制--------------')
 
-my_width = [float(v['weight'] / 10) for (r, c, v) in G.edges(data=True)]
-my_node_size=[float(net.iloc[i, i] * 6) for i in np.arange(num)]
+my_width = [float(v['weight'] / 3) for (r, c, v) in G.edges(data=True)]
+my_node_size=[float(net.iloc[i, i] * 1) for i in np.arange(num)]
 
 print(my_node_size)
 print(len(my_width))
@@ -140,9 +140,9 @@ nx.draw_networkx(G,
                     edge_color='orange',
                     # 根据词出现的次数，设置点的大小
                     node_size=my_node_size,
-                    node_color='white'
+                    node_color='black'
                     )
 #plt.axis('off')
 #plt.title('助攻表现（常规赛）',fontstyle='oblique')
-plt.savefig('test2.png')
+plt.savefig('test3.png')
 #plt.show()
