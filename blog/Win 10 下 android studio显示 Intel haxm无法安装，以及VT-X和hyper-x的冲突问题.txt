@@ -1,14 +1,27 @@
 
 
 
+
     
 
+
+ 
+
+
       我 的电脑是神舟战神k650c i7 D4，处理器是Intel core i7 4710-MQ，系统是win 10的
+
+
 我心血来潮想学习一下安卓开发，就首先安装了android studio，但是启动安卓模拟器时候，提示说 intel 的haxm没有安装，但是我在SDK manager 里面没有发现有下载的选项，就在官网：
+
+
 
 https://software.intel.com/en-us/android/articles/intel-hardware-accelerated-execution-manager
 
+
+
 下载，完后安装，但是出现了一系列问题，那我们就来好好探究一下。
+
+
 安装时候提示：
 
 
@@ -16,43 +29,122 @@ https://software.intel.com/en-us/android/articles/intel-hardware-accelerated-exe
 
 
 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
 注意：
+
+
 我 的机器，win 10 的hyer-x是开着的，啥时候开的我也忘了
+
+
 （Hyer-V是一个微软的虚拟机，部署在win 8.x 64位 pro以上版本中，和Windows 2008以上服务器的版本中）
+
+
 http://www.jb51.net/os/Windows8/105220.html）
 
+
+ 
+
+
 此时，用检测软件，http://securable.en.softonic.com/
+
+
+ 
+
 
 惊讶发现啊，我的i7处理器虚拟化没有开启。后面我修好后才截图的，所以网上找的图，除了处理器型号不一样其他都一样：
 
 
+ 
+
+
+ 
+
+
+ 
+
+
+ 
 
 
 当然，没开虚拟化，intel 的haxm就没法装，我就准备进bios开启，结果一进去瞎了，没这个选项，结果准备刷bios，其实各位，神舟的这款机器VT-x 的选项就是默认开启的，根本不用开，按照网上的帖子就去就瞎了：
+
+
 
 http://jingyan.baidu.com/article/60ccbceb61272d64cab1972f.html（如何开启处理器vt虚拟化功能）
 
 
 
+ 
+
+
+ 
+
+
 最牛逼的莫过于这位仁兄：把intel 的文档都翻了个底朝天：
+
+
 
 http://www.crifan.com/adt_haxm_xd_not_supported_this_computer_does_not_support_intel_execute_disable_bit_xd_or_it_is_disable_in_the_bios/comment-page-1/
 
 
+
+ 
+
+
 看到这个帖子后，我恍然大悟，这两个虚拟化技术方案存在冲突啊：
 
+
+
 http://jingyan.baidu.com/article/c74d60006edd7c0f6a595d22.html
+
+
 
 
 http://blog.sharechiwai.com/2015/01/vt-not-supported-this-computer-does-not-support-intel-virtualization-tech-nology-vt0x-haxm-cannot-be-installed/
 
 
+
+ 
+
+
 于是在系统中关闭hyer-x，重新检测：ok 一切正常，完后安装haxm，启动虚拟机，一切步入正轨
 
 
+ 
+
+
+ 
+
+
+ 
+
+
+ 
 
 
 我们都熟悉的：hello world！
+
+
+ 
+
+
+ 
+
+
+
 
 
 

@@ -32,11 +32,9 @@ opencv_stitching244.lib
 opencv_video244.lib
 opencv_videostab244.lib
 Zlib.lib
-
- 
+  
 可能还需要给代码上添加以下内容：
-#pragma   comment(lib,   "vfw32.lib ")
-#pragma comment (lib , "comctl32.lib")
+#pragma   comment(lib,   "vfw32.lib ") #pragma comment (lib , "comctl32.lib")
  
 3.在c/c++ --》代码生成--》运行库，选择，多线程/MT，即为静态库编译
  

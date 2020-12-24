@@ -57,7 +57,6 @@ Graph Cut方法是基于颜色统计采样的方法，因此对前背景相差�
  
 grabcut代码：
  
-
 // Grabcut.cpp : 定义控制台应用程序的入口点。
 //
 
@@ -415,10 +414,8 @@ exit_main:
 	return 0;
 }
 
-
- lazy snapping代码实现：
+  lazy snapping代码实现：
  
-
 // LazySnapping.cpp : 定义控制台应用程序的入口点。
 //
 /* author: zhijie Lee
@@ -816,8 +813,7 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-
- 
+  
  
  
  
@@ -833,5 +829,6 @@ int main(int argc, char** argv)
  
 转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
 来自：shiter编写程序的艺术
-  
+ 
+
 

@@ -7,500 +7,269 @@ http://blog.csdn.net/zouxy09
 
 注：下面有project网站的大部分都有paper和相应的code。Code一般是C/C++或者Matlab代码。
 最近一次更新：2013-3-17
-
+ 
 一、特征提取Feature Extraction：
-·         
-SIFT [1] [Demo program][SIFT
- Library] [VLFeat]
-·         
-PCA-SIFT [2] [Project]
-·         
-Affine-SIFT [3] [Project]
-·         
-SURF [4] [OpenSURF] [Matlab
- Wrapper]
-·         
-Affine Covariant Features [5] [Oxford project]
-·         
-MSER [6] [Oxford project] [VLFeat]
-·         
-Geometric Blur [7] [Code]
-·         
-Local Self-Similarity Descriptor [8] [Oxford implementation]
-·         
-Global and Efficient Self-Similarity [9] [Code]
-·         
-Histogram of Oriented Graidents [10] [INRIA Object Localization Toolkit] [OLT
- toolkit for Windows]
-·         
-GIST [11] [Project]
-·         
-Shape Context [12] [Project]
-·         
-Color Descriptor [13] [Project]
-·         
-Pyramids of Histograms of Oriented Gradients [Code]
-·         
-Space-Time Interest Points (STIP) [14][Project] [Code]
-·         
-Boundary Preserving Dense Local Regions [15][Project]
-·         
-Weighted Histogram[Code]
-·         
-Histogram-based Interest Points Detectors[Paper][Code]
-·         
-An OpenCV - C++ implementation of Local Self Similarity Descriptors [Project]
-·         
-Fast Sparse Representation with Prototypes[Project]
-·         
-Corner Detection [Project]
-·         
-AGAST Corner Detector: faster than FAST and even FAST-ER[Project]
-·        
-Real-time Facial Feature Detection using Conditional Regression Forests[Project]
-·        
-Global and Efficient Self-Similarity for Object Classification and Detection[code]
-·        
-WαSH: Weighted α-Shapes for Local Feature Detection[Project]
-·        
-HOG[Project]
-·        
-Online Selection of Discriminative Tracking Features[Project]
-                       
-
+·          SIFT [1] [Demo program][SIFT Library] [VLFeat]
+·          PCA-SIFT [2] [Project]
+·          Affine-SIFT [3] [Project]
+·          SURF [4] [OpenSURF] [Matlab Wrapper]
+·          Affine Covariant Features [5] [Oxford project]
+·          MSER [6] [Oxford project] [VLFeat]
+·          Geometric Blur [7] [Code]
+·          Local Self-Similarity Descriptor [8] [Oxford implementation]
+·          Global and Efficient Self-Similarity [9] [Code]
+·          Histogram of Oriented Graidents [10] [INRIA Object Localization Toolkit] [OLT toolkit for Windows]
+·          GIST [11] [Project]
+·          Shape Context [12] [Project]
+·          Color Descriptor [13] [Project]
+·          Pyramids of Histograms of Oriented Gradients [Code]
+·          Space-Time Interest Points (STIP) [14][Project] [Code]
+·          Boundary Preserving Dense Local Regions [15][Project]
+·          Weighted Histogram[Code]
+·          Histogram-based Interest Points Detectors[Paper][Code]
+·          An OpenCV - C++ implementation of Local Self Similarity Descriptors [Project]
+·          Fast Sparse Representation with Prototypes[Project]
+·          Corner Detection [Project]
+·          AGAST Corner Detector: faster than FAST and even FAST-ER[Project]
+·         Real-time Facial Feature Detection using Conditional Regression Forests[Project] 
+·         Global and Efficient Self-Similarity for Object Classification and Detection[code] 
+·         WαSH: Weighted α-Shapes for Local Feature Detection[Project] 
+·         HOG[Project]
+·         Online Selection of Discriminative Tracking Features[Project] 
+                        
 二、图像分割Image Segmentation：
-·           
-Normalized Cut [1] [Matlab code]
-·           
-Gerg Mori’ Superpixel code [2] [Matlab code]
-·           
-Efficient Graph-based Image Segmentation [3] [C++ code] [Matlab
- wrapper]
-·           
-Mean-Shift Image Segmentation [4] [EDISON C++ code] [Matlab
- wrapper]
-·           
-OWT-UCM Hierarchical Segmentation [5] [Resources]
-·           
-Turbepixels [6] [Matlab code 32bit] [Matlab
- code 64bit] [Updated code]
-·           
-Quick-Shift [7] [VLFeat]
-·           
-SLIC Superpixels [8] [Project]
-·           
-Segmentation by Minimum Code Length [9] [Project]
-·           
-Biased Normalized Cut [10] [Project]
-·           
-Segmentation Tree [11-12] [Project]
-·           
-Entropy Rate Superpixel Segmentation [13] [Code]
-·           
-Fast Approximate Energy Minimization via Graph Cuts[Paper][Code]
-·           
-Efﬁcient Planar Graph Cuts with Applications in Computer Vision[Paper][Code]
-·           
-Isoperimetric Graph Partitioning for Image Segmentation[Paper][Code]
-·           
-Random Walks for Image Segmentation[Paper][Code]
-·           
-Blossom V: A new implementation of a minimum cost perfect matching algorithm[Code]
-·           
-An Experimental Comparison of Min-Cut/Max-Flow Algorithms for Energy Minimization in Computer Vision[Paper][Code]
-·           
-Geodesic Star Convexity for Interactive Image Segmentation[Project]
-·           
-Contour Detection and Image Segmentation Resources[Project][Code]
-·           
-Biased Normalized Cuts[Project]
-·           
-Max-flow/min-cut[Project]
-·           
-Chan-Vese Segmentation using Level Set[Project]
-·           
-A Toolbox of Level Set Methods[Project]
-·           
-Re-initialization Free Level Set Evolution via Reaction Diffusion[Project]
-·           
-Improved C-V active contour model[Paper][Code]
-·           
-A Variational Multiphase Level Set Approach to Simultaneous Segmentation and Bias Correction[Paper][Code]
-·         
-Level Set Method Research by Chunming Li[Project]
-·         
-ClassCut for Unsupervised Class Segmentation[code]
-·        
-SEEDS: Superpixels Extracted via Energy-Driven Sampling[Project][other]
+·            Normalized Cut [1] [Matlab code]
+·            Gerg Mori’ Superpixel code [2] [Matlab code]
+·            Efficient Graph-based Image Segmentation [3] [C++ code] [Matlab wrapper]
+·            Mean-Shift Image Segmentation [4] [EDISON C++ code] [Matlab wrapper]
+·            OWT-UCM Hierarchical Segmentation [5] [Resources]
+·            Turbepixels [6] [Matlab code 32bit] [Matlab code 64bit] [Updated code]
+·            Quick-Shift [7] [VLFeat]
+·            SLIC Superpixels [8] [Project]
+·            Segmentation by Minimum Code Length [9] [Project]
+·            Biased Normalized Cut [10] [Project]
+·            Segmentation Tree [11-12] [Project]
+·            Entropy Rate Superpixel Segmentation [13] [Code]
+·            Fast Approximate Energy Minimization via Graph Cuts[Paper][Code]
+·            Efﬁcient Planar Graph Cuts with Applications in Computer Vision[Paper][Code]
+·            Isoperimetric Graph Partitioning for Image Segmentation[Paper][Code]
+·            Random Walks for Image Segmentation[Paper][Code]
+·            Blossom V: A new implementation of a minimum cost perfect matching algorithm[Code]
+·            An Experimental Comparison of Min-Cut/Max-Flow Algorithms for Energy Minimization in Computer Vision[Paper][Code]
+·            Geodesic Star Convexity for Interactive Image Segmentation[Project]
+·            Contour Detection and Image Segmentation Resources[Project][Code]
+·            Biased Normalized Cuts[Project]
+·            Max-flow/min-cut[Project]
+·            Chan-Vese Segmentation using Level Set[Project]
+·            A Toolbox of Level Set Methods[Project]
+·            Re-initialization Free Level Set Evolution via Reaction Diffusion[Project]
+·            Improved C-V active contour model[Paper][Code]
+·            A Variational Multiphase Level Set Approach to Simultaneous Segmentation and Bias Correction[Paper][Code]
+·          Level Set Method Research by Chunming Li[Project] 
+·          ClassCut for Unsupervised Class Segmentation[code] 
+·         SEEDS: Superpixels Extracted via Energy-Driven Sampling[Project][other] 
 
 三、目标检测Object Detection：
-·           
-A simple object detector with boosting [Project]
-·           
-INRIA Object Detection and Localization Toolkit [1] [Project]
-·           
-Discriminatively Trained Deformable Part Models [2] [Project]
-·           
-Cascade Object Detection with Deformable Part Models [3] [Project]
-·           
-Poselet [4] [Project]
-·           
-Implicit Shape Model [5] [Project]
-·           
-Viola and Jones’s Face Detection [6] [Project]
-·           
-Bayesian Modelling of Dyanmic Scenes for Object Detection[Paper][Code]
-·           
-Hand detection using multiple proposals[Project]
-·           
-Color Constancy, Intrinsic Images, and Shape Estimation[Paper][Code]
-·           
-Discriminatively trained deformable part models[Project]
-·           
-Gradient Response Maps for Real-Time Detection of Texture-Less Objects: LineMOD [Project]
-·           
-Image Processing On Line[Project]
-·           
-Robust Optical Flow Estimation[Project]
-·           
-Where's Waldo: Matching People in Images of Crowds[Project]
-·          
-Scalable Multi-class Object Detection[Project]
-·          
-Class-Specific Hough Forests for Object Detection[Project]
-·        
-Deformed Lattice Detection In Real-World Images[Project]
-·        
-Discriminatively trained deformable part models[Project]
+·            A simple object detector with boosting [Project]
+·            INRIA Object Detection and Localization Toolkit [1] [Project]
+·            Discriminatively Trained Deformable Part Models [2] [Project]
+·            Cascade Object Detection with Deformable Part Models [3] [Project]
+·            Poselet [4] [Project]
+·            Implicit Shape Model [5] [Project]
+·            Viola and Jones’s Face Detection [6] [Project]
+·            Bayesian Modelling of Dyanmic Scenes for Object Detection[Paper][Code]
+·            Hand detection using multiple proposals[Project]
+·            Color Constancy, Intrinsic Images, and Shape Estimation[Paper][Code]
+·            Discriminatively trained deformable part models[Project]
+·            Gradient Response Maps for Real-Time Detection of Texture-Less Objects: LineMOD [Project]
+·            Image Processing On Line[Project]
+·            Robust Optical Flow Estimation[Project]
+·            Where's Waldo: Matching People in Images of Crowds[Project]
+·           Scalable Multi-class Object Detection[Project] 
+·           Class-Specific Hough Forests for Object Detection[Project] 
+·         Deformed Lattice Detection In Real-World Images[Project] 
+·         Discriminatively trained deformable part models[Project] 
 
 四、显著性检测Saliency Detection：
-·           
-Itti, Koch, and Niebur’ saliency detection [1] [Matlab code]
-·           
-Frequency-tuned salient region detection [2] [Project]
-·           
-Saliency detection using maximum symmetric surround [3] [Project]
-·           
-Attention via Information Maximization [4] [Matlab code]
-·           
-Context-aware saliency detection [5] [Matlab code]
-·           
-Graph-based visual saliency [6] [Matlab code]
-·           
-Saliency detection: A spectral residual approach. [7] [Matlab code]
-·           
-Segmenting salient objects from images and videos. [8] [Matlab code]
-·           
-Saliency Using Natural statistics. [9] [Matlab code]
-·           
-Discriminant Saliency for Visual Recognition from Cluttered Scenes. [10] [Code]
-·           
-Learning to Predict Where Humans Look [11] [Project]
-·           
-Global Contrast based Salient Region Detection [12] [Project]
-·           
-Bayesian Saliency via Low and Mid Level Cues[Project]
-·           
-Top-Down Visual Saliency via Joint CRF and Dictionary Learning[Paper][Code]
-·        
-Saliency Detection: A Spectral Residual Approach[Code]
+·            Itti, Koch, and Niebur’ saliency detection [1] [Matlab code]
+·            Frequency-tuned salient region detection [2] [Project]
+·            Saliency detection using maximum symmetric surround [3] [Project]
+·            Attention via Information Maximization [4] [Matlab code]
+·            Context-aware saliency detection [5] [Matlab code]
+·            Graph-based visual saliency [6] [Matlab code]
+·            Saliency detection: A spectral residual approach. [7] [Matlab code]
+·            Segmenting salient objects from images and videos. [8] [Matlab code]
+·            Saliency Using Natural statistics. [9] [Matlab code]
+·            Discriminant Saliency for Visual Recognition from Cluttered Scenes. [10] [Code]
+·            Learning to Predict Where Humans Look [11] [Project]
+·            Global Contrast based Salient Region Detection [12] [Project]
+·            Bayesian Saliency via Low and Mid Level Cues[Project]
+·            Top-Down Visual Saliency via Joint CRF and Dictionary Learning[Paper][Code]
+·         Saliency Detection: A Spectral Residual Approach[Code] 
 
 五、图像分类、聚类Image Classification, Clustering
-·           
-Pyramid Match [1] [Project]
-·           
-Spatial Pyramid Matching [2] [Code]
-·           
-Locality-constrained Linear Coding [3] [Project] [Matlab
- code]
-·           
-Sparse Coding [4] [Project] [Matlab
- code]
-·           
-Texture Classification [5] [Project]
-·           
-Multiple Kernels for Image Classification [6] [Project]
-·           
-Feature Combination [7] [Project]
-·           
-SuperParsing [Code]
-·           
-Large Scale Correlation Clustering Optimization[Matlab code]
-·           
-Detecting and Sketching the Common[Project]
-·           
-Self-Tuning Spectral Clustering[Project][Code]
-·           
-User Assisted Separation of Reflections from a Single Image Using a Sparsity Prior[Paper][Code]
-·           
-Filters for Texture Classification[Project]
-·           
-Multiple Kernel Learning for Image Classification[Project]
-·         
-SLIC Superpixels[Project]
+·            Pyramid Match [1] [Project]
+·            Spatial Pyramid Matching [2] [Code]
+·            Locality-constrained Linear Coding [3] [Project] [Matlab code]
+·            Sparse Coding [4] [Project] [Matlab code]
+·            Texture Classification [5] [Project]
+·            Multiple Kernels for Image Classification [6] [Project]
+·            Feature Combination [7] [Project]
+·            SuperParsing [Code]
+·            Large Scale Correlation Clustering Optimization[Matlab code]
+·            Detecting and Sketching the Common[Project]
+·            Self-Tuning Spectral Clustering[Project][Code]
+·            User Assisted Separation of Reflections from a Single Image Using a Sparsity Prior[Paper][Code]
+·            Filters for Texture Classification[Project]
+·            Multiple Kernel Learning for Image Classification[Project]
+·          SLIC Superpixels[Project] 
 
 六、抠图Image Matting
-·           
-A Closed Form Solution to Natural Image Matting [Code]
-·           
-Spectral Matting [Project]
-·           
-Learning-based Matting [Code]
+·            A Closed Form Solution to Natural Image Matting [Code]
+·            Spectral Matting [Project]
+·            Learning-based Matting [Code]
 
 七、目标跟踪Object Tracking：
-·           
-A Forest of Sensors - Tracking Adaptive Background Mixture Models [Project]
-·           
-Object Tracking via Partial Least Squares Analysis[Paper][Code]
-·           
-Robust Object Tracking with Online Multiple Instance Learning[Paper][Code]
-·           
-Online Visual Tracking with Histograms and Articulating Blocks[Project]
-·           
-Incremental Learning for Robust Visual Tracking[Project]
-·           
-Real-time Compressive Tracking[Project]
-·           
-Robust Object Tracking via Sparsity-based Collaborative Model[Project]
-·           
-Visual Tracking via Adaptive Structural Local Sparse Appearance Model[Project]
-·           
-Online Discriminative Object Tracking with Local Sparse Representation[Paper][Code]
-·           
-Superpixel Tracking[Project]
-·           
-Learning Hierarchical Image Representation with Sparsity, Saliency and Locality[Paper][Code]
-·           
-Online Multiple Support Instance Tracking [Paper][Code]
-·           
-Visual Tracking with Online Multiple Instance Learning[Project]
-·           
-Object detection and recognition[Project]
-·           
-Compressive Sensing Resources[Project]
-·           
-Robust Real-Time Visual Tracking using Pixel-Wise Posteriors[Project]
-·           
-Tracking-Learning-Detection[Project][OpenTLD/C++
- Code]
-·          
-the HandVu：vision-based hand gesture interface[Project]
-·          
-Learning Probabilistic Non-Linear Latent Variable Models for Tracking Complex Activities[Project]
+·            A Forest of Sensors - Tracking Adaptive Background Mixture Models [Project]
+·            Object Tracking via Partial Least Squares Analysis[Paper][Code]
+·            Robust Object Tracking with Online Multiple Instance Learning[Paper][Code]
+·            Online Visual Tracking with Histograms and Articulating Blocks[Project]
+·            Incremental Learning for Robust Visual Tracking[Project]
+·            Real-time Compressive Tracking[Project]
+·            Robust Object Tracking via Sparsity-based Collaborative Model[Project]
+·            Visual Tracking via Adaptive Structural Local Sparse Appearance Model[Project]
+·            Online Discriminative Object Tracking with Local Sparse Representation[Paper][Code]
+·            Superpixel Tracking[Project]
+·            Learning Hierarchical Image Representation with Sparsity, Saliency and Locality[Paper][Code]
+·            Online Multiple Support Instance Tracking [Paper][Code]
+·            Visual Tracking with Online Multiple Instance Learning[Project]
+·            Object detection and recognition[Project]
+·            Compressive Sensing Resources[Project]
+·            Robust Real-Time Visual Tracking using Pixel-Wise Posteriors[Project]
+·            Tracking-Learning-Detection[Project][OpenTLD/C++ Code]
+·           the HandVu：vision-based hand gesture interface[Project] 
+·           Learning Probabilistic Non-Linear Latent Variable Models for Tracking Complex Activities[Project] 
 
 八、Kinect：
-·           
-Kinect toolbox[Project]
-·           
-OpenNI[Project]
-·           
-zouxy09 CSDN Blog[Resource]
-·           
-FingerTracker 手指跟踪[code]
+·            Kinect toolbox[Project]
+·            OpenNI[Project]
+·            zouxy09 CSDN Blog[Resource]
+·            FingerTracker 手指跟踪[code] 
 
 九、3D相关：
-·           
-3D Reconstruction of a Moving Object[Paper]
- [Code]
-·           
-Shape From Shading Using Linear Approximation[Code]
-·           
-Combining Shape from Shading and Stereo Depth Maps[Project][Code]
-·           
-Shape from Shading: A Survey[Paper][Code]
-·           
-A Spatio-Temporal Descriptor based on 3D Gradients (HOG3D)[Project][Code]
-·           
-Multi-camera Scene Reconstruction via Graph Cuts[Paper][Code]
-·           
-A Fast Marching Formulation of Perspective Shape from Shading under Frontal Illumination[Paper][Code]
-·           
-Reconstruction:3D Shape, Illumination, Shading, Reflectance, Texture[Project]
-·           
-Monocular Tracking of 3D Human Motion with a Coordinated Mixture of Factor Analyzers[Code]
-·           
-Learning 3-D Scene Structure from a Single Still Image[Project]
+·            3D Reconstruction of a Moving Object[Paper] [Code]
+·            Shape From Shading Using Linear Approximation[Code]
+·            Combining Shape from Shading and Stereo Depth Maps[Project][Code]
+·            Shape from Shading: A Survey[Paper][Code]
+·            A Spatio-Temporal Descriptor based on 3D Gradients (HOG3D)[Project][Code]
+·            Multi-camera Scene Reconstruction via Graph Cuts[Paper][Code]
+·            A Fast Marching Formulation of Perspective Shape from Shading under Frontal Illumination[Paper][Code]
+·            Reconstruction:3D Shape, Illumination, Shading, Reflectance, Texture[Project]
+·            Monocular Tracking of 3D Human Motion with a Coordinated Mixture of Factor Analyzers[Code]
+·            Learning 3-D Scene Structure from a Single Still Image[Project]
 
 十、机器学习算法：
-·           
-Matlab class for computing Approximate Nearest Nieghbor (ANN) [Matlab class providing interface
- toANN library]
-·           
-Random Sampling[code]
-·           
-Probabilistic Latent Semantic Analysis (pLSA)[Code]
-·           
-FASTANN and FASTCLUSTER for approximate k-means (AKM)[Project]
-·           
-Fast Intersection / Additive Kernel SVMs[Project]
-·           
-SVM[Code]
-·           
-Ensemble learning[Project]
-·           
-Deep Learning[Net]
-·          
-Deep Learning Methods for Vision[Project]
-·           
-Neural Network for Recognition of Handwritten Digits[Project]
-·           
-Training a deep autoencoder or a classifier on MNIST digits[Project]
-·         
-THE MNIST DATABASE of handwritten digits[Project]
-·         
-Ersatz：deep neural networks in the cloud[Project]
-·         
-Deep Learning [Project]
-·         
-sparseLM : Sparse Levenberg-Marquardt nonlinear least squares in C/C++[Project]
-·         
-Weka 3: Data Mining Software in Java[Project]
-·         
-Invited talk "A Tutorial on Deep Learning" by Dr. Kai Yu (余凯)[Video]
-·         
-CNN - Convolutional neural network class[Matlab Tool]
-·         
-Yann LeCun's Publications[Wedsite]
-·         
-LeNet-5, convolutional neural networks[Project]
-·         
-Training a deep autoencoder or a classifier on MNIST digits[Project]
-·         
-Deep Learning 大牛Geoffrey E. Hinton's HomePage[Website]
-·        
-Multiple Instance Logistic Discriminant-based Metric Learning (MildML) and Logistic Discriminant-based Metric Learning (LDML)[Code]
-·        
-Sparse coding simulation software[Project]
-·        
-Visual Recognition and Machine Learning Summer School[Software]
+·            Matlab class for computing Approximate Nearest Nieghbor (ANN) [Matlab class providing interface toANN library]
+·            Random Sampling[code]
+·            Probabilistic Latent Semantic Analysis (pLSA)[Code]
+·            FASTANN and FASTCLUSTER for approximate k-means (AKM)[Project]
+·            Fast Intersection / Additive Kernel SVMs[Project]
+·            SVM[Code]
+·            Ensemble learning[Project]
+·            Deep Learning[Net]
+·           Deep Learning Methods for Vision[Project] 
+·            Neural Network for Recognition of Handwritten Digits[Project]
+·            Training a deep autoencoder or a classifier on MNIST digits[Project]
+·          THE MNIST DATABASE of handwritten digits[Project] 
+·          Ersatz：deep neural networks in the cloud[Project] 
+·          Deep Learning [Project] 
+·          sparseLM : Sparse Levenberg-Marquardt nonlinear least squares in C/C++[Project] 
+·          Weka 3: Data Mining Software in Java[Project] 
+·          Invited talk "A Tutorial on Deep Learning" by Dr. Kai Yu (余凯)[Video] 
+·          CNN - Convolutional neural network class[Matlab Tool] 
+·          Yann LeCun's Publications[Wedsite] 
+·          LeNet-5, convolutional neural networks[Project] 
+·          Training a deep autoencoder or a classifier on MNIST digits[Project] 
+·          Deep Learning 大牛Geoffrey E. Hinton's HomePage[Website] 
+·         Multiple Instance Logistic Discriminant-based Metric Learning (MildML) and Logistic Discriminant-based Metric Learning (LDML)[Code] 
+·         Sparse coding simulation software[Project] 
+·         Visual Recognition and Machine Learning Summer School[Software] 
 
 十一、目标、行为识别Object, Action Recognition：
-·           
-Action Recognition by Dense Trajectories[Project][Code]
-·           
-Action Recognition Using a Distributed Representation of Pose and Appearance[Project]
-·           
-Recognition Using Regions[Paper][Code]
-·           
-2D Articulated Human Pose Estimation[Project]
-·           
-Fast Human Pose Estimation Using Appearance and Motion via Multi-Dimensional Boosting Regression[Paper][Code]
-·           
-Estimating Human Pose from Occluded Images[Paper][Code]
-·           
-Quasi-dense wide baseline matching[Project]
-·          
-ChaLearn Gesture Challenge: Principal motion: PCA-based reconstruction of motion histograms[Project]
-·          
-Real Time Head Pose Estimation with Random Regression Forests[Project]
-·          
-2D Action Recognition Serves 3D Human Pose Estimation[Project]
-·          
-A Hough Transform-Based Voting Framework for Action Recognition[Project]
-·           
-Motion Interchange Patterns for Action Recognition in Unconstrained Videos[Project]
-·         
-2D articulated human pose estimation software[Project]
-·         
-Learning and detecting shape models [code]
-·         
-Progressive Search Space Reduction for Human Pose Estimation[Project]
-·         
-Learning Non-Rigid 3D Shape from 2D Motion[Project]
+·            Action Recognition by Dense Trajectories[Project][Code]
+·            Action Recognition Using a Distributed Representation of Pose and Appearance[Project]
+·            Recognition Using Regions[Paper][Code]
+·            2D Articulated Human Pose Estimation[Project]
+·            Fast Human Pose Estimation Using Appearance and Motion via Multi-Dimensional Boosting Regression[Paper][Code]
+·            Estimating Human Pose from Occluded Images[Paper][Code]
+·            Quasi-dense wide baseline matching[Project]
+·           ChaLearn Gesture Challenge: Principal motion: PCA-based reconstruction of motion histograms[Project] 
+·           Real Time Head Pose Estimation with Random Regression Forests[Project] 
+·           2D Action Recognition Serves 3D Human Pose Estimation[Project] 
+·           A Hough Transform-Based Voting Framework for Action Recognition[Project] 
+·            Motion Interchange Patterns for Action Recognition in Unconstrained Videos[Project] 
+·          2D articulated human pose estimation software[Project] 
+·          Learning and detecting shape models [code] 
+·          Progressive Search Space Reduction for Human Pose Estimation[Project] 
+·          Learning Non-Rigid 3D Shape from 2D Motion[Project] 
 
 十二、图像处理：
-·         
-Distance Transforms of Sampled Functions[Project]
-·       
-The Computer Vision Homepage[Project]
-·       
-Efficient appearance distances between windows[code]
-·        
-Image Exploration algorithm[code]
-·        
-Motion Magnification 运动放大 [Project]
-·        
-Bilateral Filtering for Gray and Color Images 双边滤波器 [Project]
-·        
-A Fast Approximation of the Bilateral Filter using a Signal Processing Approach [Project]
-                 
-
+·          Distance Transforms of Sampled Functions[Project]
+·        The Computer Vision Homepage[Project] 
+·        Efficient appearance distances between windows[code] 
+·         Image Exploration algorithm[code] 
+·         Motion Magnification 运动放大 [Project] 
+·         Bilateral Filtering for Gray and Color Images 双边滤波器 [Project] 
+·         A Fast Approximation of the Bilateral Filter using a Signal Processing Approach [Project] 
+                  
 十三、一些实用工具：
-·           
-EGT: a Toolbox for Multiple View Geometry and Visual Servoing[Project] [Code]
-·           
-a development kit of matlab mex functions for OpenCV library[Project]
-·           
-Fast Artificial Neural Network Library[Project]
+·            EGT: a Toolbox for Multiple View Geometry and Visual Servoing[Project] [Code]
+·            a development kit of matlab mex functions for OpenCV library[Project]
+·            Fast Artificial Neural Network Library[Project]
 
 
 十四、人手及指尖检测与识别：
-·          
-finger-detection-and-gesture-recognition [Code]
-·          
-Hand and Finger Detection using JavaCV[Project]
-·          
-Hand and fingers detection[Code]
-
+·           finger-detection-and-gesture-recognition [Code]
+·           Hand and Finger Detection using JavaCV[Project]
+·           Hand and fingers detection[Code]
+ 
 
 十五、场景解释：
 ·           Nonparametric Scene Parsing via Label Transfer [Project]
-
+ 
 
 十六、光流Optical flow：
 ·         High accuracy optical flow using a theory for warping [Project]
-·        
-Dense Trajectories Video Description [Project]
-·        
-SIFT Flow: Dense Correspondence across Scenes and its Applications[Project]
-·        
-KLT: An Implementation of the Kanade-Lucas-Tomasi Feature Tracker [Project]
-·        
-Tracking Cars Using Optical Flow[Project]
-·        
-Secrets of optical flow estimation and their principles[Project]
-·        
-implmentation of the Black and Anandan dense optical flow method[Project]
-·        
-Optical Flow Computation[Project]
-·        
-Beyond Pixels: Exploring New Representations and Applications for Motion Analysis[Project]
-·        
-A Database and Evaluation Methodology for Optical Flow[Project]
-·        
-optical flow relative[Project]
-·        
-Robust Optical Flow Estimation [Project]
-·        
-optical flow[Project]
-十七、图像检索Image Retrieval：
-·           Semi-Supervised Distance Metric Learning for Collaborative Image Retrieval
-[Paper][code]
+·         Dense Trajectories Video Description [Project] 
+·         SIFT Flow: Dense Correspondence across Scenes and its Applications[Project] 
+·         KLT: An Implementation of the Kanade-Lucas-Tomasi Feature Tracker [Project] 
+·         Tracking Cars Using Optical Flow[Project] 
+·         Secrets of optical flow estimation and their principles[Project] 
+·         implmentation of the Black and Anandan dense optical flow method[Project] 
+·         Optical Flow Computation[Project] 
+·         Beyond Pixels: Exploring New Representations and Applications for Motion Analysis[Project] 
+·         A Database and Evaluation Methodology for Optical Flow[Project] 
+·         optical flow relative[Project]
+·         Robust Optical Flow Estimation [Project] 
+·         optical flow[Project] 
 
+十七、图像检索Image Retrieval：
+·           Semi-Supervised Distance Metric Learning for Collaborative Image Retrieval [Paper][code]
+ 
 
 十八、马尔科夫随机场Markov Random Fields：
-·         Markov Random Fields for Super-Resolution
-[Project]
-·        
-A Comparative Study of Energy Minimization Methods for Markov Random Fields with Smoothness-Based Priors [Project]
+·         Markov Random Fields for Super-Resolution [Project]
+·         A Comparative Study of Energy Minimization Methods for Markov Random Fields with Smoothness-Based Priors [Project] 
+
 十九、运动检测Motion detection：
-·         Moving Object Extraction, Using Models or Analysis of Regions
-[Project]
-·        
-Background Subtraction: Experiments and Improvements for ViBe [Project]
-·        
-A Self-Organizing Approach to Background Subtraction for Visual Surveillance Applications [Project]
-·        
-changedetection.net: A new change detection benchmark dataset[Project]
-·        
-ViBe - a powerful technique for background detection and subtraction in video sequences[Project]
-·        
-Background Subtraction Program[Project]
-·        
-Motion Detection Algorithms[Project]
-·        
-Stuttgart Artificial Background Subtraction Dataset[Project]
-·        
-Object Detection, Motion Estimation, and Tracking[Project]
+·         Moving Object Extraction, Using Models or Analysis of Regions [Project]
+·         Background Subtraction: Experiments and Improvements for ViBe [Project]
+·         A Self-Organizing Approach to Background Subtraction for Visual Surveillance Applications [Project] 
+·         changedetection.net: A new change detection benchmark dataset[Project] 
+·         ViBe - a powerful technique for background detection and subtraction in video sequences[Project] 
+·         Background Subtraction Program[Project] 
+·         Motion Detection Algorithms[Project] 
+·         Stuttgart Artificial Background Subtraction Dataset[Project] 
+·         Object Detection, Motion Estimation, and Tracking[Project]
 
 

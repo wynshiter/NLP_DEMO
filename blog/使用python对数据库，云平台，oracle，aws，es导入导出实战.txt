@@ -5,24 +5,21 @@
 
 
 
-文章大纲大数据ETL 系列文章简介1. oracle数据泵 导入导出实战1.1 数据库创建1.2. installs Oracle1.3 export / import data from oracle2.  将数据库表导出成 CSV, 并批量上传至 AWS2.1 export all table to CSV2.2 upload csv to aws3.本地文件导入aws elastic search4. oracle table-视图 windows 批处理 导出4.1 使用win32 脚本调用sqlplus 导出视图4.2 使用python 执行视图导出5.spark dataframe 数据导入Elasticsearch5.1 dataframe 及环境初始化5.2 清洗及写入数据
+
+文章大纲
+大数据ETL 系列文章简介1. oracle数据泵 导入导出实战1.1 数据库创建1.2. installs Oracle1.3 export / import data from oracle
+2. 将数据库表导出成 CSV, 并批量上传至 AWS2.1 export all table to CSV2.2 upload csv to aws
+3.本地文件导入aws elastic search4. oracle table-视图 windows 批处理 导出4.1 使用win32 脚本调用sqlplus 导出视图4.2 使用python 执行视图导出
+5.spark dataframe 数据导入Elasticsearch5.1 dataframe 及环境初始化5.2 清洗及写入数据
+
+
+
 
 大数据ETL 系列文章简介
 本系列文章主要针对ETL大数据处理这一典型场景，基于python语言使用Oracle、aws、Elastic search 、Spark 相关组件进行一些基本的数据导入导出实战，如：
-
-oracle使用数据泵impdp进行导入操作。
-aws使用awscli进行上传下载操作。
-本地文件上传至aws es
-spark dataframe录入ElasticSearch
-
+oracle使用数据泵impdp进行导入操作。aws使用awscli进行上传下载操作。本地文件上传至aws esspark dataframe录入ElasticSearch
 等典型数据ETL功能的探索。
-系列文章：
-1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出
-2.大数据ETL实践探索（2）---- python 与aws 交互
-3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器
-4.大数据ETL实践探索（4）---- 之 搜索神器elastic search
-5.使用python对数据库，云平台，oracle，aws，es导入导出实战
-6.aws ec2 配置ftp----使用vsftp
+系列文章： 1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出 2.大数据ETL实践探索（2）---- python 与aws 交互 3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器 4.大数据ETL实践探索（4）---- 之 搜索神器elastic search 5.使用python对数据库，云平台，oracle，aws，es导入导出实战 6.aws ec2 配置ftp----使用vsftp
 
 本文主要使用python基于oracle和aws 相关组件进行一些基本的数据导入导出实战，oracle使用数据泵impdp进行导入操作，aws使用awscli进行上传下载操作。本地文件上传至aws es，spark dataframe录入ElasticSearch等典型数据ETL功能的探索。
 
@@ -30,10 +27,8 @@ spark dataframe录入ElasticSearch
 1.1 数据库创建
 本文主要使用最新版本的oracle 12c，如果创建oracle数据库时候使用了数据库容器（CDB）承载多个可插拔数据库（PDB）的模式，那么数据库的用户名需要用c##开头，使用数据泵进行操作 的时候也有一些不同：
 在CDB中，只能创建以c##或C##开头的用户，如果不加c##，则会提示错误“ORA-65096：公用用户名或角色名无效”,只有在PDB数据库中才能创建我们习惯性命名的用户，oracle称之为Local User,前者称之为Common User。
-创建的时候不要勾选：
-
-https://www.cnblogs.com/xqzt/p/5034261.html
-https://www.cnblogs.com/fanyongbin/p/5699482.html
+创建的时候不要勾选： 
+https://www.cnblogs.com/xqzt/p/5034261.html https://www.cnblogs.com/fanyongbin/p/5699482.html
 
 1.2. installs Oracle
 Download and install Oracle 12C,
@@ -60,8 +55,7 @@ Temporary tablespace temp;
 
 Grant DBA to username;
 
-.
-由于全库导入的时候oracle_home和之前的数据库发生了改变，所以原来数据库的表空间需要提前建立。可以根据导出日志或者导入日志的报错，查看原来数据库中到底有那些表空间。特别注意有关视图和索引的表空间和用户也需要提起建立好。当然如果你只要数据的话就不太影像了。基本上使用表空间就可以全部导入。
+. 由于全库导入的时候oracle_home和之前的数据库发生了改变，所以原来数据库的表空间需要提前建立。可以根据导出日志或者导入日志的报错，查看原来数据库中到底有那些表空间。特别注意有关视图和索引的表空间和用户也需要提起建立好。当然如果你只要数据的话就不太影像了。基本上使用表空间就可以全部导入。
 Create table space :
 E.g
 Create tablespace xxx datafile'f:\xxx.dbf'size 200M AUTOEXTEND on;
@@ -80,16 +74,12 @@ command as follow:
 Impdp username/password@orcl full=y directory=dir_yiliao dumpfile=full1%U.dmp remap_schema=username_old:username_new exclude=GRANT remap_tablespace='(t1:tempt1, t2:tempt2) '  tablespaces=tempt1,temp2
 
 以下两种导入方式只能二选一：
+full=ytablespaces=tempt1,temp2
+整体说明 https://www.2cto.com/database/201605/508212.html
 
-full=y
-tablespaces=tempt1,temp2
-
-整体说明
-https://www.2cto.com/database/201605/508212.html
-
-2.  将数据库表导出成 CSV, 并批量上传至 AWS
+2. 将数据库表导出成 CSV, 并批量上传至 AWS
 2.1 export all table to CSV
-使用oracle函数 utl_file  进行快速导入导出（一分钟300万条的量级），这个比spool快多啦
+使用oracle函数 utl_file 进行快速导入导出（一分钟300万条的量级），这个比spool快多啦
 CREATE OR REPLACE PROCEDURE SQL_TO_CSV
 (
  P_QUERY IN VARCHAR2, -- PLSQL文
@@ -160,8 +150,7 @@ EXEC sql_to_csv('select * from table2','OUT_PATH','table2.csv');
 For reference, the links are as follows
 Https://blog.csdn.net/huangzhijie3918/article/details/72732816
 2.2 upload csv to aws
-使用awscli上传大文件，当然直接浏览器上传也行，但是好像超过4g会有问题。
-Download Windows Installer
+使用awscli上传大文件，当然直接浏览器上传也行，但是好像超过4g会有问题。 Download Windows Installer
 Https://docs.aws.amazon.com/zh_cn/cli/latest/userguide/awscli-install-windows.html#awscli-install-windows-path
 When installed, use
 AWS --version
@@ -179,8 +168,7 @@ aws s3 --region cn-north-1 cp LOG2.csv s3://xxxx/csv/
 3.本地文件导入aws elastic search
 修改访问策略，设置本地电脑的公网ip，这个经常会变化，每次使用时候需要设置一下
 
-安装anancota
-https://www.anaconda.com/download/
+安装anancota https://www.anaconda.com/download/
 初始化环境，win10下打开Anaconda Prompt 的命令行
 
 conda create -n elasticsearch python=3.6
@@ -251,10 +239,8 @@ for file in fileslist:
 
 
 上一段代码发现，数据录入es时候有问题，由于并行录入是懒加载的模式，所以数据居然没录进去，按照下面链接提供的思路，代码需要如下修改：
-代码实例：
-https://www.programcreek.com/python/example/104891/elasticsearch.helpers.parallel_bulk
-参考帖子：
-https://discuss.elastic.co/t/helpers-parallel-bulk-in-python-not-working/39498
+代码实例： https://www.programcreek.com/python/example/104891/elasticsearch.helpers.parallel_bulk
+参考帖子： https://discuss.elastic.co/t/helpers-parallel-bulk-in-python-not-working/39498
 
 from elasticsearch import helpers, Elasticsearch
 import pandas as pd
@@ -400,8 +386,7 @@ quit;
 
 后来发现一个问题，比如上面的第2小节的存储过程 SQL_TO_CSV，死活没法成功执行，只好安装cx_oracle ,用python 导出了，代码如下。
 4.2 使用python 执行视图导出
-主要逻辑是，按照月份 ，执行视图生成这个月每天的数据插入到表中，当一个月的数据执行完毕，将这个月份表导出。
-类似这种流程化的东西，python果然还是利器
+主要逻辑是，按照月份 ，执行视图生成这个月每天的数据插入到表中，当一个月的数据执行完毕，将这个月份表导出。 类似这种流程化的东西，python果然还是利器
 # -*- coding:utf-8 -*-
 """@author:season@file:export_view.py@time:2018/5/211:19"""
 
@@ -494,8 +479,7 @@ if __name__ == '__main__':
 
 5.spark dataframe 数据导入Elasticsearch
 5.1 dataframe 及环境初始化
-初始化， spark 第三方网站下载包：elasticsearch-spark-20_2.11-6.1.1.jar
-http://spark.apache.org/third-party-projects.html
+初始化， spark 第三方网站下载包：elasticsearch-spark-20_2.11-6.1.1.jar http://spark.apache.org/third-party-projects.html
 import sys
 import os
 print(os.getcwd())
@@ -553,9 +537,7 @@ hadoop_conf = sc._jsc.hadoopConfiguration()
 hadoop_conf.set("mapreduce.fileoutputcommitter.algorithm.version", "2")
 
 5.2 清洗及写入数据
-
 数据加载
-
 #数据加载
 df = (spark
                  .read
@@ -569,9 +551,7 @@ print(df.count())
 
 #
 
-
 数据清洗，增加一列，或者针对某一列进行udf 转换
-
 '''  
 #加一列yiyong ，如果是众城数据则为zhongcheng
 '''
@@ -582,9 +562,7 @@ from pyspark.sql.functions import udf
 from pyspark.sql import functions
 df = df.withColumn('customer',functions.lit("腾讯用户"))
 
-
 使用udf 清洗时间格式及数字格式
-
 #udf 清洗时间
 #清洗日期格式字段
 from dateutil import parser
@@ -652,6 +630,7 @@ save("is/doc")
 
 
 未完待续
+
 
 
 

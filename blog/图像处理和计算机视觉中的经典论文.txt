@@ -5,424 +5,66 @@
 
 
 
-　 感谢水木上同领域的同学分享，有了他的整理，让我很方便的获得了CV方面相关的经典论文，我也顺便整理一下，把pdf中的文字贴到网页上，方便其它人更直观的获取所要内容~~~
-     资料的下载链接为：      
-http://iask.sina.com.cn/u/2252291285/ish?folderid=775855
-    以下为该同学的整理的综述：
-“
+　 感谢水木上同领域的同学分享，有了他的整理，让我很方便的获得了CV方面相关的经典论文，我也顺便整理一下，把pdf中的文字贴到网页上，方便其它人更直观的获取所要内容~~~      资料的下载链接为：       http://iask.sina.com.cn/u/2252291285/ish?folderid=775855 
+    以下为该同学的整理的综述： “
 前言：最近由于工作的关系，接触到了很多篇以前都没有听说过的经典文章，在感叹这些文章伟大的同时，也顿感自己视野的狭小。  想在网上找找计算机视觉界的经典文章汇总，一直没有找到。失望之余，我决定自己总结一篇，希望对 CV 领域的童鞋们有所帮助。由于自己的视野比较狭窄，肯定也有很多疏漏，权当抛砖引玉了，如果你觉得哪篇文章是非常经典的，也可以把相关信息连带你的昵称发给我，我好补上。我的信箱 xdyang.ustc@gmail.com
 
-文章主要来源：PAMI, IJCV, TIP, CVIU, PR, IVC, CVGIU, CVPR, ICCV, ECCV, NIPS, SIGGRAPH, BMVC等
-主要参考网站: Google scholar, citeseer, cvpapers, opencv 中英文官方网站 
-主要参考书籍： 
-数字图像处理  第三版  冈萨雷斯等 
-图像处理，分析和机器视觉  第三版  Sonka等（非常非常好的一本书） 
-学习OpenCV 
-计算机视觉：算法与应用 
+文章主要来源：PAMI, IJCV, TIP, CVIU, PR, IVC, CVGIU, CVPR, ICCV, ECCV, NIPS, SIGGRAPH, BMVC等  主要参考网站: Google scholar, citeseer, cvpapers, opencv 中英文官方网站 
+主要参考书籍：  数字图像处理  第三版  冈萨雷斯等  图像处理，分析和机器视觉  第三版  Sonka等（非常非常好的一本书）  学习OpenCV  计算机视觉：算法与应用 
 
 文章按时间排序，排名不分先后，^_^。每一行最后一栏是我自己加的注释，如果不喜欢可以无视之，如果有不对的地方还请告诉我，免得继续出丑。 给出的文章有些是从google scholar或者citeseer上拷贝下来的，所以有链接。所有的文章在网上都很容易找到。有空的时候我会把它们全部整理出来，逐步上传到ishare.iask.sina.com
-由于整理的很仓促，时间也很短，还有很多不完善的地方。我会不断改进，并不时上传新版本。 
-上传地址为http://iask.sina.com.cn/u/2252291285/ish?folderid=775855
+由于整理的很仓促，时间也很短，还有很多不完善的地方。我会不断改进，并不时上传新版本。  上传地址为http://iask.sina.com.cn/u/2252291285/ish?folderid=775855
 最后更新：2012/3/14
 1990 年之前 
-Peter Burt, Edward Adelson
-The  Laplacian  Pyramid  as  ACompact Image Code
-虽说这个Laplacian Pyramid是有冗余的，但使用起来非常简单方便，对理解小波变换也非常有帮助。这位Adelson是W.T.Freeman的老板，都是大牛.
-J Canny
-A Computational Approach to EdgeDetection
-经典不需要解释。在 Sonka的书里面对这个算法也有比较详细的描述。
-S Mallat.
-A  theory  for  multiresolution  signaldecomposition:  The 
- waveletrepresentation
-Mallat的代表作
-M Kass, A Witkin, D  Terzopoulos.
-Snakes: active contour models
-Deformable model的开山鼻祖。
-RM HARALICK
-Textural Features for Image Classiﬁcation
-这三篇都是关于纹理特征的，虽然过去这么多年了，现在在检索和识别中依然很有用。
-RM HARALICK
-Statistical and structural approaches
- 
-Tamura等
-Texture features corresponding to visual perception
- 
-A P Dempster, N M Laird, D B Rubin. 1977
-Maximum  likelihood  from  incomplete data via the EM algorithm 
-EM 算法在计算机视觉中有着非常重要的作用
-L Rabiner. 1989
-A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition
-HMM 同样是计算机视觉必须掌握的一项工具
-B D Lucas, T Kanade
-An  iterative  image  registration technique  with  an  application  to stereo- vision
-Lucas 光流法
-J R Quinlan
-Induction of decision trees
-偏模式识别和机器学习一点
+Peter Burt, Edward AdelsonThe  Laplacian  Pyramid  as  ACompact Image Code虽说这个Laplacian Pyramid是有冗余的，但使用起来非常简单方便，对理解小波变换也非常有帮助。这位Adelson是W.T.Freeman的老板，都是大牛.J CannyA Computational Approach to EdgeDetection经典不需要解释。在 Sonka的书里面对这个算法也有比较详细的描述。S Mallat.A  theory  for  multiresolution  signaldecomposition:  The  waveletrepresentationMallat的代表作M Kass, A Witkin, D  Terzopoulos.Snakes: active contour modelsDeformable model的开山鼻祖。RM HARALICKTextural Features for Image Classiﬁcation这三篇都是关于纹理特征的，虽然过去这么多年了，现在在检索和识别中依然很有用。RM HARALICKStatistical and structural approaches Tamura等Texture features corresponding to visual perception A P Dempster, N M Laird, D B Rubin. 1977Maximum  likelihood  from  incomplete data via the EM algorithm EM 算法在计算机视觉中有着非常重要的作用L Rabiner. 1989A Tutorial on Hidden Markov Models and Selected Applications in Speech RecognitionHMM 同样是计算机视觉必须掌握的一项工具B D Lucas, T KanadeAn  iterative  image  registration technique  with  an  application  to stereo- visionLucas 光流法J R QuinlanInduction of decision trees偏模式识别和机器学习一点
 1990 年 
-P Perona, J Malik. PAMI
-Scale-space and edge detection using anisotropic diffusion
-关于 scale space 最早的一篇论文之一，引用率很高                                                                      
-T Lindeberg
-Scale-space for discrete signals.
-Lindeberg 关于 scale space 比较早的一篇，后续还有好几篇
-anzad, A.; Hong, Y.H.
-Invariant image recognition by Zernike moments
-Zernike moment,做过模式识别或者检索的应该都知道这个东东
+P Perona, J Malik. PAMIScale-space and edge detection using anisotropic diffusion关于 scale space 最早的一篇论文之一，引用率很高                                                                      T LindebergScale-space for discrete signals.Lindeberg 关于 scale space 比较早的一篇，后续还有好几篇anzad, A.; Hong, Y.H.Invariant image recognition by Zernike momentsZernike moment,做过模式识别或者检索的应该都知道这个东东
 1991 年 
-W Freeman, E Adelson.
-The design and use of steerable filters
-Freeman最早的一篇力作，也是我读的第一篇学术论文。现在Freeman在 MIT 风生水起，早已是IEEE Fellow了     
-Michael J. Swain , Dana H. Ballard
-Color Indexing.
-google scholar 上引用将近五千次
-MA Turk CVPR
-Face recognition using eigenfaces
- 
+W Freeman, E Adelson.The design and use of steerable filtersFreeman最早的一篇力作，也是我读的第一篇学术论文。现在Freeman在 MIT 风生水起，早已是IEEE Fellow了     Michael J. Swain , Dana H. BallardColor Indexing.google scholar 上引用将近五千次MA Turk CVPRFace recognition using eigenfaces 
 1992 年 
-L G Brown.
-A survey of image registration techniques.
-比较早的一篇关于配准的综述了                                                                                                                                                 
+L G Brown.A survey of image registration techniques.比较早的一篇关于配准的综述了                                                                                                                                                 
 1993 年
-S G Mallat, Z Zhang.
-Matching pursuits with time-frequency dictionaries
-Mallat另一篇关于小波的文章，不研究小波的可以无视之               
-L Vincent.
-Morphological grayscale reconstruction in image analysis: Applications and efficient algorithms
- 
-DP Huttenlocher
-Comparing images using the Hausdorff distance
-Google scolar 上引用2200多次
+S G Mallat, Z Zhang.Matching pursuits with time-frequency dictionariesMallat另一篇关于小波的文章，不研究小波的可以无视之               L Vincent.Morphological grayscale reconstruction in image analysis: Applications and efficient algorithms DP HuttenlocherComparing images using the Hausdorff distanceGoogle scolar 上引用2200多次
 1994 年
-J Shi, C Tomasi.
-Good feature to track.
-Tomasi这个名字还会出现好几次，真的很牛                                                                                      
-Linderberg
-Scale-space theory in computer vision
- 
-J L Barron, D J Fleet, S S  Beauchemin.
-Performance  of  optical  flow techniques.
- 
+J Shi, C Tomasi.Good feature to track.Tomasi这个名字还会出现好几次，真的很牛                                                                                      LinderbergScale-space theory in computer vision J L Barron, D J Fleet, S S  Beauchemin.Performance  of  optical  flow techniques. 
 1995 年 
-R Malladi, J Sethian, B Vemuri.
-Shape Modeling with Front Propagation: A Level Set Approach
-Level set的经典文章                                                                                              
-TF COOTES
-Active Shape Models-Their Training and Application
-ASM
-MA Stricker
-Similarity of color images
-颜色检索相关
-C Cortes, V Vapnik.
-Support-vector networks.
-SVM 在计算机视觉中也有着非常重要的地位
+R Malladi, J Sethian, B Vemuri.Shape Modeling with Front Propagation: A Level Set ApproachLevel set的经典文章                                                                                              TF COOTESActive Shape Models-Their Training and ApplicationASMMA StrickerSimilarity of color images颜色检索相关C Cortes, V Vapnik.Support-vector networks.SVM 在计算机视觉中也有着非常重要的地位
 1996 年 
-T MCINERNEY.
-Deformable models in medical image analysis: A survey
-活动模型的一篇较早的综述
-Tai Sing Lee
-Image Representation Using 2D Gabor Wavelets
-Google引用也有近千次
-Amir Said,  A. Pearlman
-A New, Fast, and Efﬁcient  Image Codec Based on Set Partitioning in Hierarchical Tree
-SPIHT。图像压缩领域与 EBCOT齐名的经典算法。
-L P Kaelbling, M L Littman, A W Moore.
-Reinforcement learning: A survey
-机器学习里面的一篇综述，引用率比较高，就列在这了。
-B. S. Manjunath and W. Y. Ma
-Texture features for browsing and retrieval of image data
-检索的文章比较多，其实它们的应用不仅仅是检索。只要是需要提取特征的地方，检索里面的方法都可以用到
- 
-comparing images using color coherence vectors
-检索中的CCV方法
- 
-Image retrieval using color and shape
-关于形状特征后面有一篇综述
+T MCINERNEY.Deformable models in medical image analysis: A survey活动模型的一篇较早的综述Tai Sing LeeImage Representation Using 2D Gabor WaveletsGoogle引用也有近千次Amir Said,  A. PearlmanA New, Fast, and Efﬁcient  Image Codec Based on Set Partitioning in Hierarchical TreeSPIHT。图像压缩领域与 EBCOT齐名的经典算法。L P Kaelbling, M L Littman, A W Moore.Reinforcement learning: A survey机器学习里面的一篇综述，引用率比较高，就列在这了。B. S. Manjunath and W. Y. MaTexture features for browsing and retrieval of image data检索的文章比较多，其实它们的应用不仅仅是检索。只要是需要提取特征的地方，检索里面的方法都可以用到 comparing images using color coherence vectors检索中的CCV方法 Image retrieval using color and shape关于形状特征后面有一篇综述
 1997 年
-V Caselles, R Kimmel, G Sapiro.
-Geodesic active contours
-活动轮廓模型的一个小分支
-R E Schapire, Y Freund, P Bartlett, W S Lee.
-Boosting the Margin: A New Explanation for the Effectiveness of Voting Methods.
-Schapire 和 Freund 发 明 了Adaboost，给计算机视觉带来了不少经典算法
-F Maes, D Vandermeulen, G Marchal, P Suetens.
-Multimodality  image registration by maximization of mutual information
-互信息量配准
-E Osuna, R Freund, F Girosi.
-Training support vector machines: An application to face detection.
-SVM在人脸检测中的应用。不过人脸检测最经典的方法应 该是Viola-Jones
-J Huang, S Kumar, M Mitra, W-J Zhu, R Zabih.
-Image indexing using color correlogram
-Color correlogram，检索中的又一个颜色特征。和前面的 CCV 以及颜色矩特征基本上覆盖了所有的颜色特征。
-Y Freund, R Schapire.
-A  decisiontheoretic  generalization  of on-line learning and an application to boosting. 
-Adaboost的经典文章
+V Caselles, R Kimmel, G Sapiro.Geodesic active contours活动轮廓模型的一个小分支R E Schapire, Y Freund, P Bartlett, W S Lee.Boosting the Margin: A New Explanation for the Effectiveness of Voting Methods.Schapire 和 Freund 发 明 了Adaboost，给计算机视觉带来了不少经典算法F Maes, D Vandermeulen, G Marchal, P Suetens.Multimodality  image registration by maximization of mutual information互信息量配准E Osuna, R Freund, F Girosi.Training support vector machines: An application to face detection.SVM在人脸检测中的应用。不过人脸检测最经典的方法应 该是Viola-JonesJ Huang, S Kumar, M Mitra, W-J Zhu, R Zabih.Image indexing using color correlogramColor correlogram，检索中的又一个颜色特征。和前面的 CCV 以及颜色矩特征基本上覆盖了所有的颜色特征。Y Freund, R Schapire.A  decisiontheoretic  generalization  of on-line learning and an application to boosting. Adaboost的经典文章
 1998 年 
 1998 年是图像处理和计算机视觉经典文章井喷的一年。大概从这一年开始，开始有了新的趋势。由于竞争的加剧，一些好的算法都先发在会议上了，先占个坑，等过一两年之后再扩展到会议上。
-T Lindeberg
-Feature detection with automatic scale selection
-Linderberg的 scale space到此为止基本结束了。在一些边缘提取，道路或者血管检测中，scale space 确实是一种很不错的工具
-C J C Burges.
-A tutorial on support vector machines for pattern recognition.
-使用 svm的话，这篇文章应该是必读的了。比 95 年那篇原始文章引用率还高
-M Isard, A Blake.
-CONDENSATION  –  Conditional TrackingDensity Propagation for Visual
-Tracking中的经典文章了
-L Page, S Brin, R Motwani, T  Winograd
-The PageRank citation ranking: bringing order to the web
-这篇文章应该不属于 CV 的范畴，鉴于作者的大名鼎鼎，暂且列在这
-C Tomasi, R Manduchi.
-Bilateral filtering for gray and color images.
-做过图像滤波平滑去噪或者 HDR的应该都知道Bilateral filter。原理非常非常简单，简单到一个公式就可以概括这篇文章，简单到实在无法扩充到期刊。这也是 Tomasi 第二次出现了。一直很纳闷，这个很直观的思想在这之前怎么就从来没人提呢。
-C  Xu, J L Prince.
-Snakes, shapes and gradient vector flow.
-终于碰到中国人写的文章了，很荣幸还是校友。GVF是 snake和levelset领域的重要分支和方法
-Wim Sweldens.
-The lifting scheme: A construction of second generation wavelets.
-第二代小波。真正让小波有了实用价值，在 JPEG2000 中就采用的提升小波。个人更喜欢的是下一篇，简单易懂，字体也大
-Daubechies Wim Sweldens
-Factoring wavelet transforms into lifting steps
-另一位作者也很牛，小波十讲的作者
-H A Rowley, S Baluja, T Kanade.
-Neural Network-based Face Detection.
-做人脸的应该是必看的了。不做人脸的话应该可以不用看吧
-J B A Maintz, M A Viergever.
-A survey of medical image registration.
-关于图像配准的另一篇综述
-T F Cootes, G J Edwards, C J Taylor.
-Active Appearance Models
-AAM
+T LindebergFeature detection with automatic scale selectionLinderberg的 scale space到此为止基本结束了。在一些边缘提取，道路或者血管检测中，scale space 确实是一种很不错的工具C J C Burges.A tutorial on support vector machines for pattern recognition.使用 svm的话，这篇文章应该是必读的了。比 95 年那篇原始文章引用率还高M Isard, A Blake.CONDENSATION  –  Conditional TrackingDensity Propagation for VisualTracking中的经典文章了L Page, S Brin, R Motwani, T  WinogradThe PageRank citation ranking: bringing order to the web这篇文章应该不属于 CV 的范畴，鉴于作者的大名鼎鼎，暂且列在这C Tomasi, R Manduchi.Bilateral filtering for gray and color images.做过图像滤波平滑去噪或者 HDR的应该都知道Bilateral filter。原理非常非常简单，简单到一个公式就可以概括这篇文章，简单到实在无法扩充到期刊。这也是 Tomasi 第二次出现了。一直很纳闷，这个很直观的思想在这之前怎么就从来没人提呢。C  Xu, J L Prince.Snakes, shapes and gradient vector flow.终于碰到中国人写的文章了，很荣幸还是校友。GVF是 snake和levelset领域的重要分支和方法Wim Sweldens.The lifting scheme: A construction of second generation wavelets.第二代小波。真正让小波有了实用价值，在 JPEG2000 中就采用的提升小波。个人更喜欢的是下一篇，简单易懂，字体也大Daubechies Wim SweldensFactoring wavelet transforms into lifting steps另一位作者也很牛，小波十讲的作者H A Rowley, S Baluja, T Kanade.Neural Network-based Face Detection.做人脸的应该是必看的了。不做人脸的话应该可以不用看吧J B A Maintz, M A Viergever.A survey of medical image registration.关于图像配准的另一篇综述T F Cootes, G J Edwards, C J Taylor.Active Appearance ModelsAAM
 1999 年 
-D Lowe.
-Object Recognition from Local Scale-invariant Features
-大名鼎鼎的SIFT，后面有一篇IJCV上的 Journal版本，更全面一点。             
-R E Schapire.
-A brief Introduction to Boosting
-还是 boosting
-D M Gavrila.
-The visual analysis of human movements: a survey
-综述文章的引用一般都比较高
-Y Rui, T S Huang, S F Change.
-Image retrieval: current techniques, promising directions, and open issues
-TSHuang小组对检索的一个总结
-J K Aggarwal, Q Cai.
-Human motion analysis: a review
-人体运动分析的一个综述
+D Lowe.Object Recognition from Local Scale-invariant Features大名鼎鼎的SIFT，后面有一篇IJCV上的 Journal版本，更全面一点。             R E Schapire.A brief Introduction to Boosting还是 boostingD M Gavrila.The visual analysis of human movements: a survey综述文章的引用一般都比较高Y Rui, T S Huang, S F Change.Image retrieval: current techniques, promising directions, and open issuesTSHuang小组对检索的一个总结J K Aggarwal, Q Cai.Human motion analysis: a review人体运动分析的一个综述
 2000 年 
 世纪之交，各种综述都出来了
-J Shi, J Malik.
-Normalized Cuts and Image Segmentation
-NCuts的引用率相当高，Jianbo Shi也因为这篇文章成为计算机视觉界引用率最高的作者之一
-Z Zhang.
-A Flexible New Technique for Camera Calibration
-张正友的关于摄像机标定的经典短文
-A K Jain, R P W Duin, J C Mao.
-Statistical pattern  recognition: a review.
-统计模式识别综述，这一年 pami上两篇很有名的综述之一。 在这里推荐 Web 写的 Statistical Pattern Recognition第三版，相当不错，网上有电子版。
-C Stauffe
-Learning Patterns of Activity Using Real-Time Tracking
-搜 TLD 的时候发现这篇文章引用率也很高，两千多次。还没来得及读。
-D Taubman.
-High performance Scalable Image Compression With EBCOT
-EBCOT，JPEG2000 中的算法
-A W M Smeulders, M Worring, S Santini, A Gupta, R Jain.
-Content-based image retrieval at the end of the early years
-在世纪之交对图像检索的一篇很权威的综述。感觉在这之后检索的研究也没那么热了。不过在工业界热度依旧，各大网上购物平台，比如淘宝，  亚马逊，京东等都在做这方面的研发，衣服检索是一个很不错的应用点。
-M Pantic, L J M Rothkrantz.
-Automatic analysis of facial expressions: the state of the art.
- 
-N Paragios, R Deriche.
-Geodesic active contours and  level sets for the detection and tracking of moving objects
-使用 level set做跟踪
-Y Rubner, C Tomasi, L Guibas.
-TThe earth mover’s distance as a metric for image retrieval.
-EMD算法。Tomasi再次出现
- 
-PicToSeek Combining Color and Shape Invariant Features for Image Retrieval
-依然是检索特征
+J Shi, J Malik.Normalized Cuts and Image SegmentationNCuts的引用率相当高，Jianbo Shi也因为这篇文章成为计算机视觉界引用率最高的作者之一Z Zhang.A Flexible New Technique for Camera Calibration张正友的关于摄像机标定的经典短文A K Jain, R P W Duin, J C Mao.Statistical pattern  recognition: a review.统计模式识别综述，这一年 pami上两篇很有名的综述之一。 在这里推荐 Web 写的 Statistical Pattern Recognition第三版，相当不错，网上有电子版。C StauffeLearning Patterns of Activity Using Real-Time Tracking搜 TLD 的时候发现这篇文章引用率也很高，两千多次。还没来得及读。D Taubman.High performance Scalable Image Compression With EBCOTEBCOT，JPEG2000 中的算法A W M Smeulders, M Worring, S Santini, A Gupta, R Jain.Content-based image retrieval at the end of the early years在世纪之交对图像检索的一篇很权威的综述。感觉在这之后检索的研究也没那么热了。不过在工业界热度依旧，各大网上购物平台，比如淘宝，  亚马逊，京东等都在做这方面的研发，衣服检索是一个很不错的应用点。M Pantic, L J M Rothkrantz.Automatic analysis of facial expressions: the state of the art. N Paragios, R Deriche.Geodesic active contours and  level sets for the detection and tracking of moving objects使用 level set做跟踪Y Rubner, C Tomasi, L Guibas.TThe earth mover’s distance as a metric for image retrieval.EMD算法。Tomasi再次出现 PicToSeek Combining Color and Shape Invariant Features for Image Retrieval依然是检索特征
 2001 年 
-Paul Viola, Michael J Jones.
-Robust real-time object detection
-这是一篇很牛的文章，在人脸检测上几乎成了标准。比较坑爹的是，号称发在IJCV2001 上，但怎么找也找不到。应该是 IJCV2004年的那篇“Robust real-time face detection”吧。 他们在这一年另一篇比较出名的文章是在CVPR上的“Rapid ObjectDetection using a Boosted Cascade of Simple Features”这篇才是04年那篇著名文章的会议版。
-Y Boykov, Kolmogorov.
-An experimental comparison of min-cut/max-flow algorithms for energy minimization in vision.
-俄罗斯人在 graph cut 领域开始发力了
-T Moeslund, E Granum.
-A Survey of Computer Vision Based Human Motion Capture
-人体运动综述
-T F Chan, L Vese.
-Active contours without edges.
-Snake 和 level set领域的经典文章
-A M Martinez, A C Kak.
-PCA versus LDA
-PCA 也是计算机视觉中非掌握不可的工具。LDA在模式识别中有很重要的地位
-BS Manjunath
-Color and texture descriptors
-颜色和纹理的描述子，在识别中很有用
+Paul Viola, Michael J Jones.Robust real-time object detection这是一篇很牛的文章，在人脸检测上几乎成了标准。比较坑爹的是，号称发在IJCV2001 上，但怎么找也找不到。应该是 IJCV2004年的那篇“Robust real-time face detection”吧。 他们在这一年另一篇比较出名的文章是在CVPR上的“Rapid ObjectDetection using a Boosted Cascade of Simple Features”这篇才是04年那篇著名文章的会议版。Y Boykov, Kolmogorov.An experimental comparison of min-cut/max-flow algorithms for energy minimization in vision.俄罗斯人在 graph cut 领域开始发力了T Moeslund, E Granum.A Survey of Computer Vision Based Human Motion Capture人体运动综述T F Chan, L Vese.Active contours without edges.Snake 和 level set领域的经典文章A M Martinez, A C Kak.PCA versus LDAPCA 也是计算机视觉中非掌握不可的工具。LDA在模式识别中有很重要的地位BS ManjunathColor and texture descriptors颜色和纹理的描述子，在识别中很有用
 2002 年 
-D Comaniciu, P Meer.
-Mean  shift:  A  robust  approach toward feature space analysis. 
-Mean shift的经典文章。前两天发现 Comaniciu 已经是 IEEE Fellow了
-Ming-Husan Yang, David J Kriegman, Narendra Ahuja.
-Detecting  Faces  in  Images:  A Survey.
-人脸检测综述，引用率想不高都难
-R Hsu, M Abdel-Mottaleb.
-Face Detection in Color Images.
-依然是人脸检测，名字都起得这么霸气
-J-L Starck, E J Candès, D L Donoho.
-The  curvelet  transform  for  image denoising.
-Geometrical wavelet 中的一篇代表 作 。 其 他 的 如 ridgelet, contourlet, bandelet 等在这里就不赘述了。研究这方面的很容易找到这方面的经典文献。个人以为不研究这方面的看了后对自己的研究也不会有多大启发。曾经以为这个方向会很火，到最后还是没火起来。  我觉得原因可能是现在存储和传输能力的大大提高，使得对压缩的需求没有那么大了，这方面的研究自然就停滞了，就如同JPEG2000没有成气候
- 
-Shape matching and object recognition using shape contexts
-Shape context。用形状匹配达到目标识别目的。这方面最经典的文章了。随后后续也有一些这方面的文章，但基本都是很小的改进或者应用。作者提供了原码，可以在 matlab上运行看看效果。
-N Paragios, R Deriche.
-Geodesic  active  regions  and  level set methods  for  supervised  texture segmentation
- 
- 
-Statistical Color Models with Application to Skin Detection
- 
- 
-A tutorial on particle filters for online nonlinear non-Gaussian Bayesian tracking
-particle filter 的一个综述
+D Comaniciu, P Meer.Mean  shift:  A  robust  approach toward feature space analysis. Mean shift的经典文章。前两天发现 Comaniciu 已经是 IEEE Fellow了Ming-Husan Yang, David J Kriegman, Narendra Ahuja.Detecting  Faces  in  Images:  A Survey.人脸检测综述，引用率想不高都难R Hsu, M Abdel-Mottaleb.Face Detection in Color Images.依然是人脸检测，名字都起得这么霸气J-L Starck, E J Candès, D L Donoho.The  curvelet  transform  for  image denoising.Geometrical wavelet 中的一篇代表 作 。 其 他 的 如 ridgelet, contourlet, bandelet 等在这里就不赘述了。研究这方面的很容易找到这方面的经典文献。个人以为不研究这方面的看了后对自己的研究也不会有多大启发。曾经以为这个方向会很火，到最后还是没火起来。  我觉得原因可能是现在存储和传输能力的大大提高，使得对压缩的需求没有那么大了，这方面的研究自然就停滞了，就如同JPEG2000没有成气候 Shape matching and object recognition using shape contextsShape context。用形状匹配达到目标识别目的。这方面最经典的文章了。随后后续也有一些这方面的文章，但基本都是很小的改进或者应用。作者提供了原码，可以在 matlab上运行看看效果。N Paragios, R Deriche.Geodesic  active  regions  and  level set methods  for  supervised  texture segmentation  Statistical Color Models with Application to Skin Detection  A tutorial on particle filters for online nonlinear non-Gaussian Bayesian trackingparticle filter 的一个综述
 2003 年 
-W Zhao, R Chellappa, P J Phillips, A Rosenfeld.
-Face recognition: A literature survey.
-人脸检测的综述
-J Sivic, A Zisserman.
-Video  Google:  A  text  retrieval approach  to  object  matching  in videos.
-好像是Visual words的起源文章。引用率很高，先列出来再看。
-D Comaniciu, V Ramesch, P Meer.
-Kernel-Based Object Tracking.
-基于核的跟踪。
-B Zitová, J Flusser.
-Image  registration  methods:  A survey.
-又一篇图像配准的综述。做图像配准的比较有福气，综述很多
-K Mikolajczyk, C Schmid.
-A  performance  evaluation  of  local descriptors. 
-比较各种描述子的，包括SIFT
-M J Wainwright, M I Jordan.
-Graphical  models,  exponential families, and variational inference. 
-乔丹的名气太大，不露露脸说不过去
-J Portilla, V Strela, M Wainwright, E Simoncelli.
-Image  denoising  using  scale mixtures of gaussians  in  the wavelet domain.
-图像去噪，小波变换，混合高斯
-Robert E. Schapire
-The Boosting Approach to Machine Learning  An Overview
-boosting作者自己写的综述，自然值得一看。
+W Zhao, R Chellappa, P J Phillips, A Rosenfeld.Face recognition: A literature survey.人脸检测的综述J Sivic, A Zisserman.Video  Google:  A  text  retrieval approach  to  object  matching  in videos.好像是Visual words的起源文章。引用率很高，先列出来再看。D Comaniciu, V Ramesch, P Meer.Kernel-Based Object Tracking.基于核的跟踪。B Zitová, J Flusser.Image  registration  methods:  A survey.又一篇图像配准的综述。做图像配准的比较有福气，综述很多K Mikolajczyk, C Schmid.A  performance  evaluation  of  local descriptors. 比较各种描述子的，包括SIFTM J Wainwright, M I Jordan.Graphical  models,  exponential families, and variational inference. 乔丹的名气太大，不露露脸说不过去J Portilla, V Strela, M Wainwright, E Simoncelli.Image  denoising  using  scale mixtures of gaussians  in  the wavelet domain.图像去噪，小波变换，混合高斯Robert E. SchapireThe Boosting Approach to Machine Learning  An Overviewboosting作者自己写的综述，自然值得一看。
 2004 年 
- 
-Lucas-Kanade 20 Years On A Unifying Framework 
-引用文章摘要的第一句话Since the Lucas-Kanade algorithm was proposed in 1981 image alignment has become one of the most widely used techniques in computer vision. Applications range from optical flow and tracking to layered motion,  mosaic construction, and face coding. 
-D G Lowe.
-Distinctive  image  features  from scale-invariant keypoints. 
-SIFT，不解释
-Chih-ChungChang,Chih-Jen Lin.  
-LIBSVM: A  library  for support vectormachines
-我实在怀疑引用这篇文章的人是否都看过这篇文章。貌似不看这篇文章也可以使用 LIBSVM
-Z Wang, A C Bovik, H R Sheikh, E P Simoncelli.
-Image  quality  assessment:  From error visibility to structural similarity
-图像质量评价，最近 Bovik 还有一篇类似的文章也刊登在 TIP上
-Y Ke, R Sukthankar.
-Pca-sift:  a  more  distinctive representation  for  local  image descriptors
-SIFT 的变形
- 
-Review of shape representation and description techniques
- 
- 
-Efficient Graph-Based Image Segmentation
- 
+ Lucas-Kanade 20 Years On A Unifying Framework 引用文章摘要的第一句话Since the Lucas-Kanade algorithm was proposed in 1981 image alignment has become one of the most widely used techniques in computer vision. Applications range from optical flow and tracking to layered motion,  mosaic construction, and face coding. D G Lowe.Distinctive  image  features  from scale-invariant keypoints. SIFT，不解释Chih-ChungChang,Chih-Jen Lin.  LIBSVM: A  library  for support vectormachines我实在怀疑引用这篇文章的人是否都看过这篇文章。貌似不看这篇文章也可以使用 LIBSVMZ Wang, A C Bovik, H R Sheikh, E P Simoncelli.Image  quality  assessment:  From error visibility to structural similarity图像质量评价，最近 Bovik 还有一篇类似的文章也刊登在 TIP上Y Ke, R Sukthankar.Pca-sift:  a  more  distinctive representation  for  local  image descriptorsSIFT 的变形 Review of shape representation and description techniques  Efficient Graph-Based Image Segmentation 
 2005 年
-N Dalal, B Triggs.
-Histograms  of  oriented  gradients  for human detection. 
-HOG  虽然很新，但很经典
-A C Berg, T L Berg, J Malik.
-Shape  matching  and  object recognition  using  low  distortion correspondences.
-还是 shape matching
-S Roth, M Black.
-Fields  of  experts:  A  framework  for learning image priors.
-这篇应该要归结到图像统计特性的范畴吧
-Z Tu, X Chen,A L Yuille, S C Zhu.
-Image  parsing:  Unifying segmentation,  detection,  and recognition.
- 
- 
-Geodesic active regions and level set methods for motion  estimation and tracking
- 
-Chunming Li, Chenyang Xu, Changfeng Gui, and  Martin D. Fox
-Level Set Evolution Without Re-initialization: A New Variational Formulation
-这篇文章解决了level set中需要不停的重初始化的问题。在 2010 年的 TIP上有一篇 Journal版本 Distance Regularized Level Set Evolution and its Application to Image Segmentation
- 
-A Performance Evaluation of Local Descriptors
-前面那篇是会议的，这篇是 PAMI上的。比较各种描述子的，包括SIFT
+N Dalal, B Triggs.Histograms  of  oriented  gradients  for human detection. HOG  虽然很新，但很经典A C Berg, T L Berg, J Malik.Shape  matching  and  object recognition  using  low  distortion correspondences.还是 shape matchingS Roth, M Black.Fields  of  experts:  A  framework  for learning image priors.这篇应该要归结到图像统计特性的范畴吧Z Tu, X Chen,A L Yuille, S C Zhu.Image  parsing:  Unifying segmentation,  detection,  and recognition.  Geodesic active regions and level set methods for motion  estimation and tracking Chunming Li, Chenyang Xu, Changfeng Gui, and  Martin D. FoxLevel Set Evolution Without Re-initialization: A New Variational Formulation这篇文章解决了level set中需要不停的重初始化的问题。在 2010 年的 TIP上有一篇 Journal版本 Distance Regularized Level Set Evolution and its Application to Image Segmentation A Performance Evaluation of Local Descriptors前面那篇是会议的，这篇是 PAMI上的。比较各种描述子的，包括SIFT
 2006 年 
-D Donoho.
-Compressed sensing. 
-CS  压缩感知  最近很火的一个名词                     
-Greg Welch, Gary Bishop.
-An introduction to the Kalman Filter.
-kalman滤波
-S Lazebnik, C Schmid, J Ponce.
-Beyond  bags  of  features:  spatial pyramid  matching  for  recognizing natural scene categories. 
-Visual words
-Xiaojin Zhu.
-Semi-supervised  learning  literature survey.
- 
-A Yilmaz, O Javed, M Shah.
-Object Tracking: A survey.
-tracking的一篇综述
- 
-Image Alignment and Stitching: A Tutorial
- 
+D Donoho.Compressed sensing. CS  压缩感知  最近很火的一个名词                     Greg Welch, Gary Bishop.An introduction to the Kalman Filter.kalman滤波S Lazebnik, C Schmid, J Ponce.Beyond  bags  of  features:  spatial pyramid  matching  for  recognizing natural scene categories. Visual wordsXiaojin Zhu.Semi-supervised  learning  literature survey. A Yilmaz, O Javed, M Shah.Object Tracking: A survey.tracking的一篇综述 Image Alignment and Stitching: A Tutorial 
 2007 年 
- 
-A Review of Statistical Approaches to Level Set Segmentation: Integrating Color, Texture, Motion and Shape             
- 
- 
-The Appearance of Human Skin: A Survey
- 
- 
-Local Invariant Feature Detectors: A Survey
- 
+ A Review of Statistical Approaches to Level Set Segmentation: Integrating Color, Texture, Motion and Shape               The Appearance of Human Skin: A Survey  Local Invariant Feature Detectors: A Survey 
 2008 年 
-H Bay, A Ess, T Tuytelaars, L V Gool.
-SURF:  Speeded  Up  Robust Features.  
- 
-K E A van de Sande, T Gevers, C G M Snoek.
-Evaluation  of  Color  Descriptors  for Object and Scene Recognition
- 
-M Yang 
-A Survey of Shape Feature Extraction Techniques
-虽然这篇文章的引用率目前来看并不高,但个人认为这是一篇在shape feature方面很不错的文章
-P.Felzenszwalb, D. McAllester, D. Ramanan
-A Discriminatively Trained, Multiscale, Deformable Part Model
-2008 年的 CVPR，到现在引用已有四百多次，潜力巨大。rosepink提供
+H Bay, A Ess, T Tuytelaars, L V Gool.SURF:  Speeded  Up  Robust Features.   K E A van de Sande, T Gevers, C G M Snoek.Evaluation  of  Color  Descriptors  for Object and Scene Recognition M Yang A Survey of Shape Feature Extraction Techniques虽然这篇文章的引用率目前来看并不高,但个人认为这是一篇在shape feature方面很不错的文章P.Felzenszwalb, D. McAllester, D. RamananA Discriminatively Trained, Multiscale, Deformable Part Model2008 年的 CVPR，到现在引用已有四百多次，潜力巨大。rosepink提供
 2009 年 
-J Wright, A Y Yang, A Ganesh, S S Sastry, Ma.
-Robust Face Recognition via Sparse Representation.                              
- 
-B Settles.
-Active learning literature survey
- 
+J Wright, A Y Yang, A Ganesh, S S Sastry, Ma.Robust Face Recognition via Sparse Representation.                               B Settles.Active learning literature survey 
 2010 年 
- 
- 
- 
- 
- 
- 
+      
 2011 年 
- 
-Hough Forests for Object Detection, Tracking, and Action Recognition
- 
- 
-Robust Principal Component Analysis?
-Candes  和 UIUC 的Ma Yi等人                                                                         
+ Hough Forests for Object Detection, Tracking, and Action Recognition  Robust Principal Component Analysis?Candes  和 UIUC 的Ma Yi等人                                                                         
 2012 年 
-Zdenek Kalal, Krystian Mikolajczyk,and Jiri Matas,
-Tracking-Learning-Detection
-PAMI上的，虽然还没有正式发表，但肯定会火。在作者的主页上有几篇相关的会议文章， demo和code。用到了 Lucas-Kanade方法
- 
- 
- 
+Zdenek Kalal, Krystian Mikolajczyk,and Jiri Matas,Tracking-Learning-DetectionPAMI上的，虽然还没有正式发表，但肯定会火。在作者的主页上有几篇相关的会议文章， demo和code。用到了 Lucas-Kanade方法   
 
 （完）“
 

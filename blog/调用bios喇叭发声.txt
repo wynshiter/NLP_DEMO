@@ -3,103 +3,102 @@
 
 话不多说，上代码：
  
-#include <windows.h>
-#include <iostream>
-#include <map>
-using namespace std;
+#include <windows.h>
+#include <iostream>
+#include <map>
+using namespace std;
+
+const int DO = 261;
+const int RE = 293;
+const int MI = 329;
+const int FA = 349;
+const int SO = 392;
+const int LA = 440;
+const int TI = 493;
+
+const int DO_ = 130;
+const int RE_ = 147;
+const int MI_ = 165;
+const int FA_ = 174;
+const int SO_ = 186;
+const int LA_ = 220;
+const int TI_ = 247;
+
+int frequency(char note){
+    static map<const char,int> table;
+    
+    if(table.size() == 0){
+        table['1'] = DO;    
+        table['2'] = RE;            
+        table['3'] = MI;    
+        table['4'] = FA;    
+        table['5'] = SO;    
+        table['6'] = LA;    
+        table['7'] = TI;    
+        
+        table['c'] = DO_;    
+        table['d'] = RE_;            
+        table['e'] = MI_;    
+        table['f'] = FA_;    
+        table['g'] = SO_;    
+        table['a'] = LA_;    
+        table['b'] = TI_;    
+    }
+        
+    return table.find(note) -> second;
+}
+
+class music{
+    private:
+        string notes;
+        int tenuto;
+    public:
+        music(string &song , int tenuto_) { notes = song; tenuto = tenuto_; play(notes.end(),tenuto);}
+        void play(string::iterator it,int duration );
+};
+void music::play(string::iterator it, int duration){
+    char note = *it;
+    
+    if( it == notes.begin() )
+        return;
+    
+    if( note == '-') 
+        play( it - 1, duration + tenuto);
+    else {
+        if( isalnum(note) ) {
+            play( it - 1, 0);
+            
+            Beep(frequency(note), tenuto + duration);
+        } else
+            play( it - 1, duration);
+    }
+    
+}
+
+ string bee = "\
+ 5 3 3 - | 4 2 2 - | 1 2 3 4 | 5 5 5 - | \
+ 5 3 3 - | 4 2 2 - | 1 3 5 5 | 3 3 3 - | \
+ 2 2 2 2 | 2 3 4 - | 3 3 3 3 | 3 4 5 - | \
+ 5 3 3 - | 4 2 2 - | 1 3 5 5 | 1 3 1 - |  \
+ ";
+ 
+ string happynewyear = "\
+						  1 1 1 - g - | 3 3 3 - 1 - | 1 3 5 - 5 - | \
+						  4 3 2 - - - | 2 3 4 - 4 - | 3 2 3 - 1 - | \
+						  1 3 2 - g - | b 2 1 - - - | \
+						  ";
+ 
+ int main()
+ {    
+	 music m(bee, 300);
+	 
+	 music m2(happynewyear, 200);
+	 
+	 return 0;
+ }
+ 
+ 
 
-const int DO = 261;
-const int RE = 293;
-const int MI = 329;
-const int FA = 349;
-const int SO = 392;
-const int LA = 440;
-const int TI = 493;
-
-const int DO_ = 130;
-const int RE_ = 147;
-const int MI_ = 165;
-const int FA_ = 174;
-const int SO_ = 186;
-const int LA_ = 220;
-const int TI_ = 247;
-
-int frequency(char note){
-    static map<const char,int> table;
-    
-    if(table.size() == 0){
-        table['1'] = DO;    
-        table['2'] = RE;            
-        table['3'] = MI;    
-        table['4'] = FA;    
-        table['5'] = SO;    
-        table['6'] = LA;    
-        table['7'] = TI;    
-        
-        table['c'] = DO_;    
-        table['d'] = RE_;            
-        table['e'] = MI_;    
-        table['f'] = FA_;    
-        table['g'] = SO_;    
-        table['a'] = LA_;    
-        table['b'] = TI_;    
-    }
-        
-    return table.find(note) -> second;
-}
-
-class music{
-    private:
-        string notes;
-        int tenuto;
-    public:
-        music(string &song , int tenuto_) { notes = song; tenuto = tenuto_; play(notes.end(),tenuto);}
-        void play(string::iterator it,int duration );
-};
-void music::play(string::iterator it, int duration){
-    char note = *it;
-    
-    if( it == notes.begin() )
-        return;
-    
-    if( note == '-') 
-        play( it - 1, duration + tenuto);
-    else {
-        if( isalnum(note) ) {
-            play( it - 1, 0);
-            
-            Beep(frequency(note), tenuto + duration);
-        } else
-            play( it - 1, duration);
-    }
-    
-}
-
- string bee = "\
- 5 3 3 - | 4 2 2 - | 1 2 3 4 | 5 5 5 - | \
- 5 3 3 - | 4 2 2 - | 1 3 5 5 | 3 3 3 - | \
- 2 2 2 2 | 2 3 4 - | 3 3 3 3 | 3 4 5 - | \
- 5 3 3 - | 4 2 2 - | 1 3 5 5 | 1 3 1 - |  \
- ";
- 
- string happynewyear = "\
-						  1 1 1 - g - | 3 3 3 - 1 - | 1 3 5 - 5 - | \
-						  4 3 2 - - - | 2 3 4 - 4 - | 3 2 3 - 1 - | \
-						  1 3 2 - g - | b 2 1 - - - | \
-						  ";
- 
- int main()
- {    
-	 music m(bee, 300);
-	 
-	 music m2(happynewyear, 200);
-	 
-	 return 0;
- }
- 
- 
-
-
- 
+  
 
 

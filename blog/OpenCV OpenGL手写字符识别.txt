@@ -18,1713 +18,1710 @@ http://download.csdn.net/detail/wangyaninglm/8244549
  
  
 Finger.h
-#ifndef __TOUCHSCREEN_FINGER__
-#define __TOUCHSCREEN_FINGER__
-
-#include <cxcore.h>
-#include <vector>
-
-class Finger
-{
-public:
-	Finger()
-	{
-		area = 0.0f;	
-		w=h=0;
-	};
-public:
-	CvPoint center;
-	float area;
-	float w;
-	float h;
-};
-
-
-//typedef std::vector<Finger> FingerTrack;	
-
-
-class FingerTrack
-{
-public:
-	FingerTrack()
-	{
-		states=0;
-		lostCount =0;
-	}
-	std::vector<Finger> track;
-	int states;
-	int lostCount;
-
-};
-
+#ifndef __TOUCHSCREEN_FINGER__
+#define __TOUCHSCREEN_FINGER__
+
+#include <cxcore.h>
+#include <vector>
+
+class Finger
+{
+public:
+	Finger()
+	{
+		area = 0.0f;	
+		w=h=0;
+	};
+public:
+	CvPoint center;
+	float area;
+	float w;
+	float h;
+};
+
+
+//typedef std::vector<Finger> FingerTrack;	
+
+
+class FingerTrack
+{
+public:
+	FingerTrack()
+	{
+		states=0;
+		lostCount =0;
+	}
+	std::vector<Finger> track;
+	int states;
+	int lostCount;
+
+};
+
 #endif 
-
- 
+  
  
 MachineLearning.h
  
-#include <cxcore.h>
-#include <cv.h>
-#include <ml.h>
-#include <string>
-using namespace std ;
-class MachineLearning
-{
-	enum TraningMethod 
-	{
-		RandomTrees,
-		Boosting,
-		NeuralNetworks,
-		SVM
-	};
+#include <cxcore.h>
+#include <cv.h>
+#include <ml.h>
+#include <string>
+using namespace std ;
+class MachineLearning
+{
+	enum TraningMethod 
+	{
+		RandomTrees,
+		Boosting,
+		NeuralNetworks,
+		SVM
+	};
+
+public:
+	bool getCrossFeature(IplImage *img,float featureData[]);
+	bool predict(char &shape_type,float featureData[]);
+	bool load(const char *training_filename);
+	bool train(const  char *data_filename,const  char *save_filename);
+	MachineLearning(void);
+	void ExtractDFT(float pcadata[],const int featureData[],const int &dataWidth,const int &DFTwidth);
+	int DataCount;
+
+private:
+	static const int CROSS_COLS = 50;
+	static const int CROSS_ROWS = 50;
+	void getCrossFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows );
+	void getDistanceFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows );
+	void getCrossCenter(IplImage *img_cross,int &cx,int &cy);
+	void getCrossSpecifyArea(IplImage *img_cross,CvRect &specifie_rect);
+	void ExtractPCA(float pcadata[],const int featureData[],const int &dataWidth );
+
+	bool is_load_training_model; 
+	TraningMethod  traning_method;
+	int read_num_class_data( const char* filename, int var_count,CvMat** data, CvMat** responses);
+	int build_rtrees_classifier(const char* data_filename,const char* filename_to_save,const char* filename_to_load);
+	int build_boost_classifier( char* data_filename,char* filename_to_save, char* filename_to_load );
+	int build_mlp_classifier( char* data_filename,char* filename_to_save, char* filename_to_load );
+	int build_svm_classifier( char* data_filename,char* filename_to_save, char* filename_to_load );
+
+	CvRTrees forest;
+	int predict_rtrees_classifier(CvMat *sample_data,char &shape_type);
+
+
+
+};
 
-public:
-	bool getCrossFeature(IplImage *img,float featureData[]);
-	bool predict(char &shape_type,float featureData[]);
-	bool load(const char *training_filename);
-	bool train(const  char *data_filename,const  char *save_filename);
-	MachineLearning(void);
-	void ExtractDFT(float pcadata[],const int featureData[],const int &dataWidth,const int &DFTwidth);
-	int DataCount;
-
-private:
-	static const int CROSS_COLS = 50;
-	static const int CROSS_ROWS = 50;
-	void getCrossFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows );
-	void getDistanceFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows );
-	void getCrossCenter(IplImage *img_cross,int &cx,int &cy);
-	void getCrossSpecifyArea(IplImage *img_cross,CvRect &specifie_rect);
-	void ExtractPCA(float pcadata[],const int featureData[],const int &dataWidth );
-
-	bool is_load_training_model; 
-	TraningMethod  traning_method;
-	int read_num_class_data( const char* filename, int var_count,CvMat** data, CvMat** responses);
-	int build_rtrees_classifier(const char* data_filename,const char* filename_to_save,const char* filename_to_load);
-	int build_boost_classifier( char* data_filename,char* filename_to_save, char* filename_to_load );
-	int build_mlp_classifier( char* data_filename,char* filename_to_save, char* filename_to_load );
-	int build_svm_classifier( char* data_filename,char* filename_to_save, char* filename_to_load );
-
-	CvRTrees forest;
-	int predict_rtrees_classifier(CvMat *sample_data,char &shape_type);
-
-
-
-};
-
-
- 
+  
  
 machinelearning.cpp
  
-/*************************************************
-  Copyright (C)
-  File name:      
-  Author:				Hardy
-  Version:				1.0
-  Date:					2007－3－5
-  Description:			模式识别部分,提取特征数据，训练模型，预测结果
-  Others:         
-  Function List:      
-  History:        
-    1. Date:
-       Author:
-       Modification:
-    2. ...
-************************************************/
-
-#include "stdafx.h"
-#include "MachineLearning.h"
-#include <highgui.h>
-#include <iostream>
-#include <fstream>
-
-
-MachineLearning::MachineLearning(void)
-{
-	is_load_training_model = false;
-	traning_method = RandomTrees;
+/*************************************************
+  Copyright (C)
+  File name:      
+  Author:				Hardy
+  Version:				1.0
+  Date:					2007－3－5
+  Description:			模式识别部分,提取特征数据，训练模型，预测结果
+  Others:         
+  Function List:      
+  History:        
+    1. Date:
+       Author:
+       Modification:
+    2. ...
+************************************************/
+
+#include "stdafx.h"
+#include "MachineLearning.h"
+#include <highgui.h>
+#include <iostream>
+#include <fstream>
+
+
+MachineLearning::MachineLearning(void)
+{
+	is_load_training_model = false;
+	traning_method = RandomTrees;
+}
+
+bool MachineLearning::getCrossFeature(IplImage *img,float pcaData[])
+/*************************************************
+  Function:        
+  Description:  样本数据载入		
+  Date:			2007－3－5
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+
+	assert(img);
+
+	计算图形所在矩形
+	//int cx,cy;
+	//getCrossCenter(img,cx,cy);
+	//CvRect roiRect;
+	//getCrossSpecifyArea(img,roiRect);
+
+	//assert(roiRect.x>0);
+	//assert(roiRect.y>0);
+	//assert(roiRect.height>0 && roiRect.height < img->width);
+	//assert(roiRect.width>0 && roiRect.width < img->width );
+	//cvSetImageROI(img,roiRect);
+
+
+	//IplImage *img_copy = cvCreateImage(cvSize(100,100) , 8, 1 );
+	//img_copy->origin = img->origin;
+	//cvZero(img_copy);
+	//cvResize(img,img_copy,CV_INTER_NN);
+	//cvResetImageROI(img);
+
+
+	//计算形心
+	int cx,cy;
+	getCrossCenter(img,cx,cy);
+
+	assert(cx<img->width);
+	assert(cx>0);
+	assert(cy<img->height);
+	assert(cy>0);
+
+	int shift_x = img->width/2 - cx;
+	int shift_y = img->height/2 - cy;
+
+
+	IplImage *img_copy = cvCreateImage(cvGetSize(img) , 8, 1 );
+	img_copy->origin = img->origin;
+	cvZero(img_copy);
+
+	//移动图形到中心
+	for(int i = 0; i<img->width;i++)
+	{
+		for(int j = 0; j<img->height;j++)
+		{
+			CvScalar c = cvGetAt(img,j,i); 
+			int v = (int)c.val[0];
+			if(v==255)
+			{
+				int nj=j+shift_y;
+				int ni=i+shift_x;
+				if(nj<img->height && ni<img->width)
+					if(nj>=0 && ni>=0)
+						cvSet2D(img_copy,nj,ni,c);
+			}
+		}
+	}
+
+	//计算密度特征数据--------------
+	//int featureData[CROSS_ROWS + CROSS_COLS];
+	//memset(featureData,-1,sizeof(featureData));
+	//getCrossFeatureData(img_copy,featureData,CROSS_COLS,CROSS_ROWS);
+	std::cout<<"--------------------------------------------"<<std::endl;
+	cvShowImage("WIN1",img_copy);
+	cvWaitKey(0);	
+	//float CrossData[10];
+	//ExtractPCA(CrossData,featureData,CROSS_COLS+CROSS_ROWS);
+	//
+	
+	//计算距离特征数据	
+	int featureDisData[2*CROSS_ROWS + CROSS_COLS];
+	memset(featureDisData,-1,sizeof(featureDisData));	
+	getDistanceFeatureData(img_copy,featureDisData,CROSS_COLS,CROSS_ROWS);
+	float DistanceData[10];
+	ExtractPCA(DistanceData,featureDisData,CROSS_COLS+2*CROSS_ROWS);
+
+	//合并特征数据
+	//for(int i=0;i<5;i++) pcaData[i] = CrossData[i];
+	//for(int i=5;i<10;i++) pcaData[i] = DistanceData[i-5];
+	for(int i=0;i<10;i++) pcaData[i] = DistanceData[i];
+
+	
+	cvReleaseImage(&img_copy);
+
+	return true;
+}
+
+void MachineLearning::getCrossFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows)
+/*************************************************
+  Function:        
+  Description:  穿线得到特征数据		
+  Date:			2007－3－5
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+	const int CROSS_VALID_LENGTH = 6; //在6个象素内不计算穿越数目,避免噪音
+	CvScalar c;
+
+	for(int cross_index=0;cross_index<rows;cross_index++)
+	{
+		int y = (int)(img_cross->height*((float)cross_index/rows)); //按照比例决定位置
+
+		int cross_count = 0;
+		int pre_v = -1;
+		int pre_x = 0;
+		for(int x =0;x<img_cross->width;x++)
+		{			 
+			c = cvGetAt(img_cross,y,x); 
+			int v = (int)c.val[0];
+			if(pre_v==255 && v==0) 
+				if((x-pre_x)>CROSS_VALID_LENGTH)
+				{
+					cross_count++;
+					pre_x = x;
+				}
+			pre_v = v;
+			
+		}
+
+		//cout<<cross_count<<",";		
+		featureData[cross_index] = cross_count;
+		
+	}
+
+	for(int cross_index=0;cross_index<cols;cross_index++)
+	{
+		int x = (int)(img_cross->width*((float)cross_index/cols));
+
+		int cross_count = 0;
+		int pre_v = -1;
+		int pre_y = 0;
+		for(int y =0;y<img_cross->height;y++)
+		{
+			
+			c = cvGetAt(img_cross,y,x); 
+			int v = (int)c.val[0];
+			if(pre_v==255 && v==0)
+				if((y-pre_y)>CROSS_VALID_LENGTH)
+				{
+					cross_count++;
+					pre_y = y;
+				}
+
+			pre_v = v;
+		}
+
+		//cout<<cross_count<<",";		
+		featureData[rows+cross_index] = cross_count;		
+	} 
+
+
+}
+
+void MachineLearning::getDistanceFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows)
+/*************************************************
+  Function:        
+  Description:  穿线得到距离特征数据		
+  Date:			2007－3－9
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{	
+
+	CvScalar c;
+
+	//从左向右穿线
+	for(int cross_index=0;cross_index<rows;cross_index++)
+	{
+		int y = (int)(img_cross->height*((float)cross_index/rows)); //按照比例决定位置
+		int meet_x = 0;
+		for(int x =0;x<img_cross->width;x++)
+		{			 
+			c = cvGetAt(img_cross,y,x); 
+			int v = (int)c.val[0];
+			if(v==255) 
+			{
+				meet_x = x;			
+				break;
+			}
+		}
+		//cout<<meet_x<<",";		
+		featureData[cross_index] = meet_x;		
+	}
+
+	//从右向左穿线
+	for(int cross_index=rows;cross_index<2*rows;cross_index++)
+	{
+		int y = (int)(img_cross->height*((float)(cross_index-rows)/rows)); //按照比例决定位置
+		int meet_x = 0;
+		for(int x =(img_cross->width-1);x>-1;x--)
+		{			 
+			c = cvGetAt(img_cross,y,x); 
+			int v = (int)c.val[0];
+			if(v==255) 
+			{
+				meet_x = x;			
+				break;
+			}			
+		}
+		//cout<<meet_x<<",";
+		featureData[cross_index] = meet_x;		
+	}
+
+	//从下向上穿线
+	for(int cross_index=0;cross_index<cols;cross_index++)
+	{
+		int x = (int)(img_cross->width*((float)cross_index/cols));
+
+		int meet_y = 0;
+		for(int y =(img_cross->height-1);y>-1;y--)
+		{
+			
+			c = cvGetAt(img_cross,y,x); 
+			int v = (int)c.val[0];
+			if(v==255) 
+			{
+				meet_y = y;
+				break;
+			}
+		}
+		//cout<<meet_y<<",";		
+		featureData[2*rows+cross_index] = meet_y;		
+	} 
+
+
+}
+
+void MachineLearning::getCrossSpecifyArea(IplImage *img,CvRect &specifie_rect)
+/*************************************************
+  Function:        
+  Description:  获得图像矩形		
+  Date:			2007－3－7
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+	CvRect res_rect = cvRect(0,0,0,0);
+	const int fix =0;
+	CvMemStorage*  mt_storage  =  cvCreateMemStorage(0);
+	CvSeq* mt_contour = NULL;
+	int ApproxCount = 2; //轮廓优化等级	
+	IplImage *frame_copy = cvCreateImage(cvGetSize(img) , 8, 1 );
+	frame_copy->origin = img->origin;
+	cvCopy(img,frame_copy,0);
+	cvFindContours( frame_copy, mt_storage, &mt_contour, sizeof(CvContour),
+		CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
+	if(mt_contour)
+	{
+		CvSeqReader reader;
+		int i;
+		CvPoint left_top_pt=cvPoint(img->width,img->height);
+		CvPoint right_bottom_pt=cvPoint(0,0);
+		
+		CvPoint pt;
+		CvSeq *contour2 = mt_contour;
+
+		for (; contour2 != NULL; contour2 = contour2->h_next)
+		{
+			cvStartReadSeq(contour2, &reader);
+			int N = contour2->total;
+			if(N<10) continue;
+
+			for (i = 0; i < N; i++)
+			{
+				CV_READ_SEQ_ELEM(pt, reader);
+				if(left_top_pt.x>pt.x)left_top_pt.x = pt.x;
+				if(left_top_pt.y>pt.y)left_top_pt.y = pt.y;
+				if(right_bottom_pt.x<pt.x)right_bottom_pt.x = pt.x;
+				if(right_bottom_pt.y<pt.y)right_bottom_pt.y = pt.y;
+
+			}
+			res_rect = cvRect(abs(left_top_pt.x-fix),abs(left_top_pt.y-fix),(right_bottom_pt.x-left_top_pt.x+2*fix),(right_bottom_pt.y-left_top_pt.y+2*fix));
+			specifie_rect = res_rect;
+			break;
+		}
+	}
+
+	cvClearMemStorage(mt_storage);
+	cvReleaseImage(&frame_copy);
+}
+
+void MachineLearning::getCrossCenter(IplImage *img,int &cx,int &cy)
+/*************************************************
+  Function:        
+  Description:  获得图像平移到中心		
+  Date:			2007－3－5
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+	CvMemStorage*  mt_storage  =  cvCreateMemStorage(0);
+	CvSeq* mt_contour = NULL;
+	int ApproxCount = 2; //轮廓优化等级	
+	IplImage *frame_copy = cvCreateImage(cvGetSize(img) , 8, 1 );
+	frame_copy->origin = img->origin;
+	cvCopy(img,frame_copy,0);
+	cvFindContours( frame_copy, mt_storage, &mt_contour, sizeof(CvContour),
+		CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
+	if(mt_contour)
+	{
+		CvSeqReader reader;
+		int i;
+		int total_x = 0;
+		int total_y = 0;
+		
+		CvPoint pt;
+		CvSeq *contour2 = mt_contour;
+
+		for (; contour2 != NULL; contour2 = contour2->h_next)
+		{
+			cvStartReadSeq(contour2, &reader);
+			int N = contour2->total;
+			if(N<10) continue;
+
+			for (i = 0; i < N; i++)
+			{
+				CV_READ_SEQ_ELEM(pt, reader);
+				total_x += pt.x;
+				total_y += pt.y;
+			}
+			cx = total_x/N;
+			cy = total_y/N;
+			break;
+		}
+	}
+	cvReleaseMemStorage(&mt_storage);
+	cvReleaseImage(&frame_copy);
+}
+
+void MachineLearning::ExtractPCA(float pcadata[],const int featureData[],const int &dataWidth )
+/*************************************************
+  Function:        
+  Description:  采用fourier transfer 得到降维的数据		
+  Date:			2007－3－5
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+			
+	//int dataWidth = cols + rows;		
+	//CvMat* pData = cvCreateMat(2,dataWidth, CV_32FC1);
+	//for(int i = 0; i < dataWidth; i++)
+	//{
+	//	cvSet2D(pData, 0, i,cvRealScalar(i));				
+	//	cvSet2D(pData, 1, i,cvRealScalar(featureData[i]));				
+	//}
+
+	//CvMat* pMean = cvCreateMat(2, dataWidth, CV_32FC1);
+	//CvMat* pEigVals = cvCreateMat(2, dataWidth, CV_32FC1);
+	//CvMat* pEigVecs = cvCreateMat(2, dataWidth, CV_32FC1);
+
+	//cvCalcPCA(pData, pMean, pEigVals, pEigVecs, CV_PCA_DATA_AS_ROW );
+
+	//float pp[100];
+	//memcpy(pp,pEigVals->data.fl,100 );
+	//memcpy(pp,pEigVecs->data.fl,100 );
+	//memcpy(pp,pMean->data.fl,100 );
+	
+	CvMat* s = cvCreateMat(1,dataWidth,CV_32FC1);
+	memcpy(s->data.i,featureData,sizeof(featureData));
+	for(int i=0;i<dataWidth;i++)
+			cvSetReal2D(s,0,i,featureData[i]);
+ 
+	//for(int i=0;i<dataWidth;i++)
+	//		printf("%6.2f\t",cvGetReal2D(s,0,i));
+	//printf("\n");
+
+	CvMat* d = cvCreateMat(1,dataWidth,CV_32FC1);
+
+	cvDFT(s,d,CV_DXT_FORWARD|CV_DXT_SCALE);
+
+	//for(int i=0;i<dataWidth;i++)
+	//		printf("%6.2f\t",cvGetReal2D(d,0,i));
+	//printf("\n");
+
+	for(int i=0;i<10;i++)
+	{
+		pcadata[i] = (float)cvGetReal2D(d,0,i); 
+	}
+
+	cvReleaseMat(&s);
+	cvReleaseMat(&d);
+}
+
+
+
+void MachineLearning::ExtractDFT(float pcadata[],const int featureData[],const int &dataWidth,const int &DFTwidth )
+/*************************************************
+  Function:        
+  Description:  采用fourier transfer 得到降维的数据		
+  Date:			2007－3－5
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+			
+
+	
+	CvMat* s = cvCreateMat(1,dataWidth,CV_32FC1);
+	memcpy(s->data.i,featureData,sizeof(featureData));
+	for(int i=0;i<dataWidth;i++)
+			cvSetReal2D(s,0,i,featureData[i]);
+ 
+	//for(int i=0;i<dataWidth;i++)
+	//		printf("%6.2f\t",cvGetReal2D(s,0,i));
+	//printf("\n");
+
+	CvMat* d = cvCreateMat(1,dataWidth,CV_32FC1);
+
+	cvDFT(s,d,CV_DXT_FORWARD|CV_DXT_SCALE);
+
+	//for(int i=0;i<dataWidth;i++)
+	//		printf("%6.2f\t",cvGetReal2D(d,0,i));
+	//printf("\n");
+
+	for(int i=0;i<DFTwidth;i++)
+	{
+		pcadata[i] = (float)cvGetReal2D(d,0,i); 
+	}
+
+	cvReleaseMat(&s);
+	cvReleaseMat(&d);
+}
+
+
+
+int MachineLearning::read_num_class_data( const char* filename, int var_count,CvMat** data, CvMat** responses )
+{
+    const int M = 1024;
+    FILE* f = fopen( filename, "rt" );
+    CvMemStorage* storage;
+    CvSeq* seq;
+    char buf[M+2];
+    float* el_ptr;
+    CvSeqReader reader;
+    int i, j;
+
+    if( !f )
+        return 0;
+
+    el_ptr = new float[var_count+1];
+    storage = cvCreateMemStorage();
+    seq = cvCreateSeq( 0, sizeof(*seq), (var_count+1)*sizeof(float), storage );
+
+    for(;;)
+    {
+        char* ptr;
+        if( !fgets( buf, M, f ) || !strchr( buf, ',' ) )
+            break;
+        el_ptr[0] = buf[0];
+        ptr = buf+2;
+        for( i = 1; i <= var_count; i++ )
+        {
+            int n = 0;
+            sscanf( ptr, "%f%n", el_ptr + i, &n );
+            ptr += n + 1;
+        }
+        if( i <= var_count )
+            break;
+        cvSeqPush( seq, el_ptr );
+    }
+    fclose(f);
+
+    *data = cvCreateMat( seq->total, var_count, CV_32F );
+    *responses = cvCreateMat( seq->total, 1, CV_32F );
+
+    cvStartReadSeq( seq, &reader );
+
+    for( i = 0; i < seq->total; i++ )
+    {
+        const float* sdata = (float*)reader.ptr + 1;
+        float* ddata = data[0]->data.fl + var_count*i;
+        float* dr = responses[0]->data.fl + i;
+
+        for( j = 0; j < var_count; j++ )
+            ddata[j] = sdata[j];
+        *dr = sdata[-1];
+        CV_NEXT_SEQ_ELEM( seq->elem_size, reader );
+    }
+
+    cvReleaseMemStorage( &storage );
+    delete el_ptr;
+    return 1;
+}
+
+int MachineLearning::build_rtrees_classifier(const char* data_filename,
+  const char* filename_to_save, const char* filename_to_load )
+{
+    CvMat* data = 0;
+    CvMat* responses = 0;
+    CvMat* var_type = 0;
+    CvMat* sample_idx = 0;
+
+	
+
+
+    // Create or load Random Trees classifier
+    if( filename_to_load )
+    {
+        // load classifier from the specified file
+        forest.load( filename_to_load );
+        if( forest.get_tree_count() == 0 )
+        {
+            printf( "Could not read the classifier %s\n", filename_to_load );
+            return -1;
+        }
+        printf( "The classifier %s is loaded.\n", data_filename );
+    }
+    else
+    {
+		int ok = read_num_class_data( data_filename, DataCount, &data, &responses );
+		int nsamples_all = 0, ntrain_samples = 0;
+		int i = 0;
+		double train_hr = 0, test_hr = 0;
+		
+		CvMat* var_importance = 0;
+
+		if( !ok )
+		{
+			printf( "Could not read the database %s\n", data_filename );
+			return -1;
+		}
+
+		printf( "The database %s is loaded.\n", data_filename );
+		nsamples_all = data->rows;
+		ntrain_samples = (int)(nsamples_all*0.8);
+
+		int ntrain_tests = -1;
+
+		// create classifier by using <data> and <responses>
+        printf( "Training the classifier ...");
+
+        // 1. create type mask
+        var_type = cvCreateMat( data->cols + 1, 1, CV_8U );
+        cvSet( var_type, cvScalarAll(CV_VAR_ORDERED) );
+        cvSetReal1D( var_type, data->cols, CV_VAR_CATEGORICAL );
+		//00000000001
+
+		// 2. create sample_idx
+		sample_idx = cvCreateMat( 1, nsamples_all, CV_8UC1 );
+		{
+			CvMat mat;
+			cvGetCols( sample_idx, &mat, 0, nsamples_all );
+			cvSet( &mat, cvRealScalar(1) );
+
+			for(int i=0;i<nsamples_all;i++)
+			{
+				if((i%5)==0) 
+				{
+					cvSet2D(sample_idx,0,i,cvRealScalar(0));
+					ntrain_tests++;
+				}
+			}
+		}
+		
+	
+		// 3. train classifier
+		forest.train( data, CV_ROW_SAMPLE, responses, 0, sample_idx, var_type, 0,
+			CvRTParams(10,10,0,false,15,0,true,4,100,0.01f,CV_TERMCRIT_ITER));
+		printf( "\n");
+
+		// compute prediction error on train and test data
+		int test_count=0;
+		int train_count=0;
+		for(int i = 0; i < nsamples_all; i++ )
+		{
+			double r;
+			CvMat sample;
+			cvGetRow( data, &sample, i );
+
+			r = forest.predict( &sample );
+			double abs_r = fabs((float)r - responses->data.fl[i]) <= FLT_EPSILON ? 1.0 : 0.0;
+
+			if(abs_r < FLT_EPSILON)
+			{
+				printf( "data error with lines %d '%c' %f \n",i,(char)responses->data.fl[i],fabs((float)r - responses->data.fl[i])); 
+			}
+
+			if((i%5)==0)
+			{
+				test_hr += abs_r;	
+			}
+			else
+			{
+				train_hr += abs_r; 
+			}
+				
+		}
+
+		test_hr /= (double)(ntrain_tests);
+		train_hr /= (double)(nsamples_all-ntrain_tests);
+		printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
+			train_hr*100., test_hr*100. );
+
+		//printf( "Number of trees: %d\n", forest.get_tree_count() );
+	}
+
+
+
+
+
+
+     Save Random Trees classifier to file if needed
+    if( filename_to_save )
+        forest.save( filename_to_save );
+	//forest.save("..//data//rTreeResult.xml");
+
+    cvReleaseMat( &sample_idx );
+    cvReleaseMat( &var_type );
+    cvReleaseMat( &data );
+    cvReleaseMat( &responses );
+
+    return 0;
+}
+
+
+int MachineLearning::build_boost_classifier( char* data_filename,
+    char* filename_to_save, char* filename_to_load )
+{
+    const int class_count = 3;
+    CvMat* data = 0;
+    CvMat* responses = 0;
+    CvMat* var_type = 0;
+    CvMat* temp_sample = 0;
+    CvMat* weak_responses = 0;
+
+    int ok = read_num_class_data( data_filename, 13, &data, &responses );
+    int nsamples_all = 0, ntrain_samples = 0;
+    int var_count;
+    int i, j, k;
+    double train_hr = 0, test_hr = 0;
+    CvBoost boost;
+
+    if( !ok )
+    {
+        printf( "Could not read the database %s\n", data_filename );
+        return -1;
+    }
+
+    printf( "The database %s is loaded.\n", data_filename );
+    nsamples_all = data->rows;
+    ntrain_samples = (int)(nsamples_all*0.9);
+    var_count = data->cols;
+
+    // Create or load Boosted Tree classifier
+    if( filename_to_load )
+    {
+        // load classifier from the specified file
+        boost.load( filename_to_load );
+        ntrain_samples = 0;
+        if( !boost.get_weak_predictors() )
+        {
+            printf( "Could not read the classifier %s\n", filename_to_load );
+            return -1;
+        }
+        printf( "The classifier %s is loaded.\n", data_filename );
+    }
+    else
+    {
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //
+        // As currently boosted tree classifier in MLL can only be trained
+        // for 2-class problems, we transform the training database by
+        // "unrolling" each training sample as many times as the number of
+        // classes (26) that we have.
+        //
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        CvMat* new_data = cvCreateMat( ntrain_samples*class_count, var_count + 1, CV_32F );
+        CvMat* new_responses = cvCreateMat( ntrain_samples*class_count, 1, CV_32S );
+
+        // 1. unroll the database type mask
+        printf( "Unrolling the database...\n");
+        for( i = 0; i < ntrain_samples; i++ )
+        {
+            float* data_row = (float*)(data->data.ptr + data->step*i);
+            for( j = 0; j < class_count; j++ )
+            {
+                float* new_data_row = (float*)(new_data->data.ptr +
+                                new_data->step*(i*class_count+j));
+                for( k = 0; k < var_count; k++ )
+                    new_data_row[k] = data_row[k];
+                new_data_row[var_count] = (float)j;
+                new_responses->data.i[i*class_count + j] = responses->data.fl[i] == j+'A';
+            }
+        }
+
+        // 2. create type mask
+        var_type = cvCreateMat( var_count + 2, 1, CV_8U );
+        cvSet( var_type, cvScalarAll(CV_VAR_ORDERED) );
+        // the last indicator variable, as well
+        // as the new (binary) response are categorical
+        cvSetReal1D( var_type, var_count, CV_VAR_CATEGORICAL );
+        cvSetReal1D( var_type, var_count+1, CV_VAR_CATEGORICAL );
+
+
+
+        // 3. train classifier
+        printf( "Training the classifier (may take a few minutes)...");
+        boost.train( new_data, CV_ROW_SAMPLE, new_responses, 0, 0, var_type, 0,
+            CvBoostParams(CvBoost::REAL, 100, 0.95, 5, false, 0 ));
+        cvReleaseMat( &new_data );
+        cvReleaseMat( &new_responses );
+        printf("\n");
+    }
+
+    temp_sample = cvCreateMat( 1, var_count + 1, CV_32F );
+    weak_responses = cvCreateMat( 1, boost.get_weak_predictors()->total, CV_32F ); 
+
+    // compute prediction error on train and test data
+    for( i = 0; i < nsamples_all; i++ )
+    {
+        int best_class = 0;
+        double max_sum = -DBL_MAX;
+        double r;
+        CvMat sample;
+        cvGetRow( data, &sample, i );
+        for( k = 0; k < var_count; k++ )
+            temp_sample->data.fl[k] = sample.data.fl[k];
+
+        for( j = 0; j < class_count; j++ )
+        {
+            temp_sample->data.fl[var_count] = (float)j;
+            boost.predict( temp_sample, 0, weak_responses );
+            double sum = cvSum( weak_responses ).val[0];
+            if( max_sum < sum )
+            {
+                max_sum = sum;
+                best_class = j + 'A';
+            }
+        }
+
+        r = fabs(best_class - responses->data.fl[i]) < FLT_EPSILON ? 1 : 0;
+
+        if( i < ntrain_samples )
+            train_hr += r;
+        else
+            test_hr += r;
+    }
+
+    test_hr /= (double)(nsamples_all-ntrain_samples);
+    train_hr /= (double)ntrain_samples;
+    printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
+            train_hr*100., test_hr*100. );
+
+    printf( "Number of trees: %d\n", boost.get_weak_predictors()->total );
+
+    // Save classifier to file if needed
+    if( filename_to_save )
+        boost.save( filename_to_save );
+
+    cvReleaseMat( &temp_sample );
+    cvReleaseMat( &weak_responses );
+    cvReleaseMat( &var_type );
+    cvReleaseMat( &data );
+    cvReleaseMat( &responses );
+
+    return 0;
+}
+
+
+int MachineLearning::build_mlp_classifier( char* data_filename,
+    char* filename_to_save, char* filename_to_load )
+{
+    const int class_count = 3;
+    CvMat* data = 0;
+    CvMat train_data;
+    CvMat* responses = 0;
+    CvMat* mlp_response = 0;
+
+    int ok = read_num_class_data( data_filename, 13, &data, &responses );
+    int nsamples_all = 0, ntrain_samples = 0;
+    int i, j;
+    double train_hr = 0, test_hr = 0;
+    CvANN_MLP mlp;
+
+    if( !ok )
+    {
+        printf( "Could not read the database %s\n", data_filename );
+        return -1;
+    }
+
+    printf( "The database %s is loaded.\n", data_filename );
+    nsamples_all = data->rows;
+    ntrain_samples = (int)(nsamples_all*0.9);
+
+    // Create or load MLP classifier
+    if( filename_to_load )
+    {
+        // load classifier from the specified file
+        mlp.load( filename_to_load );
+        ntrain_samples = 0;
+        if( !mlp.get_layer_count() )
+        {
+            printf( "Could not read the classifier %s\n", filename_to_load );
+            return -1;
+        }
+        printf( "The classifier %s is loaded.\n", data_filename );
+    }
+    else
+    {
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //
+        // MLP does not support categorical variables by explicitly.
+        // So, instead of the output class label, we will use
+        // a binary vector of <class_count> components for training and,
+        // therefore, MLP will give us a vector of "probabilities" at the
+        // prediction stage
+        //
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        CvMat* new_responses = cvCreateMat( ntrain_samples, class_count, CV_32F );
+
+        // 1. unroll the responses
+        printf( "Unrolling the responses...\n");
+        for( i = 0; i < ntrain_samples; i++ )
+        {
+            int cls_label = cvRound(responses->data.fl[i]) - 'A';
+            float* bit_vec = (float*)(new_responses->data.ptr + i*new_responses->step);
+            for( j = 0; j < class_count; j++ )
+                bit_vec[j] = 0.f;
+            bit_vec[cls_label] = 1.f;
+        }
+        cvGetRows( data, &train_data, 0, ntrain_samples );
+
+        // 2. train classifier
+        int layer_sz[] = { data->cols, 100, 100, class_count };
+        CvMat layer_sizes =
+            cvMat( 1, (int)(sizeof(layer_sz)/sizeof(layer_sz[0])), CV_32S, layer_sz );
+        mlp.create( &layer_sizes );
+        printf( "Training the classifier (may take a few minutes)...");
+        mlp.train( &train_data, new_responses, 0, 0,
+            CvANN_MLP_TrainParams(cvTermCriteria(CV_TERMCRIT_ITER,300,0.01),
+            CvANN_MLP_TrainParams::RPROP,0.01));
+        cvReleaseMat( &new_responses );
+        printf("\n");
+    }
+
+    mlp_response = cvCreateMat( 1, class_count, CV_32F );
+
+    // compute prediction error on train and test data
+    for( i = 0; i < nsamples_all; i++ )
+    {
+        int best_class;
+        CvMat sample;
+        cvGetRow( data, &sample, i );
+        CvPoint max_loc = {0,0};
+        mlp.predict( &sample, mlp_response );
+        cvMinMaxLoc( mlp_response, 0, 0, 0, &max_loc, 0 );
+        best_class = max_loc.x + 'A';
+
+        int r = fabs((double)best_class - responses->data.fl[i]) < FLT_EPSILON ? 1 : 0;
+
+        if( i < ntrain_samples )
+            train_hr += r;
+        else
+            test_hr += r;
+    }
+
+    test_hr /= (double)(nsamples_all-ntrain_samples);
+    train_hr /= (double)ntrain_samples;
+    printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
+            train_hr*100., test_hr*100. );
+
+    // Save classifier to file if needed
+    if( filename_to_save )
+        mlp.save( filename_to_save );
+
+    cvReleaseMat( &mlp_response );
+    cvReleaseMat( &data );
+    cvReleaseMat( &responses );
+
+    return 0;
+}
+
+int MachineLearning::build_svm_classifier( char* data_filename,
+    char* filename_to_save, char* filename_to_load )
+{
+
+    CvMat* data = 0;
+    //CvMat train_data;
+    CvMat* responses = 0;
+    CvMat* mlp_response = 0;
+	CvMat* var_type = 0;
+    CvMat* sample_idx = 0;
+
+    int ok = read_num_class_data( data_filename, 10, &data, &responses );
+
+	float kk[100];
+	memcpy(kk,data->data.fl,100);
+    int nsamples_all = 0, ntrain_samples = 0;
+    int i;
+    double train_hr = 0, test_hr = 0;
+    CvSVM svm;	
+
+    if( !ok )
+    {
+        printf( "Could not read the database %s\n", data_filename );
+        return -1;
+    }
+
+    printf( "The database %s is loaded.\n", data_filename );
+    nsamples_all = data->rows;
+    ntrain_samples = (int)(nsamples_all*0.9);
+
+
+    // Create or load svm classifier
+    if( filename_to_load )
+    {
+        // load classifier from the specified file
+        svm.load( filename_to_load );
+        ntrain_samples = 0;
+		
+        if( !svm.get_support_vector_count() )
+        {
+            printf( "Could not read the classifier %s\n", filename_to_load );
+            return -1;
+        }
+        printf( "The classifier %s is loaded.\n", filename_to_load );
+    }
+    else
+    {
+         printf( "The classifier is in tranning...\n" );
+		// 1. create type mask
+		 
+        var_type = cvCreateMat( data->cols, 1, CV_8U );
+        cvSet( var_type, cvScalarAll(CV_VAR_CATEGORICAL) );
+		//1111111111
+
+        // 2. create sample_idx
+        sample_idx = cvCreateMat( 1, nsamples_all, CV_8UC1 );
+        {
+            CvMat mat;
+            cvGetCols( sample_idx, &mat, 0, ntrain_samples );
+            cvSet( &mat, cvRealScalar(1) );
+
+            cvGetCols( sample_idx, &mat, ntrain_samples, nsamples_all );
+            cvSetZero( &mat );
+        }
+		//1111111000
+
+
+        // 3. train classifier
+        svm.train( data,responses,var_type,sample_idx,
+			CvSVMParams( CvSVM::C_SVC, CvSVM::RBF ,0,0.3,0,0.1, 0, 0,
+                 0, cvTermCriteria(CV_TERMCRIT_ITER,300,0.01) ));
+        printf( "\n");
+    }
+
+    // compute prediction error on train and test data
+    for( i = 0; i < nsamples_all; i++ )
+    {
+        double r;
+        CvMat sample;
+        cvGetRow( data, &sample, i );
+
+        r = svm.predict( &sample );
+        r = fabs((double)r - responses->data.fl[i]) <= FLT_EPSILON ? 1 : 0;
+
+        if( i < ntrain_samples )
+            train_hr += r;
+        else
+            test_hr += r;
+    }
+
+    test_hr /= (double)(nsamples_all-ntrain_samples);
+    train_hr /= (double)ntrain_samples;
+    printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
+            train_hr*100., test_hr*100. );
+
+    printf( "Number of support_vector_count: %d\n", svm.get_support_vector_count() );
+
+	//printf( "value of svm.get_support_vector(0): %f\n", svm.get_support_vector(0) );
+
+
+    // Save classifier to file if needed
+    //if( filename_to_save )
+        //svm.save( filename_to_save );
+	svm.save("../data/svmResult.xml");
+
+    cvReleaseMat( &mlp_response );
+    cvReleaseMat( &data );
+    cvReleaseMat( &responses );
+
+    return 0;
+}
+
+
+
+bool MachineLearning::load(const  char *training_filename)
+/*************************************************
+  Function:        
+  Description:  训练数据载入		
+  Date:			2007－3－6
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+	switch( traning_method )
+	{
+	case RandomTrees:
+		forest.clear();
+		build_rtrees_classifier(NULL,NULL,training_filename);
+		break;
+	default:
+		;
+	}
+	is_load_training_model = true;
+
+	return true;
+}
+bool MachineLearning::train(const  char *data_filename,const  char *save_filename)
+/*************************************************
+  Function:        
+  Description:  样本数据训练		
+  Date:			2007－3－6
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+	switch( traning_method )
+	{
+	case RandomTrees:
+		forest.clear();
+		build_rtrees_classifier(data_filename,save_filename,NULL);
+		break;
+	default:
+		;
+	}
+	is_load_training_model = true;
+	return true;
+}
+bool MachineLearning::predict(char &shape_type,float featureData[])
+/*************************************************
+  Function:        
+  Description:  样本数据预测		
+  Date:			2007－3－6
+  Author:   
+  Input:                         
+  Output:         
+  Return:         
+  Others:          
+*************************************************/
+{
+	if(is_load_training_model)
+	{
+		//float featureData[10];
+		//getCrossFeature(img,featureData);
+		
+		//to do build sample
+		CvMat *sample_data= cvCreateMat( 1, DataCount, CV_32F );
+		//cvSet2D(sample_data,0,0,cvRealScalar(0));
+		for(int i=0;i<DataCount;i++)
+		{
+			cvSet2D(sample_data,0,i,cvRealScalar(featureData[i]));
+		}
+		//float ss[23];
+		//memcpy(ss,sample_data->data.fl,sizeof(float)*23); 
+
+		switch( traning_method )
+		{
+		case RandomTrees:
+			predict_rtrees_classifier(sample_data,shape_type);
+			break;
+		default:
+			;
+		}
+		cvReleaseMat(&sample_data);
+
+		return true;
+	}
+	else
+		 return false;
+}
+
+int MachineLearning::predict_rtrees_classifier(CvMat *sample_data,char &shape_type)
+{
+	double r = forest.predict( sample_data );
+	shape_type = (char)r;
+	return 0;
 }
-
-bool MachineLearning::getCrossFeature(IplImage *img,float pcaData[])
-/*************************************************
-  Function:        
-  Description:  样本数据载入		
-  Date:			2007－3－5
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-
-	assert(img);
-
-	////计算图形所在矩形
-	//int cx,cy;
-	//getCrossCenter(img,cx,cy);
-	//CvRect roiRect;
-	//getCrossSpecifyArea(img,roiRect);
-
-	//assert(roiRect.x>0);
-	//assert(roiRect.y>0);
-	//assert(roiRect.height>0 && roiRect.height < img->width);
-	//assert(roiRect.width>0 && roiRect.width < img->width );
-	//cvSetImageROI(img,roiRect);
-
-
-	//IplImage *img_copy = cvCreateImage(cvSize(100,100) , 8, 1 );
-	//img_copy->origin = img->origin;
-	//cvZero(img_copy);
-	//cvResize(img,img_copy,CV_INTER_NN);
-	//cvResetImageROI(img);
-
-
-	//计算形心
-	int cx,cy;
-	getCrossCenter(img,cx,cy);
-
-	assert(cx<img->width);
-	assert(cx>0);
-	assert(cy<img->height);
-	assert(cy>0);
-
-	int shift_x = img->width/2 - cx;
-	int shift_y = img->height/2 - cy;
-
-
-	IplImage *img_copy = cvCreateImage(cvGetSize(img) , 8, 1 );
-	img_copy->origin = img->origin;
-	cvZero(img_copy);
-
-	//移动图形到中心
-	for(int i = 0; i<img->width;i++)
-	{
-		for(int j = 0; j<img->height;j++)
-		{
-			CvScalar c = cvGetAt(img,j,i); 
-			int v = (int)c.val[0];
-			if(v==255)
-			{
-				int nj=j+shift_y;
-				int ni=i+shift_x;
-				if(nj<img->height && ni<img->width)
-					if(nj>=0 && ni>=0)
-						cvSet2D(img_copy,nj,ni,c);
-			}
-		}
-	}
-
-	//计算密度特征数据--------------
-	//int featureData[CROSS_ROWS + CROSS_COLS];
-	//memset(featureData,-1,sizeof(featureData));
-	//getCrossFeatureData(img_copy,featureData,CROSS_COLS,CROSS_ROWS);
-	////std::cout<<"--------------------------------------------"<<std::endl;
-	////cvShowImage("WIN1",img_copy);
-	////cvWaitKey(0);	
-	//float CrossData[10];
-	//ExtractPCA(CrossData,featureData,CROSS_COLS+CROSS_ROWS);
-	//
-	
-	//计算距离特征数据	
-	int featureDisData[2*CROSS_ROWS + CROSS_COLS];
-	memset(featureDisData,-1,sizeof(featureDisData));	
-	getDistanceFeatureData(img_copy,featureDisData,CROSS_COLS,CROSS_ROWS);
-	float DistanceData[10];
-	ExtractPCA(DistanceData,featureDisData,CROSS_COLS+2*CROSS_ROWS);
-
-	//合并特征数据
-	//for(int i=0;i<5;i++) pcaData[i] = CrossData[i];
-	//for(int i=5;i<10;i++) pcaData[i] = DistanceData[i-5];
-	for(int i=0;i<10;i++) pcaData[i] = DistanceData[i];
-
-	
-	cvReleaseImage(&img_copy);
-
-	return true;
-}
-
-void MachineLearning::getCrossFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows)
-/*************************************************
-  Function:        
-  Description:  穿线得到特征数据		
-  Date:			2007－3－5
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-	const int CROSS_VALID_LENGTH = 6; //在6个象素内不计算穿越数目,避免噪音
-	CvScalar c;
-
-	for(int cross_index=0;cross_index<rows;cross_index++)
-	{
-		int y = (int)(img_cross->height*((float)cross_index/rows)); //按照比例决定位置
-
-		int cross_count = 0;
-		int pre_v = -1;
-		int pre_x = 0;
-		for(int x =0;x<img_cross->width;x++)
-		{			 
-			c = cvGetAt(img_cross,y,x); 
-			int v = (int)c.val[0];
-			if(pre_v==255 && v==0) 
-				if((x-pre_x)>CROSS_VALID_LENGTH)
-				{
-					cross_count++;
-					pre_x = x;
-				}
-			pre_v = v;
-			
-		}
-
-		//cout<<cross_count<<",";		
-		featureData[cross_index] = cross_count;
-		
-	}
-
-	for(int cross_index=0;cross_index<cols;cross_index++)
-	{
-		int x = (int)(img_cross->width*((float)cross_index/cols));
-
-		int cross_count = 0;
-		int pre_v = -1;
-		int pre_y = 0;
-		for(int y =0;y<img_cross->height;y++)
-		{
-			
-			c = cvGetAt(img_cross,y,x); 
-			int v = (int)c.val[0];
-			if(pre_v==255 && v==0)
-				if((y-pre_y)>CROSS_VALID_LENGTH)
-				{
-					cross_count++;
-					pre_y = y;
-				}
-
-			pre_v = v;
-		}
-
-		//cout<<cross_count<<",";		
-		featureData[rows+cross_index] = cross_count;		
-	} 
-
-
-}
-
-void MachineLearning::getDistanceFeatureData(IplImage *img_cross,int featureData[],const int &cols,const int &rows)
-/*************************************************
-  Function:        
-  Description:  穿线得到距离特征数据		
-  Date:			2007－3－9
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{	
-
-	CvScalar c;
-
-	//从左向右穿线
-	for(int cross_index=0;cross_index<rows;cross_index++)
-	{
-		int y = (int)(img_cross->height*((float)cross_index/rows)); //按照比例决定位置
-		int meet_x = 0;
-		for(int x =0;x<img_cross->width;x++)
-		{			 
-			c = cvGetAt(img_cross,y,x); 
-			int v = (int)c.val[0];
-			if(v==255) 
-			{
-				meet_x = x;			
-				break;
-			}
-		}
-		//cout<<meet_x<<",";		
-		featureData[cross_index] = meet_x;		
-	}
-
-	//从右向左穿线
-	for(int cross_index=rows;cross_index<2*rows;cross_index++)
-	{
-		int y = (int)(img_cross->height*((float)(cross_index-rows)/rows)); //按照比例决定位置
-		int meet_x = 0;
-		for(int x =(img_cross->width-1);x>-1;x--)
-		{			 
-			c = cvGetAt(img_cross,y,x); 
-			int v = (int)c.val[0];
-			if(v==255) 
-			{
-				meet_x = x;			
-				break;
-			}			
-		}
-		//cout<<meet_x<<",";
-		featureData[cross_index] = meet_x;		
-	}
-
-	//从下向上穿线
-	for(int cross_index=0;cross_index<cols;cross_index++)
-	{
-		int x = (int)(img_cross->width*((float)cross_index/cols));
-
-		int meet_y = 0;
-		for(int y =(img_cross->height-1);y>-1;y--)
-		{
-			
-			c = cvGetAt(img_cross,y,x); 
-			int v = (int)c.val[0];
-			if(v==255) 
-			{
-				meet_y = y;
-				break;
-			}
-		}
-		//cout<<meet_y<<",";		
-		featureData[2*rows+cross_index] = meet_y;		
-	} 
-
-
-}
-
-void MachineLearning::getCrossSpecifyArea(IplImage *img,CvRect &specifie_rect)
-/*************************************************
-  Function:        
-  Description:  获得图像矩形		
-  Date:			2007－3－7
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-	CvRect res_rect = cvRect(0,0,0,0);
-	const int fix =0;
-	CvMemStorage*  mt_storage  =  cvCreateMemStorage(0);
-	CvSeq* mt_contour = NULL;
-	int ApproxCount = 2; //轮廓优化等级	
-	IplImage *frame_copy = cvCreateImage(cvGetSize(img) , 8, 1 );
-	frame_copy->origin = img->origin;
-	cvCopy(img,frame_copy,0);
-	cvFindContours( frame_copy, mt_storage, &mt_contour, sizeof(CvContour),
-		CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
-	if(mt_contour)
-	{
-		CvSeqReader reader;
-		int i;
-		CvPoint left_top_pt=cvPoint(img->width,img->height);
-		CvPoint right_bottom_pt=cvPoint(0,0);
-		
-		CvPoint pt;
-		CvSeq *contour2 = mt_contour;
-
-		for (; contour2 != NULL; contour2 = contour2->h_next)
-		{
-			cvStartReadSeq(contour2, &reader);
-			int N = contour2->total;
-			if(N<10) continue;
-
-			for (i = 0; i < N; i++)
-			{
-				CV_READ_SEQ_ELEM(pt, reader);
-				if(left_top_pt.x>pt.x)left_top_pt.x = pt.x;
-				if(left_top_pt.y>pt.y)left_top_pt.y = pt.y;
-				if(right_bottom_pt.x<pt.x)right_bottom_pt.x = pt.x;
-				if(right_bottom_pt.y<pt.y)right_bottom_pt.y = pt.y;
-
-			}
-			res_rect = cvRect(abs(left_top_pt.x-fix),abs(left_top_pt.y-fix),(right_bottom_pt.x-left_top_pt.x+2*fix),(right_bottom_pt.y-left_top_pt.y+2*fix));
-			specifie_rect = res_rect;
-			break;
-		}
-	}
-
-	cvClearMemStorage(mt_storage);
-	cvReleaseImage(&frame_copy);
-}
-
-void MachineLearning::getCrossCenter(IplImage *img,int &cx,int &cy)
-/*************************************************
-  Function:        
-  Description:  获得图像平移到中心		
-  Date:			2007－3－5
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-	CvMemStorage*  mt_storage  =  cvCreateMemStorage(0);
-	CvSeq* mt_contour = NULL;
-	int ApproxCount = 2; //轮廓优化等级	
-	IplImage *frame_copy = cvCreateImage(cvGetSize(img) , 8, 1 );
-	frame_copy->origin = img->origin;
-	cvCopy(img,frame_copy,0);
-	cvFindContours( frame_copy, mt_storage, &mt_contour, sizeof(CvContour),
-		CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
-	if(mt_contour)
-	{
-		CvSeqReader reader;
-		int i;
-		int total_x = 0;
-		int total_y = 0;
-		
-		CvPoint pt;
-		CvSeq *contour2 = mt_contour;
-
-		for (; contour2 != NULL; contour2 = contour2->h_next)
-		{
-			cvStartReadSeq(contour2, &reader);
-			int N = contour2->total;
-			if(N<10) continue;
-
-			for (i = 0; i < N; i++)
-			{
-				CV_READ_SEQ_ELEM(pt, reader);
-				total_x += pt.x;
-				total_y += pt.y;
-			}
-			cx = total_x/N;
-			cy = total_y/N;
-			break;
-		}
-	}
-	cvReleaseMemStorage(&mt_storage);
-	cvReleaseImage(&frame_copy);
-}
-
-void MachineLearning::ExtractPCA(float pcadata[],const int featureData[],const int &dataWidth )
-/*************************************************
-  Function:        
-  Description:  采用fourier transfer 得到降维的数据		
-  Date:			2007－3－5
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-			
-	//int dataWidth = cols + rows;		
-	//CvMat* pData = cvCreateMat(2,dataWidth, CV_32FC1);
-	//for(int i = 0; i < dataWidth; i++)
-	//{
-	//	cvSet2D(pData, 0, i,cvRealScalar(i));				
-	//	cvSet2D(pData, 1, i,cvRealScalar(featureData[i]));				
-	//}
-
-	//CvMat* pMean = cvCreateMat(2, dataWidth, CV_32FC1);
-	//CvMat* pEigVals = cvCreateMat(2, dataWidth, CV_32FC1);
-	//CvMat* pEigVecs = cvCreateMat(2, dataWidth, CV_32FC1);
-
-	//cvCalcPCA(pData, pMean, pEigVals, pEigVecs, CV_PCA_DATA_AS_ROW );
-
-	//float pp[100];
-	//memcpy(pp,pEigVals->data.fl,100 );
-	//memcpy(pp,pEigVecs->data.fl,100 );
-	//memcpy(pp,pMean->data.fl,100 );
-	
-	CvMat* s = cvCreateMat(1,dataWidth,CV_32FC1);
-	memcpy(s->data.i,featureData,sizeof(featureData));
-	for(int i=0;i<dataWidth;i++)
-			cvSetReal2D(s,0,i,featureData[i]);
- 
-	//for(int i=0;i<dataWidth;i++)
-	//		printf("%6.2f\t",cvGetReal2D(s,0,i));
-	//printf("\n");
-
-	CvMat* d = cvCreateMat(1,dataWidth,CV_32FC1);
-
-	cvDFT(s,d,CV_DXT_FORWARD|CV_DXT_SCALE);
-
-	//for(int i=0;i<dataWidth;i++)
-	//		printf("%6.2f\t",cvGetReal2D(d,0,i));
-	//printf("\n");
-
-	for(int i=0;i<10;i++)
-	{
-		pcadata[i] = (float)cvGetReal2D(d,0,i); 
-	}
-
-	cvReleaseMat(&s);
-	cvReleaseMat(&d);
-}
-
-
-
-void MachineLearning::ExtractDFT(float pcadata[],const int featureData[],const int &dataWidth,const int &DFTwidth )
-/*************************************************
-  Function:        
-  Description:  采用fourier transfer 得到降维的数据		
-  Date:			2007－3－5
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-			
-
-	
-	CvMat* s = cvCreateMat(1,dataWidth,CV_32FC1);
-	memcpy(s->data.i,featureData,sizeof(featureData));
-	for(int i=0;i<dataWidth;i++)
-			cvSetReal2D(s,0,i,featureData[i]);
- 
-	//for(int i=0;i<dataWidth;i++)
-	//		printf("%6.2f\t",cvGetReal2D(s,0,i));
-	//printf("\n");
-
-	CvMat* d = cvCreateMat(1,dataWidth,CV_32FC1);
-
-	cvDFT(s,d,CV_DXT_FORWARD|CV_DXT_SCALE);
-
-	//for(int i=0;i<dataWidth;i++)
-	//		printf("%6.2f\t",cvGetReal2D(d,0,i));
-	//printf("\n");
-
-	for(int i=0;i<DFTwidth;i++)
-	{
-		pcadata[i] = (float)cvGetReal2D(d,0,i); 
-	}
-
-	cvReleaseMat(&s);
-	cvReleaseMat(&d);
-}
-
-
-
-int MachineLearning::read_num_class_data( const char* filename, int var_count,CvMat** data, CvMat** responses )
-{
-    const int M = 1024;
-    FILE* f = fopen( filename, "rt" );
-    CvMemStorage* storage;
-    CvSeq* seq;
-    char buf[M+2];
-    float* el_ptr;
-    CvSeqReader reader;
-    int i, j;
-
-    if( !f )
-        return 0;
-
-    el_ptr = new float[var_count+1];
-    storage = cvCreateMemStorage();
-    seq = cvCreateSeq( 0, sizeof(*seq), (var_count+1)*sizeof(float), storage );
-
-    for(;;)
-    {
-        char* ptr;
-        if( !fgets( buf, M, f ) || !strchr( buf, ',' ) )
-            break;
-        el_ptr[0] = buf[0];
-        ptr = buf+2;
-        for( i = 1; i <= var_count; i++ )
-        {
-            int n = 0;
-            sscanf( ptr, "%f%n", el_ptr + i, &n );
-            ptr += n + 1;
-        }
-        if( i <= var_count )
-            break;
-        cvSeqPush( seq, el_ptr );
-    }
-    fclose(f);
-
-    *data = cvCreateMat( seq->total, var_count, CV_32F );
-    *responses = cvCreateMat( seq->total, 1, CV_32F );
-
-    cvStartReadSeq( seq, &reader );
-
-    for( i = 0; i < seq->total; i++ )
-    {
-        const float* sdata = (float*)reader.ptr + 1;
-        float* ddata = data[0]->data.fl + var_count*i;
-        float* dr = responses[0]->data.fl + i;
-
-        for( j = 0; j < var_count; j++ )
-            ddata[j] = sdata[j];
-        *dr = sdata[-1];
-        CV_NEXT_SEQ_ELEM( seq->elem_size, reader );
-    }
-
-    cvReleaseMemStorage( &storage );
-    delete el_ptr;
-    return 1;
-}
-
-int MachineLearning::build_rtrees_classifier(const char* data_filename,
-  const char* filename_to_save, const char* filename_to_load )
-{
-    CvMat* data = 0;
-    CvMat* responses = 0;
-    CvMat* var_type = 0;
-    CvMat* sample_idx = 0;
-
-	
-
-
-    // Create or load Random Trees classifier
-    if( filename_to_load )
-    {
-        // load classifier from the specified file
-        forest.load( filename_to_load );
-        if( forest.get_tree_count() == 0 )
-        {
-            printf( "Could not read the classifier %s\n", filename_to_load );
-            return -1;
-        }
-        printf( "The classifier %s is loaded.\n", data_filename );
-    }
-    else
-    {
-		int ok = read_num_class_data( data_filename, DataCount, &data, &responses );
-		int nsamples_all = 0, ntrain_samples = 0;
-		int i = 0;
-		double train_hr = 0, test_hr = 0;
-		
-		CvMat* var_importance = 0;
-
-		if( !ok )
-		{
-			printf( "Could not read the database %s\n", data_filename );
-			return -1;
-		}
-
-		printf( "The database %s is loaded.\n", data_filename );
-		nsamples_all = data->rows;
-		ntrain_samples = (int)(nsamples_all*0.8);
-
-		int ntrain_tests = -1;
-
-		// create classifier by using <data> and <responses>
-        printf( "Training the classifier ...");
-
-        // 1. create type mask
-        var_type = cvCreateMat( data->cols + 1, 1, CV_8U );
-        cvSet( var_type, cvScalarAll(CV_VAR_ORDERED) );
-        cvSetReal1D( var_type, data->cols, CV_VAR_CATEGORICAL );
-		//00000000001
-
-		// 2. create sample_idx
-		sample_idx = cvCreateMat( 1, nsamples_all, CV_8UC1 );
-		{
-			CvMat mat;
-			cvGetCols( sample_idx, &mat, 0, nsamples_all );
-			cvSet( &mat, cvRealScalar(1) );
-
-			for(int i=0;i<nsamples_all;i++)
-			{
-				if((i%5)==0) 
-				{
-					cvSet2D(sample_idx,0,i,cvRealScalar(0));
-					ntrain_tests++;
-				}
-			}
-		}
-		
-	
-		// 3. train classifier
-		forest.train( data, CV_ROW_SAMPLE, responses, 0, sample_idx, var_type, 0,
-			CvRTParams(10,10,0,false,15,0,true,4,100,0.01f,CV_TERMCRIT_ITER));
-		printf( "\n");
-
-		// compute prediction error on train and test data
-		int test_count=0;
-		int train_count=0;
-		for(int i = 0; i < nsamples_all; i++ )
-		{
-			double r;
-			CvMat sample;
-			cvGetRow( data, &sample, i );
-
-			r = forest.predict( &sample );
-			double abs_r = fabs((float)r - responses->data.fl[i]) <= FLT_EPSILON ? 1.0 : 0.0;
-
-			if(abs_r < FLT_EPSILON)
-			{
-				printf( "data error with lines %d '%c' %f \n",i,(char)responses->data.fl[i],fabs((float)r - responses->data.fl[i])); 
-			}
-
-			if((i%5)==0)
-			{
-				test_hr += abs_r;	
-			}
-			else
-			{
-				train_hr += abs_r; 
-			}
-				
-		}
-
-		test_hr /= (double)(ntrain_tests);
-		train_hr /= (double)(nsamples_all-ntrain_tests);
-		printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
-			train_hr*100., test_hr*100. );
-
-		//printf( "Number of trees: %d\n", forest.get_tree_count() );
-	}
-
-
-
-
-
-
-    //// Save Random Trees classifier to file if needed
-    if( filename_to_save )
-        forest.save( filename_to_save );
-	//forest.save("..//data//rTreeResult.xml");
-
-    cvReleaseMat( &sample_idx );
-    cvReleaseMat( &var_type );
-    cvReleaseMat( &data );
-    cvReleaseMat( &responses );
-
-    return 0;
-}
-
-
-int MachineLearning::build_boost_classifier( char* data_filename,
-    char* filename_to_save, char* filename_to_load )
-{
-    const int class_count = 3;
-    CvMat* data = 0;
-    CvMat* responses = 0;
-    CvMat* var_type = 0;
-    CvMat* temp_sample = 0;
-    CvMat* weak_responses = 0;
-
-    int ok = read_num_class_data( data_filename, 13, &data, &responses );
-    int nsamples_all = 0, ntrain_samples = 0;
-    int var_count;
-    int i, j, k;
-    double train_hr = 0, test_hr = 0;
-    CvBoost boost;
-
-    if( !ok )
-    {
-        printf( "Could not read the database %s\n", data_filename );
-        return -1;
-    }
-
-    printf( "The database %s is loaded.\n", data_filename );
-    nsamples_all = data->rows;
-    ntrain_samples = (int)(nsamples_all*0.9);
-    var_count = data->cols;
-
-    // Create or load Boosted Tree classifier
-    if( filename_to_load )
-    {
-        // load classifier from the specified file
-        boost.load( filename_to_load );
-        ntrain_samples = 0;
-        if( !boost.get_weak_predictors() )
-        {
-            printf( "Could not read the classifier %s\n", filename_to_load );
-            return -1;
-        }
-        printf( "The classifier %s is loaded.\n", data_filename );
-    }
-    else
-    {
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //
-        // As currently boosted tree classifier in MLL can only be trained
-        // for 2-class problems, we transform the training database by
-        // "unrolling" each training sample as many times as the number of
-        // classes (26) that we have.
-        //
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        CvMat* new_data = cvCreateMat( ntrain_samples*class_count, var_count + 1, CV_32F );
-        CvMat* new_responses = cvCreateMat( ntrain_samples*class_count, 1, CV_32S );
-
-        // 1. unroll the database type mask
-        printf( "Unrolling the database...\n");
-        for( i = 0; i < ntrain_samples; i++ )
-        {
-            float* data_row = (float*)(data->data.ptr + data->step*i);
-            for( j = 0; j < class_count; j++ )
-            {
-                float* new_data_row = (float*)(new_data->data.ptr +
-                                new_data->step*(i*class_count+j));
-                for( k = 0; k < var_count; k++ )
-                    new_data_row[k] = data_row[k];
-                new_data_row[var_count] = (float)j;
-                new_responses->data.i[i*class_count + j] = responses->data.fl[i] == j+'A';
-            }
-        }
-
-        // 2. create type mask
-        var_type = cvCreateMat( var_count + 2, 1, CV_8U );
-        cvSet( var_type, cvScalarAll(CV_VAR_ORDERED) );
-        // the last indicator variable, as well
-        // as the new (binary) response are categorical
-        cvSetReal1D( var_type, var_count, CV_VAR_CATEGORICAL );
-        cvSetReal1D( var_type, var_count+1, CV_VAR_CATEGORICAL );
-
-
-
-        // 3. train classifier
-        printf( "Training the classifier (may take a few minutes)...");
-        boost.train( new_data, CV_ROW_SAMPLE, new_responses, 0, 0, var_type, 0,
-            CvBoostParams(CvBoost::REAL, 100, 0.95, 5, false, 0 ));
-        cvReleaseMat( &new_data );
-        cvReleaseMat( &new_responses );
-        printf("\n");
-    }
-
-    temp_sample = cvCreateMat( 1, var_count + 1, CV_32F );
-    weak_responses = cvCreateMat( 1, boost.get_weak_predictors()->total, CV_32F ); 
-
-    // compute prediction error on train and test data
-    for( i = 0; i < nsamples_all; i++ )
-    {
-        int best_class = 0;
-        double max_sum = -DBL_MAX;
-        double r;
-        CvMat sample;
-        cvGetRow( data, &sample, i );
-        for( k = 0; k < var_count; k++ )
-            temp_sample->data.fl[k] = sample.data.fl[k];
-
-        for( j = 0; j < class_count; j++ )
-        {
-            temp_sample->data.fl[var_count] = (float)j;
-            boost.predict( temp_sample, 0, weak_responses );
-            double sum = cvSum( weak_responses ).val[0];
-            if( max_sum < sum )
-            {
-                max_sum = sum;
-                best_class = j + 'A';
-            }
-        }
-
-        r = fabs(best_class - responses->data.fl[i]) < FLT_EPSILON ? 1 : 0;
-
-        if( i < ntrain_samples )
-            train_hr += r;
-        else
-            test_hr += r;
-    }
-
-    test_hr /= (double)(nsamples_all-ntrain_samples);
-    train_hr /= (double)ntrain_samples;
-    printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
-            train_hr*100., test_hr*100. );
-
-    printf( "Number of trees: %d\n", boost.get_weak_predictors()->total );
-
-    // Save classifier to file if needed
-    if( filename_to_save )
-        boost.save( filename_to_save );
-
-    cvReleaseMat( &temp_sample );
-    cvReleaseMat( &weak_responses );
-    cvReleaseMat( &var_type );
-    cvReleaseMat( &data );
-    cvReleaseMat( &responses );
-
-    return 0;
-}
-
-
-int MachineLearning::build_mlp_classifier( char* data_filename,
-    char* filename_to_save, char* filename_to_load )
-{
-    const int class_count = 3;
-    CvMat* data = 0;
-    CvMat train_data;
-    CvMat* responses = 0;
-    CvMat* mlp_response = 0;
-
-    int ok = read_num_class_data( data_filename, 13, &data, &responses );
-    int nsamples_all = 0, ntrain_samples = 0;
-    int i, j;
-    double train_hr = 0, test_hr = 0;
-    CvANN_MLP mlp;
-
-    if( !ok )
-    {
-        printf( "Could not read the database %s\n", data_filename );
-        return -1;
-    }
-
-    printf( "The database %s is loaded.\n", data_filename );
-    nsamples_all = data->rows;
-    ntrain_samples = (int)(nsamples_all*0.9);
-
-    // Create or load MLP classifier
-    if( filename_to_load )
-    {
-        // load classifier from the specified file
-        mlp.load( filename_to_load );
-        ntrain_samples = 0;
-        if( !mlp.get_layer_count() )
-        {
-            printf( "Could not read the classifier %s\n", filename_to_load );
-            return -1;
-        }
-        printf( "The classifier %s is loaded.\n", data_filename );
-    }
-    else
-    {
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //
-        // MLP does not support categorical variables by explicitly.
-        // So, instead of the output class label, we will use
-        // a binary vector of <class_count> components for training and,
-        // therefore, MLP will give us a vector of "probabilities" at the
-        // prediction stage
-        //
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        CvMat* new_responses = cvCreateMat( ntrain_samples, class_count, CV_32F );
-
-        // 1. unroll the responses
-        printf( "Unrolling the responses...\n");
-        for( i = 0; i < ntrain_samples; i++ )
-        {
-            int cls_label = cvRound(responses->data.fl[i]) - 'A';
-            float* bit_vec = (float*)(new_responses->data.ptr + i*new_responses->step);
-            for( j = 0; j < class_count; j++ )
-                bit_vec[j] = 0.f;
-            bit_vec[cls_label] = 1.f;
-        }
-        cvGetRows( data, &train_data, 0, ntrain_samples );
-
-        // 2. train classifier
-        int layer_sz[] = { data->cols, 100, 100, class_count };
-        CvMat layer_sizes =
-            cvMat( 1, (int)(sizeof(layer_sz)/sizeof(layer_sz[0])), CV_32S, layer_sz );
-        mlp.create( &layer_sizes );
-        printf( "Training the classifier (may take a few minutes)...");
-        mlp.train( &train_data, new_responses, 0, 0,
-            CvANN_MLP_TrainParams(cvTermCriteria(CV_TERMCRIT_ITER,300,0.01),
-            CvANN_MLP_TrainParams::RPROP,0.01));
-        cvReleaseMat( &new_responses );
-        printf("\n");
-    }
-
-    mlp_response = cvCreateMat( 1, class_count, CV_32F );
-
-    // compute prediction error on train and test data
-    for( i = 0; i < nsamples_all; i++ )
-    {
-        int best_class;
-        CvMat sample;
-        cvGetRow( data, &sample, i );
-        CvPoint max_loc = {0,0};
-        mlp.predict( &sample, mlp_response );
-        cvMinMaxLoc( mlp_response, 0, 0, 0, &max_loc, 0 );
-        best_class = max_loc.x + 'A';
-
-        int r = fabs((double)best_class - responses->data.fl[i]) < FLT_EPSILON ? 1 : 0;
-
-        if( i < ntrain_samples )
-            train_hr += r;
-        else
-            test_hr += r;
-    }
-
-    test_hr /= (double)(nsamples_all-ntrain_samples);
-    train_hr /= (double)ntrain_samples;
-    printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
-            train_hr*100., test_hr*100. );
-
-    // Save classifier to file if needed
-    if( filename_to_save )
-        mlp.save( filename_to_save );
-
-    cvReleaseMat( &mlp_response );
-    cvReleaseMat( &data );
-    cvReleaseMat( &responses );
-
-    return 0;
-}
-
-int MachineLearning::build_svm_classifier( char* data_filename,
-    char* filename_to_save, char* filename_to_load )
-{
-
-    CvMat* data = 0;
-    //CvMat train_data;
-    CvMat* responses = 0;
-    CvMat* mlp_response = 0;
-	CvMat* var_type = 0;
-    CvMat* sample_idx = 0;
-
-    int ok = read_num_class_data( data_filename, 10, &data, &responses );
-
-	float kk[100];
-	memcpy(kk,data->data.fl,100);
-    int nsamples_all = 0, ntrain_samples = 0;
-    int i;
-    double train_hr = 0, test_hr = 0;
-    CvSVM svm;	
-
-    if( !ok )
-    {
-        printf( "Could not read the database %s\n", data_filename );
-        return -1;
-    }
-
-    printf( "The database %s is loaded.\n", data_filename );
-    nsamples_all = data->rows;
-    ntrain_samples = (int)(nsamples_all*0.9);
-
-
-    // Create or load svm classifier
-    if( filename_to_load )
-    {
-        // load classifier from the specified file
-        svm.load( filename_to_load );
-        ntrain_samples = 0;
-		
-        if( !svm.get_support_vector_count() )
-        {
-            printf( "Could not read the classifier %s\n", filename_to_load );
-            return -1;
-        }
-        printf( "The classifier %s is loaded.\n", filename_to_load );
-    }
-    else
-    {
-         printf( "The classifier is in tranning...\n" );
-		// 1. create type mask
-		 
-        var_type = cvCreateMat( data->cols, 1, CV_8U );
-        cvSet( var_type, cvScalarAll(CV_VAR_CATEGORICAL) );
-		//1111111111
-
-        // 2. create sample_idx
-        sample_idx = cvCreateMat( 1, nsamples_all, CV_8UC1 );
-        {
-            CvMat mat;
-            cvGetCols( sample_idx, &mat, 0, ntrain_samples );
-            cvSet( &mat, cvRealScalar(1) );
-
-            cvGetCols( sample_idx, &mat, ntrain_samples, nsamples_all );
-            cvSetZero( &mat );
-        }
-		//1111111000
-
-
-        // 3. train classifier
-        svm.train( data,responses,var_type,sample_idx,
-			CvSVMParams( CvSVM::C_SVC, CvSVM::RBF ,0,0.3,0,0.1, 0, 0,
-                 0, cvTermCriteria(CV_TERMCRIT_ITER,300,0.01) ));
-        printf( "\n");
-    }
-
-    // compute prediction error on train and test data
-    for( i = 0; i < nsamples_all; i++ )
-    {
-        double r;
-        CvMat sample;
-        cvGetRow( data, &sample, i );
-
-        r = svm.predict( &sample );
-        r = fabs((double)r - responses->data.fl[i]) <= FLT_EPSILON ? 1 : 0;
-
-        if( i < ntrain_samples )
-            train_hr += r;
-        else
-            test_hr += r;
-    }
-
-    test_hr /= (double)(nsamples_all-ntrain_samples);
-    train_hr /= (double)ntrain_samples;
-    printf( "Recognition rate: train = %.1f%%, test = %.1f%%\n",
-            train_hr*100., test_hr*100. );
-
-    printf( "Number of support_vector_count: %d\n", svm.get_support_vector_count() );
-
-	//printf( "value of svm.get_support_vector(0): %f\n", svm.get_support_vector(0) );
-
-
-    // Save classifier to file if needed
-    //if( filename_to_save )
-        //svm.save( filename_to_save );
-	svm.save("../data/svmResult.xml");
-
-    cvReleaseMat( &mlp_response );
-    cvReleaseMat( &data );
-    cvReleaseMat( &responses );
-
-    return 0;
-}
-
-
-
-bool MachineLearning::load(const  char *training_filename)
-/*************************************************
-  Function:        
-  Description:  训练数据载入		
-  Date:			2007－3－6
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-	switch( traning_method )
-	{
-	case RandomTrees:
-		forest.clear();
-		build_rtrees_classifier(NULL,NULL,training_filename);
-		break;
-	default:
-		;
-	}
-	is_load_training_model = true;
-
-	return true;
-}
-bool MachineLearning::train(const  char *data_filename,const  char *save_filename)
-/*************************************************
-  Function:        
-  Description:  样本数据训练		
-  Date:			2007－3－6
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-	switch( traning_method )
-	{
-	case RandomTrees:
-		forest.clear();
-		build_rtrees_classifier(data_filename,save_filename,NULL);
-		break;
-	default:
-		;
-	}
-	is_load_training_model = true;
-	return true;
-}
-bool MachineLearning::predict(char &shape_type,float featureData[])
-/*************************************************
-  Function:        
-  Description:  样本数据预测		
-  Date:			2007－3－6
-  Author:   
-  Input:                         
-  Output:         
-  Return:         
-  Others:          
-*************************************************/
-{
-	if(is_load_training_model)
-	{
-		//float featureData[10];
-		//getCrossFeature(img,featureData);
-		
-		//to do build sample
-		CvMat *sample_data= cvCreateMat( 1, DataCount, CV_32F );
-		//cvSet2D(sample_data,0,0,cvRealScalar(0));
-		for(int i=0;i<DataCount;i++)
-		{
-			cvSet2D(sample_data,0,i,cvRealScalar(featureData[i]));
-		}
-		//float ss[23];
-		//memcpy(ss,sample_data->data.fl,sizeof(float)*23); 
-
-		switch( traning_method )
-		{
-		case RandomTrees:
-			predict_rtrees_classifier(sample_data,shape_type);
-			break;
-		default:
-			;
-		}
-		cvReleaseMat(&sample_data);
-
-		return true;
-	}
-	else
-		 return false;
-}
-
-int MachineLearning::predict_rtrees_classifier(CvMat *sample_data,char &shape_type)
-{
-	double r = forest.predict( sample_data );
-	shape_type = (char)r;
-	return 0;
-}
-
- 
+  
  
  
 trainingtools.cpp
-// TrainingTools.cpp : 定义控制台应用程序的入口点。
-//
-
-//   26个字母要按一定笔划顺序书写。书写的规律有以下几点：  
-//联机大写字母书写规则
-//1. C J L O S U V W Z  一笔划完成 
-//2. B D G K M N P Q T X Y   两笔划完成 
-//3. A E F H I R      三笔划完成 
-
-//online upper letter rule
-//1. C J L O S U V W Z        finish in one stroke
-//2. B D G K M N P Q T X Y    finish in two stroke
-//3. A E F H I R              finish in three stroke
-
-
-#include "stdafx.h"
-#include "windows.h"
-#include <iostream>
-#include <string.h>
-#include <cxcore.h>
-#include <cv.h>
-#include <highgui.h>
-#include <fstream>
-#include "Finger.h"
-#include "MachineLearning.h"
-
-#pragma comment(lib,"opencv_core2410d.lib")
-#pragma comment(lib,"opencv_highgui2410d.lib")
-#pragma comment(lib,"opencv_ml2410d.lib")
-#pragma comment(lib,"opencv_imgproc2410.lib")
-
-IplImage *image = 0 ; //原始图像
-IplImage *image2 = 0 ; //原始图像
-
-using namespace std;
-
-const int SCALE_MAX = 500;
-const DWORD IDLE_TIME_SPAN = 1000; //间隔一秒内没有输入，开始写入数据
-const int SAMPLE_COUNT = 50; //每条曲线 五十个特征点
-const int SAMPLE_COUNT_OPT = 5; //每条曲线只取五维
-DWORD start_time =0;
-DWORD idle_time =0;
-bool InRecongnize = true;  //0 训练   1 预测
-char pre_letter =0;
-MachineLearning ml;
-
-std::vector< FingerTrack > FingerTrackList;
-std::vector <Finger>::iterator Itr_Finger;
-std::vector< FingerTrack >::iterator Itr_FingerTrack;
-std::vector< FingerTrack > FingerTrackListOpt;//优化轮廓
-
-bool inTrack =false;
-void WriteData(float featureData[]);
-int DFT();
-void toNormalSize();
-int traing_data =0;
-char letter='A';
-
-CvFont mycvFont;
-
-//归一化处理
-void toNormalSize()
-{
-	int max_temp_x=0;
-	int max_temp_y=0;
-	int min_temp_x=10000;
-	int min_temp_y=10000;
-	for(int i=0;i<(int)FingerTrackListOpt.size();i++)
-	{
-		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
-		for(int j=0;j<(int)ListObjSize;j++)	
-		{				
-			//FingerTrackListOpt[i].track[j].center.x -=FingerTrackListOpt[i].track[0].center.x; 
-			//FingerTrackListOpt[i].track[j].center.y -=FingerTrackListOpt[i].track[0].center.y;
-			max_temp_x = max((FingerTrackListOpt[i].track[j].center.x),max_temp_x);
-			max_temp_y = max((FingerTrackListOpt[i].track[j].center.y),max_temp_y);
-			min_temp_x = min((FingerTrackListOpt[i].track[j].center.x),min_temp_x);
-			min_temp_y = min((FingerTrackListOpt[i].track[j].center.y),min_temp_y);
-		}		
-	}
-
-
-	for(int i=0;i<(int)FingerTrackListOpt.size();i++)
-	{
-		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
-		for(int j=0;j<(int)ListObjSize;j++)	
-		{				
-			FingerTrackListOpt[i].track[j].center.x -=min_temp_x; 
-			FingerTrackListOpt[i].track[j].center.y -=min_temp_y;
-		}
-	}
-
-	int MaxW = max(max_temp_x-min_temp_x,max_temp_y-min_temp_y); //最大的
-	for(int i=0;i<(int)FingerTrackListOpt.size();i++)
-	{
-		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
-		for(int j=0;j<(int)ListObjSize;j++)	
-		{				
-			FingerTrackListOpt[i].track[j].center.x =(int)((float)FingerTrackListOpt[i].track[j].center.x/MaxW*SCALE_MAX); 
-			FingerTrackListOpt[i].track[j].center.y =(int)((float)FingerTrackListOpt[i].track[j].center.y/MaxW*SCALE_MAX);   
-		}
-	}
-
-}
-
-
-void analysis()
-{
-	FingerTrackListOpt.clear();
-	for(int i=0;i<(int)FingerTrackList.size();i++)
-	{
-		//创建FingerTrack 加入FingerTrackListOpt
-		FingerTrack ft;			
-		FingerTrackListOpt.push_back(ft);
-		CvPoint start_pt = FingerTrackList[i].track[0].center;		
-		Finger fg;
-		fg.center  = start_pt;
-		FingerTrackListOpt[i].track.push_back(fg);	
-
-		//求取距离总和
-		long total_dis =0;
-		int ListObjSize = (int)FingerTrackList[i].track.size();
-		for(int j=0;j<ListObjSize-1;j++)	
-		{
-			CvPoint pt = FingerTrackList[i].track[j].center;
-			CvPoint pt_next = FingerTrackList[i].track[j+1].center;
-			long distance = (pt_next.x - pt.x)*(pt_next.x - pt.x) +  (pt_next.y - pt.y)*(pt_next.y - pt.y);
-			total_dis+=(long)sqrt((float)distance);
-		}
-		int search_len = total_dis/(SAMPLE_COUNT+2); //确定分割长度，取20等份
-		assert(search_len>0);
-
-		//插值
-		for(int j=0;j<ListObjSize;j++)				
-		{				
-
-			CvPoint pt = FingerTrackList[i].track[j].center;
-			long distance = (start_pt.x - pt.x)*(start_pt.x - pt.x) +  (start_pt.y - pt.y)*(start_pt.y - pt.y);
-			distance = (long)sqrt((float)distance);
-			if(distance>search_len)
-			{
-				//在轨迹上计算一个插值虚拟点
-				float radio = (float)search_len/distance;
-				start_pt.x = (int)(start_pt.x + (pt.x - start_pt.x)*radio);
-				start_pt.y = (int)(start_pt.y + (pt.y - start_pt.y)*radio);
-				Finger fg;
-				fg.center  = start_pt;
-				FingerTrackListOpt[i].track.push_back(fg);	
-				j--;
-			}				
-		}
-	}
-
-	//归一化处理
-	toNormalSize();
-
-
-
-};
-//写入特征数据到文件或者数组
-void WriteData(float featureData[])
-{
-	std::fstream logfile("data.txt",std::ios::app);	
-	int Tracksize = (int)FingerTrackListOpt.size();
-	if(!InRecongnize)
-	{
-		logfile<<letter<<",";
-		logfile<<Tracksize;
-	}
-
-	featureData[0] = (float)Tracksize;
-	int f_index = 0;
-
-	for(int i=0;i<Tracksize;i++)
-	{		
-		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
-		assert(ListObjSize>=SAMPLE_COUNT);
-
-		float pcadata[SAMPLE_COUNT_OPT];
-		int fData[SAMPLE_COUNT];	
-		//X DFT
-		for(int j=0;j<SAMPLE_COUNT;j++)
-		{			
-			fData[j] = FingerTrackListOpt[i].track[j].center.x;			
-		}
-		ml.ExtractDFT(pcadata,fData,SAMPLE_COUNT,SAMPLE_COUNT_OPT);
-		for(int k=0;k<SAMPLE_COUNT_OPT;k++)
-		{
-			if(!InRecongnize) logfile<<","<<pcadata[k];
-			f_index++;
-			featureData[f_index] = pcadata[k];
-
-
-		}
-		//Y DFT
-		for(int j=0;j<SAMPLE_COUNT;j++)
-		{			
-			fData[j] = FingerTrackListOpt[i].track[j].center.y;			
-		}
-		ml.ExtractDFT(pcadata,fData,SAMPLE_COUNT,SAMPLE_COUNT_OPT);
-		for(int k=0;k<SAMPLE_COUNT_OPT;k++)
-		{
-			if(!InRecongnize) logfile<<","<<pcadata[k];
-			f_index++;
-			featureData[f_index] = pcadata[k];
-		}
-
-
-	}
-	for(int i=Tracksize;i<3;i++) //用0填充
-	{			
-		for(int j=0;j<SAMPLE_COUNT_OPT;j++)
-		{
-			if(!InRecongnize) logfile<<","<<0;
-			if(!InRecongnize) logfile<<","<<0;
-			f_index++;
-			featureData[f_index] =  0.0f; 
-			f_index++;
-			featureData[f_index] =  0.0f; 
-		}
-	}
-	if(!InRecongnize) logfile<<"\n";
-	logfile.close();
-}
-
-static void on_mouse( int event, int x, int y, int flags, void *param )
-{
-	if( event == CV_EVENT_LBUTTONDOWN )
-	{
-		if(!inTrack)
-		{
-			FingerTrack ft;			
-			FingerTrackList.push_back(ft);
-			inTrack = true;
-
-		}
-
-	} 
-	else if ( event == CV_EVENT_MOUSEMOVE )
-	{
-		if(inTrack)
-		{
-			Finger fg;
-			fg.center  = cvPoint(x,y);
-			FingerTrackList.back().track.push_back(fg);		
-			idle_time =0;
-		}
-	}
-	else if ( event == CV_EVENT_LBUTTONUP ) 
-	{
-		inTrack = false;
-		//analysis();
-
-		start_time = timeGetTime();
-		analysis();
-		//DFT();
-
-	}
-
-};
-void OnChangeData(int pos)
-{
-	letter = pos+'A';
-}
-
-int main(int argc, char* argv[])
-{
-
-
-	std::cout<<"                == The upper letter online handwriting recongnize ==" << std::endl;
-	std::cout<<" 1. there two state (recongnizing and traning) for the app,In recongnizing mode,use your mouse write upper letter on 'Win' window,after 1 second,then will get result on Win2" << std::endl;
-	std::cout<<" 2. you can press 'm' key to change mode from recongnizing to traning or back." << std::endl;	
-	std::cout<<" 3. In traning mode,change the value of letter, then you can write upper letter on 'Win' window, and app will write data into data.txt." << std::endl;
-	std::cout<<" 4. you can retrain the traning data by press 't' without restart program." << std::endl;
-	std::cout<<" 5. you can modify the traning data 'data.txt' by hand if you want. " << std::endl<< std::endl;
-	std::cout<<" enjoy it.:)" << std::endl<< std::endl;
-	std::cout<<" ===============================================================" << std::endl;
-
-
-
-	CvSize image_sz = cvSize( 1000,1000); 
-	image = cvCreateImage(image_sz , 8, 3 );
-	image2 = cvCreateImage(image_sz , 8, 3 );
-
-	cvNamedWindow("Win",0);
-	cvNamedWindow("Win2",0);
-	cvSetMouseCallback( "Win", on_mouse, 0 );
-	cvResizeWindow("Win",500,500);
-	cvResizeWindow("Win2",500,500);
-	cvCreateTrackbar("Letter", "Win2", &traing_data, 25, OnChangeData);
-
-	mycvFont = cvFont(5,2);
-	ml.DataCount = 1 + SAMPLE_COUNT_OPT*2*3;
-	ml.train("data.txt",0);	
-
-
-	for(;;)
-	{			
-		//set Timer		
-		idle_time = timeGetTime()-start_time;
-		if(idle_time>IDLE_TIME_SPAN && FingerTrackList.size()>0 && !inTrack)
-		{
-
-			float featureData[31];
-			//记录训练数据
-			WriteData(featureData);
-			idle_time = 0;
-			FingerTrackList.clear();
-			FingerTrackListOpt.clear();
-
-			if(InRecongnize)
-			{
-				pre_letter = 0;
-				ml.predict(pre_letter,featureData);
-
-			}
-
-		}
-
-		cvZero(image);
-		cvZero(image2);
-
-		for(int i=0;i<(int)FingerTrackList.size();i++)
-		{
-			for(int j=0;j<(int)FingerTrackList[i].track.size();j++)	
-				cvCircle(image,FingerTrackList[i].track[j].center,10,CV_RGB(0,255,0),1,8,0);
-		}
-
-		for(int i=0;i<(int)FingerTrackListOpt.size();i++)
-		{
-			for(int j=0;j<(int)FingerTrackListOpt[i].track.size();j++)	
-			{
-				CvPoint newpt = FingerTrackListOpt[i].track[j].center;
-				newpt.x =newpt.x/2+image2->width/2;
-				newpt.y =newpt.y/2+image2->height/2;
-				cvLine(image2,cvPoint(image2->width/2,0),cvPoint(image2->width/2 ,image2->height),CV_RGB(255,255,0),2,8,0);
-				cvLine(image2,cvPoint(0,image2->height/2),cvPoint(image2->width ,image2->height/2),CV_RGB(255,255,0),2,8,0);				
-				cvCircle(image2,newpt,10,CV_RGB(255,0,0),1,8,0);
-			}
-		}
-
-
-		CvPoint pt_info;
-
-		if(InRecongnize) 
-		{
-			pt_info = cvPoint(20,920);
-			mycvFont = cvFont(2,2);
-			cvPutText(image2,"recongnizing result = ",pt_info,&mycvFont,CV_RGB(20,250,250));
-			if(pre_letter!=0)
-			{
-				mycvFont = cvFont(5,2);
-				pt_info = cvPoint(400,920);
-				cvPutText(image2,&pre_letter,pt_info,&mycvFont,CV_RGB(255,0,0));
-			}
-		}
-		else
-		{
-			mycvFont = cvFont(5,2);
-			pt_info = cvPoint(290,920);
-			cvPutText(image2,&letter,pt_info,&mycvFont,CV_RGB(20,250,250));
-			mycvFont = cvFont(2,2);
-			pt_info = cvPoint(20,920);
-			cvPutText(image2,"is traning...",pt_info,&mycvFont,CV_RGB(20,250,250));			
-
-		}
-
-
-
-		cvShowImage("Win",image);
-		cvShowImage("Win2",image2);
-		int keyCode = cvWaitKey(10);
-		if (keyCode==27) break;
-		if (keyCode=='c')
-		{
-			FingerTrackList.clear();
-			FingerTrackListOpt.clear();
-		}
-		if (keyCode=='t')
-		{			
-			ml.train("data.txt",0);	
-		}
-		if (keyCode=='m')
-		{
-			InRecongnize = InRecongnize^1;
-		}
-
-	}
-
-	return 0;
-}
-
-
-int DFT()
-{
-	for(int k=0;k<(int)FingerTrackListOpt.size();k++)
-	{
-
-		int ListObjSize = (int)FingerTrackListOpt[k].track.size();
-		//if(ListObjSize==20) break;
-		printf("\n\nListObjSize %d ",ListObjSize);
-
-		CvMat* s = cvCreateMat(1,ListObjSize,CV_32FC1);
-		CvMat* d = cvCreateMat(1,ListObjSize,CV_32FC1);
-		CvMat* s2 = cvCreateMat(1,ListObjSize,CV_32FC1);
-
-		long avg_x =0;
-		long avg_y =0;
-		for(int j=0;j<(int)ListObjSize;j++)	
-		{
-			CvPoint pt = FingerTrackListOpt[k].track[j].center;
-			avg_x +=pt.x;
-			avg_y +=pt.y;
-		}
-		avg_x = avg_x/ListObjSize;
-		avg_y = avg_y/ListObjSize;
-
-		for(int j=0;j<(int)ListObjSize;j++)	
-		{
-			CvPoint pt = FingerTrackListOpt[k].track[j].center;
-			float dis =(float)((pt.x-avg_x)* (pt.x-avg_x) +  (pt.y-avg_y)* (pt.y-avg_y));
-			dis = sqrt(dis);
-			cvSetReal2D(s,0,j,dis);
-		}
-		//for(int j=0;j<(int)ListObjSize;j++)	
-		//{
-		//	printf("%6.2f ",cvGetReal2D(s,0,j));
-		//}
-
-		printf(" \n");
-
-		//DFT 离散傅立叶变换
-		cvDFT(s,d,CV_DXT_FORWARD);     //CV_DXT_FORWARD 代表了正变换：空域－〉频域
-
-		printf("\n The result of DFT: ");
-		for(int j=0;j<(int)ListObjSize;j++)	
-			printf("%6.2f ",cvGetReal2D(d,0,j));
-
-		//printf(" \n");
-		////DFT 离散傅立叶逆变换
-		//cvDFT(d,s2,CV_DXT_INV_SCALE); //逆变换
-		//printf("\n The result of IDFT: ");
-		//for(int j=0;j<(int)ListObjSize;j++)	
-		//	printf("%6.2f ",cvGetReal2D(s2,0,j));
-		//printf(" ");
-
-		cvReleaseMat(&s);
-		cvReleaseMat(&d);
-		cvReleaseMat(&s2);
-	}
-	return 0;
-}
+// TrainingTools.cpp : 定义控制台应用程序的入口点。
+//
+
+//   26个字母要按一定笔划顺序书写。书写的规律有以下几点：  
+//联机大写字母书写规则
+//1. C J L O S U V W Z  一笔划完成 
+//2. B D G K M N P Q T X Y   两笔划完成 
+//3. A E F H I R      三笔划完成 
+
+//online upper letter rule
+//1. C J L O S U V W Z        finish in one stroke
+//2. B D G K M N P Q T X Y    finish in two stroke
+//3. A E F H I R              finish in three stroke
+
+
+#include "stdafx.h"
+#include "windows.h"
+#include <iostream>
+#include <string.h>
+#include <cxcore.h>
+#include <cv.h>
+#include <highgui.h>
+#include <fstream>
+#include "Finger.h"
+#include "MachineLearning.h"
+
+#pragma comment(lib,"opencv_core2410d.lib")
+#pragma comment(lib,"opencv_highgui2410d.lib")
+#pragma comment(lib,"opencv_ml2410d.lib")
+#pragma comment(lib,"opencv_imgproc2410.lib")
+
+IplImage *image = 0 ; //原始图像
+IplImage *image2 = 0 ; //原始图像
+
+using namespace std;
+
+const int SCALE_MAX = 500;
+const DWORD IDLE_TIME_SPAN = 1000; //间隔一秒内没有输入，开始写入数据
+const int SAMPLE_COUNT = 50; //每条曲线 五十个特征点
+const int SAMPLE_COUNT_OPT = 5; //每条曲线只取五维
+DWORD start_time =0;
+DWORD idle_time =0;
+bool InRecongnize = true;  //0 训练   1 预测
+char pre_letter =0;
+MachineLearning ml;
+
+std::vector< FingerTrack > FingerTrackList;
+std::vector <Finger>::iterator Itr_Finger;
+std::vector< FingerTrack >::iterator Itr_FingerTrack;
+std::vector< FingerTrack > FingerTrackListOpt;//优化轮廓
+
+bool inTrack =false;
+void WriteData(float featureData[]);
+int DFT();
+void toNormalSize();
+int traing_data =0;
+char letter='A';
+
+CvFont mycvFont;
+
+//归一化处理
+void toNormalSize()
+{
+	int max_temp_x=0;
+	int max_temp_y=0;
+	int min_temp_x=10000;
+	int min_temp_y=10000;
+	for(int i=0;i<(int)FingerTrackListOpt.size();i++)
+	{
+		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
+		for(int j=0;j<(int)ListObjSize;j++)	
+		{				
+			//FingerTrackListOpt[i].track[j].center.x -=FingerTrackListOpt[i].track[0].center.x; 
+			//FingerTrackListOpt[i].track[j].center.y -=FingerTrackListOpt[i].track[0].center.y;
+			max_temp_x = max((FingerTrackListOpt[i].track[j].center.x),max_temp_x);
+			max_temp_y = max((FingerTrackListOpt[i].track[j].center.y),max_temp_y);
+			min_temp_x = min((FingerTrackListOpt[i].track[j].center.x),min_temp_x);
+			min_temp_y = min((FingerTrackListOpt[i].track[j].center.y),min_temp_y);
+		}		
+	}
+
+
+	for(int i=0;i<(int)FingerTrackListOpt.size();i++)
+	{
+		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
+		for(int j=0;j<(int)ListObjSize;j++)	
+		{				
+			FingerTrackListOpt[i].track[j].center.x -=min_temp_x; 
+			FingerTrackListOpt[i].track[j].center.y -=min_temp_y;
+		}
+	}
+
+	int MaxW = max(max_temp_x-min_temp_x,max_temp_y-min_temp_y); //最大的
+	for(int i=0;i<(int)FingerTrackListOpt.size();i++)
+	{
+		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
+		for(int j=0;j<(int)ListObjSize;j++)	
+		{				
+			FingerTrackListOpt[i].track[j].center.x =(int)((float)FingerTrackListOpt[i].track[j].center.x/MaxW*SCALE_MAX); 
+			FingerTrackListOpt[i].track[j].center.y =(int)((float)FingerTrackListOpt[i].track[j].center.y/MaxW*SCALE_MAX);   
+		}
+	}
+
+}
+
+
+void analysis()
+{
+	FingerTrackListOpt.clear();
+	for(int i=0;i<(int)FingerTrackList.size();i++)
+	{
+		//创建FingerTrack 加入FingerTrackListOpt
+		FingerTrack ft;			
+		FingerTrackListOpt.push_back(ft);
+		CvPoint start_pt = FingerTrackList[i].track[0].center;		
+		Finger fg;
+		fg.center  = start_pt;
+		FingerTrackListOpt[i].track.push_back(fg);	
+
+		//求取距离总和
+		long total_dis =0;
+		int ListObjSize = (int)FingerTrackList[i].track.size();
+		for(int j=0;j<ListObjSize-1;j++)	
+		{
+			CvPoint pt = FingerTrackList[i].track[j].center;
+			CvPoint pt_next = FingerTrackList[i].track[j+1].center;
+			long distance = (pt_next.x - pt.x)*(pt_next.x - pt.x) +  (pt_next.y - pt.y)*(pt_next.y - pt.y);
+			total_dis+=(long)sqrt((float)distance);
+		}
+		int search_len = total_dis/(SAMPLE_COUNT+2); //确定分割长度，取20等份
+		assert(search_len>0);
+
+		//插值
+		for(int j=0;j<ListObjSize;j++)				
+		{				
+
+			CvPoint pt = FingerTrackList[i].track[j].center;
+			long distance = (start_pt.x - pt.x)*(start_pt.x - pt.x) +  (start_pt.y - pt.y)*(start_pt.y - pt.y);
+			distance = (long)sqrt((float)distance);
+			if(distance>search_len)
+			{
+				//在轨迹上计算一个插值虚拟点
+				float radio = (float)search_len/distance;
+				start_pt.x = (int)(start_pt.x + (pt.x - start_pt.x)*radio);
+				start_pt.y = (int)(start_pt.y + (pt.y - start_pt.y)*radio);
+				Finger fg;
+				fg.center  = start_pt;
+				FingerTrackListOpt[i].track.push_back(fg);	
+				j--;
+			}				
+		}
+	}
+
+	//归一化处理
+	toNormalSize();
+
+
+
+};
+//写入特征数据到文件或者数组
+void WriteData(float featureData[])
+{
+	std::fstream logfile("data.txt",std::ios::app);	
+	int Tracksize = (int)FingerTrackListOpt.size();
+	if(!InRecongnize)
+	{
+		logfile<<letter<<",";
+		logfile<<Tracksize;
+	}
+
+	featureData[0] = (float)Tracksize;
+	int f_index = 0;
+
+	for(int i=0;i<Tracksize;i++)
+	{		
+		int ListObjSize = (int)FingerTrackListOpt[i].track.size();
+		assert(ListObjSize>=SAMPLE_COUNT);
+
+		float pcadata[SAMPLE_COUNT_OPT];
+		int fData[SAMPLE_COUNT];	
+		//X DFT
+		for(int j=0;j<SAMPLE_COUNT;j++)
+		{			
+			fData[j] = FingerTrackListOpt[i].track[j].center.x;			
+		}
+		ml.ExtractDFT(pcadata,fData,SAMPLE_COUNT,SAMPLE_COUNT_OPT);
+		for(int k=0;k<SAMPLE_COUNT_OPT;k++)
+		{
+			if(!InRecongnize) logfile<<","<<pcadata[k];
+			f_index++;
+			featureData[f_index] = pcadata[k];
+
+
+		}
+		//Y DFT
+		for(int j=0;j<SAMPLE_COUNT;j++)
+		{			
+			fData[j] = FingerTrackListOpt[i].track[j].center.y;			
+		}
+		ml.ExtractDFT(pcadata,fData,SAMPLE_COUNT,SAMPLE_COUNT_OPT);
+		for(int k=0;k<SAMPLE_COUNT_OPT;k++)
+		{
+			if(!InRecongnize) logfile<<","<<pcadata[k];
+			f_index++;
+			featureData[f_index] = pcadata[k];
+		}
+
+
+	}
+	for(int i=Tracksize;i<3;i++) //用0填充
+	{			
+		for(int j=0;j<SAMPLE_COUNT_OPT;j++)
+		{
+			if(!InRecongnize) logfile<<","<<0;
+			if(!InRecongnize) logfile<<","<<0;
+			f_index++;
+			featureData[f_index] =  0.0f; 
+			f_index++;
+			featureData[f_index] =  0.0f; 
+		}
+	}
+	if(!InRecongnize) logfile<<"\n";
+	logfile.close();
+}
+
+static void on_mouse( int event, int x, int y, int flags, void *param )
+{
+	if( event == CV_EVENT_LBUTTONDOWN )
+	{
+		if(!inTrack)
+		{
+			FingerTrack ft;			
+			FingerTrackList.push_back(ft);
+			inTrack = true;
+
+		}
+
+	} 
+	else if ( event == CV_EVENT_MOUSEMOVE )
+	{
+		if(inTrack)
+		{
+			Finger fg;
+			fg.center  = cvPoint(x,y);
+			FingerTrackList.back().track.push_back(fg);		
+			idle_time =0;
+		}
+	}
+	else if ( event == CV_EVENT_LBUTTONUP ) 
+	{
+		inTrack = false;
+		//analysis();
+
+		start_time = timeGetTime();
+		analysis();
+		//DFT();
+
+	}
+
+};
+void OnChangeData(int pos)
+{
+	letter = pos+'A';
+}
+
+int main(int argc, char* argv[])
+{
+
+
+	std::cout<<"                == The upper letter online handwriting recongnize ==" << std::endl;
+	std::cout<<" 1. there two state (recongnizing and traning) for the app,In recongnizing mode,use your mouse write upper letter on 'Win' window,after 1 second,then will get result on Win2" << std::endl;
+	std::cout<<" 2. you can press 'm' key to change mode from recongnizing to traning or back." << std::endl;	
+	std::cout<<" 3. In traning mode,change the value of letter, then you can write upper letter on 'Win' window, and app will write data into data.txt." << std::endl;
+	std::cout<<" 4. you can retrain the traning data by press 't' without restart program." << std::endl;
+	std::cout<<" 5. you can modify the traning data 'data.txt' by hand if you want. " << std::endl<< std::endl;
+	std::cout<<" enjoy it.:)" << std::endl<< std::endl;
+	std::cout<<" ===============================================================" << std::endl;
+
+
+
+	CvSize image_sz = cvSize( 1000,1000); 
+	image = cvCreateImage(image_sz , 8, 3 );
+	image2 = cvCreateImage(image_sz , 8, 3 );
+
+	cvNamedWindow("Win",0);
+	cvNamedWindow("Win2",0);
+	cvSetMouseCallback( "Win", on_mouse, 0 );
+	cvResizeWindow("Win",500,500);
+	cvResizeWindow("Win2",500,500);
+	cvCreateTrackbar("Letter", "Win2", &traing_data, 25, OnChangeData);
+
+	mycvFont = cvFont(5,2);
+	ml.DataCount = 1 + SAMPLE_COUNT_OPT*2*3;
+	ml.train("data.txt",0);	
+
+
+	for(;;)
+	{			
+		//set Timer		
+		idle_time = timeGetTime()-start_time;
+		if(idle_time>IDLE_TIME_SPAN && FingerTrackList.size()>0 && !inTrack)
+		{
+
+			float featureData[31];
+			//记录训练数据
+			WriteData(featureData);
+			idle_time = 0;
+			FingerTrackList.clear();
+			FingerTrackListOpt.clear();
+
+			if(InRecongnize)
+			{
+				pre_letter = 0;
+				ml.predict(pre_letter,featureData);
+
+			}
+
+		}
+
+		cvZero(image);
+		cvZero(image2);
+
+		for(int i=0;i<(int)FingerTrackList.size();i++)
+		{
+			for(int j=0;j<(int)FingerTrackList[i].track.size();j++)	
+				cvCircle(image,FingerTrackList[i].track[j].center,10,CV_RGB(0,255,0),1,8,0);
+		}
+
+		for(int i=0;i<(int)FingerTrackListOpt.size();i++)
+		{
+			for(int j=0;j<(int)FingerTrackListOpt[i].track.size();j++)	
+			{
+				CvPoint newpt = FingerTrackListOpt[i].track[j].center;
+				newpt.x =newpt.x/2+image2->width/2;
+				newpt.y =newpt.y/2+image2->height/2;
+				cvLine(image2,cvPoint(image2->width/2,0),cvPoint(image2->width/2 ,image2->height),CV_RGB(255,255,0),2,8,0);
+				cvLine(image2,cvPoint(0,image2->height/2),cvPoint(image2->width ,image2->height/2),CV_RGB(255,255,0),2,8,0);				
+				cvCircle(image2,newpt,10,CV_RGB(255,0,0),1,8,0);
+			}
+		}
+
+
+		CvPoint pt_info;
+
+		if(InRecongnize) 
+		{
+			pt_info = cvPoint(20,920);
+			mycvFont = cvFont(2,2);
+			cvPutText(image2,"recongnizing result = ",pt_info,&mycvFont,CV_RGB(20,250,250));
+			if(pre_letter!=0)
+			{
+				mycvFont = cvFont(5,2);
+				pt_info = cvPoint(400,920);
+				cvPutText(image2,&pre_letter,pt_info,&mycvFont,CV_RGB(255,0,0));
+			}
+		}
+		else
+		{
+			mycvFont = cvFont(5,2);
+			pt_info = cvPoint(290,920);
+			cvPutText(image2,&letter,pt_info,&mycvFont,CV_RGB(20,250,250));
+			mycvFont = cvFont(2,2);
+			pt_info = cvPoint(20,920);
+			cvPutText(image2,"is traning...",pt_info,&mycvFont,CV_RGB(20,250,250));			
+
+		}
+
+
+
+		cvShowImage("Win",image);
+		cvShowImage("Win2",image2);
+		int keyCode = cvWaitKey(10);
+		if (keyCode==27) break;
+		if (keyCode=='c')
+		{
+			FingerTrackList.clear();
+			FingerTrackListOpt.clear();
+		}
+		if (keyCode=='t')
+		{			
+			ml.train("data.txt",0);	
+		}
+		if (keyCode=='m')
+		{
+			InRecongnize = InRecongnize^1;
+		}
+
+	}
+
+	return 0;
+}
+
+
+int DFT()
+{
+	for(int k=0;k<(int)FingerTrackListOpt.size();k++)
+	{
+
+		int ListObjSize = (int)FingerTrackListOpt[k].track.size();
+		//if(ListObjSize==20) break;
+		printf("\n\nListObjSize %d ",ListObjSize);
+
+		CvMat* s = cvCreateMat(1,ListObjSize,CV_32FC1);
+		CvMat* d = cvCreateMat(1,ListObjSize,CV_32FC1);
+		CvMat* s2 = cvCreateMat(1,ListObjSize,CV_32FC1);
+
+		long avg_x =0;
+		long avg_y =0;
+		for(int j=0;j<(int)ListObjSize;j++)	
+		{
+			CvPoint pt = FingerTrackListOpt[k].track[j].center;
+			avg_x +=pt.x;
+			avg_y +=pt.y;
+		}
+		avg_x = avg_x/ListObjSize;
+		avg_y = avg_y/ListObjSize;
+
+		for(int j=0;j<(int)ListObjSize;j++)	
+		{
+			CvPoint pt = FingerTrackListOpt[k].track[j].center;
+			float dis =(float)((pt.x-avg_x)* (pt.x-avg_x) +  (pt.y-avg_y)* (pt.y-avg_y));
+			dis = sqrt(dis);
+			cvSetReal2D(s,0,j,dis);
+		}
+		//for(int j=0;j<(int)ListObjSize;j++)	
+		//{
+		//	printf("%6.2f ",cvGetReal2D(s,0,j));
+		//}
+
+		printf(" \n");
+
+		//DFT 离散傅立叶变换
+		cvDFT(s,d,CV_DXT_FORWARD);     //CV_DXT_FORWARD 代表了正变换：空域－〉频域
+
+		printf("\n The result of DFT: ");
+		for(int j=0;j<(int)ListObjSize;j++)	
+			printf("%6.2f ",cvGetReal2D(d,0,j));
+
+		//printf(" \n");
+		DFT 离散傅立叶逆变换
+		//cvDFT(d,s2,CV_DXT_INV_SCALE); //逆变换
+		//printf("\n The result of IDFT: ");
+		//for(int j=0;j<(int)ListObjSize;j++)	
+		//	printf("%6.2f ",cvGetReal2D(s2,0,j));
+		//printf(" ");
+
+		cvReleaseMat(&s);
+		cvReleaseMat(&d);
+		cvReleaseMat(&s2);
+	}
+	return 0;
+}
 
  
  
 实现效果：
  
-
+ 
 
 

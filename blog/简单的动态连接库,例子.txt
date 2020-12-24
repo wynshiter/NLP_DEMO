@@ -8,72 +8,66 @@
  
 平时我们使用在代码中的:
 #pragma comment(lib,"Test_of_dll.lib")
-
-的意思是指文中生成的obj文件应该与Test_of_dll.lib一起链接.或者可以在VC的工程中设置加载此lib
+ 的意思是指文中生成的obj文件应该与Test_of_dll.lib一起链接.或者可以在VC的工程中设置加载此lib
  
 下面,来做一个简单动态Dll
 新建一个Win32 Application,application setting中勾选Dll,完成.添加如下文件后,编译链接.
  
 lib.h文件如下:
-#ifndef LIB_H
-#define LIB_H
-extern "C" int __declspec(dllexport)add(int x,int y);
+#ifndef LIB_H
+#define LIB_H
+extern "C" int __declspec(dllexport)add(int x,int y);
 #endif
-
-lib.cpp文件如下:
-#include"stdafx.h"
-#include"lib.h"
-
-int add(int x,int y)
-{
-	return x + y;
+ lib.cpp文件如下:
+#include"stdafx.h"
+#include"lib.h"
+
+int add(int x,int y)
+{
+	return x + y;
 }
-
-之后另外新建一个工程,调用此工程生成的Dll,Test_of_nonMFCdll.dll
+ 之后另外新建一个工程,调用此工程生成的Dll,Test_of_nonMFCdll.dll
 代码如下:
-// Test_of_dllCall.cpp : Defines the entry point for the console application.
-//
+// Test_of_dllCall.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include"stdio.h"
+#include"windows.h"
+
+typedef int(*lpAddFun)(int, int);	//宏定义函数指针类型
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HINSTANCE hDll;		//Dll句柄
+	lpAddFun addFun;	//函数指针
+	hDll=LoadLibrary("..\\..\\Debug\\Test_of_nonMFCdll.dll");
+
+	if(NULL!=hDll)
+	{
+		addFun=(lpAddFun)GetProcAddress(hDll,"add");
+
+		if(NULL!=addFun)
+		{
+			int  result = addFun(2, 3);
+			printf("The result of addFun is %d \n",result);
+			getchar();
+		}
+
+
+		FreeLibrary(hDll);
+	}
+	return 0;
+}
+
 
-#include "stdafx.h"
-#include"stdio.h"
-#include"windows.h"
+ 注意其中的路径,要根据Dll所在做变化,不然找不到相应的Dll:
+hDll=LoadLibrary("..\\..\\Debug\\Test_of_nonMFCdll.dll");
 
-typedef int(*lpAddFun)(int, int);	//宏定义函数指针类型
-
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-	HINSTANCE hDll;		//Dll句柄
-	lpAddFun addFun;	//函数指针
-	hDll=LoadLibrary("..\\..\\Debug\\Test_of_nonMFCdll.dll");
-
-	if(NULL!=hDll)
-	{
-		addFun=(lpAddFun)GetProcAddress(hDll,"add");
-
-		if(NULL!=addFun)
-		{
-			int  result = addFun(2, 3);
-			printf("The result of addFun is %d \n",result);
-			getchar();
-		}
-
-
-		FreeLibrary(hDll);
-	}
-	return 0;
-}
-
-
-
-注意其中的路径,要根据Dll所在做变化,不然找不到相应的Dll:
-hDll=LoadLibrary("..\\..\\Debug\\Test_of_nonMFCdll.dll");
-
-
-调用后的结果:
+ 调用后的结果:
 The result of addFun is 5
-
- 
+  
  
  
 

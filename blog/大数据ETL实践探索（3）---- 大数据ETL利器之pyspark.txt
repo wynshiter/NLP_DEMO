@@ -5,36 +5,28 @@
 
 
 
-文章大纲大数据ETL 系列文章简介pyspark Dataframe ETLspark dataframe 数据导入Elasticsearchdataframe 及环境初始化清洗及写入数据到Elastic searchspark SQLDataframe 操作加载大文件遍历增删改查空值处理更改dataframe 列 类型wherejoin 及聚集函数列式数据存储格式parquet参考
+
+文章大纲
+大数据ETL 系列文章简介pyspark Dataframe ETLspark dataframe 数据导入Elasticsearchdataframe 及环境初始化清洗及写入数据到Elastic search
+spark SQLDataframe 操作加载大文件遍历增删改查空值处理更改dataframe 列 类型wherejoin 及聚集函数
+列式数据存储格式parquet参考
+
+
 
 大数据ETL 系列文章简介
 本系列文章主要针对ETL大数据处理这一典型场景，基于python语言使用Oracle、aws、Elastic search 、Spark 相关组件进行一些基本的数据导入导出实战，如：
-
-oracle使用数据泵impdp进行导入操作。
-aws使用awscli进行上传下载操作。
-本地文件上传至aws es
-spark dataframe录入ElasticSearch
-
+oracle使用数据泵impdp进行导入操作。aws使用awscli进行上传下载操作。本地文件上传至aws esspark dataframe录入ElasticSearch
 等典型数据ETL功能的探索。
-系列文章：
-1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出
-2.大数据ETL实践探索（2）---- python 与aws 交互
-3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器
-4.大数据ETL实践探索（4）---- 之 搜索神器elastic search
-5.使用python对数据库，云平台，oracle，aws，es导入导出实战
-6.aws ec2 配置ftp----使用vsftp
-7.浅谈pandas，pyspark 的大数据ETL实践经验
+系列文章： 1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出 2.大数据ETL实践探索（2）---- python 与aws 交互 3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器 4.大数据ETL实践探索（4）---- 之 搜索神器elastic search 5.使用python对数据库，云平台，oracle，aws，es导入导出实战 6.aws ec2 配置ftp----使用vsftp 7.浅谈pandas，pyspark 的大数据ETL实践经验
 
 pyspark Dataframe ETL
 本部分内容主要在 系列文章7 ：浅谈pandas，pyspark 的大数据ETL实践经验 上已有介绍 ，不用多说
 
 spark dataframe 数据导入Elasticsearch
 下面重点介绍 使用spark 作为工具和其他组件进行交互（数据导入导出）的方法
-ES 对于spark 的相关支持做的非常好，https://www.elastic.co/guide/en/elasticsearch/hadoop/2.4/spark.html
-在官网的文档中基本上说的比较清楚，但是大部分代码都是java 的，所以下面我们给出python 的demo 代码
+ES 对于spark 的相关支持做的非常好，https://www.elastic.co/guide/en/elasticsearch/hadoop/2.4/spark.html 在官网的文档中基本上说的比较清楚，但是大部分代码都是java 的，所以下面我们给出python 的demo 代码
 dataframe 及环境初始化
-初始化， spark 第三方网站下载包：elasticsearch-spark-20_2.11-6.1.1.jar
-http://spark.apache.org/third-party-projects.html
+初始化， spark 第三方网站下载包：elasticsearch-spark-20_2.11-6.1.1.jar http://spark.apache.org/third-party-projects.html
 import sys
 import os
 print(os.getcwd())
@@ -92,9 +84,7 @@ hadoop_conf = sc._jsc.hadoopConfiguration()
 hadoop_conf.set("mapreduce.fileoutputcommitter.algorithm.version", "2")
 
 清洗及写入数据到Elastic search
-
 数据加载
-
 #数据加载
 df = (spark
                  .read
@@ -108,9 +98,7 @@ print(df.count())
 
 #
 
-
 数据清洗，增加一列，或者针对某一列进行udf 转换
-
 '''  
 #加一列用户名，如果是xx数据则为xx
 '''
@@ -121,9 +109,7 @@ from pyspark.sql.functions import udf
 from pyspark.sql import functions
 df = df.withColumn('customer',functions.lit("腾讯用户"))
 
-
 使用udf 清洗时间格式及数字格式
-
 #udf 清洗时间
 #清洗日期格式字段
 from dateutil import parser
@@ -191,9 +177,7 @@ save("is/doc")
 
 
 spark SQL
-SPARK 的spark 写起来对于 经常写sql 的人来说还是很友好的
-一份代码样例如下，参考：update a dataframe column with new values
-
+SPARK 的spark 写起来对于 经常写sql 的人来说还是很友好的 一份代码样例如下，参考：update a dataframe column with new values 
 
 data1 = [
   (1, "a"),
@@ -292,27 +276,14 @@ for t in ['BinaryType', 'BooleanType', 'ByteType', 'DateType',
     print(f"{t}: {getattr(types, t)().simpleString()}")
 
 
-BinaryType: binary
-BooleanType: boolean
-ByteType: tinyint
-DateType: date
-DecimalType: decimal(10,0)
-DoubleType: double
-FloatType: float
-IntegerType: int
-LongType: bigint
-ShortType: smallint
-StringType: string
-TimestampType: timestamp
+BinaryType: binary BooleanType: boolean ByteType: tinyint DateType: date DecimalType: decimal(10,0) DoubleType: double FloatType: float IntegerType: int LongType: bigint ShortType: smallint StringType: string TimestampType: timestamp
 
 说实话，spark 的文档 cast api 的介绍 写的还没人家这个回答好
 参考：https://stackoverflow.com/questions/32284620/how-to-change-a-dataframe-column-from-string-type-to-double-type-in-pyspark
 where
 like 操作怎么写都不对, 原来是对象的方法
-like(other)
-SQL like expression. Returns a boolean Column based on a SQL LIKE match.
-Parameters:	other – a SQL LIKE pattern
-See rlike() for a regex version
+like(other) SQL like expression. Returns a boolean Column based on a SQL LIKE match.
+Parameters: other – a SQL LIKE pattern See rlike() for a regex version
 >>>
 df.filter(df.name.like('Al%')).collect()
 [Row(age=2, name='Alice')]
@@ -344,7 +315,7 @@ df.groupBy('name').agg({'age': 'mean'})
 
 
 列式数据存储格式parquet
-parquet 是针对列式数据存储的一种申请的压缩格式，百万级的数据用spark 加载成pyspark 的dataframe  然后在进行count 操作基本上是秒出结果
+parquet 是针对列式数据存储的一种申请的压缩格式，百万级的数据用spark 加载成pyspark 的dataframe 然后在进行count 操作基本上是秒出结果
 读写 demo code
 #直接用pyspark dataframe写parquet数据（overwrite模式）
 df.write.mode("overwrite").parquet("data.parquet")
@@ -355,13 +326,13 @@ DF = spark.read.parquet("data.parquet")
 DF.count()
 
 
-Parquet 用于 Spark SQL 时表现非常出色。它不仅提供了更高的压缩率，还允许通过已选定的列和低级别的读取器过滤器来只读取感兴趣的记录。因此，如果需要多次传递数据，那么花费一些时间编码现有的平面文件可能是值得的。
-
+Parquet 用于 Spark SQL 时表现非常出色。它不仅提供了更高的压缩率，还允许通过已选定的列和低级别的读取器过滤器来只读取感兴趣的记录。因此，如果需要多次传递数据，那么花费一些时间编码现有的平面文件可能是值得的。 
 参考
 parquet
 https://www.ibm.com/developerworks/cn/analytics/blog/5-reasons-to-choose-parquet-for-spark-sql/index.html
 parquet 实战应用
 http://www.cnblogs.com/piaolingzxh/p/5469964.html
+
 
 
 

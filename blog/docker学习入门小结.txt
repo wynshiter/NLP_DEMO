@@ -1,0 +1,57 @@
+
+
+
+
+公司为了进一步业务的发展需要，组织了为期两天的docker容器化培训，也对该领域的大致概念、发展方向有了一定的了解。针对传统软件开发中存在的诸多问题，docker借助集装箱的成功经验应运而生，docker主要解决了软件生命周期中的快速发布问题，下面对docker的基本概念及部署做简要介绍，目前也在学习中，过程中若有什么问题，还请指出，随后深入学习。
+
+
+docker的基本框架：
+
+docker的基本环境：centOS7（推荐）、ubuntu12.04 14.04（推荐） 及以上
+借助阿里云安装docker引擎，此处用curl命令：
+curl -sSL http://acs-public-mirror.oss-cn-hangzhou.aliyuncs.com/docker-engine/internet | sh -
+安装完成后，检测docker是否安装成功：
+docker info
+若失败的话，还需要再安装下：
+yum install docker
+docker的常用命令，使用docker --help查看，
+
+下面列出我学习中用到的几个：
+docker pull 拉去镜像
+
+有时会出现这样的错误，则说明docker服务没有启动：
+启动docker：
+systemctl  start docker.service
+
+这里没有拉去到镜像，但是docker已经是在运行中了；
+docker run在docker中非常重要，因为不run的话，应用起不来啊；
+其中的cpuset  memory等也会经常用到
+
+docker logs查看日志的
+
+docker images查看存在的image
+
+docker search [image name]
+docker kill 等。
+docker安装完了，还需要安装部署harbor，推荐大家下载offline版本备用：
+https://github.com/vmware/harbor/blob/master/docs/installation_guide.md
+先安装dockercloud：
+curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s
+http://099430a4.m.daocloud.io
+安装docker compose：
+wget https://bootstrap.pypa.io/get-pip.py --no-check-certificate
+python get-pip.py
+sudo pip install -U docker-compose
+
+找到下载好的harbor tar包，解压tar xvf tar包名，执行安装：
+
+
+有时会因为网络的问题，会安装失败。
+安装完后，还要修改下配置文件：
+
+改一下hostname
+
+大致的安装流程就是这样了，现在已经有大量的公司、企业在使用容器化技术、网上也有很多成功的例子和优秀的开源工程，本文仅做学习笔记使用，未详尽之处还请大家多多包涵，希望能给大家带来些许帮助。
+
+
+

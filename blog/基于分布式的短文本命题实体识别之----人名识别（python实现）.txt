@@ -4,22 +4,19 @@
 
 
 
-
 目前对中文分词精度影响最大的主要是两方面：未登录词的识别和歧义切分。
 据统计：未登录词中中文姓人名在文本中一般只占2%左右，但这其中高达50%以上的人名会产生切分错误。在所有的分词错误中，与人名有关的错误占到了将近90%，这中国人名都是根据人的想法起的名字，有很大的随意性，并且数量巨大，规律也不尽相同。
 
 
 1.理论简介
 命名实体识别(Named Entities Recognition, NER)是自然语言处理(Natural LanguageProcessing, NLP)的一个基础任务。其目的是识别语料中人名、地名、组织机构名等命名实体。由于这些命名实体数量不断增加，通常不可能在词典中穷尽列出，且其构成方法具有各自的一些规律性，因而,通常把对这些词的识别从词汇形态处理(如汉语切分)任务中独立处理，称为命名实体识别。命名实体识别技术是信息抽取、信息检索、机器翻译、问答系统等多种自然语言处理技术必不可少的组成部分。
-命名实体是命名实体识别的研究主体，一般包括3大类(实体类、时间类和数字类)和7小类(人名、地名、机构名、时间、日期、货币和百分比)命名实体。评判一个命名实体是否被正确识别包括两个方面：实体的边界是否正确；实体的类型是否标注正确。主要错误类型包括文本正确，类型可能错误；反之，文本边界错误,而其包含的主要实体词和词类标记可能正确。 
-    命名实体识别的主要技术方法分为：基于规则和词典的方法、基于统计的方法、二者混合的方法等
+命名实体是命名实体识别的研究主体，一般包括3大类(实体类、时间类和数字类)和7小类(人名、地名、机构名、时间、日期、货币和百分比)命名实体。评判一个命名实体是否被正确识别包括两个方面：实体的边界是否正确；实体的类型是否标注正确。主要错误类型包括文本正确，类型可能错误；反之，文本边界错误,而其包含的主要实体词和词类标记可能正确。  命名实体识别的主要技术方法分为：基于规则和词典的方法、基于统计的方法、二者混合的方法等
 1.1基于规则和词典的方法
 基于规则的方法多采用语言学专家手工构造规则模板,选用特征包括统计信息、标点符号、关键字、指示词和方向词、位置词(如尾字)、中心词等方法，以模式和字符串相匹配为主要手段，这类系统大多依赖于知识库和词典的建立。基于规则和词典的方法是命名实体识别中最早使用的方法，一般而言，当提取的规则能比较精确地反映语言现象时，基于规则的方法性能要优于基于统计的方法。但是这些规则往往依赖于具体语言、领域和文本风格，编制过程耗时且难以涵盖所有的语言现象，特别容易产生错误，系统可移植性不好，对于不同的系统需要语言学专家重新书写规则。基于规则的方法的另外一个缺点是代价太大，存在系统建设周期长、移植性差而且需要建立不同领域知识库作为辅助以提高系统识别能力等问题。
 1.2基于统计的方法
 基于统计机器学习的方法主要包括：隐马尔可夫模型(HiddenMarkovMode,HMM)、最大熵(MaxmiumEntropy,ME)、支持向量机(Support VectorMachine,SVM)、条件随机场( ConditionalRandom Fields,CRF)等。
 在这4种学习方法中，最大熵模型结构紧凑，具有较好的通用性，主要缺点是训练时间复杂性非常高，有时甚至导致训练代价难以承受，另外由于需要明确的归一化计算，导致开销比较大。而条件随机场为命名实体识别提供了一个特征灵活、全局最优的标注框架，但同时存在收敛速度慢、训练时间长的问题。一般说来，最大熵和支持向量机在正确率上要比隐马尔可夫模型高一些，但是隐马尔可夫模型在训练和识别时的速度要快一些，主要是由于在利用Viterbi算法求解命名实体类别序列的效率较高。隐马尔可夫模型更适用于一些对实时性有要求以及像信息检索这样需要处理大量文本的应用,如短文本命名实体识别。
-基于统计的方法对特征选取的要求较高，需要从文本中选择对该项任务有影响的各种特征，并将这些特征加入到特征向量中。依据特定命名实体识别所面临的主要困难和所表现出的特性，考虑选择能有效反映该类实体特性的特征集合。主要做法是通过对训练语料所包含的语言信息进行统计和分析，从训练语料中挖掘出特征。有关特征可以分为具体的单词特征、上下文特征、词典及词性特征、停用词特征、核心词特征以及语义特征等。 
-基于统计的方法对语料库的依赖也比较大，而可以用来建设和评估命名实体识别系统的大规模通用语料库又比较少。
+基于统计的方法对特征选取的要求较高，需要从文本中选择对该项任务有影响的各种特征，并将这些特征加入到特征向量中。依据特定命名实体识别所面临的主要困难和所表现出的特性，考虑选择能有效反映该类实体特性的特征集合。主要做法是通过对训练语料所包含的语言信息进行统计和分析，从训练语料中挖掘出特征。有关特征可以分为具体的单词特征、上下文特征、词典及词性特征、停用词特征、核心词特征以及语义特征等。  基于统计的方法对语料库的依赖也比较大，而可以用来建设和评估命名实体识别系统的大规模通用语料库又比较少。
 1.3混合方法
 自然语言处理并不完全是一个随机过程,单独使用基于统计的方法使状态搜索空间非常庞大，必须借助规则知识提前进行过滤修剪处理。目前几乎没有单纯使用统计模型而不使用规则知识的命名实体识别系统，在很多情况下是使用混合方法：
 3.1 统计学习方法之间或内部层叠融合。
@@ -33,9 +30,7 @@
 2 jieba框架以及算法简介jieba介绍
 jieba分词系统，主要实现三个模块，
 
-分词 
-  词性标注 
-  关键词抽取
+分词  词性标注  关键词抽取
 
 以下算法介绍，均参考jieba介绍
 2.1分词
@@ -45,20 +40,15 @@ jieba分词是如何对未登录词进行分词呢？
 基于汉字成词能力的HMM模型识别未登录词。利用HMM模型进行分词，主要是将分词问题视为一个序列标注（sequence labeling）问题，其中，句子为观测序列，分词结果为状态序列。首先通过语料训练出HMM相关的模型，然后利用Viterbi算法进行求解，最终得到最优的状态序列，然后再根据状态序列，输出分词结果。
 e.g.ICTCLAS中的HMM人名识别
 
-1.以“王菲”为例，粗分结果是“始##始, 王, 菲, 末##末,”，很明显，粗分过程并不能识别正确的人名，因为“王菲”这个词并不存在于一元语言模型词典中。 
-观测序列
+1.以“王菲”为例，粗分结果是“始##始, 王, 菲, 末##末,”，很明显，粗分过程并不能识别正确的人名，因为“王菲”这个词并不存在于一元语言模型词典中。  观测序列
 
-观测序列是我们能看到的显状态序列，这个例子里是“始##始, 王, 菲, 末##末,”。 
-之后通过查表，初分等以下几个过程 
-隐状态
+观测序列是我们能看到的显状态序列，这个例子里是“始##始, 王, 菲, 末##末,”。  之后通过查表，初分等以下几个过程  隐状态
 初始概率
 转移概率
 发射概率
-求解HMM 
-通过维特比算法找出最可能的标注序列了。最终标注结果：
+求解HMM  通过维特比算法找出最可能的标注序列了。最终标注结果：
 
-始##始, 王, 菲, 末##末, 
-  100-*     1-B 4-E  101-*  
+始##始, 王, 菲, 末##末,  100-* 1-B 4-E 101-* 
 
 模式匹配
 对于BE这个标注序列，如何知道里面是否含有人名，含有的是哪种人名呢？这需要通过模式匹配来发现，模式串有：
@@ -69,8 +59,7 @@ e.g.ICTCLAS中的HMM人名识别
 
 3 单机版实现
 
-本文基于大数据的开源组件实现了两个姓名提取脚本， 
-一个单机版，一个spark版本。 主要使用到了python3和jieba分词库，以及部分人工积累的停用词库。
+本文基于大数据的开源组件实现了两个姓名提取脚本，  一个单机版，一个spark版本。 主要使用到了python3和jieba分词库，以及部分人工积累的停用词库。
 利用hdfs清洗后的结构化数据，在hive中创建外表语句：
 create external table name_analysis
 (
@@ -202,11 +191,21 @@ def main():
 if __name__ =='__main__':
     main()
 
- 
- 
+
+
+
+
+
+
 停用词文件举例
- 
+
+
+
+  
+
 人名提取的结果示例
+
+
 
 4.spark分布式版本
 4.1分布式环境搭建
@@ -225,9 +224,7 @@ for((i=2;i<=xxx;i++));do ssh host-${i} "hostname; cd /opt/python/jieba-0.38;pyth
 4.2.1 如何保障每个节点都能加载停用词：
 spark有两个技术可以保证：
 
-1.全局变量Broadcast   spark文档 
-  A broadcast variable that gets reused across tasks. 
-  A broadcast variable created with SparkContext.broadcast(). Access its value through value.
+1.全局变量Broadcast  spark文档  A broadcast variable that gets reused across tasks.  A broadcast variable created with SparkContext.broadcast(). Access its value through value.
 
 class pyspark.Broadcast(sc=None, value=None, pickle_registry=None, path=None)
 A broadcast variable created with SparkContext.broadcast(). Access its value through value.
@@ -244,9 +241,7 @@ Examples:
 >>> b.unpersist()
 >>> large_broadcast = sc.broadcast(range(10000))
 
-2.sc.addFile(path)添加可分发的文件  spark文档 
-  addFile(path, recursive=False) 
-  Add a file to be downloaded with this Spark job on every node. The path passed can be either a local file, a file in HDFS (or other Hadoop-supported filesystems), or an HTTP, HTTPS or FTP URI.
+2.sc.addFile(path)添加可分发的文件 spark文档  addFile(path, recursive=False)  Add a file to be downloaded with this Spark job on every node. The path passed can be either a local file, a file in HDFS (or other Hadoop-supported filesystems), or an HTTP, HTTPS or FTP URI.
 
 To access the file in Spark jobs, use L{SparkFiles.get(fileName)
 4.2.2 使用spark-submit 提交姓名提取脚本
@@ -353,15 +348,8 @@ if __name__ =='__main__':
 
 未完待续。。。
 参考文献
-1.http://blog.csdn.net/lalalawxt/article/details/55804384 
-2.http://www.cnblogs.com/yuxc/archive/2012/01/11/2319631.html 
-3.臧勇真. 基于统计和规则的中文人名识别研究与实现[D]. 西南交通大学, 2013. 
-4.jieba介绍   http://www.cnblogs.com/zhbzz2007/p/6076246.html 
-5.spark文档   http://spark.apache.org/docs/latest/api/python/pyspark.html 
-6.文本情感分析 https://www.ibm.com/developerworks/cn/cognitive/library/cc-1606-spark-seniment-analysis/index.html 
-7.ICTCLAS中的HMM人名识别 
-http://www.hankcs.com/nlp/segment/ictclas-the-hmm-name-recognition.html 
-8.实战HMM-Viterbi角色标注中国人名识别 
-http://www.hankcs.com/nlp/chinese-name-recognition-in-actual-hmm-viterbi-role-labeling.html 
+1.http://blog.csdn.net/lalalawxt/article/details/55804384  2.http://www.cnblogs.com/yuxc/archive/2012/01/11/2319631.html  3.臧勇真. 基于统计和规则的中文人名识别研究与实现[D]. 西南交通大学, 2013.  4.jieba介绍 http://www.cnblogs.com/zhbzz2007/p/6076246.html  5.spark文档 http://spark.apache.org/docs/latest/api/python/pyspark.html  6.文本情感分析 https://www.ibm.com/developerworks/cn/cognitive/library/cc-1606-spark-seniment-analysis/index.html  7.ICTCLAS中的HMM人名识别  http://www.hankcs.com/nlp/segment/ictclas-the-hmm-name-recognition.html  8.实战HMM-Viterbi角色标注中国人名识别  http://www.hankcs.com/nlp/chinese-name-recognition-in-actual-hmm-viterbi-role-labeling.html
+
+
 
 

@@ -5,16 +5,19 @@
 
 
 
-文章大纲0.基础性工作连接类sqlclchemy 基础操作sqlalchemy 数据库shema 表 样例pandas 加速读取 excel2.psycopg2 原生 api3.pgAdmin 导入4.pandas 数据清洗与to_sql方法录入数据数据清洗数据类型转换数据脱敏增加自增列to_sql 数据录入5.使用 sqlalchemy 批量录入方法sqlalchemy  参数性能调优PostgreSQL 参数优化sqlalchemy DBsession 批量入数据6.多进程 配合 sqlalchemy 录入数据7.使用cProfile 进行性能分析cProfilesnakeviz可视化 性能分析结果参考文献
+
+文章大纲
+0.基础性工作连接类sqlclchemy 基础操作sqlalchemy 数据库shema 表 样例pandas 加速读取 excel
+2.psycopg2 原生 api3.pgAdmin 导入4.pandas 数据清洗与to_sql方法录入数据数据清洗数据类型转换数据脱敏增加自增列
+to_sql 数据录入
+5.使用 sqlalchemy 批量录入方法sqlalchemy 参数性能调优PostgreSQL 参数优化sqlalchemy DBsession 批量入数据
+6.多进程 配合 sqlalchemy 录入数据7.使用cProfile 进行性能分析cProfilesnakeviz可视化 性能分析结果
+参考文献
+
+
 
 最近有个需求，需要将100W 40个字段左右的 excel 格式数据录入 postgreSQL 数据库。 我想了几种办法：
-
-使用psycopg2 原生 api
-使用pgAdmin 页面 建立好table 直接导入csv
-使用pandas to_sql 方法
-使用 sqlalchemy 批量录入方法
-使用python 多进程，pandas 数据清洗后用 sqlalchemy 批量录入方法
-
+使用psycopg2 原生 api使用pgAdmin 页面 建立好table 直接导入csv使用pandas to_sql 方法使用 sqlalchemy 批量录入方法使用python 多进程，pandas 数据清洗后用 sqlalchemy 批量录入方法
 先说一下结论吧，我实验的流程是读取3个文件大小分别是3000行，30万行，70万行，清洗合并后是一个111万行40 个字段的宽表。 使用最后一种多进程批量入数据的方式，基本测试结果是，数据加载及清洗将近6分钟，数据入库6分钟。
 我机器是i7 7500U 运行上述程序时候 睿频加速到3.5GHz 左右，cpu 占用40%， 数据清洗时候内存占用500-600MB 拆分入库阶段，内存占用飙升到2000MB - 4000MB 其中包含每个子进程单独占用70MB 左右。
 后面且听我娓娓道来
@@ -47,7 +50,7 @@ class connet_databases:
 
 
 sqlclchemy 基础操作
-需要注意的一个细节是，sqlclchemy  对数据库的操作无论是 engine 这个客户端级别的还是 DBsession 这个级别的，在做完操作的时候，都应该 关闭数据库链接。这在操作大量数据时候非常容易忽视。
+需要注意的一个细节是，sqlclchemy 对数据库的操作无论是 engine 这个客户端级别的还是 DBsession 这个级别的，在做完操作的时候，都应该 关闭数据库链接。这在操作大量数据时候非常容易忽视。
 使用：
 DBSession.remove()
 engine.dispose()
@@ -145,8 +148,7 @@ class DetailsOfDrugsItems(Base):
 
 pandas 加速读取 excel
 发现是应该可以加速读取csv，当然csv 怎么都快，使用modin 的pandas 比传统的快4倍 其实就是加了个多进程或者线程，难点是加速读取大的excel，没有看到有效的解决方案。
-官方文档：https://pypi.org/project/modin/
-参考文档：https://www.jiqizhixin.com/articles/2019-04-13-2
+官方文档：https://pypi.org/project/modin/ 参考文档：https://www.jiqizhixin.com/articles/2019-04-13-2
 pip install modin[dask]
 import modin.pandas as pd
 
@@ -161,9 +163,7 @@ df = pd.read_csv("my_dataset.csv")
 3.pgAdmin 导入
 文档：https://www.pgadmin.org/docs/pgadmin4/development/import_export_data.html
 导入文件支持3中方式：
-binary for a .bin file.
-csv for a .csv file.
-text for a .txt file.
+binary for a .bin file. csv for a .csv file. text for a .txt file.
 
 具体导入速度待测试
 
@@ -265,11 +265,8 @@ df.to_sql('integers', con=engine, index=False,
 
 5.使用 sqlalchemy 批量录入方法
 不得不说的是sqlalchemy这个玩意的文档可读性真的很差。
-
-sqlalchemy  orm1.3  参考文档：https://docs.sqlalchemy.org/en/13/orm/index.html
-PostgreSQL  支持参考文档 （Support for the PostgreSQL database.）：https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
-
-sqlalchemy  参数性能调优
+sqlalchemy orm1.3 参考文档：https://docs.sqlalchemy.org/en/13/orm/index.htmlPostgreSQL 支持参考文档 （Support for the PostgreSQL database.）：https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#module-sqlalchemy.dialects.postgresql.psycopg2
+sqlalchemy 参数性能调优
 其实本质就是加个create_engine参数：executemany_mode， 别小看了这个参数，100万数据级别加上这个参数4个进程大概300s 入库完成，不加参数，4个进程入数据得将近一个小时，差了将近十倍。
 简直是魔幻现实。
 https://www.psycopg.org/docs/extras.html#fast-execution-helpers
@@ -347,11 +344,7 @@ def bulk_insert(df_dict_list,DBSession,class_obj, BULK_SIZE):
 
 6.多进程 配合 sqlalchemy 录入数据
 主要步骤有以下几个：
-
-pandas 加载excel 中的数据
-数据清洗，合并，过滤
-dataframe 转化为dict 的list，并按照进程数进行分片
-
+pandas 加载excel 中的数据数据清洗，合并，过滤dataframe 转化为dict 的list，并按照进程数进行分片
 #pandas dataframe 转化为dict 的list，每行转化为单独的dict
 pdf_dictList = pdf.to_dict(orient='records')
 
@@ -378,9 +371,7 @@ def get_fragmentation_lists(length, bulk_num):
     return Fragmentation_list
 
 
-
 每个进程从队列中获取 dict_list[分片] 进行数据入库
-
 import os
 import time
 import datetime
@@ -521,42 +512,17 @@ Thu Jun 18 10:41:48 2020    result.out
 Process finished with exit code 0
 
 
-
-
-ncalls
-调用次数
-
-
-tottime
-在指定函数中消耗的总时间（不包括调用子函数的时间）
-
-
-percall
-是 tottime 除以 ncalls 的商
-
-
-cumtime
-指定的函数及其所有子函数（从调用到退出）消耗的累积时间。这个数字对于递归函数来说是准确的。
-
-
-percall
-是 cumtime 除以原始调用（次数）的商（即：函数运行一次的平均时间）
-
-
+ ncalls 调用次数  tottime 在指定函数中消耗的总时间（不包括调用子函数的时间）  percall 是 tottime 除以 ncalls 的商  cumtime 指定的函数及其所有子函数（从调用到退出）消耗的累积时间。这个数字对于递归函数来说是准确的。  percall 是 cumtime 除以原始调用（次数）的商（即：函数运行一次的平均时间） 
 snakeviz可视化 性能分析结果
-SnakeViz is a viewer for Python profiling data that runs as a web application in your browser. It is inspired by the wxPython profile viewer RunSnakeRun.
-snakeviz 文档
+SnakeViz is a viewer for Python profiling data that runs as a web application in your browser. It is inspired by the wxPython profile viewer RunSnakeRun. snakeviz 文档
 本地会启动一个页面，进行性能分析文件的展示
 snakeviz result.out
 
-可见 函数的很大部分时间用来 读取excel 了。
-
+可见 函数的很大部分时间用来 读取excel 了。 
 
 参考文献
-Python大型文件数据读取及并行高效写入MongoDB代码分享
-Python 多进程导入数据到 MySQL
-性能分析与提升
-好用的 Python Profile（性能/耗时分析）工具
+Python大型文件数据读取及并行高效写入MongoDB代码分享 Python 多进程导入数据到 MySQL 性能分析与提升 好用的 Python Profile（性能/耗时分析）工具
+
 
 
 

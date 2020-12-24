@@ -2,7 +2,7 @@
 
 
 
-
+ 
 // aiqiyitest.cpp : 定义控制台应用程序的入口点。
 //
 
@@ -31,10 +31,11 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
+ 
+ 
+ 
 
-
-
-
+ 
 
 // aiqiyitest.cpp : 定义控制台应用程序的入口点。
 //
@@ -64,5 +65,9 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
+
+
+ 
+ 
 
 

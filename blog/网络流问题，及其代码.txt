@@ -16,23 +16,7 @@
 几种最大流算法的时间复杂度：
 
  
-Algorithm
-Principle
-Complexity
-Ford--Fulkerson, 1956
-Finding flow augmenting paths
-O(nm2)
-Dinic, 1970
-Shortest augmenting paths in one step
-O(n2m)
-in a dense graph:
-O(n3)
-in a sparse graph:
-O(nm log(n))
-Goldberg--Tarjan, 1985
-Pushing a pre-flow
-O(nm log(n2/m))
-
- 
+AlgorithmPrincipleComplexityFord--Fulkerson, 1956Finding flow augmenting pathsO(nm2)Dinic, 1970Shortest augmenting paths in one stepO(n2m)in a dense graph:O(n3)in a sparse graph:O(nm log(n))Goldberg--Tarjan, 1985Pushing a pre-flowO(nm log(n2/m))
+  
 
 

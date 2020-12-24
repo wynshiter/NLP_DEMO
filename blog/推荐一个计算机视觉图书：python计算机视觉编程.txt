@@ -1,37 +1,68 @@
 
 
 
-
-
-
+ 
+ 
+ 
 编辑部的主页：好像没啥用
 http://shop.oreilly.com/product/0636920022923.do
-
-
+ 
+ 
 每章的代码，github上面的：中文版
 https://github.com/willard-yuan/pcv-book-code
-
+ 
 github上面，英文版：
 https://github.com/jesolem/PCV
-
+ 
 项目主页：
 http://programmingcomputervision.com
-
+ 
 中文在线的书：
 http://www.ituring.com.cn/tupubarticle/2024?utm_source=tuicool
 
+ 
+
+
+ 
+
 
 然后下载安装
-python（x,y）下载地址：https://code.google.com/p/pythonxy/
-PIL windows下安装地址：http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe
+
+
+python（x,y）下载地址：
+https://code.google.com/p/pythonxy/
+
+
+PIL windows下安装地址：
+http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe
+
+
+ 
+
 
 安装好了以后，点击自动的编辑器：
 
 
+ 
 
+
+ 
+
+
+
+
+
+
+
+
+ 
 
 
 新建工程，插入代码：
+
+
+ 
+
 
 # -*- coding: utf-8 -*-
 """
@@ -60,12 +91,28 @@ show()
 
 
 
-这个编辑器着实不错，可以下断点，单步调试啥的，完全满足日常需要，python又降低了进行计算机视觉相关研究的门槛啊
-效果：
 
 
 
-﻿﻿
-﻿﻿
+
+
+
+这个编辑器着实不错，可以下断点，单步调试啥的，完全满足日常需要，python又降低了进行计算机视觉相关研究的门槛啊 效果：
+
+
+
+
+
+
+
+
+
+
+
+ ﻿﻿
+
+
+ ﻿﻿
+
 
 

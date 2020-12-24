@@ -1,7 +1,27 @@
 
 
 
-我们来看下效果原图： 效果：       原理其实很简单：采用一张圣诞帽的png图像作为素材，         利用png图像背景是透明的，贴在背景图片上就是戴帽子的效果了。人脸检测的目的主要是为了确定贴帽子的位置，类似ps中自由变换的功能，检测到人脸中间的位置，resize圣诞帽子和人脸大小匹配，确定位置，贴上去，ok！   代码：非常简洁，根据参考博客给出的代码，由OpenCV自带的人脸检测代码经过简单修改即可。// getheader.cpp : 定义控制台应用程序的入口点。
+我们来看下效果
+原图：
+
+ 
+效果：
+ 
+ 
+
+ 
+    原理其实很简单：
+采用一张圣诞帽的png图像作为素材，
+
+ 
+    
+    利用png图像背景是透明的，贴在背景图片上就是戴帽子的效果了。
+人脸检测的目的主要是为了确定贴帽子的位置，类似ps中自由变换的功能，检测到人脸中间的位置，resize圣诞帽子和人脸大小匹配，确定位置，贴上去，ok！
+ 
+ 
+ 
+代码：非常简洁，根据参考博客给出的代码，由OpenCV自带的人脸检测代码经过简单修改即可。
+// getheader.cpp : 定义控制台应用程序的入口点。
 //
 
 #include "stdafx.h"
@@ -137,7 +157,13 @@ void detectAndDisplay( Mat frame )
 	imwrite("merry christmas.jpg",frame);
 }
 
-  下面是摄像头实时戴帽子，改下主函数就好了： int main( void )
+
+ 
+ 
+
+下面是摄像头实时戴帽子，改下主函数就好了：
+ 
+int main( void )
 {
 	CvCapture* capture;
 	//VideoCapture capture;
@@ -168,7 +194,44 @@ void detectAndDisplay( Mat frame )
 			waitKey(0);
 	
 	return 0;
-} 我的系统的是win10 64位的系统，之前摄像头出来都是黑的，发现需要用vs2010配置一下x64版本方可使用，查了半天还是自己之前写的博客靠谱：就是按照win7 x64来配置，完美运行 http://blog.csdn.net/wangyaninglm/article/details/16325283 效果：参考文献：http://blog.csdn.net/lonelyrains/article/details/50388999http://docs.opencv.org/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html我调试好的工程：点击打开链接﻿﻿一个python版本的代码：https://github.com/LiuXiaolong19920720/Add-Christmas-Hatimport numpy as np 
+}
+
+
+ 
+我的系统的是win10 64位的系统，之前摄像头出来都是黑的，发现需要用vs2010配置一下x64版本方可使用，查了半天还是自己之前写的博客靠谱：
+就是按照win7 x64来配置，完美运行
+ http://blog.csdn.net/wangyaninglm/article/details/16325283
+ 效果：
+
+
+参考文献：
+http://blog.csdn.net/lonelyrains/article/details/50388999
+http://docs.opencv.org/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
+
+我调试好的工程：
+点击打开链接
+
+ ﻿﻿
+
+
+
+
+
+ 一个python版本的代码：
+
+
+
+
+
+
+ https://github.com/LiuXiaolong19920720/Add-Christmas-Hat
+ 
+
+
+
+
+
+import numpy as np 
 import cv2
 import dlib
 
@@ -314,5 +377,12 @@ cv2.imwrite("output.jpg",output)
 #     cv2.imshow("output",output )  
 #     cv2.waitKey(0)  
 
-cv2.destroyAllWindows()   
+cv2.destroyAllWindows()  
+
+
+
+
+
+
+
 

@@ -126,8 +126,7 @@ CvMat* A = cvCreateMat(3,3,CV_32FC1);
 CvMat* E = cvCreateMat(3,3,CV_32FC1);
 CvMat* l = cvCreateMat(3,1,CV_32FC1);
 cvEigenVV(A, E, l); // l = A 的特征值(递减顺序)
- //
- E = 对应的特征向量 (行向量)
+ // E = 对应的特征向量 (行向量)
 
 
 （7） 奇异值分解（SVD）:====

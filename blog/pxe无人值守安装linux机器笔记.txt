@@ -4,15 +4,11 @@
 
 
 
-
 最近做一些集群的测试的工作，做服务器测试最根本就是要安装系统，曾经我们用十几个光驱并行安装光驱的日子过去了，自从有了pxe一两天搭建好一个集群不是梦！当然做多了集群的搭建工作最多的感受就是，其实运维工作谁都能做，关键是效率高不高的问题，pxe装机这个东西就是能极高提升我们效率的工具，下面我来分享一下整个搭建过程。
 1. 基建工作
 1.关闭防火墙
 
-a)service iptables stop 
-  b)service ip6tables stop 
-  c)chkconfig iptables off 
-  d)chkconfig ip6tables off
+a)service iptables stop  b)service ip6tables stop  c)chkconfig iptables off  d)chkconfig ip6tables off
 
 2.关闭SELinux
 a)临时关闭SELinux(重启失效)：
@@ -21,7 +17,7 @@ setenforce 0
 
 b)
 
-/etc/selinux/cofig    disabled
+/etc/selinux/cofig disabled
 
 2. 配置dhcp服务
 1.将/usr/share/doc/dhcp-4.1.1/dhcpd.conf.sample拷贝至/etc/dhcp/dhcpd.conf：
@@ -71,10 +67,7 @@ ss -nul
 4.编辑/etc/xinetd.d/tftp文件，将”disable=yes”改为”disable=no”;
 5.测试tftp服务：
 
-a)新建test.txt，放到/var/lib/tftpboot/目录下，并在服务器本机进行测试。 
-  b)切换到根目录下，执行 tftp 192.168.1.205(服务器地址): 
-  tftp > get test.txt; 
-  tftp > quit;
+a)新建test.txt，放到/var/lib/tftpboot/目录下，并在服务器本机进行测试。  b)切换到根目录下，执行 tftp 192.168.1.205(服务器地址):  tftp > get test.txt;  tftp > quit;
 
 如果根目录下出现test.txt，则tftp服务搭建成功，删除测试文件test.txt;
 4. 配置nfs服务
@@ -84,19 +77,15 @@ mkdir /nfsroot
 
 2.配置nfs服务：在/etc/exports末尾行中加入
 
-/nfsroot *(rw,wdelay,crossmnt,insecure,root_squash,no_subtree_check,fsid=0) 
-  并运行 
-  exportfs –a #使配置生效；
+/nfsroot *(rw,wdelay,crossmnt,insecure,root_squash,no_subtree_check,fsid=0)  并运行  exportfs –a #使配置生效；
 
 3.启动rpcbind服务：
 
-chkconfig rpcbind on 
-  service rpcbind start
+chkconfig rpcbind on  service rpcbind start
 
 4.启动nfs服务：
 
-chkconfig nfs on 
-  service nfs start
+chkconfig nfs on  service nfs start
 
 5. 搭建本地yum源
 1.挂在镜像文件rhel6.5.iso 到 /mnt:
@@ -105,12 +94,7 @@ mount -o loop /opt/rhel6.5.iso /mnt
 
 2.cd 到/etc/yum.repos.d 目录下建立以”.repo”结尾的文件，这里我建立的是rhel65.repo，内容如下：
 
-[rhel65] 
-  name=rhel65 
-  baseurl=file:///mnt 
-  enabled=1 
-  gpgcheck = 0 
-   #gpgkey = http://yum.zb/rhel65/RPM-GPG-KEY-redhat-release
+[rhel65]  name=rhel65  baseurl=file:///mnt  enabled=1  gpgcheck = 0  #gpgkey = http://yum.zb/rhel65/RPM-GPG-KEY-redhat-release
 
 3.配置完成后用命令：
 
@@ -118,17 +102,7 @@ yum clean all #进行刷新
 
 4.常用命令：
 
-a)yum install package1 安装指定的安装包package1 
-  b)yum groupinsall group1 安装程序组group1 
-  c)yum update package1 更新指定程序包package1 
-  d)yum check-update 检查可更新的程序 
-  e)yum upgrade package1 升级指定程序包package1 
-  f)yum groupupdate group1 升级程序组group1 
-  g)yum info package1 显示安装包信息package1 
-  h)yum list 显示所有已经安装和可以安装的程序包 
-  i)yum list package1 显示指定程序包安装情况package1 
-  j)yum remove  package1 删除程序包package1 
-  k)yum groupremove group1 删除程序组group1
+a)yum install package1 安装指定的安装包package1  b)yum groupinsall group1 安装程序组group1  c)yum update package1 更新指定程序包package1  d)yum check-update 检查可更新的程序  e)yum upgrade package1 升级指定程序包package1  f)yum groupupdate group1 升级程序组group1  g)yum info package1 显示安装包信息package1  h)yum list 显示所有已经安装和可以安装的程序包  i)yum list package1 显示指定程序包安装情况package1  j)yum remove package1 删除程序包package1  k)yum groupremove group1 删除程序组group1
 
 6. 制作kickstart.cfg文件
 1.请先搭建本地yum源；
@@ -140,14 +114,10 @@ system-config-kickstart
 3.Basic Configuration（基础配置）
 
 4.Installation Method 安装方式
- 
-此处选择nfs方式： 
-NFS Serve：nfs服务器ip 
-NFS Directory：/nfsroot
+  此处选择nfs方式：  NFS Serve：nfs服务器ip  NFS Directory：/nfsroot
 5.Boot Loader Options 默认
 6.配置分区信息
- 
-要指定分区，使用sda，其中/boot大小为200M，/的大小为剩余空间
+  要指定分区，使用sda，其中/boot大小为200M，/的大小为剩余空间
 7.Network Configuration 将网卡eth0 设置为dhcp模式
 
 8.Authentication默认
@@ -168,6 +138,8 @@ NFS Directory：/nfsroot
 
 5.将安装光盘里的images目录复制到/nfsroot目录下，并将RHEl 6.5的ISO文件复制到/nfsroot目录下
 6.所需文件见文件夹。
-ps：重启后的可以使用gdm命令切换桌面 
+ps：重启后的可以使用gdm命令切换桌面
+
+
 
 

@@ -2,10 +2,10 @@
 
 
 效果图：
-
+ 
 
 代码：
-
+ 
 
 // FindGravity.cpp : 定义控制台应用程序的入口点。
 //
@@ -121,10 +121,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;
 }
 
+ 
 
-
-
-
+ 
+ 
 我调试好的工程：点击打开链接
 http://download.csdn.net/detail/wangyaninglm/9389338 
 

@@ -5,8 +5,7 @@
 mdk(Micro-Development-Kit)微量级软件开发包，提供几个常用类，主要实现了一个高性能的并发服务器引擎 
   使用c++开发，是一个跨平台的开发包，支持linux32/linux64/win32/win64的类库  。
   mdk服务器引擎，提出面向业务的服务器开发模式，根据服务器业务层最关心的3件事，抽象出连接发生（OnConnect），消息到达（OnClose），连接关闭（OnClose）3个接口，让服务器端开发者可以全身心的投入业务逻辑的开发中。 
-特点：        提供分布式支持，自身是一个server-client的结合体（即做服务器使用的同时，也可以像client一样去连接别的服务器，组成分布式系统），并且io接口统一到onconnect onmsg onclose中，不必区别对待        事件轮巡使用的是原生epoll iocp实现，确保了对io响应速度的完全掌控        几乎等同于lock free的并发算法，保证并发效率       
- 欢迎大家共同学习使用。
+特点：        提供分布式支持，自身是一个server-client的结合体（即做服务器使用的同时，也可以像client一样去连接别的服务器，组成分布式系统），并且io接口统一到onconnect onmsg onclose中，不必区别对待        事件轮巡使用的是原生epoll iocp实现，确保了对io响应速度的完全掌控        几乎等同于lock free的并发算法，保证并发效率        欢迎大家共同学习使用。
  
 http://download.csdn.net/detail/wangyaninglm/8260299
 或者是这里：
@@ -17,7 +16,7 @@ https://github.com/huoyu820125/Micro-Development-Kit
 socket.h如下：
 // Socket.h: interface for the Socket class.
 //
-//////////////////////////////////////////////////////////////////////
+//
 /***********************************************************************
 
 ************************************************************************/
@@ -95,7 +94,7 @@ public:
 	//
 	bool IsClosed();
 
-	//////////////////////////////////////////////////////////////////////////
+	//
 	/*
     TCP
 		
@@ -106,7 +105,7 @@ public:
 	*/
 	int Receive( void* lpBuf, int nBufLen, bool bCheckDataLength = false, long lSecond = 0, long lMinSecond = 0 );
 
-	//////////////////////////////////////////////////////////////////////////
+	//
 	/*UDP
 	
 	*/
@@ -204,12 +203,11 @@ private:
 
 #endif // MDK_SOCKET_H
 
-
- 
+  
 socket.cpp的实现：
 // Socket.cpp: implementation of the Socket class.
 //
-//////////////////////////////////////////////////////////////////////
+//
 #include <stdio.h>
 #include <iostream>
 #include "Socket.h"
@@ -719,8 +717,7 @@ void Socket::GetAddress( const sockaddr_in &sockAddr, string &strIP, int &nPort 
 
 }//namespace mdk
 
-
- 
+  
  定义一个客户端的经常用的头文件：
  
 //
@@ -733,12 +730,12 @@ void Socket::GetAddress( const sockaddr_in &sockAddr, string &strIP, int &nPort 
 
 #ifndef mac_client_mac_h
 #define mac_client_mac_h
-////////////////////////////////////////////////////////////////////////////////////////
+
 /*
 1.注意中文标点，编译器不容易察觉
 2.server 和client端的宏定义大小要统一
 */
-/////////////////////////////////////////////////////////////////////////////////////////
+/
 #define MAX_SIZE 1024
 #define MAX_NAME_LENGTH 64
 #define MAX_PATH 260            //保持和windows端定义的一样
@@ -749,7 +746,7 @@ void Socket::GetAddress( const sockaddr_in &sockAddr, string &strIP, int &nPort 
 #define MAX_SEND_BUFFER 1024*4
 #define MAX_RECV_BUFFER 1024*4
 
-/////////////////////////////////////////////////////////////////////////////////////////
+/
 
 
 
@@ -798,7 +795,7 @@ enum
     COMMAND_BREAK,             //断开链接
     COMMAND_UNINSTALL,         //卸载　
     COMMAND_MODIFY_REMARK,     //修改备注
-///////////////////////////////////////////////////////////////////////////
+///
     COMMAND_MANAGER_FILE,           //打开文件管理窗口
     COMMAND_GET_DIRECTORY,          //获取控制端主机根目录下所有文件信息 
     COMMAND_GET_REQUEST_DIRECTORY,  //获取双击请求目录中所有文件信息
@@ -806,19 +803,19 @@ enum
     COMMAND_WRONG_DIRECTORY,        //目录为空或者不可读
     COMMAND_DELETE_FILE,            //删除文件
     COMMAND_FILE_CLOSE,             //关闭当前文件管理功能的链接
-//////////////////////////////////////////////////////////////////////////
+//
     
     COMMAND_MANAGER_CMD,    //打开cmd管理窗口
     TOKEN_CMD_NEXT,         //等待下一个命令
     COMMAND_SHELL,          //控制端请求的shell命令
     COMMAND_SHELL_CLOSE,    //关闭shell
-////////////////////////////////////////////////////////////////////////// 
+// 
     COMMAND_MANAGER_DOWNLOAD,   //打开文件下载功能
     TOKEN_DOWNLOAD_SETUP,   //控制端发送文件下载连接和uuid
     COMMAND_GET_FILEDATA,   //请求文件数据
     TOKEN_SENT_FILEDATA,    //发送文件数据
     TOKEN_CANT_GET_DATA,    //给控制端发送消息文件不可读
-////////////////////////////////////////////////////////////////////////
+
     COMMAND_MANAGER_UPLOAD,     //开启文件上传
     TOKEN_UPLOAD_SETUP,         //接受文件上传连接
     COMMAND_SENT_UPLOAD_DATA,   //发送上传文件数据
@@ -835,8 +832,7 @@ enum
 
 #endif
 
-
- 
+  
 客户端centos下面使用正常，开发环境codeblocks
  客户端下载：
 http://download.csdn.net/detail/wangyaninglm/8326249

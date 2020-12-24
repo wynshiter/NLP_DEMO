@@ -3,92 +3,40 @@
 
  
 2012-2-9 星期4
-linux 常用命令：压缩解压命令
--gz命令的英文原意：Gnu zip
-语法：gzip 选项[文件]
-功能描述：压缩文件
-压缩后文件格式： .gz
-1. 只能压缩文件，不能压缩目录
-2.不保留源文件
-解压缩命令：gunzip
-语法：gunzip选项[压缩文件]
-功能描述：解压缩.gz的压缩文件
-范例：gunzip file1.gz
-压缩解压目录：tar
-命令名称：tar
-语法 tar选项[cvf][目录]
-     -c 产生.tar打包文件
-     -v 显示详细信息
-     -f 指定压缩后的文件名
-     -z 打包的同时压缩
-压缩后的文件格式：.tar.gz
-tar -zcvf dir1.tar.gz dir1
-将目录dir1压缩成一个打包文件并压缩文件
-file命令：查看文件的格式，文件类型
-zip解压缩命令.zip默认的win和linux通用的格式
-语法：zip 选项-r 
-              -r压缩目录
-zip services.zip /etc/services
-压缩文件
-zip -r test.zip /test
-压缩目录
+ linux 常用命令：压缩解压命令 -gz 命令的英文原意：Gnu zip 语法：gzip 选项[文件] 功能描述：压缩文件 压缩后文件格式： .gz
+1. 只能压缩文件，不能压缩目录 2.不保留源文件
+解压缩命令：gunzip 语法：gunzip选项[压缩文件] 功能描述：解压缩.gz的压缩文件 范例：gunzip file1.gz
+ 压缩解压目录：tar 命令名称：tar 语法 tar选项[cvf][目录]      -c 产生.tar打包文件      -v 显示详细信息      -f 指定压缩后的文件名      -z 打包的同时压缩 压缩后的文件格式：.tar.gz
+tar -zcvf dir1.tar.gz dir1 将目录dir1压缩成一个打包文件并压缩文件
+ file命令：查看文件的格式，文件类型
+ zip解压缩命令 .zip默认的win和linux通用的格式 语法：zip 选项-r                -r压缩目录 zip services.zip /etc/services 压缩文件 zip -r test.zip /test 压缩目录
  
-解压缩命令：
-unzip功能描述：解压.zip的压缩文件
-范例：unzip test.zip
-压缩解压缩命令：bzip2
-bzip2 选项-k
-          -k产生压缩文件 保留源文件
-范例：bzip2 -k file1 
+解压缩命令： unzip 功能描述：解压.zip的压缩文件 范例：unzip test.zip
+压缩解压缩命令：bzip2 bzip2 选项-k           -k产生压缩文件 保留源文件 范例：bzip2 -k file1 
  
  
-网络通信命令：
-指令名称：write指令所在路径：/usr/bin/write
-语法：write<用户名>
-向另外一个用户发信息，以ctrl+d作为结束
-范例：write samlee
+ 网络通信命令： 指令名称：write 指令所在路径：/usr/bin/write 语法：write<用户名> 向另外一个用户发信息，以ctrl+d作为结束 范例：write samlee
  
 wall命令：广播信息。所用linux的用户都能收到
  
  
-shutdown -h now 立即关机
-系统关机命令：reboot 功能：重启系统
+shutdown -h now 立即关机 系统关机命令：reboot 功能：重启系统
  
-命令别名的定义：alias copy=cp                alias xrm=“rm -r” 带选项的用双引号括起来
-查看别名信息：alias
-删除别名 ：unalias copy
+命令别名的定义：alias copy=cp                 alias xrm=“rm -r” 带选项的用双引号括起来 查看别名信息：alias 删除别名 ：unalias copy
  
  
-输入输出重定向
-同标准IO一样，shell对于每一个进程预先定义3个文件描述字
-0 STDIN 标准输入
-1 STDOUT标准输出
-2 STDERR标准错误输出
+输入输出重定向 同标准IO一样，shell对于每一个进程预先定义3个文件描述字 0 STDIN 标准输入 1 STDOUT标准输出 2 STDERR标准错误输出
 >或者>>输出重定向
-ls -l /tmp> /tmp.msg
-date >> /tmp        追加结果
-< 输入重定向
-范例：wall < /etc/motd
-2>错误输出重定向
-范例：cp -R /usr/backup/usr/bak 2> /bak/error
+ls -l /tmp> /tmp.msg date >> /tmp        追加结果
+< 输入重定向 范例：wall < /etc/motd
+2>错误输出重定向 范例：cp -R /usr/backup/usr/bak 2> /bak/error
  
  
-管道
-：将一个命令的输出传送给另一个命令，作为另一个命令的输入
-使用方法：
-命令1|命令2
-范例：
-ls-l /etc |more
-ls -l /etc|grep init |wc -l
-相当于统计出了在/etc目录下包含关键字init 的文件有几个
+管道 ：将一个命令的输出传送给另一个命令，作为另一个命令的输入 使用方法： 命令1|命令2 范例： ls-l /etc |more
+ls -l /etc|grep init |wc -l 相当于统计出了在/etc目录下包含关键字init 的文件有几个
  
  
-；
-间隔的个命令按照顺序依次执行
-&&
-前后命令的执行存在逻辑关系只有&&前面的命令执行成功后，它后面的命令才能被执行
-||
-前后命令的执行存在逻辑关系，只有||前的命令执行失败后它后面的命令才会执行
- 
+； 间隔的个命令按照顺序依次执行 && 前后命令的执行存在逻辑关系只有&&前面的命令执行成功后，它后面的命令才能被执行 || 前后命令的执行存在逻辑关系，只有||前的命令执行失败后它后面的命令才会执行
+  
 
 

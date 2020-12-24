@@ -1,61 +1,29 @@
 
 
 
-                                            
+                      
+2012-2-13 linux 引导流程
+1.固件firmware（cmos，bios）-》post加点自检 2.自举程序Bootloader（grub）-》载入内核 3.载入内核                  -》驱动硬件 4.启动进程init              -》系统启动的第一个进程 5.读取执行配置文件 /etc/inittab
  
-2012-2-13
-linux 引导流程
-1.固件firmware（cmos，bios）-》post加点自检
-2.自举程序Bootloader（grub）-》载入内核
-3.载入内核                  -》驱动硬件
-4.启动进程init              -》系统启动的第一个进程
-5.读取执行配置文件 /etc/inittab
- 
-master boot record->MBR主引导扇区 位置：0驻面0磁头1扇区
-插入图片：
-bootloader中存放的是自举程序：
-windows中为：--》ntldr 以及 boot.ini文件中的内容
-linux中为：  --》/etc/grub.conf
+ master boot record->MBR主引导扇区 位置：0驻面0磁头1扇区 插入图片：
+bootloader中存放的是自举程序： windows中为：--》ntldr 以及 boot.ini文件中的内容 linux中为：  --》/etc/grub.conf
  
  
-init的工作：
-init启动后读取inittab文件，执行缺省运行级别而继续从而引导过程。在unix系统中
-，init时第一个可以存在的进程，它的PID恒为1，但他也同时必须向一个更高级的功能负责
-：PID为0的内核调度器（kernel scheduler），从而获得cpu时间
+ init的工作： 
+init启动后读取inittab文件，执行缺省运行级别而继续从而引导过程。在unix系统中 ，init时第一个可以存在的进程，它的PID恒为1，但他也同时必须向一个更高级的功能负责 ：PID为0的内核调度器（kernel scheduler），从而获得cpu时间  
  
  
+ inittab 文件剖析
+ 在inittab中，所有的条目采取以下格式： id：run-level:action:process id:标示符，一般为两位数字或者字母或者数字 run—level：指定运行级别可以指定多个 action：指定运行状态 process：指定要运行的脚本/命令
  
-
-inittab 文件剖析
-
-在inittab中，所有的条目采取以下格式：
-id：run-level:action:process
-id:标示符，一般为两位数字或者字母或者数字
-run—level：指定运行级别可以指定多个
-action：指定运行状态
-process：指定要运行的脚本/命令
+action常用取值： 
+initdefault：指定系统缺省启动的运行级别 sysinit：系统启动执行process中的运行级别 wait：执行process中指定的命令，并等起结束再运行其他命令 once：执行process中指定的命令，不等待其结果 ctrlaltdel：按下Ctrl+alt+del时执行process指定的命令 powerfail：当出现电源错误时执行process指定的命令，不等待其结束 powerokwait：当电源恢复是执行process指定的命令 respawn：一旦process指定的命令中止，便重新运行该命名
  
-action常用取值：
-initdefault：指定系统缺省启动的运行级别
-sysinit：系统启动执行process中的运行级别
-wait：执行process中指定的命令，并等起结束再运行其他命令
-once：执行process中指定的命令，不等待其结果
-ctrlaltdel：按下Ctrl+alt+del时执行process指定的命令
-powerfail：当出现电源错误时执行process指定的命令，不等待其结束
-powerokwait：当电源恢复是执行process指定的命令
-respawn：一旦process指定的命令中止，便重新运行该命名
- 
-任何的系统级别都会起动系统的启动脚本：
-/etc/rc.d/rc.sysinit         
-ls /etc/rc.d/rc3.d 可以看到系统启动对应级别下需要执行的脚本操作
-/etc/rc.d/rc[0123456].d
-分别存放对应于运行级别的服务程序脚本的符号链接，链接到init.d目录中相应的脚本
+ 任何的系统级别都会起动系统的启动脚本： /etc/rc.d/rc.sysinit         
+ ls /etc/rc.d/rc3.d 可以看到系统启动对应级别下需要执行的脚本操作 /etc/rc.d/rc[0123456].d 分别存放对应于运行级别的服务程序脚本的符号链接，链接到init.d目录中相应的脚本
  
 比如：s12syslog
-s—start
-k—kill
-数字
-脚本名称
+s—start k—kill 数字 脚本名称
  
 启动流程：插入图片：
 

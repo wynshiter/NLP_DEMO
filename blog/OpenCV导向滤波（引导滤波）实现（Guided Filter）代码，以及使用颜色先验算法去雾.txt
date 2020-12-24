@@ -16,7 +16,7 @@ Kaiming He, Jian Sun, Xiaoou Tang. Single Image Haze Removal Using Dark Channel 
 滤波效果：
  
 单通道效果：
-
+ 
  方法1效果：
  
 
@@ -24,12 +24,12 @@ Kaiming He, Jian Sun, Xiaoou Tang. Single Image Haze Removal Using Dark Channel 
  
  
 方法2效果：
-
+ 
  
  
 效果----为何要滤波：
  
-
+ 
  
  
 guied filter滤波代码：使用了两种方法，代码来源后面参考文献中。我做了一些修改和比对工作。
@@ -407,8 +407,7 @@ Note:
 }
 
 
-
- 
+  
  
 下面的代码还没有真正的调试，只是找到了，先放在这里，后面有空再看看研究一下。 
  
@@ -882,7 +881,7 @@ void main()
 }
 
 
- 
+  
 去雾matlab代码：
 <span style="font-size:24px;">　　function q = guidedfilter(I, p, r, eps)
 　　%   GUIDEDFILTER   O(1) time implementation of guided filter.
@@ -915,7 +914,7 @@ void main()
 
 　　q = mean_a .* I + mean_b; % Eqn. (8) in the paper;
 　　end</span>
-去雾代码2：
+ 去雾代码2：
  
 #include "stdafx.h"
 #include <opencv2\opencv.hpp> 
@@ -1213,7 +1212,7 @@ int main(int argc, char** argv)
 	return 0;
 }
 
- 
+  
  
  
  

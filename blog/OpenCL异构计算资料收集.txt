@@ -4,9 +4,17 @@
  
 Easy OpenCL with Python
 
+
  
-原文  http://www.drdobbs.com/open-source/easy-opencl-with-python/240162614
- 
+ 
+
+原文 
+   
+  http://www.drdobbs.com/open-source/easy-opencl-with-python/240162614
+
+
+   
+ 
 
  
 OpenCL与python联合工作：与CUDA的前景分析
@@ -51,8 +59,7 @@ kernel 函数可以写在单独的 *.cl 文件里， 一句 python 命令就可�
  # Check on CPU with Numpy:
  print(res_np - (a_np + b_np))
  print(np.linalg.norm(res_np - (a_np + b_np)))
-
- 
+  
 GPGPU OpenCL/CUDA 高性能编程的10大注意事项
  
 http://www.cnblogs.com/xudong-bupt/p/3630952.html

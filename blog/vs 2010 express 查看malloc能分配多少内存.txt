@@ -1,46 +1,47 @@
 
 
 
-// test_of_malloc.cpp : Defines the entry point for the console application.
-//
+// test_of_malloc.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+
+#include"stdio.h"
+#include"stdlib.h"
+
+unsigned maximum=0;
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	unsigned blocksize[]={1024*1024,1024,1};
+	int i,count;
+	for(i=0;i<3;i++)
+	{
+		for(count = 1;;count++)
+		{
+			void *block=malloc(maximum+blocksize[i]*count);
+			if(block)
+			{
+				maximum=maximum+blocksize[i]*count;
+				free(block);
+			}
+			else
+			{
+				break;
+			}
+			printf("maximum malloc size = %u bytes\n",maximum);
+			
+		}
+	}
+
+	printf("maximum malloc size = %u bytes\n",maximum);
+	getchar();
+
+	return 0;
+}
+
 
-#include "stdafx.h"
 
-#include"stdio.h"
-#include"stdlib.h"
-
-unsigned maximum=0;
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-	unsigned blocksize[]={1024*1024,1024,1};
-	int i,count;
-	for(i=0;i<3;i++)
-	{
-		for(count = 1;;count++)
-		{
-			void *block=malloc(maximum+blocksize[i]*count);
-			if(block)
-			{
-				maximum=maximum+blocksize[i]*count;
-				free(block);
-			}
-			else
-			{
-				break;
-			}
-			printf("maximum malloc size = %u bytes\n",maximum);
-			
-		}
-	}
-
-	printf("maximum malloc size = %u bytes\n",maximum);
-	getchar();
-
-	return 0;
-}
-
-
-代码来自《程序员的自我修养》
+ 代码来自《程序员的自我修养》
 
 

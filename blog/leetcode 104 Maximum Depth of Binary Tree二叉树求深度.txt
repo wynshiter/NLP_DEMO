@@ -4,14 +4,10 @@
 
 
 
-
-Maximum Depth of Binary Tree 
- Total Accepted: 63668 Total Submissions: 141121 My Submissions  
-Question  Solution  
+Maximum Depth of Binary Tree  Total Accepted: 63668 Total Submissions: 141121 My Submissions  Question Solution 
 Given a binary tree, find its maximum depth.
 The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
-我的解决方案： 
-
+我的解决方案：  
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -121,6 +117,8 @@ class Solution:
             return max(1+maxDepthHelper(root.left), 1+maxDepthHelper(root.right))
 
         return maxDepthHelper(root)
- 
+
+
+
 
 

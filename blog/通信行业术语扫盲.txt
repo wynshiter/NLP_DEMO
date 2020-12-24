@@ -1,0 +1,73 @@
+
+
+
+
+
+在通信行业也干了一年多了，最近发现自己对通信行业的知识甚是缺乏，很多名词在记住之后很快又会忘掉，所以做一些笔记来记录这些术语。
+标准
+
+电信业务分类目录2015YD/T 5098-2005 通信局(站)防雷与接地工程设计规范YD/T 1170-2001 IP网络技术要求-网络总体YD/T 1754-2008 电信网和互联网物理环境安全等级保护要求YD/T 1731-2008 电信网和互联网灾难备份及恢复实施指南YD/T 1163-2001 IP网络安全技术要求-安全框架.pdf
+运营商的制式演进过程
+
+
+移动的2G/3G/4G网络如下：2G网络：GSM，Global System for Mobile Communication（全球移动通信系统）( band 2/3/8 )3G网络：TD_SCDMA，Time Division-Synchronous Code Division Multiple Access（时分同步码分多址）( band 34/39 )4G网络：TD_LTE(TDD_LTE)，Time Division Long Term Evolution（分时长期演进）(band 38/39/40 )
+联通的2G/3G/4G网络如下：2G网络：GSM ( band 2/3/8 )3G网络：WCDMA，Wideband Code Division Multiple Access（宽带码分多址）( band 1/3)4G网络：TDD_LTE ( band 40/41 )FDD_LTE ( band 1/3 )
+电信的2G/3G/4G网络如下：2G网络：CDMA 1x ( band 0 )3G网络：EVDO/CDMA2000 ( band rev.A )4G网络：TD_LTE ( band 40 )FDD_LTE ( band 1/3 )
+手机信号标识意义：G指GPRS，是2.5G网络；E指EDGE网络，属2.75G；3G指普通3G网络，速度在2-7M；H指3G的升级版HSDPA网络，是3.5G，速度可达14.4M；H+是HSDPA的升级版HSDPA ，是3.75G，速度可达21M-42M。网络速度从慢到快依次是G<E<3G<H<H+<4G。
+GSM是移动和联通的2G，CDMA 1x是电信2G，TD-SCDMA是移动3G，WCDMA是联通3G，CDMA2000是中国电信3G, TDD-LTE是国内推动的移动、电信、联通4G，FDD-LTE是另外一种世界通用的4G标准，也是联通和中国电信会使用的4G网络。
+
+上面的内容是从一个博客中整理出来的，基本已经能够总结出运营商目前的网络制式使用。目前的4G+是使用了载波聚合（Carrier Aggregation，简称CA）技术，拓展网络频谱，优化网络质量，大幅提升网络上行和下行速率，仅此而已。其实可以直这样说，现在的4G其实是3.9G，因为下面的原因。
+
+引用ITU-R（ITU Radiocommunication Sector，国际电信联盟-无线电通信部门）所定义的 IMT-Advanced（4G标准的要求）。在IMT-Advanced的蜂窝网络系统必须满足以下要求：基于全IP（All IP）分组交换网络。
+在高速移动性的环境下达到约100 Mbit/s的速率，如移动接入；在低速移动性的环境下高达约1 Gbit/s的速率，例如游牧/固定无线网络接入的峰值数据速率。能够动态地共享和利用网络资源来支持每单元多用户同时使用。使用5-20MHz可扩展的信道带宽，任选高达40 MHz。链路频谱效率的峰值为15 bit/s/Hz（下行）和6.75 bit/s/Hz（上行）（即1 Gbit/s的下行链路中应该是可能超过小于67 MHz的带宽）。系统的频谱效率下行高达3 bit/s/Hz/cell 和在室内2.25 bit/s/Hz/cell。跨不同系统网络的平滑切换。提供高质量的服务QoS(Quality of Service)，为支持新一代的多媒体传输能力。
+
+不从技术角度讲，从平时用户的使用角度，起码在高铁上，经常因为多普勒效应的影响而没有信号但是这个对普通用户影响不大，对我们来说，现在就是4g时代了。
+5G，下一代移动网络联盟(Next Generation Mobile Networks Alliance)定义了5G(5th generation mobile networks)网络的以下要求：
+以数十兆比特每秒（Mbps)的数据传输速率支持数万用户；可以以一千兆比特每秒(Gbps)的数据传输速率同时提供给在同一楼办公的许多人员；支持数十万的并发连接以用于支持大规模传感器网络的部署；频谱效率应当相比4G被显著增强；覆盖率比4G有所提高；信令效率应得到加强；延迟应该显著相比LTE被降低。
+生活常见技术
+
+VoLTE（Voice over Long-Term Evolution，基于LTE的语音方案）
+VoLTE是一个面向手机和数据终端的高速无线通信标准。它基于IP多媒体子系统（IMS）网络，在LTE上使用为控制层面（Control plane）和语音服务的媒体层面（Media plane）特制的配置文件（由GSM协会在PRD IR.92中定义。）这使语音服务（控制和媒体层面）作为数据流在LTE数据承载网络中传输，意味着不再必需维护和依赖传统的电路交换语音网络。VoLTE的语音和数据容量超过3G UMTS三倍以上，超过2G GSM六倍以上。此外，它更有效地利用了带宽，因为VoLTE的数据包信头比未优化的VoIP/LTE更小。来自维基百科。
+VoLTE是基于IMS的语音业务。IMS由于支持多种接入和丰富的多媒体业务，成为全IP时代的核心网标准架构。经历了过去几年的发展成熟后，如今IMS已经跨越裂谷，成为固定话音领域VoBB、PSTN网改的主流选择，而且也被3GPP、GSMA确定为移动语音的标准架构。VoLTE即Voice over LTE，它是一种IP数据传输技术，无需2G/3G网，全部业务承载于4G网络上，可实现数据与语音业务在同一网络下的统一。换言之，4G网络下不仅仅提供高速率的数据业务，同时还提供高质量的音视频通话，后者便需要VoLTE技术来实现。来自百度百科。
+专业技术名册
+
+HRPD
+HRPD(High Rate Packet Data)，又被称为1xEVDO，或HDR（High Data Rate)。HRPD意思是“高速分组数据”，它是由高通发明的基于CDMA的高速无线数据技术，国际标准编号为IS-856。
+电路域 分组域CS域(Circuit SwitchedDomain)就是电路域，打电话语音电话VP信号走CS，语音业务。PS域(Packet SwitchedDomain)就是分组域，彩信数据业务信号走PS，数据业务。
+汇端局、汇接局、关口局、长途局和国际局长途局(TMSC)，长途局分为DC1和DC2长途局，DC1长途局为一级交换中心，DC2长途局为二级交换中。DC1长途局的职能是：汇接所在省（自治区、直辖市）的省际长途来去话务和DC1所在本地网的长途终端话务。DC2长途局的职能是：汇接所在本地网的长途终端话务。长途局均不带普通用户。关口局(GateWay MSC,GMSC)，关口局主要是完成与其他通信运营商之间通信业务的转接功能，从而实现网间业务的互联互通。关口局均不带普通用户。汇接局，汇接局又叫市话汇接局，在本地网中负责转接端局之间（也可汇接各端局至长途局）话务的交换中心称为市话汇接局。若有的汇接局还负责疏通用户的来、去业务，即兼有端局功能，则称为混合汇接局。在本地网中市话汇接局为端局的上一级。端局(End Office)，本地网中的端局仅有本局交换功能和来、去话功能。端局以下还可以接远端模块、用户小交换机等设备。根据端局设置地点的差异，可以分为市内端局、县（市）及卫星城镇端局，农村乡、镇端局，它们的功能完全一样，并统称为端局。端局直接和用户连接。国际局，国际电话出入口局是位于国际电话电路的末端转接进入国内和发往国外电话的国际交换局。
+OFDMA正交频分多址 Orthogonal Frequency Division Multiple Access，就是LTE的基本技术。包括FDD和TDD。
+TMSCTMSC（Tandem Mobile Switching Center）汇接移动交换中心（长途局）,移动TMSC一般指一个省的长途汇接局。TMSC在软交换前同时处理信令面/用户面，在软交换后分为两部分：TMSC Server、TMG，前者处理信令面，后者处理用户面。A 全国一级汇接中心设备(TMSC1)B 省内二级汇接中心设备(TMSC2)MSC将长途呼叫送到TMSC就表示要通过传统长途交换网疏通该呼叫；MSC将长途呼叫送到TMG就表示要通过长途软交换网疏通该呼叫。
+HLRHome Location Register – 归属位置寄存器HLR是GSM/GPRS/EDGE网络的CN(Core Network，核心网)的网元。它是一个数据库，存储着某个运营商的用户的相关。例如：补充业务、鉴权参数、APN(Access Point Name，接入点名称)、用户当前访问的MSC/VLR号码、用户当前访问的SGSN号码等。HLR是GSM系统的中央数据库，存放着所有归属用户的信息，如用户的有关号码（IMSI和MSISDN）、用户类别、漫游能力、签约业务和补充业务等。此外，HLR还存储着每个归属用户有关的动态数据信息，如用户当前漫游所在的MSC/VLR地址（即位置信息）和分配给用户的补充业务。
+GSNGateway Service for Network 网关服务
+SGSNServing GSN 服务GPRS支持节点SGSN是GSM/GPRS/EDGE网络的CN(Core Network，核心网)的网元。它负责在其服务区内转发MS(Mobile Station，移动台)与外部网络之间的IP数据包。SGSN和MS之间的业务信息还要经过BSC(Base Staion Controller，基站控制器)和BTS(Base Transceiver Station，基站收发信台)的传输。SGSN的主要功能还有：鉴权和加密；会话管理；移动性管理；逻辑链路管理；通过Gr接口与HLR(Home Location Register，归属位置寄存器)连接、通过Gb接口与BSC连接、通过Gn接口与GGSN(Gateway GPRS Support Node，网关GPRS支持节点)连接；输出与无线网络使用相关的计费数据。
+GGSNGateway GPRS Support Node – 网关GPRS支持节点GGSN是GSM/GPRS/EDGE网络的CN(Core Network，核心网)的网元，是为了在GSM网络中提供GPRS业务功能而引入的一个网元功能实体，提供数据包在GPRS网和外部数据网之间的网关接口功能。用户选择哪一个GGSN作为网关，是在PDP Contexts激活过程中根据用户的签约信息以及用户请求的接入点名确定的。GGSN的主要功能有：
+通过Gi接口与外部IP分组网络连接。GPRS会话管理，建立与外部网络的通信。通过Gn接口与SGSN连接。输出与外部数据网络使用相关的计费信息。
+CGCharging Gateway 计费网关主要完成从各GSN的话单收集、合并、预处理工作，并完成同计费中心之间的通信接口。在GSM原有网络中并没有这样一个设备，GPRS用户一次上网过程的话单会从多个网元实体中产生，而且每一个网元设备中都会产生多张话单。引入CG的目的就在话单送往计费中心之前对话单进行合并与预处理，以减少计费中心的负担；同时SGSN、GGSN这样的网元设备也不需要实现同计费中心的接口功能。
+PDSNPacket Data Support Node 分组数据支持节点以分组交换(PS)方式交换和传输数据业务的电信网。用户发送的数据在进入网络时，首先被划分成一个一个的分组，分组加上寻址信息缓存在分组交换机中，转发时用作网络中的交换和路由选择的根据。分组交换数据网可以向用户提供两种基本业务：虚电路(VC)和永久虚电路(PVC)。
+AAAAuthentication, Authorization and Accounting 验证、授权和帐户。其实还有4A系统，增加了一个Auditing。认证(Authentication)：验证用户的身份与可使用的网络服务；授权(Authorization)：依据认证结果开放网络服务给用户；计帐(Accounting)：记录用户对各种网络服务的用量，并提供给计费系统。
+ANAccess Network 接入网电信部门业务节点与用户终端设备之间的实施系统。它可以部分或全部代替传统的用户本地线路网，并可包括复用、交叉连接和传输功能。是可以将各种用户接入到业务接点、能支持包括窄带和宽带多种业务综合接入的接入网。
+HSSHome Subscriber Server,归属签约用户服务器，是EPS中用于存储用户签约信息的服务器,是2G/3G网元HLR的演进和升级,主要负责管理用户的签约数据及移动用户的位置信息。
+CSCF呼叫会话控制功能（Call Session Control Function, CSCF）是IP多媒体子系统(IP Multimedia Subsystem,IMS)内部的功能实体，是整个IMS网络的核心，主要负责处理多媒体呼叫会话过程中的信令控制。它管理IMS网络的用户鉴权，IMS承载面QoS，与其它网络实体配合进行SIP会话的控制，以及业务协商和资源分配等。CSCF根据功能分为代理CSCF(Proxy CSCF, P-CSCF)，查询CSCF(Interrogating CSCF,I-CSCF)，服务CSCF(Serving CSCF,S-CSCF)。
+代理CSCF(P-CSCF)
+P-CSCF(Proxy-CSCF)是IMS拜访网络的统一入口点。所有IMS终端发起和终止于IMS终端的会话消息都要通过P-CSCF。P-CSCF作为一个SIP Proxy，负责与接入网络无关的用户鉴权与IPSec管理，网络防攻击与安全保护，为节约无线网络资源进行SIP信令压缩与解压，用户的漫游控制，通过PDF(Policy Decision Function)进行承载面的NAT与QoS等功能等。
+查询CSCF(I-CSCF)
+I-CSCF(Interrogating-CSCF)是IMS归属网络的入口点。在注册过程中，I-CSCF通过查询HSS，为用户选择一个S-CSCF。在呼叫过程中，去往IMS网络的呼叫首先路由到I-CSCF，由I-CSCF从HSS获取用户所注册的S-SCSCF地址，将消息路由到S-CSCF。
+服务CSCF(S-CSCF)
+S-CSCF(Servlng-CSCF)在IMS网络会话控制中处于核心地位，它接受来自拜访网络通过P-CSCF转发来的注册请求，与HSS配合进行用户鉴权。并从HSS处下载用户签约的业务数据。S-CSCF对于用户主叫及被叫侧进行路由管理，根据用户签约的初始过滤规则(Initial Filter Criteria,iFC)，进行SIP AS触发，实现丰富的IMS业务功能。
+IMSI国际移动用户识别码（IMSI） International Mobile Subscriber Identity,国际上为唯一识别一个移动用户所分配的号码。
+BTSBaseTransceiver Station基站，BTS是GSM/GPRS/EDGE网络的RAN(Radio Access Network，无线接入网)网元。它是负责一个小区(Cell)无线信号收发的设备的集合。这些无线设备包括天线、TRX(Transceiver，收发信机)、合路/分路器等。BTS通过Um接口(GSM/GPRS/EDGE网络的空中接口)与MS(Mobile Station，移动台)通信，通过A-bis接口与BSC通信。一组BTS可以由一个BSC控制。
+BSCBaseStationController基站控制器。
+TCSMTCSM(码速率变换与子复用器)。从MSC(移动交换中心)至BSC需经过TCSM(码速率变换与子复用器)。
+MSMobile Station 移动站
+RNCRadio Network Controller 无线网络控制器
+RRCRadio Resource Controller 无线资源控制器
+BGBase Group – 基群，基站群？
+IBCFInterconnection Border Control Function，互联边界点控制功能
+待续
+参考
+
+三大运营商网络制式简介4G wikiVilches, J. (2010, April 29). Everything you need to know about 4G Wireless Technology. TechSpot.
+#通信
+
+
+

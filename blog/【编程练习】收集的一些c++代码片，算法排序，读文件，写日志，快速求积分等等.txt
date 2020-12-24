@@ -97,8 +97,7 @@ int main( void )
 	return 0;
 }
 
-
-算法排序框架：
+  算法排序框架：
  
 #include <stdio.h>
 #include <stdlib.h>
@@ -313,8 +312,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;
 }
 
-
- 
+   
  
 
 

@@ -1,8 +1,9 @@
 
 
 
-
-就是几个动物，自动排列生成什么的
+ 
+就是几个动物，自动排列生成什么的 
+ 
 
 class Animal(object):
 	def __init__(self,name,weight):
@@ -90,10 +91,11 @@ for x in dongwu:
 
 		
 
-
-
+ 
+ 
+ 
 改版代码：
-
+ 
 class Animal(object):
 	def __init__(self,name,weight):
 		self.name = name
@@ -165,10 +167,10 @@ Zoo.relax()
 
 
 		
+ 
 
-
-
-
+ 
+  
 
 
 

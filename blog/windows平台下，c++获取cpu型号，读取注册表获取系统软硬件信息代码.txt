@@ -53,8 +53,7 @@ private:
 };
 
 #endif
-
- 
+  
  
  
 Getsysinfo.cpp:
@@ -750,8 +749,7 @@ void GetSysInfo::GetDisplayCardInfo(DWORD &dwNum,CString chCardName[])
 		break;
 	}
 }
-
- 
+  
 下面是
 Test_cpu.cpp:
  
@@ -906,8 +904,7 @@ void main()
 }
 
 
-
-效果：
+ 效果：
  
 
 

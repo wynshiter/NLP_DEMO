@@ -33,9 +33,10 @@ ORB是sift的100倍，是surf的10倍。
 
 参考Slides
 Related posts
-Android-opencv之CVCamera (1) 
+Android-opencv之CVCamera (1)
+ 
 最新版的OpenCV中新增加的ORB特征的使用
-
+  
 看到OpenCV2.3.1里面ORB特征提取算法也在里面了，套用给的SURF特征例子程序改为ORB特征一直提示错误，类型不匹配神马的，由于没有找到示例程序，只能自己找答案。
 （ORB特征论文：ORB： an efficient alternative to SIFT or SURF.点击下载论文）
 经过查找发现：
@@ -109,21 +110,7 @@ int main()
 	return 0;
 }
 另外: SURF SIFT 
-/* 
-SIFT sift; 
-sift(img_1, Mat(), keyPoints_1, descriptors_1); 
-sift(img_2, Mat(), keyPoints_2, descriptors_2); 
-BruteForceMatcher<L2<float> >  matcher; 
-*/ 
-/* 
-SURF surf; 
-surf(img_1, Mat(), keyPoints_1); 
-surf(img_2, Mat(), keyPoints_2); 
-SurfDescriptorExtractor extrator; 
-extrator.compute(img_1, keyPoints_1, descriptors_1); 
-extrator.compute(img_2, keyPoints_2, descriptors_2); 
-BruteForceMatcher<L2<float> >  matcher; 
-*/
+/*  SIFT sift;  sift(img_1, Mat(), keyPoints_1, descriptors_1);  sift(img_2, Mat(), keyPoints_2, descriptors_2);  BruteForceMatcher<L2<float> >  matcher;  */  /*  SURF surf;  surf(img_1, Mat(), keyPoints_1);  surf(img_2, Mat(), keyPoints_2);  SurfDescriptorExtractor extrator;  extrator.compute(img_1, keyPoints_1, descriptors_1);  extrator.compute(img_2, keyPoints_2, descriptors_2);  BruteForceMatcher<L2<float> >  matcher;  */
 效果： 
 
 另外一个是寻找目标匹配
@@ -198,7 +185,6 @@ double diffNorm = cv::norm(descriptorDiff);
 return 1;  
 }  
 
-
- 
+  
 
 

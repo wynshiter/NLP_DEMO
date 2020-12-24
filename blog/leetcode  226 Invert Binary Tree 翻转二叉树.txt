@@ -17,11 +17,10 @@ to
   7     2
  / \   / \
 9   6 3   1
-Trivia:
-This problem was inspired by 
-this original tweet by 
-Max Howell: 
-Google: 90% of our engineers use the software you wrote (Homebrew), but you can’t invert a binary tree on a whiteboard so fuck off.
+Trivia: This problem was inspired by  this original tweet by  Max Howell: 
+
+ Google: 90% of our engineers use the software you wrote (Homebrew), but you can’t invert a binary tree on a whiteboard so fuck off.
+
 
  
  递归解决方案：
@@ -63,10 +62,8 @@ public:
         }
         return root;
     }
-
- 
-
- python：
+  
+  python：
 def invertTree(self, root):
     if root:
         root.left, root.right = self.invertTree(root.right), self.invertTree(root.left)
@@ -95,8 +92,7 @@ def invertTree(self, root):
             stack += node.left, node.right
     return root
 
-
- 
+  
  
 def invertTree(self, root):
     if root is None:
@@ -104,8 +100,7 @@ def invertTree(self, root):
     root.left, root.right = self.invertTree(root.right), self.invertTree(root.left)
     return root
 
-
-python非递归解决方案：
+ python非递归解决方案：
 DFS version:
 
 def invertTree(self, root):
@@ -133,7 +128,6 @@ def bfs_invertTree(self, root):
 
         return root
 
-
- 
+  
 
 

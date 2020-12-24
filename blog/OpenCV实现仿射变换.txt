@@ -2,186 +2,159 @@
 
 
 什么是仿射变换?¶
-
-一个任意的仿射变换都能表示为 乘以一个矩阵 (线性变换) 接着再 加上一个向量 (平移).
-
-综上所述, 我们能够用仿射变换来表示:
-旋转 (线性变换)平移 (向量加)缩放操作 (线性变换)你现在可以知道, 事实上, 仿射变换代表的是两幅图之间的 关系 .
+ 一个任意的仿射变换都能表示为 乘以一个矩阵 (线性变换) 接着再 加上一个向量 (平移).  综上所述, 我们能够用仿射变换来表示:
+旋转 (线性变换)平移 (向量加)缩放操作 (线性变换) 你现在可以知道, 事实上, 仿射变换代表的是两幅图之间的 关系 . 
  
 
  
  
 
 
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include <iostream>
-#include <stdio.h>
-
-using namespace cv;
-using namespace std;
-
-/// 全局变量
-char* source_window = "Source image";
-char* warp_window = "Warp";
-char* warp_rotate_window = "Warp + Rotate";
-
-/** @function main */
- int main( int argc, char** argv )
- {
-   Point2f srcTri[3];
-   Point2f dstTri[3];
-
-   Mat rot_mat( 2, 3, CV_32FC1 );
-   Mat warp_mat( 2, 3, CV_32FC1 );
-   Mat src, warp_dst, warp_rotate_dst;
-
-   /// 加载源图像
-   src = imread( argv[1], 1 );
-
-   /// 设置目标图像的大小和类型与源图像一致
-   warp_dst = Mat::zeros( src.rows, src.cols, src.type() );
-
-   /// 设置源图像和目标图像上的三组点以计算仿射变换
-   srcTri[0] = Point2f( 0,0 );
-   srcTri[1] = Point2f( src.cols - 1, 0 );
-   srcTri[2] = Point2f( 0, src.rows - 1 );
-
-   dstTri[0] = Point2f( src.cols*0.0, src.rows*0.33 );
-   dstTri[1] = Point2f( src.cols*0.85, src.rows*0.25 );
-   dstTri[2] = Point2f( src.cols*0.15, src.rows*0.7 );
-
-   /// 求得仿射变换
-   warp_mat = getAffineTransform( srcTri, dstTri );
-
-   /// 对源图像应用上面求得的仿射变换
-   warpAffine( src, warp_dst, warp_mat, warp_dst.size() );
-
-   /** 对图像扭曲后再旋转 */
-
-   /// 计算绕图像中点顺时针旋转50度缩放因子为0.6的旋转矩阵
-   Point center = Point( warp_dst.cols/2, warp_dst.rows/2 );
-   double angle = -50.0;
-   double scale = 0.6;
-
-   /// 通过上面的旋转细节信息求得旋转矩阵
-   rot_mat = getRotationMatrix2D( center, angle, scale );
-
-   /// 旋转已扭曲图像
-   warpAffine( warp_dst, warp_rotate_dst, rot_mat, warp_dst.size() );
-
-   /// 显示结果
-   namedWindow( source_window, CV_WINDOW_AUTOSIZE );
-   imshow( source_window, src );
-
-   namedWindow( warp_window, CV_WINDOW_AUTOSIZE );
-   imshow( warp_window, warp_dst );
-
-   namedWindow( warp_rotate_window, CV_WINDOW_AUTOSIZE );
-   imshow( warp_rotate_window, warp_rotate_dst );
-
-   /// 等待用户按任意按键退出程序
-   waitKey(0);
-
-   return 0;
-  }
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include <iostream>
+#include <stdio.h>
+
+using namespace cv;
+using namespace std;
+
+/// 全局变量
+char* source_window = "Source image";
+char* warp_window = "Warp";
+char* warp_rotate_window = "Warp + Rotate";
+
+/** @function main */
+ int main( int argc, char** argv )
+ {
+   Point2f srcTri[3];
+   Point2f dstTri[3];
+
+   Mat rot_mat( 2, 3, CV_32FC1 );
+   Mat warp_mat( 2, 3, CV_32FC1 );
+   Mat src, warp_dst, warp_rotate_dst;
+
+   /// 加载源图像
+   src = imread( argv[1], 1 );
+
+   /// 设置目标图像的大小和类型与源图像一致
+   warp_dst = Mat::zeros( src.rows, src.cols, src.type() );
+
+   /// 设置源图像和目标图像上的三组点以计算仿射变换
+   srcTri[0] = Point2f( 0,0 );
+   srcTri[1] = Point2f( src.cols - 1, 0 );
+   srcTri[2] = Point2f( 0, src.rows - 1 );
+
+   dstTri[0] = Point2f( src.cols*0.0, src.rows*0.33 );
+   dstTri[1] = Point2f( src.cols*0.85, src.rows*0.25 );
+   dstTri[2] = Point2f( src.cols*0.15, src.rows*0.7 );
+
+   /// 求得仿射变换
+   warp_mat = getAffineTransform( srcTri, dstTri );
+
+   /// 对源图像应用上面求得的仿射变换
+   warpAffine( src, warp_dst, warp_mat, warp_dst.size() );
+
+   /** 对图像扭曲后再旋转 */
+
+   /// 计算绕图像中点顺时针旋转50度缩放因子为0.6的旋转矩阵
+   Point center = Point( warp_dst.cols/2, warp_dst.rows/2 );
+   double angle = -50.0;
+   double scale = 0.6;
+
+   /// 通过上面的旋转细节信息求得旋转矩阵
+   rot_mat = getRotationMatrix2D( center, angle, scale );
+
+   /// 旋转已扭曲图像
+   warpAffine( warp_dst, warp_rotate_dst, rot_mat, warp_dst.size() );
+
+   /// 显示结果
+   namedWindow( source_window, CV_WINDOW_AUTOSIZE );
+   imshow( source_window, src );
+
+   namedWindow( warp_window, CV_WINDOW_AUTOSIZE );
+   imshow( warp_window, warp_dst );
+
+   namedWindow( warp_rotate_window, CV_WINDOW_AUTOSIZE );
+   imshow( warp_rotate_window, warp_rotate_dst );
+
+   /// 等待用户按任意按键退出程序
+   waitKey(0);
+
+   return 0;
+  }
 
 
 
 
 说明¶
+ 定义一些需要用到的变量, 比如需要用来储存中间和目标图像的Mat和两个需要用来定义仿射变换的二维点数组.
 
-定义一些需要用到的变量, 比如需要用来储存中间和目标图像的Mat和两个需要用来定义仿射变换的二维点数组.
+Point2f srcTri[3];
+Point2f dstTri[3];
+
+Mat rot_mat( 2, 3, CV_32FC1 );
+Mat warp_mat( 2, 3, CV_32FC1 );
+Mat src, warp_dst, warp_rotate_dst;
 
-Point2f srcTri[3];
-Point2f dstTri[3];
+  加载源图像:
 
-Mat rot_mat( 2, 3, CV_32FC1 );
-Mat warp_mat( 2, 3, CV_32FC1 );
-Mat src, warp_dst, warp_rotate_dst;
+src = imread( argv[1], 1 );
 
+  以与源图像同样的类型和大小来对目标图像初始化:
 
+warp_dst = Mat::zeros( src.rows, src.cols, src.type() );
 
-加载源图像:
+  仿射变换: 正如上文所说, 我们需要源图像和目标图像上分别一一映射的三个点来定义仿射变换:
 
-src = imread( argv[1], 1 );
+srcTri[0] = Point2f( 0,0 );
+srcTri[1] = Point2f( src.cols - 1, 0 );
+srcTri[2] = Point2f( 0, src.rows - 1 );
+
+dstTri[0] = Point2f( src.cols*0.0, src.rows*0.33 );
+dstTri[1] = Point2f( src.cols*0.85, src.rows*0.25 );
+dstTri[2] = Point2f( src.cols*0.15, src.rows*0.7 );
 
+ 你可能想把这些点绘出来以获得对变换的更直观感受. 他们的位置大概就是在上面图例中的点的位置 (原理部分). 你会注意到由三点定义的三角形的大小和方向改变了.  通过这两组点, 我们能够使用OpenCV函数 getAffineTransform 来求出仿射变换:
 
+warp_mat = getAffineTransform( srcTri, dstTri );
 
-以与源图像同样的类型和大小来对目标图像初始化:
+ 我们获得了用以描述仿射变换的 2X3 矩阵 (在这里是 warp_mat)  将刚刚求得的仿射变换应用到源图像
 
-warp_dst = Mat::zeros( src.rows, src.cols, src.type() );
+warpAffine( src, warp_dst, warp_mat, warp_dst.size() );
 
+ 函数有以下参数:
+src: 输入源图像warp_dst: 输出图像warp_mat: 仿射变换矩阵warp_dst.size(): 输出图像的尺寸 这样我们就获得了变换后的图像! 我们将会把它显示出来. 在此之前, 我们还想要旋转它...  旋转: 想要旋转一幅图像, 你需要两个参数:
+旋转图像所要围绕的中心旋转的角度. 在OpenCV中正角度是逆时针的可选择: 缩放因子 我们通过下面的代码来定义这些参数:
 
+Point center = Point( warp_dst.cols/2, warp_dst.rows/2 );
+double angle = -50.0;
+double scale = 0.6;
 
-仿射变换: 正如上文所说, 我们需要源图像和目标图像上分别一一映射的三个点来定义仿射变换:
+  我们利用OpenCV函数 getRotationMatrix2D 来获得旋转矩阵, 这个函数返回一个 2X3  矩阵 (这里是 rot_mat)
 
-srcTri[0] = Point2f( 0,0 );
-srcTri[1] = Point2f( src.cols - 1, 0 );
-srcTri[2] = Point2f( 0, src.rows - 1 );
+rot_mat = getRotationMatrix2D( center, angle, scale );
 
-dstTri[0] = Point2f( src.cols*0.0, src.rows*0.33 );
-dstTri[1] = Point2f( src.cols*0.85, src.rows*0.25 );
-dstTri[2] = Point2f( src.cols*0.15, src.rows*0.7 );
+  现在把旋转应用到仿射变换的输出.
 
+warpAffine( warp_dst, warp_rotate_dst, rot_mat, warp_dst.size() );
 
-你可能想把这些点绘出来以获得对变换的更直观感受. 他们的位置大概就是在上面图例中的点的位置 (原理部分). 你会注意到由三点定义的三角形的大小和方向改变了.
+  最后我们把仿射变换和旋转的结果绘制在窗体中，源图像也绘制出来以作参照:
 
-通过这两组点, 我们能够使用OpenCV函数 getAffineTransform 来求出仿射变换:
+namedWindow( source_window, CV_WINDOW_AUTOSIZE );
+imshow( source_window, src );
+
+namedWindow( warp_window, CV_WINDOW_AUTOSIZE );
+imshow( warp_window, warp_dst );
+
+namedWindow( warp_rotate_window, CV_WINDOW_AUTOSIZE );
+imshow( warp_rotate_window, warp_rotate_dst );
 
-warp_mat = getAffineTransform( srcTri, dstTri );
-
-
-我们获得了用以描述仿射变换的 2X3 矩阵 (在这里是 warp_mat)
-
-将刚刚求得的仿射变换应用到源图像
-
-warpAffine( src, warp_dst, warp_mat, warp_dst.size() );
-
-
-函数有以下参数:
-src: 输入源图像warp_dst: 输出图像warp_mat: 仿射变换矩阵warp_dst.size(): 输出图像的尺寸这样我们就获得了变换后的图像! 我们将会把它显示出来. 在此之前, 我们还想要旋转它...
-
-旋转: 想要旋转一幅图像, 你需要两个参数:
-旋转图像所要围绕的中心旋转的角度. 在OpenCV中正角度是逆时针的可选择: 缩放因子我们通过下面的代码来定义这些参数:
-
-Point center = Point( warp_dst.cols/2, warp_dst.rows/2 );
-double angle = -50.0;
-double scale = 0.6;
-
-
-
-我们利用OpenCV函数 getRotationMatrix2D 来获得旋转矩阵,
- 这个函数返回一个 2X3  矩阵 (这里是 rot_mat)
-
-rot_mat = getRotationMatrix2D( center, angle, scale );
-
-
-
-现在把旋转应用到仿射变换的输出.
-
-warpAffine( warp_dst, warp_rotate_dst, rot_mat, warp_dst.size() );
-
-
-
-最后我们把仿射变换和旋转的结果绘制在窗体中，源图像也绘制出来以作参照:
-
-namedWindow( source_window, CV_WINDOW_AUTOSIZE );
-imshow( source_window, src );
-
-namedWindow( warp_window, CV_WINDOW_AUTOSIZE );
-imshow( warp_window, warp_dst );
-
-namedWindow( warp_rotate_window, CV_WINDOW_AUTOSIZE );
-imshow( warp_rotate_window, warp_rotate_dst );
-
-
-
-等待用户退出程序
+  等待用户退出程序
 
 waitKey(0);
-
+ 
 
  
+
 
 

@@ -4,12 +4,17 @@
 
 
 
+转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/43853435， 来自：shiter编写程序的艺术
 
-转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/43853435，
-来自：shiter编写程序的艺术
-文章大纲1.PSNR峰值信噪比原理简介参考资料代码效果2.感知哈希算法实现步骤代码效果3.计算特征点代码效果更新
 
-对计算图像相似度的方法，本文做了如下总结，主要有三种办法：
+文章大纲
+1.PSNR峰值信噪比原理简介参考资料代码效果
+2.感知哈希算法实现步骤代码效果
+3.计算特征点代码效果
+更新
+
+
+ 对计算图像相似度的方法，本文做了如下总结，主要有三种办法：
 
 1.PSNR峰值信噪比
 PSNR（Peak Signal to Noise Ratio），一种全参考的图像质量评价指标。
@@ -23,11 +28,9 @@ SSIM取值范围[0,1]，值越大，表示图像失真越小.
 
 参考资料
 [1] 峰值信噪比-维基百科
-[2] 王宇庆，刘维亚，王勇. 一种基于局部方差和结构相似度的图像质量评价方法[J]. 光电子激光，2008。
-[3]http://www.cnblogs.com/vincent2012/archive/2012/10/13/2723152.html
+[2] 王宇庆，刘维亚，王勇. 一种基于局部方差和结构相似度的图像质量评价方法[J]. 光电子激光，2008。 [3]http://www.cnblogs.com/vincent2012/archive/2012/10/13/2723152.html
 官方文档的说明，不过是GPU版本的，我们可以修改不用gpu不然还得重新编译
-http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/highgui/video-input-psnr-ssim/video-input-psnr-ssim.html#videoinputpsnrmssim
-http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/gpu/gpu-basics-similarity/gpu-basics-similarity.html?highlight=psnr
+http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/highgui/video-input-psnr-ssim/video-input-psnr-ssim.html#videoinputpsnrmssim http://www.opencv.org.cn/opencvdoc/2.3.2/html/doc/tutorials/gpu/gpu-basics-similarity/gpu-basics-similarity.html?highlight=psnr
 
 代码
 // PSNR.cpp : 定义控制台应用程序的入口点。
@@ -123,7 +126,7 @@ int main(int argc, char *argv[])
 	cout << "Time of PSNR CPU (averaged for " << TIMES << " runs): " << time << " milliseconds."
 		<< " With result of: " <<  result << endl; 
 
-	////------------------------------- PSNR GPU ----------------------------------------------------
+	------------------------------- PSNR GPU ----------------------------------------------------
 	//time = (double)getTickCount();    
 
 	//for (int i = 0; i < TIMES; ++i)
@@ -308,7 +311,7 @@ Scalar getMSSIM( const Mat& i1, const Mat& i2)
 	GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
 	sigma12 -= mu1_mu2;
 
-	///////////////////////////////// FORMULA ////////////////////////////////
+	/ FORMULA 
 	Mat t1, t2, t3; 
 
 	t1 = 2 * mu1_mu2 + C1; 
@@ -374,7 +377,7 @@ Scalar getMSSIM_GPU( const Mat& i1, const Mat& i2)
 		(Mat)sigma12 =(Mat)sigma12 - (Mat)mu1_mu2;
 		//sigma12 = sigma12 - mu1_mu2
 
-		///////////////////////////////// FORMULA ////////////////////////////////
+		/ FORMULA 
 		gpu::GpuMat t1, t2, t3; 
 
 // 		t1 = 2 * mu1_mu2 + C1; 
@@ -476,31 +479,8 @@ Scalar getMSSIM_GPU_optimized( const Mat& i1, const Mat& i2, BufferMSSIM& b)
 http://blog.csdn.net/fengbingchun/article/details/42153261
 感知哈希算法(perceptual hash algorithm)，它的作用是对每张图像生成一个“指纹”(fingerprint)字符串，然后比较不同图像的指纹。结果越接近，就说明图像越相似。
 实现步骤
-
-
-缩小尺寸：将图像缩小到8*8的尺寸，总共64个像素。
-
-
-这一步的作用是去除图像的细节，只保留结构/明暗等基本信息，摒弃不同尺寸/比例带来的图像差异；这一步的作用是去除图像的细节，只保留结构/明暗等基本信息，摒弃不同尺寸/比例带来的图像差异；
-
-
-简化色彩：将缩小后的图像，转为64级灰度，即所有像素点总共只有64种颜色；
-
-
-计算平均值：计算所有64个像素的灰度平均值；
-
-
-比较像素的灰度：将每个像素的灰度，与平均值进行比较，大于或等于平均值记为1，小于平均值记为0；
-
-
-计算哈希值：将上一步的比较结果，组合在一起，就构成了一个64位的整数，这就是这张图像的指纹。组合的次序并不重要，只要保证所有图像都采用同样次序就行了；
-
-
-得到指纹以后，就可以对比不同的图像，看看64位中有多少位是不一样的。在理论上，这等同于”汉明距离”(Hamming distance,在信息论中，两个等长字符串之间的汉明距离是两个字符串对应位置的不同字符的个数)。
-
-
-如果不相同的数据位数不超过5，就说明两张图像很相似；
-如果大于10，就说明这是两张不同的图像。
+ 缩小尺寸：将图像缩小到8*8的尺寸，总共64个像素。  这一步的作用是去除图像的细节，只保留结构/明暗等基本信息，摒弃不同尺寸/比例带来的图像差异；这一步的作用是去除图像的细节，只保留结构/明暗等基本信息，摒弃不同尺寸/比例带来的图像差异；  简化色彩：将缩小后的图像，转为64级灰度，即所有像素点总共只有64种颜色；  计算平均值：计算所有64个像素的灰度平均值；  比较像素的灰度：将每个像素的灰度，与平均值进行比较，大于或等于平均值记为1，小于平均值记为0；  计算哈希值：将上一步的比较结果，组合在一起，就构成了一个64位的整数，这就是这张图像的指纹。组合的次序并不重要，只要保证所有图像都采用同样次序就行了；  得到指纹以后，就可以对比不同的图像，看看64位中有多少位是不一样的。在理论上，这等同于”汉明距离”(Hamming distance,在信息论中，两个等长字符串之间的汉明距离是两个字符串对应位置的不同字符的个数)。 
+如果不相同的数据位数不超过5，就说明两张图像很相似； 如果大于10，就说明这是两张不同的图像。
 以上内容摘自：http://www.ruanyifeng.com/blog/2011/07/principle_of_similar_image_search.html
 代码
 // similarity.cpp : 定义控制台应用程序的入口点。
@@ -604,8 +584,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 3.计算特征点
 OpenCV的feature2d module中提供了从局部图像特征（Local image feature）的检测、特征向量（feature vector）的提取，到特征匹配的实现。其中的局部图像特征包括了常用的几种局部图像特征检测与描述算子，如FAST、SURF、SIFT、以及ORB。对于高维特征向量之间的匹配，OpenCV主要有两种方式：
-1）BruteForce穷举法；
-2）FLANN近似K近邻算法（包含了多种高维特征向量匹配的算法，例如随机森林等）。
+1）BruteForce穷举法； 2）FLANN近似K近邻算法（包含了多种高维特征向量匹配的算法，例如随机森林等）。
 feature2d module： http://docs.opencv.org/modules/features2d/doc/features2d.html
 OpenCV FLANN: http://docs.opencv.org/modules/flann/doc/flann.html
 FLANN: http://www.cs.ubc.ca/~mariusm/index.php/FLANN/FLANN
@@ -901,9 +880,8 @@ int dstCn = 0 // 输出的通道数 (0='automatic')
 
 你src、dst都传同一个array，内部计算的同时又在修改array的值，自然有问题。可以看看cvtColor的实现。dst换用另外的变量即可，后面的计算也以更换的变量来。
 
-转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/51533549，
-来自：
-shiter编写程序的艺术
+转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/51533549， 来自： shiter编写程序的艺术
+
 
 
 

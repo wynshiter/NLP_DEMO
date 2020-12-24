@@ -4,14 +4,12 @@
 
 
 
-
 Given an array of size n, find the majority element. The majority element is the element that appears more than ⌊ n/2 ⌋ times.
 You may assume that the array is non-empty and the majority element always exist in the array.
 思路：
 Find k different element, and “remove” them as a group, the remaining element must be the element that appears more than ⌊n/k⌋ times. (Detailed explanation is given in comment)
 In this problem, k equals to 2.
-Thus we “remove” each pair of 2 different elements, and the remaining element that do not have its counterpart is the desired element.  
-时间复杂度O(n)空间复杂度O(1)的算法呢? 实际上，早在91年就有人专门就这个问题发表了论文，介绍了一种线性时间的算法: Majority Vote Algorithm。通过名字就可以看出，这个算法是专门用来解决这个问题的。而由于作者是J Moore (目前是Utexas的计算机系主任)，这个算法有时候也会被称为Moore’s Voting Algorithm (当然这个Moore并不是提出Moore’s Law的那个Gordon Moore)。
+Thus we “remove” each pair of 2 different elements, and the remaining element that do not have its counterpart is the desired element.  时间复杂度O(n)空间复杂度O(1)的算法呢? 实际上，早在91年就有人专门就这个问题发表了论文，介绍了一种线性时间的算法: Majority Vote Algorithm。通过名字就可以看出，这个算法是专门用来解决这个问题的。而由于作者是J Moore (目前是Utexas的计算机系主任)，这个算法有时候也会被称为Moore’s Voting Algorithm (当然这个Moore并不是提出Moore’s Law的那个Gordon Moore)。
 算法的基本思想非常简洁: 每次都找出一对不同的元素，从数组中删掉，直到数组为空或只有一种元素。 不难证明，如果存在元素e出现频率超过半数，那么数组中最后剩下的就只有e。当然，最后剩下的元素也可能并没有出现半数以上。比如说数组是[1, 2, 3]，最后剩下的3显然只出现了1次，并不到半数。排除这种false positive情况的方法也很简单，只要保存下原始数组，最后扫描一遍验证一下就可以了。
 现在来分析一下复杂度。删除元素可以在常数时间内完成，但找不同元素似乎有点麻烦。实际上，我们可以换个角度来想，用一个小trick来重新实现下该算法。
 在算法执行过程中，我们使用常量空间实时记录一个候选元素c以及其出现次数f(c)，c即为当前阶段出现次数超过半数的元素。在遍历开始之前，该元素c为空，f(c)=0。然后在遍历数组A时，
@@ -25,8 +23,7 @@ Thus we “remove” each pair of 2 different elements, and the remaining elemen
 那么，如果我们想找的并不是超过半数的元素，而是出现频率超过一定频率的元素都要找出来，是否也存在一个类似的线性时间的算法呢?答案是肯定的。实际上，这一类从特定的数据集中找出出现频率超过某个阈值的元素的问题，有一个形象的名字叫做Iceberg query，或者叫做host list分析。而Richard Karp 老爷子当年就专门写了一篇论文来讨论这种一般性问题的解决方案，而通过下文的介绍，大家也可以发现，Karp的方案应该也是受到了Moore的算法的启发。
 首先还是看一下问题的形式化定义吧:
 对于一个序列 以及一个在(0,1)之间的实数。假定表示元素的出现频率，我们需要找到所有满足的元素。
-原帖连接： 
-https://leetcode.com/discuss/19151/solution-computation-space-problem-can-extended-situation
+原帖连接：  https://leetcode.com/discuss/19151/solution-computation-space-problem-can-extended-situation
 http://m.blog.csdn.net/blog/wenyusuran/40780253
 解决方案：
 class Solution {
@@ -98,6 +95,8 @@ class Solution:
                 count[i] += 1
                 if count[i] > len(nums)/2:
                     return i
- 
+
+
+
 
 

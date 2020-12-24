@@ -4,34 +4,15 @@
 
 
 
-
 1.HiBench算法简介
 Hibench 包含9个典型的hadoop负载（micro benchmarks,hdfs benchmarks,web search bench marks,machine learning benchmarks和data analytics benchmarks）
 具体参考CDH集群安装&测试总结：第三节内容
-
-micro benchmarks 
-Sort:使用hadoop randomtextwriter生成数据，并对数据进行排序。 
-Wordcount:统计输入数据中每个单词的出现次数，输入数据使用hadoop randomtextwriter生成。 
-TeraSort：输入数据由hadoop teragen产生，通过key值进行排序。
-hdfs benchmarks 
-增强行的dfsio：通过产生大量同时执行读写请求的任务测试hadoop机群的hdfs吞吐量
-web search bench marks 
-Nutch indexing:大规模收索引擎，这个是负载测试nutch（apache的一个开源搜索引擎）的搜索子系统，使用自动生成的web数据，web数据中的连接和单词符合zipfian分布（一个单词出现的次数与它在频率表的排名成反比） 
-Pagerank:这个负载包含在一种在hadoop上的pagerank的算法实现，使用自动生成的web数据，web数据中的链接符合zipfian分布。（对于任意一个term其频度（frequency）的排名（rank）和frequency的乘积大致是一个常数）
-machine learning benchmarks 
-Mahout bayesian classification(bayes):大规模机器学习，这个负载测试mahout（apache开源机器学习库）中的naive bayesian 训练器，输入的数据是自动生成的文档，文档中的单词符合zipfian分布。 
-Mahout k-means clustering(kmeans):测试mahout中的k-means聚类算法，输入的数据集由基于平均分布和高斯分布的genkmeansdataset产生。
-data analytics benchmarks 
-Hive query benchmarks(hivebench):包含执行的典型olap查询的hive查询（aggregation和join），使用自动生成的web数据，web数据的链接符合zipfian分布。
-
+micro benchmarks  Sort:使用hadoop randomtextwriter生成数据，并对数据进行排序。  Wordcount:统计输入数据中每个单词的出现次数，输入数据使用hadoop randomtextwriter生成。  TeraSort：输入数据由hadoop teragen产生，通过key值进行排序。hdfs benchmarks  增强行的dfsio：通过产生大量同时执行读写请求的任务测试hadoop机群的hdfs吞吐量web search bench marks  Nutch indexing:大规模收索引擎，这个是负载测试nutch（apache的一个开源搜索引擎）的搜索子系统，使用自动生成的web数据，web数据中的连接和单词符合zipfian分布（一个单词出现的次数与它在频率表的排名成反比）  Pagerank:这个负载包含在一种在hadoop上的pagerank的算法实现，使用自动生成的web数据，web数据中的链接符合zipfian分布。（对于任意一个term其频度（frequency）的排名（rank）和frequency的乘积大致是一个常数）machine learning benchmarks  Mahout bayesian classification(bayes):大规模机器学习，这个负载测试mahout（apache开源机器学习库）中的naive bayesian 训练器，输入的数据是自动生成的文档，文档中的单词符合zipfian分布。  Mahout k-means clustering(kmeans):测试mahout中的k-means聚类算法，输入的数据集由基于平均分布和高斯分布的genkmeansdataset产生。data analytics benchmarks  Hive query benchmarks(hivebench):包含执行的典型olap查询的hive查询（aggregation和join），使用自动生成的web数据，web数据的链接符合zipfian分布。
 注：使用的生成数据程序在hadoop-mapreduce-examples-2.6.0 jar 包内，可以使用反编译工具查看。
 
 
 2.HiBench中bayes算法流程
-
-主要流程为conf下配置测试项，测试语言和DataSize，然后运行bin下run-all.sh完成一次测试，此流程为手动完成，可以编写脚本重复此步骤完成多次测试减少手动操作； 
-e.g.
-
+主要流程为conf下配置测试项，测试语言和DataSize，然后运行bin下run-all.sh完成一次测试，此流程为手动完成，可以编写脚本重复此步骤完成多次测试减少手动操作；  e.g.
 #!/bin/bash
 
 #       Time: 20160930,created by sunfei
@@ -291,17 +272,12 @@ main()
 
 # the main function of application
 main
-
-prepare.sh->run.sh为run-all.sh的子流程；
-enter_bench->…->leave_bench为prepare.sh和run.sh的子流程；
-enter_bench…..gen_report等为workload-functions.sh中的公共函数。
-
+prepare.sh->run.sh为run-all.sh的子流程；enter_bench->…->leave_bench为prepare.sh和run.sh的子流程；enter_bench…..gen_report等为workload-functions.sh中的公共函数。
 流程图如下：
 
 2.1 数据生成代码分析，接口：HiBench.DataGen
 对java代码我不太熟悉，接口中我看主要用了一个switch语句
-DataGen类中DataOptions options = new DataOptions(args); 
-如果是bayes测试的话，就调用对应的数据生成类，进行数据生成。生成的数据接口部分代码：
+DataGen类中DataOptions options = new DataOptions(args);  如果是bayes测试的话，就调用对应的数据生成类，进行数据生成。生成的数据接口部分代码：
 case BAYES: {
                 BayesData data = new BayesData(options);
                 data.generate();
@@ -477,30 +453,12 @@ public class BayesData {
 }
 
 prepare.sh运行时输出如下，可以看到刚开始主要是读取配置文件中的内容，随后调用hadoop和jar包跑了一个任务，这个就是bayes文本分类的生成数据，按照第一节以及介绍的和官网的说明，这个文本主要使用linux中的字典：”/usr/share/dict/words”并且符合zipfian分布。
-[hdfs@sf11 prepare]$ ./prepare.sh  
-patching args= 
-Parsing conf: /opt/HiBench/HiBench-master/conf/00-default-properties.conf 
-Parsing conf: /opt/HiBench/HiBench-master/conf/01-default-streamingbench.conf 
-Parsing conf: /opt/HiBench/HiBench-master/conf/10-data-scale-profile.conf 
-Parsing conf: /opt/HiBench/HiBench-master/conf/20-samza-common.conf 
-Parsing conf: /opt/HiBench/HiBench-master/conf/30-samza-workloads.conf 
-Parsing conf: /opt/HiBench/HiBench-master/conf/99-user_defined_properties.conf 
-Parsing conf: /opt/HiBench/HiBench-master/workloads/bayes/conf/00-bayes-default.conf 
-Parsing conf: /opt/HiBench/HiBench-master/workloads/bayes/conf/10-bayes-userdefine.conf 
-probe sleep jar: /opt/cloudera/parcels/CDH/lib/hadoop-mapreduce/share/hadoop/mapreduce2/hadoop-mapreduce-client-jobclient-tests.jar 
-start HadoopPrepareBayes bench 
-/opt/HiBench/HiBench-master/bin/functions/workload-functions.sh: line 120: /dev/stderr: Permission denied 
-rm: `hdfs://archive.cloudera.com:8020/HiBench/Bayes/Input’: No such file or directory 
-Submit MapReduce Job: /opt/cloudera/parcels/CDH/lib/hadoop/bin/hadoop –config /etc/hadoop/conf jar /opt/HiBench/HiBench-master/src/autogen/target/autogen-5.0-SNAPSHOT-jar-with-dependencies.jar HiBench.DataGen -t bayes -b hdfs://archive.cloudera.com:8020/HiBench/Bayes -n Input -m 300 -r 1600 -p 500000 -class 100 -o sequence 
-16/10/21 16:34:02 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this. 
-16/10/21 16:34:32 INFO HiBench.BayesData: Closing bayes data generator… 
-finish HadoopPrepareBayes bench
+[hdfs@sf11 prepare]$ ./prepare.sh  patching args=  Parsing conf: /opt/HiBench/HiBench-master/conf/00-default-properties.conf  Parsing conf: /opt/HiBench/HiBench-master/conf/01-default-streamingbench.conf  Parsing conf: /opt/HiBench/HiBench-master/conf/10-data-scale-profile.conf  Parsing conf: /opt/HiBench/HiBench-master/conf/20-samza-common.conf  Parsing conf: /opt/HiBench/HiBench-master/conf/30-samza-workloads.conf  Parsing conf: /opt/HiBench/HiBench-master/conf/99-user_defined_properties.conf  Parsing conf: /opt/HiBench/HiBench-master/workloads/bayes/conf/00-bayes-default.conf  Parsing conf: /opt/HiBench/HiBench-master/workloads/bayes/conf/10-bayes-userdefine.conf  probe sleep jar: /opt/cloudera/parcels/CDH/lib/hadoop-mapreduce/share/hadoop/mapreduce2/hadoop-mapreduce-client-jobclient-tests.jar  start HadoopPrepareBayes bench  /opt/HiBench/HiBench-master/bin/functions/workload-functions.sh: line 120: /dev/stderr: Permission denied  rm: `hdfs://archive.cloudera.com:8020/HiBench/Bayes/Input’: No such file or directory  Submit MapReduce Job: /opt/cloudera/parcels/CDH/lib/hadoop/bin/hadoop –config /etc/hadoop/conf jar /opt/HiBench/HiBench-master/src/autogen/target/autogen-5.0-SNAPSHOT-jar-with-dependencies.jar HiBench.DataGen -t bayes -b hdfs://archive.cloudera.com:8020/HiBench/Bayes -n Input -m 300 -r 1600 -p 500000 -class 100 -o sequence  16/10/21 16:34:02 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.  16/10/21 16:34:32 INFO HiBench.BayesData: Closing bayes data generator…  finish HadoopPrepareBayes bench
 部分生成数据：
 
 在看了将近两周的HiBench代码进行测试后，终于摸清上述的运行流程，intel 的这个测试框架确实比较简介，通过配置文件和shell以及一些大数据框架自带的例子（如Hibench中的workcount测试就是直接调用hadoop或者spark自带的程序）完成了整个庞大的测试工作，下面我们针对贝叶斯文本分类算法中HiBench使用的三种语言：python，scala，java分别进行分析：
 2.3 python代码分析
- 
-
+  
 部分python代码：
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -608,13 +566,10 @@ if __name__ == "__main__":
 2.4 scala 代码分析
 run-spark-job org.apache.spark.examples.mllib.SparseNaiveBayes ${INPUT_HDFS}
 显然scala 的朴素贝叶斯就是调用spark mllib库中的代码了
- 
- 
-
+    
 2.5 java 代码分析
 run-spark-job com.intel.sparkbench.bayes.JavaBayes ${INPUT_HDFS}
-java部分比较意外的HiBench没有采用原生的代码或者jar包，而是自己写了一个 
-代码如下，回头慢慢分析：
+java部分比较意外的HiBench没有采用原生的代码或者jar包，而是自己写了一个  代码如下，回头慢慢分析：
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -852,70 +807,15 @@ public final class JavaBayes {
 
 
 3.运行结果
-
-
-
-Type
-Date
-Time
-Input_data_size
-Duration(s)
-Throughput(bytes/s)
-Throughput/node
-
-
-
-JavaSparkBayes
-2016-10-09
-16:41:09
-113387030
-48.857
-2320793
-2320793
-
-
-ScalaSparkBayes
-2016-10-09
-16:42:00
-113387030
-45.164
-2510562
-2510562
-
-
-PythonSparkBayes
-2016-10-09
-16:44:03
-113387030
-118.521
-956683
-956683
-
-
+TypeDateTimeInput_data_sizeDuration(s)Throughput(bytes/s)Throughput/nodeJavaSparkBayes2016-10-0916:41:0911338703048.85723207932320793ScalaSparkBayes2016-10-0916:42:0011338703045.16425105622510562PythonSparkBayes2016-10-0916:44:03113387030118.521956683956683
 bayes算法数据规模参考：
-#Bayes 
-hibench.bayes.tiny.pages                        25000 
-hibench.bayes.tiny.classes                      10 
-hibench.bayes.tiny.ngrams                       1 
-hibench.bayes.small.pages                       30000 
-hibench.bayes.small.classes                     100 
-hibench.bayes.small.ngrams                      2 
-hibench.bayes.large.pages                       100000 
-hibench.bayes.large.classes                     100 
-hibench.bayes.large.ngrams                      2 
-hibench.bayes.huge.pages                        500000 
-hibench.bayes.huge.classes                      100 
-hibench.bayes.huge.ngrams                       2 
-hibench.bayes.gigantic.pages                    1000000 
-hibench.bayes.gigantic.classes                  100 
-hibench.bayes.gigantic.ngrams                   2 
-hibench.bayes.bigdata.pages                     20000000 
-hibench.bayes.bigdata.classes                   20000 
-hibench.bayes.bigdata.ngrams                    2
+#Bayes  hibench.bayes.tiny.pages 25000  hibench.bayes.tiny.classes 10  hibench.bayes.tiny.ngrams 1  hibench.bayes.small.pages 30000  hibench.bayes.small.classes 100  hibench.bayes.small.ngrams 2  hibench.bayes.large.pages 100000  hibench.bayes.large.classes 100  hibench.bayes.large.ngrams 2  hibench.bayes.huge.pages 500000  hibench.bayes.huge.classes 100  hibench.bayes.huge.ngrams 2  hibench.bayes.gigantic.pages 1000000  hibench.bayes.gigantic.classes 100  hibench.bayes.gigantic.ngrams 2  hibench.bayes.bigdata.pages 20000000  hibench.bayes.bigdata.classes 20000  hibench.bayes.bigdata.ngrams 2
 
 参考文献
 
 https://github.com/intel-hadoop/HiBench
- 
+
+
+
 
 

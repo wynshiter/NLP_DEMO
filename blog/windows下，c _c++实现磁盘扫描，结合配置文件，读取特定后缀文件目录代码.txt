@@ -271,12 +271,12 @@ bool ScanDisk::Search(TCHAR *Path,TCHAR *File)
 				//printf(PathTemp);
 				//wprintf(PathTemp);
 				//printf("\n");
-///////////////////////////////////////////////////////////////////////////////////
+///
 //				TCHAR temp[MAX_PATH];
 //				memcpy(temp," ",sizeof(temp));
 //				temp[MAX_PATH-2]=L'\0';
 //				memcpy(temp,PathTemp,lstrlen(PathTemp)*2);
-//////////////////////////////////////////////////////////////////////////////////
+//
 				fwprintf(this->fp,L"%s",PathTemp);
 				
 				fwprintf(this->fp,L"\n");
@@ -294,7 +294,8 @@ bool ScanDisk::Search(TCHAR *Path,TCHAR *File)
 }
 
 
-这个代码必须在unicode工程下使用，支持中文路径，"OperatingIni.h"//这个头文件,如下所示
+这个代码必须在unicode工程下使用，支持中文路径，
+"OperatingIni.h"//这个头文件,如下所示
  
  
 #include <tchar.h>
@@ -408,8 +409,7 @@ void CIniWriter::DeleteString(TCHAR* szSection, TCHAR* szKey)
 	WritePrivateProfileString(szSection,szKey,NULL,m_szFileName);
 }
 
-
-主函数可以这么写：
+ 主函数可以这么写：
 #include "ScanDisk.h"
 //#include "OperatingIni.h"
 
@@ -428,7 +428,7 @@ int main()
 	CIniWriter iniWriter(L".//Log.ini");
 	iniWriter.WriteString(L"Setting",L"extension", L".txt");   
 	//iniWriter.WriteInteger(L"Setting", L"count", 2); 
-	////iniWriter.WriteFloat(L"Setting", L"Height", 1.82f); 
+	iniWriter.WriteFloat(L"Setting", L"Height", 1.82f); 
 	//iniWriter.WriteBoolean(L"Setting", L"Marriage", false);  
 	//iniWriter.WriteBoolean(L"Setting", L"Marriage", NULL); 
 	//iniWriter.DeleteString(L"Setting",L"Marriage");
@@ -484,7 +484,6 @@ int main()
 
 资源下载：
  
-http://download.csdn.net/detail/wangyaninglm/8301303
- 
+http://download.csdn.net/detail/wangyaninglm/8301303   
 
 

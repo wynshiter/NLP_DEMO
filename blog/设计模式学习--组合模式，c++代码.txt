@@ -2,7 +2,7 @@
 
 
 
-下面是组合模式的UML类图：
+ 下面是组合模式的UML类图：
  
 
  
@@ -217,7 +217,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 </span>
- 
+  
  
  
 输出结果：
@@ -227,6 +227,6 @@ int _tmain(int argc, _TCHAR* argv[])
  
 文章来源：
  
-http://www.cnblogs.com/jiese/p/3168844.html
+http://www.cnblogs.com/jiese/p/3168844.html 
 
 

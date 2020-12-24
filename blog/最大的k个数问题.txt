@@ -28,7 +28,7 @@ void HeapAdjust(int array[], int i, int Length)
 		 array[child] = temp;
 	}
 }
- 
+   
  
 一般来说，进行初始化建立堆的时候，需要对数组的一般进行调整，调用代码：
  
@@ -38,8 +38,7 @@ for (int i = Length/2 - 1;i >= 0; --i)
 		HeapAdjust(array,i,Length);
 	}
 
-
- 
+  
 下面是交互两个数的代码片：使用三次异或操作：
 void Swap(int *a, int *b)
 {
@@ -49,7 +48,6 @@ void Swap(int *a, int *b)
 	*a = *a^*b;
 }
 
-
- 
+  
 
 

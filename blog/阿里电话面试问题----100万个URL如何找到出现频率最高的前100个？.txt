@@ -4,13 +4,13 @@
 内推阿里电话面试中面试官给我出的一个题：
 我想的头一个解决方案，就是放到stl 的map里面对出现的频率作为pair的第二个字段进行排序，之后按照排序结果返回：
 下面口说无凭，show your code，当然在讨论帖子中遭遇了工程界大牛的sql代码在技术上的碾压。什么是做工程的，什么是工程师的思维，不要一味的埋头搞算法。
-
+ 
 讨论帖：
 http://bbs.csdn.net/topics/391080906
-
+ 
 python 抓取百度搜索结果的讨论贴：
 http://bbs.csdn.net/topics/391077668
-
+ 
 实验数据，python从百度抓得：
 # -*- coding: utf-8 -*-
 """
@@ -65,8 +65,8 @@ file_url.close()
 方法1：
 c++  写的读 url.txt放到map里面
 对map<string , int>的value进行排序，得到前100个
-运行一下也就55s，还是很快的，url长度进行了限制小于256个字符
-
+运行一下也就55s，还是很快的，url长度进行了限制小于256个字符 
+ 
 #pragma once
 /*
 //计算代码段运行时间的类
@@ -246,14 +246,15 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
-
-
+ 
+ 
 实验结果：55s还不算太差，可以接受，毕竟是头脑中的第一个解决方案。
 
-
-
-方法2：
+ 
+ 
+方法2： 
 hash code 版本，只是不知道怎么 hash和url关联起来：
+ 
 // urlFind.cpp : 定义控制台应用程序的入口点。
 //
 
@@ -387,11 +388,16 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
-性能15秒左右：缺点在于没有把hashcode和url进行关联，技术的处理速度已经非常可观了
 
 
+
+
+性能15秒左右：缺点在于没有把hashcode和url进行关联，技术的处理速度已经非常可观了 
+
+ 
 方法3：
 下面用STL的hash容器unordered_map，和优先队列(就是堆)来实现这个问题。
+ 
 
 // urlFind.cpp : 定义控制台应用程序的入口点。
 //
@@ -504,15 +510,31 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;
 }
 
+
+
 基本上算是算法里面比较优秀的解决方案了，面试官如果能听到这个方案应该会比较欣喜。
 
-﻿﻿
-﻿﻿
+
+
+
+
+ ﻿﻿
+
+
+ ﻿﻿
+
+
+
+
+
+
+
 
 
 
 方法4：实验耗时未知，技术上碾压了上述解决方案，中高年轻人，不要重复造轮子！哈哈
 数据库，SQL语句：
+
 load data infile "d:/bigdata.txt" into table tb_url(url);
 
 SELECT
@@ -524,8 +546,17 @@ SELECT
 	ORDER BY show_count desc
 	LIMIT 100
 
-﻿﻿
-﻿﻿
-﻿﻿
+
+
+
+
+ ﻿﻿
+
+
+ ﻿﻿
+
+
+ ﻿﻿
+
 
 

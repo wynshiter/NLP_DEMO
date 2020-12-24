@@ -1,13 +1,16 @@
 
 
 
-﻿﻿
 
-Symmetric Tree Total Accepted: 
-61440 Total Submissions: 
-194643 
-My Submissions
-                      
+ ﻿﻿
+
+ Symmetric Tree
+Total Accepted:  61440
+Total Submissions:  194643
+ My Submissions
+
+                       
+
 
 
 
@@ -22,7 +25,7 @@ For example, this binary tree is symmetric:
 
 
 
-But the following is not:
+But the following is not: 
     1
    / \
   2   2
@@ -31,12 +34,11 @@ But the following is not:
 
 
 
-Note:
-Bonus points if you could solve it both recursively and iteratively. 
-confused what "{1,#,2,3}" means? 
-> read more on how binary tree is serialized on OJ.
-
+Note: Bonus points if you could solve it both recursively and iteratively. 
+confused what "{1,#,2,3}" means?  > read more on how binary tree is serialized on OJ.
+ 
 c++ 解决方案：
+
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -84,7 +86,9 @@ public:
 
    
 
+ 
 第二种，非递归解决方案：
+
 /**
  * Definition for binary tree
  * struct TreeNode {
@@ -125,6 +129,8 @@ public:
 };
 
 
+ 
+
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -164,7 +170,11 @@ public:
 };
 
 
- c版本：
+ 
+
+
+c版本：
+
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -197,7 +207,12 @@ bool isSymmetric(struct TreeNode* root) {
         return true;
     }
     return checkNodes(root->left, root->right);
-}递归方案：
+}
+
+
+
+递归方案：
+
 bool isSymmetric(TreeNode *root) {
         if (!root) return true;
         return helper(root->left, root->right);
@@ -218,7 +233,9 @@ bool isSymmetric(TreeNode *root) {
     }
 
 
+ 
 python版本：
+
 class Solution:
     # @param {TreeNode} root
     # @return {boolean}
@@ -236,6 +253,10 @@ class Solution:
         if root is None:
             return True
         return self.helper(root.left, root.right)
+
+
+
+
 class Solution:
     # @param {TreeNode} root
     # @return {boolean}
@@ -314,6 +335,9 @@ def enqueue(queue, item):
 
 def dequeue(queue):
     return queue.pop(0)
+
+
+ 
 
 
 

@@ -4,9 +4,7 @@
 
 
 
-
 在上文Docker – 系统整洁之道 – 0中已经对Docker是什么，安装Docker以及怎么运行一个简单的容器有了初步了解，这篇文章介绍Docker的一些命令和Docker镜像的使用及操作。
-
 
 一些Docker命令
 
@@ -29,9 +27,7 @@ root@8eac2e6cf194:/# ls
 bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
 root@8eac2e6cf194:/#
 由于在上文中已经运行过一次该条命令，所以ubuntu的镜像已经下载到了本地，此次运行就可以使用该镜像产生一个容器，在容器启动后，上过-it获取到命令行，运行命令ls。
-使用–name标志可以给容器定义一个名字，如 
-docker run –name this_is_first_ubunt_container -it ubuntu 
-就会创建一个名字叫做this_is_first_ubunt_container的ubuntu的容器。名字只能使用大小写字母，数字，下划线，原点和横线，即[a-zA-Z0-9_.-]。
+使用–name标志可以给容器定义一个名字，如  docker run –name this_is_first_ubunt_container -it ubuntu  就会创建一个名字叫做this_is_first_ubunt_container的ubuntu的容器。名字只能使用大小写字母，数字，下划线，原点和横线，即[a-zA-Z0-9_.-]。
 
 关于docker run的帮助可以使用docker run --help获取。
 
@@ -46,8 +42,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 8eac2e6cf194        ubuntu              "/bin/bash"         4 minutes ago        Up 4 minutes                                        modest_davinci
 docker ps -n x，显示最后x个容器，不管容器正在运行还是停止。
 docker start 重新启动已经停止的容器
-docker start 
-docker start this_is_first_ubunt_container
+docker start  docker start this_is_first_ubunt_container
 docker attatch 附着容器
 docker attach this_is_first_ubunt_container
 docker stop 停止一个容器
@@ -135,9 +130,7 @@ docker inspect 容器详细信息
 ~ docker inspect --format='{{.NetworkSettings.IPAddress}}' daemon_ubuntu
 自动重启容器
 docker run –restart=always –name daemon_ubuntu -d ubuntu /bin/sh -c “while true;do echo hello world;sleep 1;done”
-–restart=always 无论容器的退出代码为何，都自动重启。 
-–restart=on-failure 当容器退出代码不为0时，自动重启。 
-–restart=on-failure:5 重启5次。
+–restart=always 无论容器的退出代码为何，都自动重启。  –restart=on-failure 当容器退出代码不为0时，自动重启。  –restart=on-failure:5 重启5次。
 docker rm 删除容器
 
 运行中的Docker容器是无法删除的。
@@ -147,8 +140,7 @@ docker rm `docker ps -a -q`
 Docker 镜像
 docker images
 
-Linux  /var/lib/docker 
-  Mac $HOME/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
+Linux /var/lib/docker  Mac $HOME/Library/Containers/com.docker.docker/Data/com.docker.driver.amd64-linux/Docker.qcow2
 
 docker pull ubuntu:16.10 获取ubuntu仓库中tag为16.10的镜像。
 docker pull -a ubuntu 获取ubuntu仓库中所有镜像。
@@ -160,17 +152,14 @@ docker search 查找Docker Hub上公用可用镜像。
 获取镜像时，格式其实可以看做 用户/仓库:标签。 由于很多仓库为官网所有，所有很多都变成了 仓库:标签，如上面写的 ubuntu:16.10，ubutnu仓库的tag为16.10的镜像。
 
 构建镜像
-docker commit 
-docker build 和 Dockerfile文件
+docker commit  docker build 和 Dockerfile文件
 
 一般来说，我们不是真正「创建」了一个镜像，而是基于一个已有的镜像，构建了一个新的镜像。
 
 参考链接
 
+Docker 从入门到实践第一本Docker书一个比较详细的命令用法
 
-Docker 从入门到实践
-第一本Docker书
-一个比较详细的命令用法
- 
+
 
 

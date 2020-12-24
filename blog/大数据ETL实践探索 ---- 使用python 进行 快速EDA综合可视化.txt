@@ -5,22 +5,21 @@
 
 
 
-文章大纲可视化处理的前置处理数据清洗使用pandas 对数据进行处理数据存储数据入库postgreSQL 安装数据入ESES 和 传统数据库  结构对比mapping大数据可视化非结构化数据可视化结构化数据可视化cubessuperset
+
+文章大纲
+可视化处理的前置处理数据清洗
+使用pandas 对数据进行处理数据存储数据入库postgreSQL 安装
+数据入ESES 和 传统数据库 结构对比mapping
+
+大数据可视化非结构化数据可视化结构化数据可视化cubessuperset
+参考文献
+
+
 
 可视化处理的前置处理
 数据清洗
-对于可视化的过程，拿到一份数据，我们首先要做的是进行数据清洗。我在这篇博文：数据清洗的目的，方法
-介绍了数据清洗的一个通用步骤。
-
-针对这个通用流程，我们 准备了一份医疗领域 的通用 样例数据，准备进行分析探查以及基本的可视化工作。
-
-
-数据清洗小型 脚手架
-
-
-es 目前支持sql
-
-
+对于可视化的过程，拿到一份数据，我们首先要做的是进行数据清洗。我在这篇博文：数据清洗的目的，方法 介绍了数据清洗的一个通用步骤。  针对这个通用流程，我们 准备了一份医疗领域 的通用 样例数据，准备进行分析探查以及基本的可视化工作。
+ 数据清洗小型 脚手架  es 目前支持sql 
 
 使用pandas 对数据进行处理
 我在系列博文中：大数据ETL实践探索（5）---- 大数据ETL利器之 pandas 介绍了pandas 的部分使用。
@@ -68,17 +67,14 @@ systemctl start postgresql-12
 之前在一些虚机上安装时候发现，如果没有在开始时候指定字符集，那么后来修改会比较麻烦：
 https://tutorials.technology/tutorials/How-to-change-postgresql-database-encoding-to-UTF8-from-SQL_ASCII.html
 强烈建议阅读下文：字符集修改：字符集修改
-其中提到，只要locale字符集正确，postgresql 默认字符集就ok ，
-
-
+其中提到，只要locale字符集正确，postgresql 默认字符集就ok ， 
 
 修改配置文件
-
 修改登录及监听
 修改配置文件（非常关键），操作如下:
 cd /var/lib/pgsql/12/data/
 
-首先，修改postgresql.conf，将 listen_addresses 这一行的ip地址改为  listen_addresses =’*’，代表监听所有端口，如果不改后面会出错。
+首先，修改postgresql.conf，将 listen_addresses 这一行的ip地址改为 listen_addresses =’*’，代表监听所有端口，如果不改后面会出错。
 其次，修改pg_hba.conf，将indent全部改为trust;
 另外，pg_hba.conf的#IPv4 local connections 下添加一列：
 host    all             all             0.0.0.0/0              md5      
@@ -96,9 +92,7 @@ vi /var/lib/pgsql/12/data/postgresql.conf
 timezone = 'Asia/Shanghai'
 
 
-
 数据入库
-
 
 # coding:utf-8
 
@@ -129,11 +123,10 @@ engine = create_engine(connet_databases()._connect, echo=True)
 
 数据入ES
 es 权威指南
-ES 和 传统数据库  结构对比
+ES 和 传统数据库 结构对比
 
 mapping
-自动化创建mapping，虽然 es 可以动态推断es，但是不够准确，所以一般还是需要进行指定。
-es mapping 文档
+自动化创建mapping，虽然 es 可以动态推断es，但是不够准确，所以一般还是需要进行指定。 es mapping 文档
 # 按照每一列的类型生成对应的 es index
 
 def set_mapper_field(list_name,s_type,mapper):
@@ -163,25 +156,21 @@ json_mapper = json.dumps(dict_mapper,ensure_ascii=False)
 
 
 大数据可视化
-大数据可视化的综合手段 如下图所示：最近刚出了一篇文章，我传到github 上面了：
-大数据可视化技术及应用.pdf
-
+大数据可视化的综合手段 如下图所示：最近刚出了一篇文章，我传到github 上面了： 大数据可视化技术及应用.pdf 
 
 非结构化数据可视化
-
-kibana 文档特性
-kibana 文档目录
-
-非结构化数据的可视化，我们可以使用elastic search  配套的kibana 进行可视化 的绘制。
+kibana 文档特性kibana 文档目录
+非结构化数据的可视化，我们可以使用elastic search 配套的kibana 进行可视化 的绘制。
 结构化数据可视化
 cubes
-
-cubes 官网
-cubes 文档
-
+cubes 官网cubes 文档
 superset
 superset 官网
 技术调研----BI工具对比及Surperset 之 docker安装与可视化
+
+参考文献
+EDA 教程：https://www.datacamp.com/community/tutorials/exploratory-data-analysis-python
+
 
 
 

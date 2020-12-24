@@ -4,7 +4,6 @@
 
 
 
-
 0.序言
 项目主要使用oracle但是我不太喜欢其他编程语言，加上可能需要用python部署算法包，从oracle表中读出数据，处理完成后在放回oracle中去，所以在windows上就想到先用python试一下，自然搜到了cx_oracle（一个按照Python DB API的oracle的实现，如MySQL、PostgreSQL等，只需要安装相应的软件包即可，流程及操作接口都与cx_Oracle基本一致），下面就简单解释一下怎么用这个包进行增删改查。
 1.windows 10 安装cx_Oracle注意事项
@@ -12,32 +11,23 @@
 1.1 oracle client版本
 如果windows系统没有安装oracle client 需要首先在：
 http://www.oracle.com/technetwork/topics/winx64soft-089540.html
-下载对应的版本，我的系统是windows10 
-查看系统的中的oracle client版本，使用sql/plus命令：
+下载对应的版本，我的系统是windows10  查看系统的中的oracle client版本，使用sql/plus命令：
 
 sqlplus -vSQL*Plus:
 
 
-在安装好cx_oracle后 
-使用cx_Oracle.clientversion()查看为(11, 2, 0, 4, 0)
+在安装好cx_oracle后  使用cx_Oracle.clientversion()查看为(11, 2, 0, 4, 0)
 1.2 cx_oracle版本
-cx_oracle和python版本需要对应， 
-我操作系统的版本是64位，所以上述软件采用的都是64位安装程序。python安装的版本是3.5.2
+cx_oracle和python版本需要对应，  我操作系统的版本是64位，所以上述软件采用的都是64位安装程序。python安装的版本是3.5.2
 tnsnames.ora文件我并没有配置？不知道是不是之前系统配置过了，或者是直接移动dll可以不用配置此文件。(期待大牛指导，我还不知道这个是弄啥的)
 1.3 使用python模块cx_oracle链接oracle
-C:\Users\123456>sqlplus -vSQl*Plus: 
-SQL*Plus: Release 11.2.0.2.0 Production 
-上述oracle client 版本为11.2，所以需要在https://pypi.python.org/pypi/cx_Oracle/5.2.1
+C:\Users\123456>sqlplus -vSQl*Plus:  SQL*Plus: Release 11.2.0.2.0 Production  上述oracle client 版本为11.2，所以需要在https://pypi.python.org/pypi/cx_Oracle/5.2.1
 
-下载cx_Oracle-5.2.1-11g.win-amd64-py3.5.exe，安装运行， 
-注意，windows版本使用pip安装的话可能会出错，所以推荐使用上述方式安装 
-将：
+下载cx_Oracle-5.2.1-11g.win-amd64-py3.5.exe，安装运行，  注意，windows版本使用pip安装的话可能会出错，所以推荐使用上述方式安装  将：
 http://www.oracle.com/technetwork/database/features/instant-client/index-097480.html
-下载的安装包中的： instantclient-basic-windows.x64-11.2.0.4.0 
-oci.dll此dll依赖下面两个dll（不然运行时候要出现：unable to acquire oracle environment handle）
+下载的安装包中的： instantclient-basic-windows.x64-11.2.0.4.0  oci.dll此dll依赖下面两个dll（不然运行时候要出现：unable to acquire oracle environment handle）
 
-ocijdbc11.dll 
-  oraociei11.dll
+ocijdbc11.dll  oraociei11.dll
 
 复制到：C:\Python35\Lib\site-packages下
 
@@ -46,18 +36,14 @@ ocijdbc11.dll
 2.1 Linux下多个版本的python共存
 Linux下默认系统自带python2.6的版本，这个版本被系统很多程序所依赖，所以不建议删除，如果使用最新的Python3那么我们知道编译安装源码包和系统默认包之间是没有任何影响的，所以可以安装python3和python2共存 
 2.1.1 使用版本管理工具pyenv
-经常遇到这样的情况： 
-•   系统自带的Python是2.6，自己需要Python 2.7中的某些特性； 
-•   系统自带的Python是2.x，自己需要Python 3.x； 
-此时需要在系统中安装多个Python，但又不能影响系统自带的Python，即需要实现Python的多版本共存。pyenv就是这样一个Python版本管理器。可以下载安装。
+经常遇到这样的情况：  • 系统自带的Python是2.6，自己需要Python 2.7中的某些特性；  • 系统自带的Python是2.x，自己需要Python 3.x；  此时需要在系统中安装多个Python，但又不能影响系统自带的Python，即需要实现Python的多版本共存。pyenv就是这样一个Python版本管理器。可以下载安装。
 2.2.2 安装时进行配置
 如果你想用python3，你可以下载python源码，在配置的时候指定perfix，比如你可以安装到/usr/local/python3, （主要步骤）
 
 ./configure –prefix=/usr/local/python3
 
 之后配置正确就可以使用/usr/local/python3/bin/python3启动python3.
-一般安装步骤 
-RedHat下安装Python3步骤
+一般安装步骤  RedHat下安装Python3步骤
 1.下载解压。
 
 $ tar zxvf Python-3.5.2.tgz
@@ -74,8 +60,7 @@ $ make
 
 $ make install
 
-5.建立软连接 
-安装后建立一个链接，这样我们可以用python3直接运行程序，和python2区别开来。
+5.建立软连接  安装后建立一个链接，这样我们可以用python3直接运行程序，和python2区别开来。
 
 $ ln -s /opt/python3/bin/python3 /usr/bin/python3
 
@@ -85,77 +70,40 @@ $ ln -s /opt/python3/bin/python3 /usr/bin/python3
 安装Python的cx_Oracle，接下来说说如何安装它。
 一、涉及软件包
 1、cx_Oracle
-下载地址：http://sourceforge.net/projects/cx-oracle/files/?source=navbar 
-我下载的是最新版的cx_Oracle-5.2.1.tar.gz
+下载地址：http://sourceforge.net/projects/cx-oracle/files/?source=navbar  我下载的是最新版的cx_Oracle-5.2.1.tar.gz
 2、Oracle_client
-使用cx_Oracle必须要安装Oracle_client端，或者你已经安装了Oracle数据库。 
-下载地址：http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
+使用cx_Oracle必须要安装Oracle_client端，或者你已经安装了Oracle数据库。  下载地址：http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
 以连接Oracle11(其实12也行，这和oracle client版本无关)为例需要下载以下rpm包：
 
-oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm 
-  oracle-instantclient11.2-jdbc-11.2.0.4.0-1.x86_64.rpm 
-  oracle-instantclient11.2-sqlplus-11.2.0.4.0-1.x86_64.rpm 
-  oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm 
-  oracle-instantclient11.2-odbc-11.2.0.4.0-1.x86_64.rpm 
-  oracle-instantclient11.2-tools-11.2.0.4.0-1.x86_64.rpm
+oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-jdbc-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-sqlplus-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-odbc-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-tools-11.2.0.4.0-1.x86_64.rpm
 
 软件包都下载完后，我们开始来安装。
 二、源码安装
 1、Oracle_client端安装：
 
-# rpm -ivh oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-jdbc-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-sqlplus-11.2.0.4.0-1.x86_64.rpm oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-odbc-11.2.0.4.0-1.x86_64.rpm  oracle-instantclient11.2-tools-11.2.0.4.0-1.x86_64.rpm
-# echo /usr/lib/oracle/11.2/client64/lib/ >> /etc/ld.so.conf 
-  # ldconfig
+# rpm -ivh oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm oracle-instantclient11.2-jdbc-11.2.0.4.0-1.x86_64.rpm oracle-instantclient11.2-sqlplus-11.2.0.4.0-1.x86_64.rpm oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm oracle-instantclient11.2-odbc-11.2.0.4.0-1.x86_64.rpm oracle-instantclient11.2-tools-11.2.0.4.0-1.x86_64.rpm
+# echo /usr/lib/oracle/11.2/client64/lib/ >> /etc/ld.so.conf  # ldconfig
 
 如果不进行ldconfig配置，在运行cx_Oracle时会报以下错误：
 
 libclntsh.so.11.1: cannot open shared object file: No such file or directory
 
-2、设置相应用户的环境变量： 
-在这里需要说明下，你使用哪个帐户装cx_Oracle就需要配置哪个帐户的环境变量，以下已root帐户为例； 
-如果不配置环境变量、或环境变量配置不正确，在安装cx_Oracle时，会报各种错误，比如说： 
-oci.h: No such file or directory
+2、设置相应用户的环境变量：  在这里需要说明下，你使用哪个帐户装cx_Oracle就需要配置哪个帐户的环境变量，以下已root帐户为例；  如果不配置环境变量、或环境变量配置不正确，在安装cx_Oracle时，会报各种错误，比如说：  oci.h: No such file or directory
 
-#vi ~/.bashrc 
-  export TNS_ADMIN=”/usr/lib/oracle” 
-  export ORACLE_HOME=”/usr/lib/oracle/11.2/client64” 
-  export LD_LIBRARY_PATH=”${LD_LIBRARY_PATH}:${ORACLE_HOME}/lib” 
-  export PATH=”${PATH}:${ORACLE_HOME}” 
-  #source ~/.bashrc
+#vi ~/.bashrc  export TNS_ADMIN=”/usr/lib/oracle”  export ORACLE_HOME=”/usr/lib/oracle/11.2/client64”  export LD_LIBRARY_PATH=”${LD_LIBRARY_PATH}:${ORACLE_HOME}/lib”  export PATH=”${PATH}:${ORACLE_HOME}”  #source ~/.bashrc
 
 3、源码安装
 
-#tar -zxvf cx_Oracle-5.1.2.tar.gz 
-  #cd cx_Oracle-5.1.2 
-  #python setup.py install
+#tar -zxvf cx_Oracle-5.1.2.tar.gz  #cd cx_Oracle-5.1.2  #python setup.py install
 
 4、安装成功后相应检查
 
-#python3 
-  Python 3.5.2 (default, Aug 21 2013, 12:12:55)  
-  [GCC 4.4.4 20100726 (Red Hat 4.4.4-13)] on linux2 
-  Type “help”, “copyright”, “credits” or “license” for more information. 
-  >>>import cx_Oracle 
-  >>>
+#python3  Python 3.5.2 (default, Aug 21 2013, 12:12:55)  [GCC 4.4.4 20100726 (Red Hat 4.4.4-13)] on linux2  Type “help”, “copyright”, “credits” or “license” for more information.  >>>import cx_Oracle  >>>
 
 到这没啥问题就ok了。
-相关阅读： 
-CentOS install Python 2.6.5 & cx_Oracle  http://www.linuxidc.com/Linux/2011-04/34193.htm 
-Python中cx_Oracle模块安装遇到的问题与解决方法 http://www.linuxidc.com/Linux/2011-04/34118.htm 
-Python+cx_Oracle安装及一个简单示例(归档下热备数据文件) http://www.linuxidc.com/Linux/2010-10/29187.htm 
-《Python开发技术详解》.( 周伟,宗杰).[高清PDF扫描版+随书视频+代码] http://www.linuxidc.com/Linux/2013-11/92693.htm 
-Python脚本获取Linux系统信息 http://www.linuxidc.com/Linux/2013-08/88531.htm 
-Python 的详细介绍：请点这里 
-Python 的下载地址：请点这里 
-更多Oracle相关信息见Oracle 专题页面 http://www.linuxidc.com/topicnews.aspx?tid=12
+相关阅读：  CentOS install Python 2.6.5 & cx_Oracle http://www.linuxidc.com/Linux/2011-04/34193.htm  Python中cx_Oracle模块安装遇到的问题与解决方法 http://www.linuxidc.com/Linux/2011-04/34118.htm  Python+cx_Oracle安装及一个简单示例(归档下热备数据文件) http://www.linuxidc.com/Linux/2010-10/29187.htm  《Python开发技术详解》.( 周伟,宗杰).[高清PDF扫描版+随书视频+代码] http://www.linuxidc.com/Linux/2013-11/92693.htm  Python脚本获取Linux系统信息 http://www.linuxidc.com/Linux/2013-08/88531.htm  Python 的详细介绍：请点这里  Python 的下载地址：请点这里  更多Oracle相关信息见Oracle 专题页面 http://www.linuxidc.com/topicnews.aspx?tid=12
 3. cx_Oracle使用简介
-使用流程： 
-1.导入模块cx_Oracle 
-2.连接数据库 
-3.获取cursor 
-4.使用cursor进行各种操作 
-5.关闭cursor 
-6.关闭连接
+使用流程：  1.导入模块cx_Oracle  2.连接数据库  3.获取cursor  4.使用cursor进行各种操作  5.关闭cursor  6.关闭连接
 实例代码
 import sys
 import cx_Oracle
@@ -172,40 +120,16 @@ except cx_Oracle.DatabaseError, exc:
 大型的插入操作不需求多次的单独插入，这是因为 Python 通过 cx_Oracle.Cursor.executemany 方法完全支持一次插入多行。限制执行操作的数量极大地改善了程序性能，因此在编写存在大量插入操作的应用程序时应首先考虑这一功能。
 我们首先为 Python 模块列表创建一个表，这次直接从 Python 开始。您将在以后删除该表。
 
-create_table = “”” 
-  CREATE TABLE python_modules ( 
-  module_name VARCHAR2(50) NOT NULL, 
-  file_path VARCHAR2(300) NOT NULL 
-  ) 
-  “”” 
-  from sys import modules 
-  cursor.execute(create_table) 
-   M = [] 
-   for m_name, m_info in modules.items(): 
-  try: 
-  M.append((m_name, m_info.__file__)) 
-  except AttributeError: 
-  pass
+create_table = “””  CREATE TABLE python_modules (  module_name VARCHAR2(50) NOT NULL,  file_path VARCHAR2(300) NOT NULL  )  “””  from sys import modules  cursor.execute(create_table)  M = []  for m_name, m_info in modules.items():  try:  M.append((m_name, m_info.__file__))  except AttributeError:  pass
 
-cursor.prepare(“INSERT INTO python_modules(module_name, file_path) VALUES (:1, :2)”) 
-cursor.executemany(None, M) 
-db.commit() 
-r = cursor.execute(“SELECT COUNT(*) FROM python_modules”) 
- print cursor.fetchone()
-cursor.execute(“DROP TABLE python_modules PURGE”) 
-仅向数据库发出一个执行操作，要求将 76 个模块名称全部插入。这对大型插入操作而言是一个巨大的性能提升。注意此处的两点小的不同：cursor.execute(create_tab) 不产生任何输出，这是因为它是一个 DDL 语句，而 (76,) 是一个有单个元素的字节组。不含逗号的 (76) 完全等同于整数 76。
+cursor.prepare(“INSERT INTO python_modules(module_name, file_path) VALUES (:1, :2)”)  cursor.executemany(None, M)  db.commit()  r = cursor.execute(“SELECT COUNT(*) FROM python_modules”)  print cursor.fetchone()
+cursor.execute(“DROP TABLE python_modules PURGE”)  仅向数据库发出一个执行操作，要求将 76 个模块名称全部插入。这对大型插入操作而言是一个巨大的性能提升。注意此处的两点小的不同：cursor.execute(create_tab) 不产生任何输出，这是因为它是一个 DDL 语句，而 (76,) 是一个有单个元素的字节组。不含逗号的 (76) 完全等同于整数 76。
 (未完待续。。。。)
 参考文档
 http://cx-oracle.readthedocs.io/en/latest/
-精通oracle+python系列：(官方文档强烈推荐) 
-http://www.oracle.com/technetwork/cn/articles/dsl/mastering-oracle-python-1391323-zhs.html
-其他还未看： 
-https://my.oschina.net/bxxfighting/blog/386578 
-http://www.cnblogs.com/hzhida/archive/2012/08/13/2636735.html 
-http://blog.itpub.net/22664653/viewspace-711879/ 
-http://www.cnblogs.com/heric/p/5804434.html 
-http://www.cnblogs.com/linn/p/4229083.html 
-调用存储过程 
-http://blog.csdn.net/my2010sam/article/details/20724001 
+精通oracle+python系列：(官方文档强烈推荐)  http://www.oracle.com/technetwork/cn/articles/dsl/mastering-oracle-python-1391323-zhs.html
+其他还未看：  https://my.oschina.net/bxxfighting/blog/386578  http://www.cnblogs.com/hzhida/archive/2012/08/13/2636735.html  http://blog.itpub.net/22664653/viewspace-711879/  http://www.cnblogs.com/heric/p/5804434.html  http://www.cnblogs.com/linn/p/4229083.html  调用存储过程  http://blog.csdn.net/my2010sam/article/details/20724001
+
+
 
 

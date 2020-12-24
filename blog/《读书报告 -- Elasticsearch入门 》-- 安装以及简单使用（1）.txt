@@ -5,16 +5,19 @@
 
 
 
-《读书报告 – Elasticsearch入门 》
 
-第一章 Elasticsearch入门
+  《读书报告 – Elasticsearch入门 》
+ 
+
+
+
+  第一章 Elasticsearch入门
+ 
 Elasticsearch是一个实时的分布式搜索和分析引擎，使得人们可以在一定规模上和一定速度上实现数据检索，常用于全文本检索，结构化检索、分析以及三种的结合应用。Wikipedia、Guardian、Stack Overflow、Github都在使用Elasticsearch实现自己的相关检索工作。
 1.1 you konw,for search
 Elasticsearch是一个基于Apache Lucene的开源搜索引擎，全文本检索引擎库。它是一个高性能、可伸缩的信息搜索库，即它不是一个完整的全文检索引擎，而是一个全文检索引擎的架构，提供了完整的查询引擎和索引引擎，部分文本分析引擎（英文和德文）。
 1.2 ES安装
-理解Elasticsearch最简单的方式就是使用它！安装Elasticsearch之前，首先要先安装java,最好是最新版本。 
-然后，在Elasticsearch的官网下载安装包。 
-按照完成之后，进入Elasticsearch的bin目录下，启动Elasticsearch。
+理解Elasticsearch最简单的方式就是使用它！安装Elasticsearch之前，首先要先安装java,最好是最新版本。  然后，在Elasticsearch的官网下载安装包。  按照完成之后，进入Elasticsearch的bin目录下，启动Elasticsearch。
 
 cd /$path/elasticsearch-2.3.2/bin
 ./elasticsearch -d //-d代表后台运行
@@ -25,8 +28,7 @@ curl ‘http://localhost:9200/?pretty’
 
 执行效果如下：
 安装Sense
-利用Sense可以实现在浏览器里和ES的交互。 
-安装、运行Sense：
+利用Sense可以实现在浏览器里和ES的交互。  安装、运行Sense：
 1.在Kibana目录下，下载安装Sense
 
 ./bin/kibana plugin –install elastic/sense
@@ -41,15 +43,10 @@ http://localhost:5601/app/sense
 
 1.3 与Elasticsearch的交互
 与Elasticsearch的交互，使用Java语言。
-Java API 
-Elasticsearch使用两种内置的客户端模式，在其中使用java与之交互：
-
+Java API  Elasticsearch使用两种内置的客户端模式，在其中使用java与之交互：
 Node client
-
 node client作为non data node加入到本地集群，换句话说，它本身不存储任何数据，但它清楚地知道数据的存储位置，能够准确地索引到数据存储的节点。
-
 Transport client
-
 轻量级的transport client可以传递请求到远端集群，它本身不加入到集群，但它能给集群中的每个节点发送请求。
 Java clients通过9300端口，利用ES的transport协议进行通信，集群中的节点也通过9300端口通信。
 1.4 面向文档
@@ -80,14 +77,14 @@ Relational DB -> Databases -> Tables -> Rows -> Columns
 Elasticsearch -> Indices   -> Types  -> Documents -> Fields
 
 理解点：
-
-索引（名词） 如上文所述，一个索引(index)就像是传统关系数据库中的数据库，它是相关文档存储的地方，index的复数是indices 或indexes。
-索引（动词） 「索引一个文档」表示把一个文档存储到索引（名词）里，以便它可以被检索或者查询。这很像SQL中的INSERT关键字，差别是，如果文档已经存在，新的文档将覆盖旧的文档。 
-倒排索引 传统数据库为特定列增加一个索引，例如B-Tree索引来加速检索。Elasticsearch和Lucene使用一种叫做倒排索引(inverted index)的数据结构来达到相同目的。
-
+索引（名词） 如上文所述，一个索引(index)就像是传统关系数据库中的数据库，它是相关文档存储的地方，index的复数是indices 或indexes。索引（动词） 「索引一个文档」表示把一个文档存储到索引（名词）里，以便它可以被检索或者查询。这很像SQL中的INSERT关键字，差别是，如果文档已经存在，新的文档将覆盖旧的文档。 倒排索引 传统数据库为特定列增加一个索引，例如B-Tree索引来加速检索。Elasticsearch和Lucene使用一种叫做倒排索引(inverted index)的数据结构来达到相同目的。
 默认情况下，文档中所有的字段都会被索引（拥有一个倒排索引），只有这样他们才是可被搜索的。
 
+
+
 Let’s Build an Employee Directory
+
+
 构建一个Megacorp公司的职工信息，构建employee directory。在分析了需求后，具体需要实现以下要求：
 * 为每个员工的文档(document)建立索引，每个文档包含了相应员工的所有信息。
 * 每个文档的类型为employee。 
@@ -134,8 +131,7 @@ employee    类型名
 1       这个员工的ID
 
 1.7 搜索——检索文档
-现在Elasticsearch中已经存储了一些数据，我们可以根据业务需求开始工作了。第一个需求是能够检索单个员工的信息。 
-只要执行HTTP GET请求并指出文档的“地址”——索引、类型和ID既可。根据这三部分信息，我们就可以返回原始JSON文档：
+现在Elasticsearch中已经存储了一些数据，我们可以根据业务需求开始工作了。第一个需求是能够检索单个员工的信息。  只要执行HTTP GET请求并指出文档的“地址”——索引、类型和ID既可。根据这三部分信息，我们就可以返回原始JSON文档：
 代码：
 curl -XGET 'ibd14:9200/megacorp/employee/1'
 
@@ -169,14 +165,12 @@ curl -XGET 'ibd14:9200/megacorp/employee/_search？q=last_name:Smith&pretty'
                 "must": [
                     {
                         "match" : {
-                            "last_name" : "smith"  //<2>
-                        }
+                            "last_name" : "smith" //<2> }
                     }
                 ],
                 "filter": {
                     "range" : {
-                        "age" : { "gt" : 30 }  //<1>
-                    }
+                        "age" : { "gt" : 30 } //<1> }
                 }
             }
         }
@@ -198,8 +192,7 @@ curl -XGET 'ibd14:9200/megacorp/employee/_search?pretty' -d'
 
 
 我们使用了之前的match查询，从about字段中搜索”rock climbing”，我们得到了两个匹配文档。
-默认情况下，Elasticsearch根据结果相关性评分来对结果集进行排序，所谓的「结果相关性评分」就是文档与查询条件的匹配程度。很显然，排名第一的John Smith的about字段明确的写到“rock climbing”。 
-但是为什么Jane Smith也会出现在结果里呢？原因是“rock”在她的about字段中被提及了。因为只有“rock”被提及而“climbing”没有，所以她的score要低于John。
+默认情况下，Elasticsearch根据结果相关性评分来对结果集进行排序，所谓的「结果相关性评分」就是文档与查询条件的匹配程度。很显然，排名第一的John Smith的about字段明确的写到“rock climbing”。  但是为什么Jane Smith也会出现在结果里呢？原因是“rock”在她的about字段中被提及了。因为只有“rock”被提及而“climbing”没有，所以她的score要低于John。
 这个例子很好的解释了Elasticsearch如何在各种文本字段中进行全文搜索，并且返回相关性最大的结果集。相关性(relevance)的概念在Elasticsearch中非常重要，而这个概念在传统关系型数据库中是不可想象的，因为传统数据库对记录的查询只有匹配或者不匹配。
 （6）短语搜索
 目前我们可以在字段中搜索单独的一个词，这挺好的，但是有时候你想要确切的匹配若干个单词或者短语(phrases)。例如我们想要查询同时包含”rock”和”climbing”（并且是相邻的）的员工记录。
@@ -301,19 +294,20 @@ curl -XGET 'ibd14:9200/megacorp/employee/_search?pretty' -d'
 1.10 分布式
 在章节的开始我们提到Elasticsearch可以扩展到上百（甚至上千）的服务器来处理PB级的数据。然而我们的教程只是给出了一些使用Elasticsearch的例子，并未涉及相关机制。Elasticsearch为分布式而生，而且它的设计隐藏了分布式本身的复杂性。
 Elasticsearch在分布式概念上做了很大程度上的透明化，在教程中你不需要知道任何关于分布式系统、分片、集群发现或者其他大量的分布式概念。所有的教程你即可以运行在你的笔记本上，也可以运行在拥有100个节点的集群上，其工作方式是一样的。
-1  Elasticsearch致力于隐藏分布式系统的复杂性。以下这些操作都是在底层自动完成的： 将你的文档分区到不同的容器或者分片(shards)中，它们可以存在于一个或多个节点中。 将分片均匀的分配到各个节点，对索引和搜索做负载均衡。 冗余每一个分片，防止硬件故障造成的数据丢失。 将集群中任意一个节点上的请求路由到相应数据所在的节点。
+1 Elasticsearch致力于隐藏分布式系统的复杂性。以下这些操作都是在底层自动完成的： 将你的文档分区到不同的容器或者分片(shards)中，它们可以存在于一个或多个节点中。 将分片均匀的分配到各个节点，对索引和搜索做负载均衡。 冗余每一个分片，防止硬件故障造成的数据丢失。 将集群中任意一个节点上的请求路由到相应数据所在的节点。
 无论是增加节点，还是移除节点，分片都可以做到无缝的扩展和迁移。 当你阅读本书时，你可以遇到关于Elasticsearch分布式特性的补充章节。这些章节将教给你如何扩展集群和故障转移，如何处理文档存储，如何执行分布式搜索，分片是什么以及如何工作。 这些章节不是必读的——不懂这些内部机制也可以使用Elasticsearch的。但是这些能够帮助你更深入和完整的了解Elasticsearch。你可以略读它们，然后在你需要更深入的理解时再回头翻阅。
 1.11 结语
 现在对Elasticsearch可以做些什么以及其易用程度有了大概的了解。Elasticsearch致力于降低学习成本和轻松配置。学习Elasticsearch最好的方式就是开始使用它：开始索引和检索吧！ 当然，你越是了解Elasticsearch，你的生产力就越高。你越是详细告诉Elasticsearch你的应用的数据特点，你就越能得到准确的输出。
 本书其余部分将帮助你从新手晋级到专家。每一个章节都会阐述一个要点，并且会包含专家级别的技巧。如果你只是刚起步，那么这些技巧可能暂时和你无关。Elasticsearch有合理的默认配置而且可以在没有用户干预的情况下做正确的事情。当需要提升性能时你可以随时回顾这些章节。
 
-第二章 集群内部工作方式
+
+
+  第二章 集群内部工作方式
+ 
 这部分是关于Elasticsearch在分布式环境下，工作机制的补充章节。这个章解释了一些通用的术语，例如集群(cluster)、节点(node)和分片(shard)，Elasticsearch的扩展机制，以及它如何处理硬件故障。
-Elasticsearch用于构建高可用和可扩展的系统。扩展的方式包括两种： 
-（1）纵向扩展——购买更好的服务器
+Elasticsearch用于构建高可用和可扩展的系统。扩展的方式包括两种：  （1）纵向扩展——购买更好的服务器
 （2）横向扩展——购买更多的服务器
-Elasticsearch虽然能从更强大的硬件中获得更好的性能，但是纵向扩展有它的局限性。真正的扩展应该是横向的，通过增加节点来均摊负载和增加可靠性。 
-由于Elasticsearch天生就是分布式的：它知道如何管理节点来提供高扩展和高可用。因此底层实现并不用去关心。
+Elasticsearch虽然能从更强大的硬件中获得更好的性能，但是纵向扩展有它的局限性。真正的扩展应该是横向的，通过增加节点来均摊负载和增加可靠性。  由于Elasticsearch天生就是分布式的：它知道如何管理节点来提供高扩展和高可用。因此底层实现并不用去关心。
 2.1 空集群
 当启动一个单独的节点，它还没有数据和索引，这个集群就只有一个节点，同时也充当MASTER的角色。
 一个节点(node)就是一个Elasticsearch实例，而一个集群(cluster)由一个或多个节点组成，它们具有相同的cluster.name，它们协同工作，分享数据和负载。当加入新的节点或者删除一个节点时，集群就会感知到并平衡数据。
@@ -321,16 +315,15 @@ Elasticsearch虽然能从更强大的硬件中获得更好的性能，但是纵�
 用户能够与集群中的任何节点通信，包括主节点。每一个节点都知道文档存在于哪个节点上，它们可以转发请求到相应的节点上。我们访问的节点负责收集各节点返回的数据，最后一起返回给客户端。这一切都由Elasticsearch处理。
 #
 2.2 集群健康
-在Elasticsearch集群中可以监控统计很多信息，但是只有一个是最重要的：集群健康(cluster health)。集群健康有三种状态: 
-green,yellow或red。
+在Elasticsearch集群中可以监控统计很多信息，但是只有一个是最重要的：集群健康(cluster health)。集群健康有三种状态:  green,yellow或red。
 通过命令可以查看集群的状态：
 
 curl -XGET ‘ibd14:9200/_cluster/health?pretty’
 
 从返回的信息中，status字段提供一个综合的指标来表示集群的的服务状况。三种颜色各自的含义：
-| green ——    所有主要分片和复制分片都可用  
-| yellow —— 所有主要分片可用，但不是所有复制分片都可用    
-| red    —— 不是所有的主要分片都可用
+| green —— 所有主要分片和复制分片都可用 
+| yellow —— 所有主要分片可用，但不是所有复制分片都可用 
+| red —— 不是所有的主要分片都可用
 2.3 添加索引
 索引(index)——一个存储关联数据的地方。实际上，索引只是一个用来指向一个或多个分片(shards)的“逻辑命名空间(logical namespace)”。
 分片是最小级别的工作单元，它只索引中所有数据的一部分。在接下来的《深入分片》一章，将详细说明分片的工作原理，但是现在我们只要知道分片就是一个Lucene实例，并且它本身就是一个完整的搜索引擎。我们的文档存储在分片中，并且在分片中被索引，但是我们的应用程序不会直接与它们通信，取而代之的是，直接与索引通信。
@@ -372,7 +365,10 @@ curl -XPUT 'ibd14:9200/blogs' -d'
 2.4 增加故障转移
 上一节提到了由于复制分片还没有分配到节点上，所以一旦唯一的节点Node 1挂点，数据就会丢失，有单点故障的风险。要防止单点故障，我们唯一需要做的就是启动另一个节点。
 
- 启动第二个节点
+
+
+    启动第二个节点
+  
 为了测试在增加第二个节点后发生了什么，你可以使用与第一个节点相同的方式启动第二个节点（《运行Elasticsearch》一章），而且命令行在同一个目录——一个节点可以启动多个Elasticsearch实例。
 只要第二个节点与第一个节点有相同的cluster.name（请看./config/elasticsearch.yml文件），它就能自动发现并加入第一个节点所在的集群。如果没有，检查日志找出哪里出了问题。这可能是网络广播被禁用，或者防火墙阻止了节点通信。
 
@@ -406,7 +402,10 @@ curl -XPUT 'ibd14:9200/blogs' -d'
 当我们杀掉Node 2，我们的程序依然可以在没有丢失数据的情况下继续运行，因为Node 3还有每个分片的拷贝。
 如果我们重启Node 1，集群将能够重新分配丢失的复制分片，如果Node 1依旧有旧分片的拷贝，它将会尝试再利用它们，它只会从主分片上复制在故障期间有数据变更的那一部分。
 
-第三章 数据吞吐
+
+
+  第三章 数据吞吐
+ 
 实际生活中被组织起来、与实际个体、对象相对应的数据才有意义。面向对象编程语言用对象来表示和处理现实生活中那些有着潜在关系和复杂结构的实体。然而，使用关系型数据库去存储这些实体对象使得它们的灵活性不复存在。
 对象(object)是一种语言相关，记录在内存中的的数据结构。为了在网络间发送，或者存储它，需要一些标准的格式来表示它。JSON是一种可读的以文本来表示对象的方式。它已经成为NoSQL世界中数据交换的一种事实标准。当对象被序列化为JSON，它就成为JSON文档(JSON document)了。
 Elasticsearch是一个分布式的文档(document)存储引擎。它可以实时存储并检索复杂数据结构——序列化的JSON文档。换言说，一旦文档被存储在Elasticsearch中，它就可以在集群的任一节点上被检索。
@@ -418,18 +417,19 @@ Elasticsearch是一个分布式的文档(document)存储引擎。它可以实时
 在Elasticsearch中，文档(document)，特指最顶层结构或者根对象(root object)序列化成的JSON数据（以唯一ID标识并存储于Elasticsearch中）。
 3.2 文档元数据
 一个文档不只有数据。它还包含了元数据(metadata)——关于文档的信息。三个必须的元数据节点是：
-|节点      | 说明               
-| _index | 文档存储的地方     
-| _type  | 文档代表的对象的类 
-| _id    | 文档的唯一标识 
- 
+|节点 | 说明 
+| _index | 文档存储的地方 
+| _type | 文档代表的对象的类 
+| _id | 文档的唯一标识 
+
+
 索引(index)类似于关系型数据库里的“数据库”——它是我们存储和索引关联数据的地方。 
 
-  实际上，数据被存储和索引在分片(shards)中，索引只是一个把一个或多个分片分组在一起的逻辑空间。然而，这只是一些内部细节——我们的程序完全不用关心分片。对于我们的程序而言，文档存储在索引(index)中。
-  相同类型(type)的文档表示相同的“事物”，因为他们的数据结构也是相同的,类似于数据库中的“表”。 
-  每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引。
-id仅仅是一个字符串，它与_index和_type组合时，就可以在Elasticsearch中唯一标识一个文档。当创建一个文档可以自定义_id，也可以让Elasticsearch自动生成。
 
+  实际上，数据被存储和索引在
+ 分片(shards)中，索引只是一个把一个或多个分片分组在一起的逻辑空间。然而，这只是一些内部细节——我们的程序完全不用关心分片。对于我们的程序而言，文档存储在
+ 索引(index)中。 
+ 相同类型(type)的文档表示相同的“事物”，因为他们的数据结构也是相同的,类似于数据库中的“表”。  每个类型(type)都有自己的映射(mapping)或者结构定义，就像传统数据库表中的列一样。所有类型下的文档被存储在同一个索引下，但是类型的映射(mapping)会告诉Elasticsearch不同的文档如何被索引。id仅仅是一个字符串，它与_index和_type组合时，就可以在Elasticsearch中唯一标识一个文档。当创建一个文档可以自定义_id，也可以让Elasticsearch自动生成。
 3.3 索引文档
 文档通过index API被索引——使数据可以被存储和搜索。
 curl -XPUT 'ibd14:9200/website_weichao/blog/123' -d'
@@ -485,14 +485,8 @@ curl -XPUT 'ibd14:9200/website_weichao/blog/123' -d'
 在响应中，我们可以看到Elasticsearch把_version的值增加了。每重复执行一次上述代码，_version的值就会加1。这说明：
 在内部，Elasticsearch已经标记旧文档为删除并添加了一个完整的新文档。
 旧版本文档不会立即消失，但也不能去访问它。Elasticsearch会在继续索引更多数据时清理被删除的文档。
-（2）update 
-update API 似乎 允许你修改文档的局部，但事实上Elasticsearch遵循与之前所说完全相同的过程，这个过程如下：
-
-从旧文档中检索JSON
-修改它
-删除旧文档
-索引新文档
-
+（2）update  update API 似乎 允许你修改文档的局部，但事实上Elasticsearch遵循与之前所说完全相同的过程，这个过程如下：
+从旧文档中检索JSON修改它删除旧文档索引新文档
 唯一的不同是update API完成这一过程只需要一个客户端请求既可，不再需要get和index请求了。
 3.7 创建一个新文档
 索引一个文档，如何确定是完全创建了一个新的还是覆盖了一个已经存在的呢？
@@ -695,21 +689,17 @@ curl -i -XGET 'ibd14:9200/website_weichao/blog/_mget?pretty' -d'
 }'
 
 （3）检索同一type下的不同id的文档
-> 
-    curl -i -XGET ‘ibd14:9200/website_weichao/blog/_mget?pretty’ -d’ 
-    { 
-        “ids” : [“2”,”1”,”202”] 
-    }’
+>  curl -i -XGET ‘ibd14:9200/website_weichao/blog/_mget?pretty’ -d’  {  “ids” : [“2”,”1”,”202”]  }’
 尽管前面提到有一个文档没有被找到，但HTTP请求状态码还是200。事实上，就算所有文档都找不到，请求也还是返回200，原因是mget请求本身成功了。如果想知道每个文档是否都成功了，需要检查found标志。
 3.12 更省时的批量操作
 bulk API允许我们使用单一请求来实现多个文档的create、index、update或delete。这对索引类似于日志活动这样的数据流非常有用，它们可以以成百上千的数据为一个批次按序进行索引。
 行为(action)必须是以下几种：
-| 行为     | 解释                                                   
+| 行为 | 解释 
 —————————————————— |
 | create | 当文档不存在时创建之。详见《创建文档》 
-| index  | 创建新文档或替换已有文档。见《索引文档》和《更新文档》 
-| update | 局部更新文档。见《局部更新》                           
-| delete | 删除一个文档。见《删除文档》                           
+| index | 创建新文档或替换已有文档。见《索引文档》和《更新文档》 
+| update | 局部更新文档。见《局部更新》 
+| delete | 删除一个文档。见《删除文档》 
 在索引、创建、更新或删除时必须指定文档的_index、_type、_id这些元数据(metadata)。
 *使用mget bulk批量操作不同文档
 curl -i XPOST 'ibd14:9200/_bulk?pretty' -d'
@@ -722,6 +712,8 @@ curl -i XPOST 'ibd14:9200/_bulk?pretty' -d'
     { "doc" : {"title" : "My updated blog post"} }
 '
 
- 
+
+
+
 
 

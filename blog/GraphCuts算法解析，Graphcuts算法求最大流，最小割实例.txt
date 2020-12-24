@@ -47,7 +47,7 @@ http://download.csdn.net/detail/wangyaninglm/8292305
 		       \        /
 		          SINK
 
-	///////////////////////////////////////////////////
+	///
 
 	#include <stdio.h>
 	#include "graph.h"
@@ -79,9 +79,9 @@ http://download.csdn.net/detail/wangyaninglm/8292305
 		delete g;
 	}
 
-	///////////////////////////////////////////////////
+	///
 */
-
+ 
  
  
 void test_maxflow()
@@ -110,8 +110,7 @@ void test_maxflow()
 
 	delete g;
 }
-
- 
+  
  
 
  

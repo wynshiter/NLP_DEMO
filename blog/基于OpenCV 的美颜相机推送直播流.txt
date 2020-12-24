@@ -2,21 +2,17 @@
 
 
 程序流程：
-
-1.图像采集
-先从opencv（2.4.10版本）采集回来摄像头的图像，是一帧一帧的
-每一帧图像是一个矩阵，opencv中的mat 数据结构。
+ 1.图像采集
+先从opencv（2.4.10版本）采集回来摄像头的图像，是一帧一帧的 每一帧图像是一个矩阵，opencv中的mat 数据结构。
  
-2.人脸的美化
-人脸美化，我们用的皮肤检测，皮肤在颜色空间是特定的一个区域
-检测到这个区域（感兴趣区域），完后对这个区域进行美化，就是滤波，主要是双边滤波和高斯滤波。
+2.人脸的美化 人脸美化，我们用的皮肤检测，皮肤在颜色空间是特定的一个区域 检测到这个区域（感兴趣区域），完后对这个区域进行美化，就是滤波，主要是双边滤波和高斯滤波。
  
 3.视频格式转换以及编码
 处理好的矩阵颜色空间是rgb的，需要转换成yuv，yuv的颜色空间就是可以播放的，类似我们电视上面看的画面，编码就是传输时候需要发送流，只个流相当于针对数据的压缩，将yuv格式的视频帧编码成h264的格式
 Rgb转换成yuv，opencv实现（美颜在这一步实现）
 Yuv转换成h264，x264实现
 H264转换成rtmp流，libxrtmp实现
-
+ 
 4.发送给服务器进行直播
 H264的流一般就可以播放了，但是针对目前的网络直播主要是将h264转换成rtmp流，用rtmp的服务器进行播放，这块我们主要用的是adobe media server 5这个服务器进行接受工作
  
@@ -24,13 +20,13 @@ H264的流一般就可以播放了，但是针对目前的网络直播主要是�
 1.将人脸美化转换为皮肤检测
 2.各种编码的转换
 3.缓冲区的控制，这块是一个读者写着模型
-
+ 
 实现效果：
-
+ 
  
  
 部分代码：
-
+ 
 
 #include "stdafx.h"
 #include "live_beautiful_camera_streaming.h"
@@ -84,7 +80,7 @@ void CameraToH264(void *pcn)
 		MySkinEnhance(frame);
 	
 
-		/////////////////////////////////////////
+		/
 		cv::Mat yuvImg;
 		cv::cvtColor(frame, yuvImg, CV_BGR2YUV_I420);
 		memcpy(pYuvBuf, yuvImg.data, yuv_bufLen*sizeof(unsigned char));
@@ -128,26 +124,24 @@ int main( void )
 	   Sleep(100);
 	return 0;
 }
+
+
+
 ---------------------------------后续更新，20160506-------------------------------------------------------------------------------------------------------
 该程序的性能跟美颜处理的算法效果息息相关，最近发现了一个联合双边滤波器，有时间 的话集成上去效果应该不错，下面是介绍：
+ 
 
+  这十年来，在图像处理领域提出了很多新的图像分析和处理方法，包括是自动的以及一些需要有人工参与的，典型的比如stereo depth computations、image colorization、tone mapping of high dynamic range (HDR) images、 graph cuts ，这些算法都有着比较好的效果，但都普遍存在一个问题：就是计算量特别大，很难满足用户的需求。而数字图像在尺寸大小上的增长速度这段时间也相当惊人。还有个问题就是有些算法需要解一个很大的稀疏矩阵方程，可能会大到系统的无法为接其过程分配足够的内存。因此，如果解决这两个问题，一个直观而又简单的想法就是：先处理原图下采样的小图，然后将处理后的结果在上采样。
+       但是，如此处理存在的问题就是上采样算法会直接影响到处理效果。如果是纯粹的最近邻插值、或者是双线性，抑或是三次立方等复杂点插值算法，都会使人感到效果失真。但是在这种情况下的我们实际上比简单的图像放大时多了一个信息的，就是我有原始的未做处理的并且未缩小的图像的信息，是否能利用这个信息来增强上采样的效果呢?目前我看到了两种这方面的算法。
+  
+  
+       一种就是联合双边滤波 ：http://www.cnblogs.com/Imageshop/p/3677313.html
 
-
- 这十年来，在图像处理领域提出了很多新的图像分析和处理方法，包括是自动的以及一些需要有人工参与的，典型的比如stereo depth computations、image colorization、tone mapping of high dynamic range (HDR) images、 graph cuts ，这些算法都有着比较好的效果，但都普遍存在一个问题：就是计算量特别大，很难满足用户的需求。而数字图像在尺寸大小上的增长速度这段时间也相当惊人。还有个问题就是有些算法需要解一个很大的稀疏矩阵方程，可能会大到系统的无法为接其过程分配足够的内存。因此，如果解决这两个问题，一个直观而又简单的想法就是：先处理原图下采样的小图，然后将处理后的结果在上采样。
-
-      但是，如此处理存在的问题就是上采样算法会直接影响到处理效果。如果是纯粹的最近邻插值、或者是双线性，抑或是三次立方等复杂点插值算法，都会使人感到效果失真。但是在这种情况下的我们实际上比简单的图像放大时多了一个信息的，就是我有原始的未做处理的并且未缩小的图像的信息，是否能利用这个信息来增强上采样的效果呢?目前我看到了两种这方面的算法。
-
-
-
-
-
-      一种就是联合双边滤波 ：http://www.cnblogs.com/Imageshop/p/3677313.html
-
-
+ 
+ 
 参考文献：
  
-Adobe Flash Media Server 5.0.3 
-官方中文版：（下载地址和说明）
+Adobe Flash Media Server 5.0.3  官方中文版：（下载地址和说明）
 http://www.launchdigital.net/supportview.asp?bid=98&Sid=124&id=594
 http://www.xdowns.com/soft/1/71/2014/Soft_116532.html
  
@@ -162,8 +156,7 @@ h264发送rtmp流：
 http://www.cnblogs.com/haibindev/archive/2012/04/16/2450989.html
 http://blog.csdn.net/leixiaohua1020/article/details/42105049
  
-Adobe Flash Media Server 5.0.3 
-官方中文版：（下载地址和说明）
+Adobe Flash Media Server 5.0.3  官方中文版：（下载地址和说明）
 http://www.launchdigital.net/supportview.asp?bid=98&Sid=124&id=594
 http://www.xdowns.com/soft/1/71/2014/Soft_116532.html
  
@@ -175,14 +168,14 @@ yuv格式编码为h264：
 http://blog.csdn.net/leixiaohua1020/article/details/42078645
  
 h264发送rtmp流：
-http://www.cnblogs.com/haibindev/archive/2012/04/16/2450989.html
+http://www.cnblogs.com/haibindev/archive/2012/04/16/2450989.html 
 http://blog.csdn.net/leixiaohua1020/article/details/42105049
  
 环形缓冲区实现：http://blog.csdn.net/lezhiyong/article/details/7879558
-
+ 
 完整代码下载：http://download.csdn.net/detail/wangyaninglm/9480783
 github地址：https://github.com/wynshiter/live_beautiful_camera_streaming
-
-
+ 
+ 
 
 

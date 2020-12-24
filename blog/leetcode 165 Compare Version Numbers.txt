@@ -4,19 +4,10 @@
 
 
 
-
-Compare two version numbers version1 and version2. 
- If version1 > version2 return 1, if version1 < version2 return -1, otherwise return 0.
-You may assume that the version strings are non-empty and contain only digits and the . character. 
- The . character does not represent a decimal point and is used to separate number sequences. 
- For instance, 2.5 is not “two and a half” or “half way to version three”, it is the fifth second-level revision of the second first-level revision.
-Here is an example of version numbers ordering: 
-0.1 < 1.1 < 1.2 < 13.37
-解决方案： 
-The main idea is very simple and the code consists of three phases: 
-1.When version1 and version2 are not finished, compare the value of corresponding string before dot. 
-2.If version1 is finished, check whether remaining version2 contains string not equal to 0 
-3.If version2 is finished, check whether remaining version1 contains string not equal to 0
+Compare two version numbers version1 and version2.  If version1 > version2 return 1, if version1 < version2 return -1, otherwise return 0.
+You may assume that the version strings are non-empty and contain only digits and the . character.  The . character does not represent a decimal point and is used to separate number sequences.  For instance, 2.5 is not “two and a half” or “half way to version three”, it is the fifth second-level revision of the second first-level revision.
+Here is an example of version numbers ordering:  0.1 < 1.1 < 1.2 < 13.37
+解决方案：  The main idea is very simple and the code consists of three phases:  1.When version1 and version2 are not finished, compare the value of corresponding string before dot.  2.If version1 is finished, check whether remaining version2 contains string not equal to 0  3.If version2 is finished, check whether remaining version1 contains string not equal to 0
 Example1: version1==”11.22.33”, version2==”11.22.22”. 11 == 11; 22 == 22; 33 > 22; return 1.
 Example2: version1==”11.22.33”, version2==”11.22.33”. 11 == 11; 22 == 22; 33 == 33; return 0.
 Example3: version1==”11.22.33”, version2==”11.22.33.00.00”. 11 == 11; 22 == 22; 33 == 33; remaining version2 equals to 0; return 0.
@@ -76,6 +67,8 @@ class Solution:
             if gap != 0:
                 return 1 if gap > 0 else -1
         return 0
- 
+
+
+
 
 

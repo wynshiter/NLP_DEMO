@@ -4,9 +4,7 @@
 
 
 
-
-大数据系统基本架构： 
-
+大数据系统基本架构：  
 1.使用python fabric进行Linux基础配置
 使用python，可以让任何事情高效起来，包括运维工作，fabric正式这样一套基于python2的类库，它执行本地或远程shell命令提供了操作的基本套件（正常或通过sudo）和上传/下载文件，如提示用户输入运行辅助功能，或中止执行。
 用Python3开发的部署工具叫fabric3：fabric3，和fabric一样最大特点是不用登录远程服务器，在本地运行远程命令，几行Python脚本就可以轻松部署。
@@ -18,28 +16,17 @@ def host_type():
 执行方法：
  fab -f deploy.py go 
 
-Fabric提供几个简单的API来完成所有的部署，最常用的是local()和run()，分别在本地和远程执行命令，put()可以把本地文件上传到远程，当需要在远程指定当前目录时，只需用with cd(‘/path/to/dir/’):即可。 
-默认情况下，当命令执行失败时，Fabric会停止执行后续命令。
+Fabric提供几个简单的API来完成所有的部署，最常用的是local()和run()，分别在本地和远程执行命令，put()可以把本地文件上传到远程，当需要在远程指定当前目录时，只需用with cd(‘/path/to/dir/’):即可。  默认情况下，当命令执行失败时，Fabric会停止执行后续命令。
 有时，我们允许忽略失败的命令继续执行，比如run(‘rm /tmp/abc’)在文件不存在的时候有可能失败，这时可以用with settings(warn_only=True):执行命令，这样Fabric只会打出警告信息而不会中断执行。
 Fabric是如何在远程执行命令的呢？其实Fabric所有操作都是基于SSH执行的，必要时它会提示输入口令，所以非常安全。更好的办法是在指定的部署服务器上用证书配置无密码的ssh连接。
 更多请fabric参考官方文档，http://www.fabfile.org/
 1.1 基建工作基本流程
 对于私有云的用户来说，服务器的基建工作比较重要，需要做一些规范化的统一操作，方便后序搭建集群时候服务器上的操作系统有统一的配置，比如CDH,TDH等的集群管理工具，都有这样的要求。
 当然，如果是公有云，不用考虑这么多。私有云追赶潮流的话，直接上docker或者openstack就好。下面就是比较low的基建流程，基建工作主要流程为：
-
-修改hostname
-关闭sshd
-关闭Selinux以及防火墙
-重启
-格式化磁盘
-挂载磁盘
-Check上述流程结果。 
-
-
+修改hostname关闭sshd关闭Selinux以及防火墙重启格式化磁盘挂载磁盘Check上述流程结果。  
 
 1.2 使用anaconda2包（有网环境下准备）
-在有网环境下，pip instatll fabric后将anaconda打包 
-解压安装到/opt下
+在有网环境下，pip instatll fabric后将anaconda打包  解压安装到/opt下
 tar -xzf anaconda2.tar.gz 
 pwd
 
@@ -183,89 +170,27 @@ def check():
 
 
 1.4 LINUX 基建使用的命令参考
-
 命令进行ip与主机名字符串的拼接：
-
 num=`ifconfig| grep yourip | awk '{print $2}' | cut -d '.' -f 4` && echo gaibdv1_$num
-
 找到Selinux状态
-
 grep 'SELINUX=' /etc/selinux/config && getenforce
-
 关闭Selinux
-
 sed -i 's/SELINUX=.*[=A-Za-z]$/SELINUX=disabled/g' /etc/selinux/config
-
 格式化磁盘
-
 for d in diskList:
         run('''parted /dev/sd%s mklabel gpt ''' % (d))
         run('''parted /dev/sd%s mkpart primary %s %s''' % (d, '0%', '100%'))
-
 获取网速
-
 ethtool bond0| grep Speed
 
 2. RHEL 7.2 部分优化
 2.1 RHEL 7.x系统的闪光点与新特性
 
 
-
-XFS文件系统
-
-Linux Container（Docker）
-
-
-
-RHEV 3.0 红帽企业级虚拟化
-
-
+XFS文件系统 Linux Container（Docker）   RHEV 3.0 红帽企业级虚拟化 
 RHEV-M能管理虚拟机与其磁盘镜像，安装ISO，进行高可用性设置，创建虚拟机模板等，这些都能从图形web界面完成。也可使用RHEV-M管理两种类型的hypervisor。RHEV自身带有一个独立的裸机hypervisor，基于RHEL与KVM虚拟化，作为托管的物理节点使用。另外，如果你想从RHEV管理运行在RHEL上的虚拟机，可注册RHEL服务器到RHEV-M控制台。
 2.2 部分新旧命令对比
-
-
-
-任务
-旧命令
-新命令
-
-
-
-使某服务自动启动
-chkconfig –level 3 httpd on
-systemctl enable httpd.service
-
-
-使某服务不自动启动
-chkconfig –level 3 httpd off
-systemctl disable httpd.service
-
-
-检查服务状态
-service httpd status
-systemctl status httpd.service （服务详细信息）systemctl is-active httpd.service （仅显示是否 Active)
-
-
-显示所有已启动的服务
-chkconfig –list
-systemctl list-units –type=service
-
-
-启动某服务
-service httpd start
-systemctl start httpd.service
-
-
-停止某服务
-service httpd stop
-systemctl stop httpd.service
-
-
-重启某服务
-service httpd restart
-systemctl restart httpd.service
-
-
+任务旧命令新命令使某服务自动启动chkconfig –level 3 httpd onsystemctl enable httpd.service使某服务不自动启动chkconfig –level 3 httpd offsystemctl disable httpd.service检查服务状态service httpd statussystemctl status httpd.service （服务详细信息）systemctl is-active httpd.service （仅显示是否 Active)显示所有已启动的服务chkconfig –listsystemctl list-units –type=service启动某服务service httpd startsystemctl start httpd.service停止某服务service httpd stopsystemctl stop httpd.service重启某服务service httpd restartsystemctl restart httpd.service
 
 2.3 更新的命令RHEL7.2 命令更新
 一、CentOS的Services使用了systemd来代替sysvinit管理
@@ -273,25 +198,18 @@ systemctl restart httpd.service
 三、其他配置工具
 
 主要是多了systemd这个软件，采用了以下新技术：
-采用Socket激活式与总线激活式服务，以提高相互依赖的各服务的并行运行性能； 
-用cgroups代替PID来追踪进程，以此即使是两次fork之后生成的守护进程也不会脱离systemd的控制。
+采用Socket激活式与总线激活式服务，以提高相互依赖的各服务的并行运行性能；  用cgroups代替PID来追踪进程，以此即使是两次fork之后生成的守护进程也不会脱离systemd的控制。
 Systemd是一个系统管理守护进程、工具和库的集合，用于取代System V初始进程。Systemd的功能是用于集中管理和配置类UNIX系统。主要负责控制systemd系统和服务管理器。从设计构思上说，由于systemd使用了cgroup与fanotify等组件以实现其特性，所以只适用于Linux。
 在Linux生态系统中，Systemd被部署到了大多数的标准Linux发行版中，只有为数不多的几个发行版尚未部署。Systemd通常是所有其它守护进程的父进程，但并非总是如此。
 
 其他请看参考7。
 2.4 优化配置 (未完待续。。。)
 可能优化的地方
-
 更新系统
-
  yum  update -y
-
 给/etc/rc.local添加执行权限
-
 chmod +x /etc/rc.d/rc.local
-
 加大打开文件数的限制（open files）
-
 ulimit -n
 ulimit -a
 vi /etc/security/limits.conf
@@ -308,9 +226,7 @@ hive   - nproc  1024000
 root       soft    nproc     unlimited
 
 reboot
-
 优化内核
-
 cat /etc/sysctl.conf
 #CTCDN系统优化参数
 #关闭ipv6
@@ -393,9 +309,7 @@ net.ipv4.conf.default.secure_redirects = 0
 
 本文出自 “兰芷” 博客，请务必保留此出处http://7826443.blog.51cto.com/7816443/1775248
 sysctl -p  #生效
-
 vim基本设置
-
  vim  /root/.vimrc
 set history=1000
 autocmd InsertLeave * se cul
@@ -427,10 +341,7 @@ inoremap ' ''<ESC>i
 
 日志系统简介
 在rhel7系统中有两个日志服务，分别是：
-
-rsyslog
-systemd-journal
-
+rsyslogsystemd-journal
 systemd-journald是一个改进型日志管理服务，可以收集来自内核、系统早期启动阶段的日志、系统守护进程在启动和运行中的标准输出和错误信息，还有syslog的日志。该日志服务仅仅把日志集中保存在单一结构的日志文件/run/log中，由于日志是经历过压缩和格式化的二进制数据，所以在查看和定位的时候很迅速。默认情况下并不会持久化保存日志，只会保留一个月的日志。另外，一些rsyslog无法收集的日志也会被journal记录到。
 rsyslog作为传统的系统日志服务，把所有收集到的日志都记录到/var/log/目录下的各个日志文件中。常见的日志文件如下：
 /var/log/messages 绝大多数的系统日志都记录到该文件
@@ -446,30 +357,21 @@ linux命令大全
 http://man.linuxde.net/
 
 参考文献
-1.官方文档 
-http://www.fabfile.org/
-2.参考 
-http://wklken.me/posts/2013/03/25/python-tool-fabric.html
+1.官方文档  http://www.fabfile.org/
+2.参考  http://wklken.me/posts/2013/03/25/python-tool-fabric.html
 3.python3中使用fabric3
-https://github.com/mathiasertl/fabric/ 
-pip install Fabric3
+https://github.com/mathiasertl/fabric/  pip install Fabric3
 4.关闭UseDNS加速SSH登录
-经常登陆SSH的朋友可以感觉出，每次登录SSH时总是要停顿等待一下才能连接上，,这是因为OpenSSH服务器有一个DNS查找选项UseDNS默认情况下是打开的。 
-UseDNS 选项打开状态下，当客户端试图登录SSH服务器时，服务器端先根据客户端的IP地址进行DNS PTR反向查询出客户端的主机名，然后根据查询出的客户端主机名进行DNS正向A记录查询，验证与其原始IP地址是否一致，这是防止客户端欺骗的一种措施，但一般我们的是动态IP不会有PTR记录，打开这个选项不过是在白白浪费时间而已，不如将其关闭。
+经常登陆SSH的朋友可以感觉出，每次登录SSH时总是要停顿等待一下才能连接上，,这是因为OpenSSH服务器有一个DNS查找选项UseDNS默认情况下是打开的。  UseDNS 选项打开状态下，当客户端试图登录SSH服务器时，服务器端先根据客户端的IP地址进行DNS PTR反向查询出客户端的主机名，然后根据查询出的客户端主机名进行DNS正向A记录查询，验证与其原始IP地址是否一致，这是防止客户端欺骗的一种措施，但一般我们的是动态IP不会有PTR记录，打开这个选项不过是在白白浪费时间而已，不如将其关闭。
 http://www.kwx.gd/CentOSApp/Centos-SSH-UseDNS.html
-6.fabric使用简单例子，中文： 
-http://www.cnblogs.com/MacoLee/p/5680672.html 
-另一个参考： 
-http://blog.csdn.net/wklken/article/details/8719541/
+6.fabric使用简单例子，中文：  http://www.cnblogs.com/MacoLee/p/5680672.html  另一个参考：  http://blog.csdn.net/wklken/article/details/8719541/
 7.RHEL 一些改变
-http://www.ha97.com/5657.html 
-https://linux.cn/article-5926-1.html
+http://www.ha97.com/5657.html  https://linux.cn/article-5926-1.html
 8.优化RHEL
 http://hequan.blog.51cto.com/5701886/1789146/
-9.日志 
-http://www.linuxidc.com/Linux/2016-01/127729.htm 
-http://blog.csdn.net/sinat_34689375/article/details/53789592 
-https://blog.linuxeye.cn/400.html
- 
+9.日志  http://www.linuxidc.com/Linux/2016-01/127729.htm  http://blog.csdn.net/sinat_34689375/article/details/53789592  https://blog.linuxeye.cn/400.html
+
+
+
 
 

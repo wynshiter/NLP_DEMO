@@ -8,13 +8,13 @@
 3.进行美颜（提升亮度，直方图均衡，滤波）
 4.生成YUV视频
 5.生成h264
-
+ 
 现在用librtmp时候，出现了
 ERROR:RTMP_Connect0,failed to connect socket,10061(unknow error)
 不知道是咋回事了，怀疑是1935端口被禁，但是一时半会儿不知道咋弄。
-
+ 
 主要功能代码：
-
+ 
 
 /** Global variables */
 //-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
@@ -51,7 +51,7 @@ void detectAndenhance( Mat &frame )
 
 		// Do the porcess
 		blur(frame,frame,Size(7,7),Point(-1,-1));
-		//////////////////////////////////////////////
+		//
 		cvResetImageROI( &IplImage(frame) );
 		Point center( faces[i].x + faces[i].width/2, faces[i].y + faces[i].height/2 );
 		ellipse( frame, center, Size( faces[i].width/2, faces[i].height/2), 0, 0, 360, Scalar( 255, 0, 255 ), 2, 8, 0 );
@@ -277,19 +277,22 @@ void highlight(Mat &frame)
 }
 
 
+
+ 
+ 
 实现效果：实时实现的话我只加了肤色检测和简单的滤波，具体美化还需要进一步调试
 参数和算法 的组合可以在代码中调整参数实现，可以把膨胀的参数调大一点这个整个人脸就差不多可以经过肤色检测全部搞出来。
 完整工程代码：http://download.csdn.net/detail/wangyaninglm/9453146
-
-
+ 
+ 
 参考文献：
-
+ 
 肤色检测：http://blog.csdn.net/yangtrees/article/details/8269984
 人像优化：http://blog.csdn.net/u011630458/article/details/46275469
 肤色检测：http://blog.csdn.net/wj080211140/article/details/23384927
 改变对比读：http://blog.csdn.net/ubunfans/article/details/24373811
-
+ 
 直接推送直播流：http://blog.csdn.net/wangyaninglm/article/details/51056101
-
+ 
 
 

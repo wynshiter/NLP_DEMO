@@ -4,23 +4,14 @@
 
 
 
-
-在Docker – 系统整洁之道 – 1中已经对Docker的一些命令和Docker镜像的使用及操作做了记录。 
-这次就利用docker进行一次真正的实例使用，使用docker搭建一个简单的答题系统，这个系统是当时做来给网络安全周做手机答题的系统，很简单，代码风格很差。
+在Docker – 系统整洁之道 – 1中已经对Docker的一些命令和Docker镜像的使用及操作做了记录。  这次就利用docker进行一次真正的实例使用，使用docker搭建一个简单的答题系统，这个系统是当时做来给网络安全周做手机答题的系统，很简单，代码风格很差。
 这篇主要记录了三种docker使用的方式。
-
-用supervisor方式运行一个多进程的docker实例
-创建一个ngnix和php运行的环境
-创建一个ngnix，php，mysql集合运行的环境，使用docker-compose构建
-
-
+用supervisor方式运行一个多进程的docker实例创建一个ngnix和php运行的环境创建一个ngnix，php，mysql集合运行的环境，使用docker-compose构建
 
 
 感觉docker的东西越看越多，从刚开始的简简单单的一个docker run，到现在看到要build自己的镜像，compose,也就是以前的Fig，配置网络，还有swarm的docker集群，一点一点来吧。
 
-先把两个附件写在这里吧 
-此片博客中构建php+ngnix+mysql测试环境的脚本 
-在测试环境中的答题网站源码
+先把两个附件写在这里吧  此片博客中构建php+ngnix+mysql测试环境的脚本  在测试环境中的答题网站源码
 supervisor方式运行一个多进程的docker实例
 
 Docker 容器在启动的时候开启单个进程，比如，一个 ssh 或者 apache 的 daemon 服务。但我们经常需要在一个机器上开启多个服务，这可以有很多方法，最简单的就是把多个启动命令放到一个启动脚本里面，启动的时候直接启动这个脚本，另外就是安装进程管理工具。这里使用进程管理工具 supervisor 来管理容器中的多个进程。使用 Supervisor 可以更好的控制、管理、重启我们希望运行的进程。
@@ -169,8 +160,7 @@ docker run --name dream.nginx -p 80:80 -d -v ~/Workspace/tmp/www:/usr/share/ngin
 ngnix，php，mysql集合运行的环境
 
 Supervisor给出了一种能够在container中运行多个线程的方法，但是现在还是不知道要怎么样把自己的web服务部署到container中，数据库怎么建，可以有人会说直接使用SFTP将网站直接传到container里，安装数据库，配环境，但是docker中一旦container被删除，内容就没了。像这样将所有服务放在一个容器内的模式有个形象的非官方称呼：Fat Container。与之相对的是将服务分拆到容器的模式。从Docker的设计可以看到，构建镜像的过程中可以指定唯一一个容器启动的指令，因此Docker天然适合一个容器只运行一种服务，而这也是官方更推崇的。下面就记录一下部署一个简单的php程序和数据库联动的测试环境。
-整体的文件结构是这样的 
-我们创建一个这样的目录
+整体的文件结构是这样的  我们创建一个这样的目录
 Docker
 └── test
     ├── data  数据库文件夹
@@ -195,8 +185,7 @@ mysql 独立部署
 
 mysql目录下的Dockerfile文件只有一行FROM mysql:5.6，也就是直接使用mysql官方镜像5.6，然后使用命令
 docker build -t phpenv/mysql mysql
-构建自己的镜像phpenv/mysql。 
-使用命令
+构建自己的镜像phpenv/mysql。  使用命令
 docker run -p 3306:3306 -v ~/Docker/test/data/mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -it phpenv/mysql
 启动镜像，将容器的3306端口绑定到本机的3306端口，其中参数-v后代表使用~/Docker/test/data/mysql挂在到镜像的/var/lib/mysql，也就是替代源镜像的数据库文件目录，让数据库文件目录暴露在本机上，做到数据库内容的持久化。MYSQL_ROOT_PASSWORD为设置mysql的一个root密码。
 运行结果
@@ -225,16 +214,14 @@ docker run -p 3306:3306 -v ~/Docker/test/data/mysql:/var/lib/mysql -e MYSQL_ROOT
 2016-12-27 15:06:49 1 [Note] Event Scheduler: Loaded 0 events
 2016-12-27 15:06:49 1 [Note] mysqld: ready for connections.
 Version: '5.6.35'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server (GPL)
-使用DBeaver连接后 
-
+使用DBeaver连接后  
 查看一下当前~/Docker/test/data/mysql数据库目录下的文件
 ~/Docker/test/data/mysql  ls
 auto.cnf           ib_logfile0        ib_logfile1        ibdata1            mysql              performance_schema
 新建一个库docker_test后~/Docker/test/data/mysql数据库目录下的文件
 ~/Docker/test/data/mysql ls
 auto.cnf           docker_test        ib_logfile0        ib_logfile1        ibdata1            mysql              performance_schema
-可以发现数据库已经创建好了，也如下图 
-
+可以发现数据库已经创建好了，也如下图  
 为了验证数据库数据的持久型，我们先停止当前运行的container并产出它，然后从镜像启动一个新的container，如命令
 ~/Docker ⮀ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
@@ -391,13 +378,9 @@ mysql_1  | Version: '5.6.35'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306 
 
 参考链接
 
+Docker 从入门到实践第一本Docker书如何进入一个正在运行的ContainerDocker在PHP项目开发环境中的应用
+原文链接：  http://dengnanyi.com/2016/12/24/2016_12/docker-learn-3/
 
-Docker 从入门到实践
-第一本Docker书
-如何进入一个正在运行的Container
-Docker在PHP项目开发环境中的应用
 
-原文链接： 
-http://dengnanyi.com/2016/12/24/2016_12/docker-learn-3/ 
 
 

@@ -4,16 +4,9 @@
 
 
 
-
 Given a sorted linked list, delete all duplicates such that each element appear only once. 
-For example, 
- Given 1->1->2, return 1->2. 
- Given 1->1->2->3->3, return 1->2->3.  
-
-下面是我的解决方案，考虑测试用例： 
-1，1 
-1，1，1 
-1，2，2
+For example,  Given 1->1->2, return 1->2.  Given 1->1->2->3->3, return 1->2->3.  
+下面是我的解决方案，考虑测试用例：  1，1  1，1，1  1，2，2
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -101,6 +94,8 @@ class Solution:
             node = node.next
 
         return head
- 
+
+
+
 
 

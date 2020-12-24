@@ -1,0 +1,48 @@
+
+
+
+
+
+
+
+
+文章大纲
+
+pandas 简介
+
+
+Pandas Basics cheat sheet.
+a new, more advanced Pandas cheat sheet.
+ 
+What kind of data does pandas handle?
+常见问题与使用技巧
+
+
+
+
+索引
+与sql 的类比
+ 
+ 
+练习篇
+参考文献
+
+
+参考本人文章
+ 
+
+
+
+
+pandas 简介
+
+Pandas 是非常著名的开源数据处理库，我们可以通过它完成对数据集进行快速读取、转换、过滤、分析等一系列操作。除此之外，Pandas 拥有强大的缺失数据处理与数据透视功能，可谓是数据预处理中的必备利器。
+知识点
+
+数据类型
+数据读取<
+
+
+
+
+

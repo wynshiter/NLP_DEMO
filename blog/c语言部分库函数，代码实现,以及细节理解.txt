@@ -6,39 +6,38 @@
 http://blog.csdn.net/v_JULY_v
  
  
-//得9 分
-//为了实现链式操作，将目的地址返回，加2 分！
-char * strcpy( char *strDest, const char *strSrc )
-{
-assert( (strDest != NULL) && (strSrc != NULL) );
-char *address = strDest;
-while( (*strDest++ = * strSrc++) != '/0' );
-return address;
-}
+//得9 分
+//为了实现链式操作，将目的地址返回，加2 分！
+char * strcpy( char *strDest, const char *strSrc )
+{
+assert( (strDest != NULL) && (strSrc != NULL) );
+char *address = strDest;
+while( (*strDest++ = * strSrc++) != '/0' );
+return address;
+}
+
+//得10 分，基本上所有的情况，都考虑到了
+//如果有考虑到源目所指区域有重叠的情况，加1 分！
+char * strcpy( char *strDest, const char *strSrc )
+{
+if(strDest == strSrc) { return strDest; }
+assert( (strDest != NULL) && (strSrc != NULL) );
+char *address = strDest;
+while((*strDest++ = *strSrc++)!='/0');
+return address;
+}
 
-//得10 分，基本上所有的情况，都考虑到了
-//如果有考虑到源目所指区域有重叠的情况，加1 分！
-char * strcpy( char *strDest, const char *strSrc )
-{
-if(strDest == strSrc) { return strDest; }
-assert( (strDest != NULL) && (strSrc != NULL) );
-char *address = strDest;
-while((*strDest++ = *strSrc++)!='/0');
-return address;
-}
-
-
+  
  
- 
-strncpy 是 C语言的函数之一，来自 C语言标准库，定义于 string.h，char *strncpy(char *destin, char *source, int maxlen)，把src所指由NULL结束的字符串的前n个字节复制到dest所指的数组中。
-char *strncpy(char *strDes, const char *strSrc, unsigned int count)
-{
-assert(strDes != NULL && strSrc != NULL);
-char *address = strDes;
-while (count-- && *strSrc != '/0')
-*strDes++ = *strSrc++;
-*strDes = '/0';
-return address;
+strncpy 是 C语言的函数之一，来自 C语言标准库，定义于 string.h，char *strncpy(char *destin, char *source, int maxlen)，把src所指由NULL结束的字符串的前n个字节复制到dest所指的数组中。
+char *strncpy(char *strDes, const char *strSrc, unsigned int count)
+{
+assert(strDes != NULL && strSrc != NULL);
+char *address = strDes;
+while (count-- && *strSrc != '/0')
+*strDes++ = *strSrc++;
+*strDes = '/0';
+return address;
 }
  
  
@@ -50,28 +49,84 @@ strcpy的函数原型是：char* strcpy(char* dest, const char* src);
 memcpy只提供一般的内存复制，即memcpy对于需要复制的内容没有限制，因此用途更广。
 memcpy的函数原型是：void *memcpy(void *dest,  const char* src,  size_t count);
  
-  char *strcpy(char *dest, const char *src)  {     if((src == NULL) || (dest == NULL))      {          return NULL;     }
-      char *strdest = dest; // 保存目标字符串的首地址     while((*dest++ = *str) != '\0');
-     return strdest;
- }
+
+  
+ char *strcpy(
+ char *dest, 
+ const 
+ char *src)
+ 
+  {
+ 
+     
+ if((src == NULL) || (dest == NULL))
+ 
+      {
+ 
+          
+ return NULL;
+ 
+     }
+   
+ 
+     
+ char *strdest = dest; 
+ //
+ 保存目标字符串的首地址
+  
+     
+ while((*dest++ = *str) != 
+ '
+\0
+');
+       
+ return strdest;
+   } 
+ 
+
 
 
  
  
 
 
-void *memcpy(void *memTo, const char *memFrom, size_t size)
-{
-     if((memTo == NULL) || (memFrom == NULL))
-     {
-          return NULL;
-     }
-     char *tempFrom = (char *)memFrom; //保存memFrom的首地址     char *tempTo = (char *)memTo; //保存memTo的首地址      while(size-- > 0)
-     {
-          *tempTo++ = *tempFrom++;
-     }
-     return memTo;
-}
+
+
+
+void *memcpy(
+  void *memTo, 
+  const 
+  char *memFrom, size_t size)
+   {
+        
+  if((memTo == NULL) || (memFrom == NULL))
+        {
+             
+  return NULL;
+        }
+  
+      
+  char *tempFrom = (
+  char *)memFrom; 
+  //
+保存memFrom的首地址
+      
+  char *tempTo = (
+  char *)memTo; 
+  //
+保存memTo的首地址
+       
+  while(size-- > 
+  0)
+        {
+             *tempTo++ = *tempFrom++;
+        }
+        
+  return memTo;
+   }
+ 
+
+
 
 
  
@@ -88,50 +143,104 @@ memcpy是从src的其实部分开始复制，所以虽然第一种情况下没�
  
 
 
-void *memmove(void *dst,const void *src,int n)
-{
-     char *dp = (char *)dst;
-     char *sp = (char *)src; 
-     assert((src!=0)&&(dst!=0)&&(n>0));//not　null 
-     //非重叠 
-      //dp < sp 
-     //dp > (sp+n)     if(sp>dp||(sp+n)<dp)
-     { 
-         while(n--) 
-             *(dp++) = *(sp++);
-         *dp = '\0';
-     }
-     else if(sp<dp)//重叠 (此时条件 sp<dp<(sp+n))如果sp==dp则快速的返回     {//反向拷贝            sp += n; 
-         dp += n; 
-         *dp = '\0'; 
-         while(n--)
-            *(--dp) = *(--sp); 
-     }
-     return dst;
-}       
 
 
- 
+
+void *memmove(
+  void *dst,
+  const 
+  void *src,
+  int n)
+   {
+        
+  char *dp = (
+  char *)dst;
+        
+  char *sp = (
+  char *)src; 
+        assert((src!=
+  0)&&(dst!=
+  0)&&(n>
+  0));
+  //
+not　null       
+//
+非重叠        
+//
+dp < sp       
+//
+dp > (sp+n)
+      
+  if(sp>dp||(sp+n)<dp)
+        { 
+            
+  while(n--) 
+                *(dp++) = *(sp++);
+            *dp = 
+  '
+\0
+';
+        }
+        
+  else 
+  if(sp<dp)
+  //
+重叠 (此时条件 sp<dp<(sp+n))如果sp==dp则快速的返回
+      {
+  //
+反向拷贝  
+           sp += n; 
+            dp += n; 
+            *dp = 
+  '
+\0
+'; 
+            
+  while(n--)
+               *(--dp) = *(--sp); 
+        }
+ 
+
+       
+  return dst;
+   }       
+ 
+
+  
 在很多库函数上看到使用了assert()函数，assert函数的作用是计算表达式expression ，如果其值为假（即为0），那么它先向stderr打印一条错误信息，然后调用abort()来终止进程。
+
 函数名: abort
-功 能: 异常终止一个进程
+
+
+功 能:
+  异常终止一个进程
+
+
 描述：abort()函数首先解除进程对SIGABRT信号的阻止，然后向调用进程发送该信号。abort()函数会导致进程的异常终止除非SIGABRT信号被捕捉并且信号处理句柄没有返回。
-abort()函数导致所有的流被关闭和冲洗。
-abort()函数没有返回值：void abort(void);
+
+
+ abort()函数导致所有的流被关闭和冲洗。
+
+
+ abort()函数没有返回值：void abort(void);
+
+
 用 法: void abort(void);
+
+
 程序例:
-#include <stdio.h>
-#include <stdlib.h>
-int main(void) 
-{ 
-printf("Calling abort()\n");
-abort();
-return 0; /* This is never reached */
- }
 
+#include <stdio.h>
+#include <stdlib.h>
+int main(void) 
+{ 
+printf("Calling abort()\n");
+abort();
+return 0; /* This is never reached */
+ }
+
+
 
-
-
- 
+  
 
 

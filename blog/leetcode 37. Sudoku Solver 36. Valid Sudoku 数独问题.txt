@@ -9,8 +9,7 @@ The Sudoku board could be partially filled, where empty cells are filled with th
 
 A partially filled sudoku which is valid.
  
-Note:
-A valid Sudoku board (partially filled) is not necessarily solvable. Only the filled cells need to be validated.
+Note: A valid Sudoku board (partially filled) is not necessarily solvable. Only the filled cells need to be validated.
  
 Subscribe to see which companies asked this question
  
@@ -20,7 +19,6 @@ Idea
 Just go through all you see (like "7 in row 3") and check for duplicates.
 Solution 1
 Using Counter. One logical line, seven physical lines.
-
 def isValidSudoku(self, board):
     return 1 == max(collections.Counter(
         x
@@ -33,7 +31,6 @@ def isValidSudoku(self, board):
 The + [1] is only for the empty board, where max would get an empty list and complain. It's not necessary to get it accepted here, as the empty board isn't among the test cases, but it's good to have.
 Solution 2
 Using len(set).
-
 def isValidSudoku(self, board):
     seen = sum(([(c, i), (j, c), (i/3, j/3, c)]
                 for i, row in enumerate(board)
@@ -43,7 +40,6 @@ def isValidSudoku(self, board):
 
 Solution 3
 Using any.
-
 def isValidSudoku(self, board):
     seen = set()
     return not any(x in seen or seen.add(x)
@@ -54,7 +50,6 @@ def isValidSudoku(self, board):
 
 Solution 4
 Iterating a different way.
-
 def isValidSudoku(self, board):
     seen = sum(([(c, i), (j, c), (i/3, j/3, c)]
                 for i in range(9) for j in range(9)
@@ -68,7 +63,6 @@ Clean and Easy82ms Python
 +11votes
 402 views
 class Solution(object):
-
 def isValidSudoku(self, board):
     """
     :type board: List[List[str]]
@@ -110,7 +104,6 @@ Unlike in other solutions where you have bitmasks of allowed/disallowed values p
 If we're lucky (and we'll be lucky for 19 of 20 of Sudokus published in magazines) then Sudoku is solved at the end (or even before!) processing of the input.
 Otherwise, there will be empty cells which have to be resolved. Algorithm uses backtracking for this purpose. To optimize it, algorithm starts with the cell with the smallest ambiguity. This could be improved even further by using priority queue (but it's not implemented here). Backtracking is more or less standard, however, at each step we guess the number, the reactive update propagation comes back into play and it either quickly proves that the guess is unfeasible or significantly prunes the remaining search space.
 It's interesting to note, that in this case taking and restoring snapshots of the compact representation of the state is faster than doing backtracking rollback by "undoing the moves".
-
 class Solution {
     struct cell // encapsulates a single cell on a Sudoku board
     {
@@ -257,7 +250,6 @@ public:
 Simple and Clean Solution / C++
 +14votes
 871 views
-
 bool check(vector<vector<char>> &board, int i, int j, char val)
 {
     int row = i - i%3, column = j - j%3;
@@ -293,7 +285,6 @@ public: void solveSudoku(vector<vector>& board) { solveSudoku(board, 0, 0); }
 c++ clear solution using dfs, beating 90% c++ coder.
 +10votes
 690 views
-
 class Solution {
 public:
     bool col[10][10],row[10][10],f[10][10];
@@ -344,7 +335,6 @@ public:
 13-line Python solution, dfs, beats 47.79%
 +1vote
 77 views
-
 def solveSudoku(self, board):
   def dfs():
     for i, row in enumerate(board):

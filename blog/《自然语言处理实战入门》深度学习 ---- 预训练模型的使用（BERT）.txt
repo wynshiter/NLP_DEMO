@@ -1,0 +1,40 @@
+
+
+
+
+
+
+
+
+文章大纲
+
+bert 简介
+
+
+预训练模型回顾
+What is BERT?
+What has been released in this repository?
+Pre-trained models
+Fine-tuning with BERT
+汉语版bert 及多语言模型
+ 
+bert 的使用
+
+
+bert-as-service
+Tensorflow 加载 BERT 模型
+bert-keras
+ 
+bert 应用参考
+参考文档
+
+
+
+
+
+bert 简介
+BERT, or Bidirectional Encoder Representat
+
+
+
+

@@ -2,6 +2,7 @@
 
 
  matlab代码：
+
 figure('NumberTitle','off','menubar','none','toolbar','none','name','Topo Image'); 
 x=0:pi/100:2*pi;
 y=2*exp(-0.5*x).*sin(2*pi*x);
@@ -13,8 +14,7 @@ plot(x,y)
 %plot([1:100])
 %figure(1)
 
-
- 
+  
  
  
  
@@ -97,8 +97,7 @@ void Cmdi_matlab_movewindow20140810View::OnMatlab()
  
 实现效果：
  
-
- 
+  
 之前配置的过程主要参考了下面的链接：
 http://blog.csdn.net/stardust94605/article/details/8972064
  
@@ -109,46 +108,27 @@ vs2010和Matlab R2012b 混合编程
 
 
 
+
+
 思路：为了实现matlab与C++混合编程，采用由m文件构造动态链接库然后在visual studio中调用的方法。
 本人系统：Windows 7旗舰版（32位），VS2010旗舰版，Matlab R2012b    只有R2010b或以上版本才识别VS2010编辑器
  
 1. matlab中dll创建
          1.1    m文件编写
-          function [ yt ] = myfitline( x,y,m,xrange,t )
-         %xy为坐标向量，m为多项式阶数，xrange为显示图上面的坐标范围,t为要求的坐标横轴位置
-         %   Detailed explanation goes here
-         p=polyfit(x,y,m);%计算各阶系数p1x^m+p2x^(m-1)+....+ pmx+ p(m+1)
-         yy=polyval(p,xrange);%计算一个区域内的函数值用于画图
-         yt=polyval(p,t);   %  计算指定x下的函数对应的y值
-         plot(x,y,'r*',xrange,yy,'b')
-         end
+          function [ yt ] = myfitline( x,y,m,xrange,t )          %xy为坐标向量，m为多项式阶数，xrange为显示图上面的坐标范围,t为要求的坐标横轴位置          %   Detailed explanation goes here          p=polyfit(x,y,m);%计算各阶系数p1x^m+p2x^(m-1)+....+ pmx+ p(m+1)          yy=polyval(p,xrange);%计算一个区域内的函数值用于画图          yt=polyval(p,t);   %  计算指定x下的函数对应的y值          plot(x,y,'r*',xrange,yy,'b')          end
         1.2   设置编译器
                      >> mex -setup   选择VS2010
                      >> mbuild -setup  选择VS2010
                      >> mcc -W cpplib:Myfitline -T link:lib myfitline     （这就创建好了）
-              其中，mcc是Matlab提供的编译命令，对于这一点，Matlab的帮助说明如下：
-               -W lib:string link:lib其中-W是控制编译之后的封装格式，cpplib，是指编译成C++的lib，cpplib冒号后面是指编译的库的名字，-T表示目标，
-       link:lib表示要连接到一个库文件的目标，目标的名字是后面的myfitline，即你写的m函数的名字。
-              运行完之后，你的目录下面，将会出现以下一些文件：
-              Myfitline.cpp
-              Myfitline.exp
-              Myfitline.dll
-              Myfitline.exports
-              Myfitline.h
-              Myfitline.lib              mccExcludedFiles.log
-              readme.txt
-              具体每一个文件的意思，请查帮助，这里只说其中很有用的几个：
-              Myfitline.dll是编译好的动态库，myfitline这个函数封装在里面，Myfitline.h是对应的头文件，在C里面调用这个函数的时候，需要include这个头文件，
-       在这个头文件的最后，你可以看到下面的内容：
-              extern LIB_Myfitline_CPP_API void MW_CALL_CONV myfitline(int nargout, mwArray& yt, const mwArray& x,
-              const mwArray& y, const mwArray& m, const mwArray& xrange, const mwArray& t);             
+              其中，mcc是Matlab提供的编译命令，对于这一点，Matlab的帮助说明如下：                -W lib:string link:lib其中-W是控制编译之后的封装格式，cpplib，是指编译成C++的lib，cpplib冒号后面是指编译的库的名字，-T表示目标，
+       link:lib表示要连接到一个库文件的目标，目标的名字是后面的myfitline，即你写的m函数的名字。               运行完之后，你的目录下面，将会出现以下一些文件：               Myfitline.cpp               Myfitline.exp               Myfitline.dll               Myfitline.exports               Myfitline.h               Myfitline.lib               mccExcludedFiles.log               readme.txt               具体每一个文件的意思，请查帮助，这里只说其中很有用的几个：               Myfitline.dll是编译好的动态库，myfitline这个函数封装在里面，Myfitline.h是对应的头文件，在C里面调用这个函数的时候，需要include这个头文件，
+       在这个头文件的最后，你可以看到下面的内容：               extern LIB_Myfitline_CPP_API void MW_CALL_CONV myfitline(int nargout, mwArray& yt, const mwArray& x,               const mwArray& y, const mwArray& m, const mwArray& xrange, const mwArray& t);             
               这就是myfitline的C函数的声明。nargout表示输出变量的个数，其他就是对应了m函数的几个变量。
-              注意，变量的类型是mwArray，这是Matlab提供的一个特殊的变量类型（在7.0的版本，编译之后，变量类型是mxArray）。mwArray是一个类，具体可以查帮助。
+               注意，变量的类型是mwArray，这是Matlab提供的一个特殊的变量类型（在7.0的版本，编译之后，变量类型是mxArray）。mwArray是一个类，具体可以查帮助。
  
 2.系统环境配置
  
-              Computer - > Properties -> Advanced system settings -> Environment Variables -> User Variables -> path, 添加(MATLAB下为MATLAB
- 2012软件安装目录）
+              Computer - > Properties -> Advanced system settings -> Environment Variables -> User Variables -> path, 添加(MATLAB下为MATLAB 2012软件安装目录）
               ...\MATLAB\extern\lib\win32\microsoft;
               ...\MATLAB\bin\win32
               Computer - > Properties -> Advanced system settings -> Environment Variables -> System Variables -> path, 添加
@@ -156,7 +136,7 @@ vs2010和Matlab R2012b 混合编程
               ...\MATLAB\bin;
               ...\MATLAB\extern\lib\win32\microsoft;
               ...\MATLAB\bin\win32
-
+ 
 3.vs2010环境配置
  
             ①Property Pages -> VC++ Directories -> Include Directories, 添加(安装目录下)
@@ -183,42 +163,7 @@ vs2010和Matlab R2012b 混合编程
                             #include "mclcppclass.h"
                             #include "Myfitline.h”
               具体程序如下：
-              void CNewFeatureofStormView::Onposition()
-            {
-                 // TODO: 在此添加命令处理程序代码
-                 if( !MyfitlineInitialize())
-                 {
-                     MessageBox(_T("初始化失败"));
-                  }
-                 // 为变量分配内存空间，可以查帮助mwArray
-                  mwArray mwX(5, 1, mxDOUBLE_CLASS); // 5，1表示矩阵的大小（所有maltab只有一种变量，就是矩阵，
-                  mwArray mwY(5, 1, mxDOUBLE_CLASS);//为了和Cpp变量接轨，设置成1*5的矩阵，mxDOUBLE_CLASS表示变量的精度）
-                  mwArray mwM(1, 1, mxDOUBLE_CLASS);
-                  mwArray mwXR(50,1, mxDOUBLE_CLASS);
-                  mwArray mwYT(1,1, mxDOUBLE_CLASS);
-                  mwArray mwT(1,1, mxDOUBLE_CLASS);
-                  int x[5]={432,435,438,441,443};    //样本点坐标
-                  int y[5]={136,138,140,145,147};    //
-                  int xr[50],m=3,t=446;           //参数设置
-                  for (int i=400;i<450;i++)
-                  {
-                      xr[i-400]=i;
-                  }
-                  mwX.SetData(x, 5);      //调用类里面的SetData函数给类赋值
-                  mwY.SetData(y, 5);
-                  mwM.SetData(&m, 1);
-                  mwXR.SetData(xr, 50);
-                  mwT.SetData(&t, 1);
-                  myfitline(1,mwYT,mwX,mwY,mwM,mwXR,mwT);
-                  double c = mwYT.Get(1, 1); //调用类里面的Get函数获取取函数返回值
-                  CString strNumber;
-                  strNumber.Format(_T("%lf"),c);
-                  MessageBox(strNumber, _T("坐标"));
-                  // 后面是一些终止调用的程序
-                  MyfitlineTerminate();
-                  // terminate MCR
-                 mclTerminateApplication();
-            }
+              void CNewFeatureofStormView::Onposition()             {                  // TODO: 在此添加命令处理程序代码                  if( !MyfitlineInitialize())                  {                      MessageBox(_T("初始化失败"));                   }                  // 为变量分配内存空间，可以查帮助mwArray                   mwArray mwX(5, 1, mxDOUBLE_CLASS); // 5，1表示矩阵的大小（所有maltab只有一种变量，就是矩阵，                   mwArray mwY(5, 1, mxDOUBLE_CLASS);//为了和Cpp变量接轨，设置成1*5的矩阵，mxDOUBLE_CLASS表示变量的精度）                   mwArray mwM(1, 1, mxDOUBLE_CLASS);                   mwArray mwXR(50,1, mxDOUBLE_CLASS);                   mwArray mwYT(1,1, mxDOUBLE_CLASS);                   mwArray mwT(1,1, mxDOUBLE_CLASS);                   int x[5]={432,435,438,441,443};    //样本点坐标                   int y[5]={136,138,140,145,147};    //                   int xr[50],m=3,t=446;           //参数设置                   for (int i=400;i<450;i++)                   {                       xr[i-400]=i;                   }                   mwX.SetData(x, 5);      //调用类里面的SetData函数给类赋值                   mwY.SetData(y, 5);                   mwM.SetData(&m, 1);                   mwXR.SetData(xr, 50);                   mwT.SetData(&t, 1);                   myfitline(1,mwYT,mwX,mwY,mwM,mwXR,mwT);                   double c = mwYT.Get(1, 1); //调用类里面的Get函数获取取函数返回值                   CString strNumber;                   strNumber.Format(_T("%lf"),c);                   MessageBox(strNumber, _T("坐标"));                   // 后面是一些终止调用的程序                   MyfitlineTerminate();                   // terminate MCR                  mclTerminateApplication();             }
  
 
  

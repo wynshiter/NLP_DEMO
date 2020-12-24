@@ -2,25 +2,21 @@
 
 
 不知道下面的错误是为什么？
-
-
-Error:scalac: missing or invalid dependency detected while loading class file 'RDD.class'.
-Could not access term hadoop in package org.apache,
-because it (or its dependencies) are missing. Check your build definition for
-missing or conflicting dependencies. (Re-run with `-Ylog-classpath` to see the problematic classpath.)
-A full rebuild may help if 'RDD.class' was compiled against an incompatible version of org.apache.
-
-
-
+ 
+ 
+Error:scalac: missing or invalid dependency detected while loading class file 'RDD.class'. Could not access term hadoop in package org.apache, because it (or its dependencies) are missing. Check your build definition for missing or conflicting dependencies. (Re-run with `-Ylog-classpath` to see the problematic classpath.) A full rebuild may help if 'RDD.class' was compiled against an incompatible version of org.apache. 
+ 
+ 
+ 
 我i下面这个version应该写啥？写1.6.1 不对啊，没有找到
-
-
-
-
+ 
+ 
+ 
+ 
 想跑一下下面的代码，死活有问题，哎，我就很讨厌java这套东西，环境配置半天不说，还慢的要死
-
-
-
+ 
+ 
+ 
 
 /**
   * Created by Administrator on 2016/3/31.
@@ -49,10 +45,12 @@ object simpleApp {
   }
 }
 
+ 
+ 
 下面分享一个ibm 大数据基础的培训资料：
-http://download.csdn.net/detail/wangyaninglm/9478412
+http://download.csdn.net/detail/wangyaninglm/9478412 
 
-
-
+ 
+ 
 
 

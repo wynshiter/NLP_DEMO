@@ -1,0 +1,52 @@
+
+
+
+
+
+
+
+
+文章大纲
+
+简介
+基本概念
+
+
+张量
+计算图
+自动微分
+ 
+基本操作
+
+
+数据加载
+ 
+TensorFlow 2.0 升级的主要内容
+
+
+升级的主要内容
+
+
+1. API 清理
+2. Eager execution
+3. 没有更多的全局变量
+4. Functions, not sessions
+ 
+如何升级代码
+ 
+参考文档
+
+
+官方基础性材料
+TensorFlow 2.0 相关资料
+ 
+
+
+
+
+简介
+TensorFlow™ 是一个采用数据流图（data flow graphs），用于数值计算的开
+
+
+
+

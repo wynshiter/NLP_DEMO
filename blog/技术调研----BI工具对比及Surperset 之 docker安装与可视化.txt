@@ -5,107 +5,27 @@
 
 
 
-文章大纲1. BI 技术选型对比1.1 总体对比1.2 硬件要求2. docker 安装Superset2.1 Centos 安装docker2.2 参照SuperSet 官网编译官网版docker2.3 使用其他人制作好的docker2.4 使用自己的sqllite 数据源分析参考文献
+
+文章大纲
+1. BI 技术选型对比1.1 总体对比1.2 硬件要求
+2. docker 安装Superset2.1 Centos 安装docker2.2 参照SuperSet 官网编译官网版docker2.3 使用其他人制作好的docker2.4 使用自己的sqllite 数据源分析
+参考文献
+
+
 
 1. BI 技术选型对比
 假如客户有一堆数据要分析，没有太多行业知识的你需要在一周之内给出基本的可视化展现怎么办？别担心，有BI软件来帮你
 1.1 总体对比
-
-
-
-
-ES+kibana
-Tableau
-Superset
-redash
-
-
-
-
-官网链接
-https://www.elastic.co/products/kibana
-https://www.tableau.com/
-http://superset.apache.org/，https://github.com/apache/incubator-superset/
-https://redash.io/
-
-
-部署安装
-本地云端部署均可
-Tableau 后端连接数据库，数据库在本地云端均可。
-本地+docker
-https://redash.io/help/open-source/setup
-
-
-优势
-ES属于大数据新贵，已有部分最佳实践开源，支持部分定制，支持分布式，非结构化数据检索，速度快，产品成熟
-运维成本低，产品成熟，支持基本所有数据库社区支持ES
-软件成本低，支持深度定制，开源社区最高评价的BI软件
-对SQL
-
-
-缺陷
-需要对索引等ES 概念有所理解才能良好使用kibana，需要再次录入结构化数据到ES并准备一套数据schema mapper
-收费
-文档成熟度欠缺，绘图报错不显示错误信息，默认地图服务商为国外厂商
-汉化支持，文档支持较差
-
-
-汉化支持
-没有汉化版本，图表可自定义名称，坐标轴
-支持国际化
-支持国际化
-不支持汉化，且国际化支持时间不定。文档最差的一个，他的文档在官网叫help
-
-
-图例
-https://www.elastic.co/cn/products/kibana
-下载官方白皮书：https://www.tableau.com/sites/default/files/media/whitepaper_surveydata_v4.pdf （还要注册差评）
-http://superset.apache.org/gallery.html
-https://redash.io/help/user-guide/visualizations/visualization-types
-
-
-支持的数据源
-Elastic Search
-https://onlinehelp.tableau.com/current/pro/desktop/en-us/exampleconnections_overview.htm
-http://superset.apache.org/installation.html#database-dependencies
-https://redash.io/help/data-sources/setup/supported-data-sources
-
-
-是否支持ES
-支持
-社区提供连接器，https://github.com/mradamlacey/elasticsearch-tableau-connector
-不支持
-不支持
-
-
+ES+kibanaTableauSupersetredash官网链接https://www.elastic.co/products/kibanahttps://www.tableau.com/http://superset.apache.org/，https://github.com/apache/incubator-superset/https://redash.io/部署安装本地云端部署均可Tableau 后端连接数据库，数据库在本地云端均可。本地+dockerhttps://redash.io/help/open-source/setup优势ES属于大数据新贵，已有部分最佳实践开源，支持部分定制，支持分布式，非结构化数据检索，速度快，产品成熟运维成本低，产品成熟，支持基本所有数据库社区支持ES软件成本低，支持深度定制，开源社区最高评价的BI软件对SQL缺陷需要对索引等ES 概念有所理解才能良好使用kibana，需要再次录入结构化数据到ES并准备一套数据schema mapper收费文档成熟度欠缺，绘图报错不显示错误信息，默认地图服务商为国外厂商汉化支持，文档支持较差汉化支持没有汉化版本，图表可自定义名称，坐标轴支持国际化支持国际化不支持汉化，且国际化支持时间不定。文档最差的一个，他的文档在官网叫help图例https://www.elastic.co/cn/products/kibana下载官方白皮书：https://www.tableau.com/sites/default/files/media/whitepaper_surveydata_v4.pdf （还要注册差评）http://superset.apache.org/gallery.htmlhttps://redash.io/help/user-guide/visualizations/visualization-types支持的数据源Elastic Searchhttps://onlinehelp.tableau.com/current/pro/desktop/en-us/exampleconnections_overview.htmhttp://superset.apache.org/installation.html#database-dependencieshttps://redash.io/help/data-sources/setup/supported-data-sources是否支持ES支持社区提供连接器，https://github.com/mradamlacey/elasticsearch-tableau-connector不支持不支持
 除了上述提到的一些产品外，我们还有国产的一家厂商：
-
-
-FineBI
-http://www.finebi.com/
-
-
-Google Data Studio
-https://developers.google.cn/datastudio/?hl=de
-
-
+ FineBI http://www.finebi.com/  Google Data Studio https://developers.google.cn/datastudio/?hl=de 
 1.2 硬件要求
 上述BI 组件的硬件需求基本可以参考Tableau给出的
 Tableau Server 的系统要求：（最高版需求）
 最低系统要求
-
-2 核
-64 位处理器
-8 GB 系统内存
-至少 15 GB 可用磁盘空间
-
+2 核64 位处理器8 GB 系统内存至少 15 GB 可用磁盘空间
 建议要求
-
-8 个物理内核，2.0 GHz 或更高频率的 CPU
-64 位处理器
-32 GB 系统内存
-至少 50 GB 可用磁盘空间
-
+8 个物理内核，2.0 GHz 或更高频率的 CPU64 位处理器32 GB 系统内存至少 50 GB 可用磁盘空间
 
 2. docker 安装Superset
 下面我们选择Superset 来实战一下，看看效果到底怎么样。
@@ -131,8 +51,7 @@ systemctl enable docker
 docker version
 
 
-具体可以参考
-https://www.cnblogs.com/yufeng218/p/8370670.html
+具体可以参考 https://www.cnblogs.com/yufeng218/p/8370670.html
 2.2 参照SuperSet 官网编译官网版docker
 装好docker 后就是安装python 主要是为了使用python 然后docker-compose 结果直接报错：
 Step 13/21 : COPY --chown=superset:superset superset superset
@@ -187,15 +106,8 @@ superset_1  | npm ERR! A complete log of this run can be found in:
 superset_1  | npm ERR!     /home/superset/.npm/_logs/2019-02-22T04_42_13_898Z-debug.log
 superset_superset_1 exited with code 243
 
-解决方案：
-https://stackoverflow.com/questions/54049266/superset-npm-eacces-permission-denied-mkdir
-结果没好，暴力加个权限：
-chmod 777 (superset的当前目录及上一级目录)
-其实主要是docker 里面没有操作他挂载目录中的权限，提升一下权限就好了。
-结果页面成这样了
-
-调试一下，304 错误，我前端没什么储备，等高手来救场了。
-
+解决方案： https://stackoverflow.com/questions/54049266/superset-npm-eacces-permission-denied-mkdir 结果没好，暴力加个权限： chmod 777 (superset的当前目录及上一级目录) 其实主要是docker 里面没有操作他挂载目录中的权限，提升一下权限就好了。
+结果页面成这样了  调试一下，304 错误，我前端没什么储备，等高手来救场了。 
 2.3 使用其他人制作好的docker
 还是用别人搞好的吧，参考：
 https://www.jianshu.com/p/d5978b439080
@@ -222,30 +134,20 @@ docker exec -it 0e9131be7e49  superset init
 docker exec -it 0e9131be7e49  superset runserver
 
 
-自带世界银行数据的BI看板，效果爆炸有木有
-
+自带世界银行数据的BI看板，效果爆炸有木有 
 2.4 使用自己的sqllite 数据源分析
 假如客户给了一个数据库，或者一堆csv怎么办，别担心，我们的superset 对外接数据源支持还是非常出色的，对于中小型关注成本的企业来说，BI无压力。csv ，sqllite，mysql 通通连上来。
 下面我们用sqllite来小试牛刀。
-由于sqllite不支持远程链接，我们的docker 之前挂载到宿主机的一个目录上面
-这个数据库是我在NLP系列里面用爬虫爬的我自己的博客，主要包括标签，发表时间，点赞数，评论数等内容。
+由于sqllite不支持远程链接，我们的docker 之前挂载到宿主机的一个目录上面 这个数据库是我在NLP系列里面用爬虫爬的我自己的博客，主要包括标签，发表时间，点赞数，评论数等内容。  链接字符串如下
+sqlite:home/superset/NLP_demo.db
 
-链接字符串如下
-sqlite:////home/superset/NLP_demo.db
-
-记得点击可以在 SQL 工具箱中公开，这样我们才可以在SQL工具箱中加载并找到这个数据库。
-
-点击测试，seems ok 说明正常。
-
-打开sql工具箱，写完sql 就可以用这个子数据集进行一些BI分析了，但是由于我之前的数据库很多列的格式没有统计，所以画图会有一些问题，这一点superset 在导入数据库数据时候似乎不能很友好的再次修改。
+记得点击可以在 SQL 工具箱中公开，这样我们才可以在SQL工具箱中加载并找到这个数据库。  点击测试，seems ok 说明正常。  打开sql工具箱，写完sql 就可以用这个子数据集进行一些BI分析了，但是由于我之前的数据库很多列的格式没有统计，所以画图会有一些问题，这一点superset 在导入数据库数据时候似乎不能很友好的再次修改。
 
 我选择饼图，统计一下博客中那一个标签下面发的文章最多，毫无疑问 OpenCV，尽管最近都基本没有再发过了。
 
 
 参考文献
-
-数据可视化的开源方案: Superset vs Redash vs Metabase (一)
-数据可视化的开源方案: Superset vs Redash vs Metabase (二)
+数据可视化的开源方案: Superset vs Redash vs Metabase (一)数据可视化的开源方案: Superset vs Redash vs Metabase (二)
 
 
 

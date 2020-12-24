@@ -9,8 +9,7 @@
 1.首先配置好FreeType与OpenCV，添加编译好的lib，与include目录和CvxText.h和CvxText.cpp就行了，参考[1]
  
 2.说一下思路，主要就是OpenCV版本的问题造成有的函数用的IplImage，而函数
-//设置原图像文字
- text.putText(ImageSrc, msg, cvPoint(1, size_zi), color);
+//设置原图像文字  text.putText(ImageSrc, msg, cvPoint(1, size_zi), color);
 只能接受IplImage格式的参数，所以保存成png，就比较麻烦了。
  
 png格式的图片是4个通道，按照BGRA来放置，alaph就是透明通道。我们的思路就是按照原来直接给图片上叠加文字的办法，新建与文字大小相同的图片，然后二值化，按照二值模版生成新的png文字图片，有字的地方添上颜色，没字的地方设置为透明。
@@ -38,231 +37,230 @@ png格式的图片是4个通道，按照BGRA来放置，alaph就是透明通道�
  
  
 主要代码：
-// AddChinese.cpp : 定义控制台应用程序的入口点。
-//
+// AddChinese.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+
+
+#include <opencv2/core/core.hpp>  
+#include <opencv2/highgui/highgui.hpp>
+#include "CvxText.h"
+
+#pragma comment(lib,"freetype255d.lib")
+#pragma comment(lib,"opencv_core2410d.lib")                
+#pragma comment(lib,"opencv_highgui2410d.lib")                
+#pragma comment(lib,"opencv_imgproc2410d.lib")   
+
+using namespace std;
+using namespace cv;
+
+#define ROW_BLOCK 2
+#define COLUMN_Block 2
+
+// writePng.cpp : 定义控制台应用程序的入口点。
+//
+
+
+
+
+
+int run_test_png(Mat &mat,string image_name)
+{
+
+
+	/*采用自己设置的参数来保存图片*/
+	//Mat mat(480, 640, CV_8UC4);
+	//createAlphaMat(mat);
+	vector<int> compression_params;
+	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+	compression_params.push_back(9);    //png格式下，默认的参数为3.
+	try 
+	{
+		imwrite(image_name, mat, compression_params);
+	}
+	catch (runtime_error& ex) 
+	{
+		fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
+		return 1;
+	}
+	fprintf(stdout, "Saved PNG file with alpha data.\n");
+
+	waitKey(0);
+	return 0;
+}
+
+int coloured(Mat &template_src, Mat &mat_png, CvScalar color)
+{
+
+	for (int i = 0; i < template_src.rows; ++i) 
+	{
+		for (int j = 0; j < template_src.cols; ++j) 
+		{
+			Vec4b& bgra = mat_png.at<Vec4b>(i, j);
+			//int temp = template_src.at<uchar>(i,j);
+			if (template_src.at<uchar>(i,j)== 0)
+			{
+				bgra[0] = color.val[0];    //b通道
+				bgra[1] = color.val[1];		//g通道
+				bgra[2] = color.val[2];		//r通道
+				bgra[3] = 255;//alpha通道全部设置为透明完全透明为0，否则为255
+			}
+			else
+			{
+				bgra[3] = 0;//alpha通道全部设置为透明完全透明为0，否则为255
+			}
+			
+			
+			
+		}
+	}
+
+	return 0;
+}
+
+void ImageBinarization(IplImage *src)
+{	/*对灰度图像二值化，自适应门限threshold*/
+	int i,j,width,height,step,chanel,threshold;
+	/*size是图像尺寸，svg是灰度直方图均值，va是方差*/
+	float size,avg,va,maxVa,p,a,s;
+	unsigned char *dataSrc;
+	float histogram[256];
+
+	width = src->width;
+	height = src->height;
+	dataSrc = (unsigned char *)src->imageData;
+	step = src->widthStep/sizeof(char);
+	chanel = src->nChannels;
+	/*计算直方图并归一化histogram*/
+	for(i=0; i<256; i++)
+		histogram[i] = 0;
+	for(i=0; i<height; i++)
+		for(j=0; j<width*chanel; j++)
+		{
+			histogram[dataSrc[i*step+j]-'0'+48]++;
+		}
+		size = width * height;
+		for(i=0; i<256; i++)
+			histogram[i] /=size;
+		/*计算灰度直方图中值和方差*/
+		avg = 0;
+		for(i=0; i<256; i++)
+			avg += i*histogram[i];
+		va = 0;
+		for(i=0; i<256; i++)
+			va += fabs(i*i*histogram[i]-avg*avg);
+		/*利用加权最大方差求门限*/
+		threshold = 20;
+		maxVa = 0;
+		p = a = s = 0;
+		for(i=0; i<256; i++)
+		{
+			p += histogram[i];
+			a += i*histogram[i];
+			s = (avg*p-a)*(avg*p-a)/p/(1-p);
+			if(s > maxVa)
+			{
+				threshold = i;
+				maxVa = s;
+			}
+		}
+		/*二值化*/
+		for(i=0; i<height; i++)
+			for(j=0; j<width*chanel; j++)
+			{
+				if(dataSrc[i*step+j] > threshold)
+					dataSrc[i*step+j] = 255;
+				else
+					dataSrc[i*step+j] = 0;
+			}
+}
+
+Mat binaryzation(Mat &src)
+{
+	Mat des_gray(src.size(),CV_8UC1);
+
+	cvtColor(src,des_gray,CV_BGR2GRAY);
+	
+	//Mat bin_mat();
+	IplImage temp(des_gray);
+	ImageBinarization(&temp);
+
+
+	//threshold(des_gray,des_gray,150,255,THRESH_BINARY);
+	imshow("二值图像",des_gray);
+	return des_gray;
+}
+
+int generate_chinese(const int size_zi, const char *msg ,int number,CvScalar color)
+{
+	//int size_zi = 50;//字体大小
+	CvSize czSize;  //目标图像尺寸
+	float p = 0.5;
+	CvScalar fsize;
+
+
+	//读取TTF字体文件
+	CvxText text("simhei.ttf");     
+
+	//设置字体属性 字体大小/空白比例/间隔比例/旋转角度
+	fsize = cvScalar(size_zi, 1, 0.1, 0);
+	text.setFont(NULL, &fsize, NULL, &p);      
+
+	czSize.width = size_zi*number;
+	czSize.height = size_zi;
+	//加载原图像
+	IplImage* ImageSrc = cvCreateImage(czSize,IPL_DEPTH_8U,3);//cvLoadImage(Imagename, CV_LOAD_IMAGE_UNCHANGED);
+	//Mat image(ImageSrc);
+	//createAlphaMat(image);
+	//ImageSrc = ℑ
+
+	//IplImage temp(image); 
+	//ImageSrc = &temp;
+
+	//设置原图像文字
+	text.putText(ImageSrc, msg, cvPoint(1, size_zi), color); 
+
+	//显示原图像
+	cvShowImage("原图", ImageSrc);
+
+
+	string hanzi = msg;
+	hanzi = hanzi + ".png";
+
+	Mat chinese(ImageSrc,true);
+	Mat gray = binaryzation(chinese);
+
+	imwrite("chinese_gray.jpg",gray);
+
+	Mat mat_png(chinese.size(),CV_8UC4);
+	coloured(gray,mat_png,color);
+	run_test_png(mat_png,hanzi);
+	//
+	cvSaveImage("hanzi.jpg",reDstImage);
+	//run_test_png(chinese,hanzi);
+	//等待按键事件
+	cvWaitKey();
+	return 0;
+}
+
+int main()
+{
+	CvScalar color = CV_RGB(0,0,0);
+	int size = 200;
+	const char* msg = "你好a";//暂时一行字不要太长
+
+	int number = 3;//字符个数
+
+	generate_chinese(size,msg,number,color);
+	
+
+	return 0;
+}
+
 
-#include "stdafx.h"
-
-
-
-#include <opencv2/core/core.hpp>  
-#include <opencv2/highgui/highgui.hpp>
-#include "CvxText.h"
-
-#pragma comment(lib,"freetype255d.lib")
-#pragma comment(lib,"opencv_core2410d.lib")                
-#pragma comment(lib,"opencv_highgui2410d.lib")                
-#pragma comment(lib,"opencv_imgproc2410d.lib")   
-
-using namespace std;
-using namespace cv;
-
-#define ROW_BLOCK 2
-#define COLUMN_Block 2
-
-// writePng.cpp : 定义控制台应用程序的入口点。
-//
-
-
-
-
-
-int run_test_png(Mat &mat,string image_name)
-{
-
-
-	/*采用自己设置的参数来保存图片*/
-	//Mat mat(480, 640, CV_8UC4);
-	//createAlphaMat(mat);
-	vector<int> compression_params;
-	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
-	compression_params.push_back(9);    //png格式下，默认的参数为3.
-	try 
-	{
-		imwrite(image_name, mat, compression_params);
-	}
-	catch (runtime_error& ex) 
-	{
-		fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
-		return 1;
-	}
-	fprintf(stdout, "Saved PNG file with alpha data.\n");
-
-	waitKey(0);
-	return 0;
-}
-
-int coloured(Mat &template_src, Mat &mat_png, CvScalar color)
-{
-
-	for (int i = 0; i < template_src.rows; ++i) 
-	{
-		for (int j = 0; j < template_src.cols; ++j) 
-		{
-			Vec4b& bgra = mat_png.at<Vec4b>(i, j);
-			//int temp = template_src.at<uchar>(i,j);
-			if (template_src.at<uchar>(i,j)== 0)
-			{
-				bgra[0] = color.val[0];    //b通道
-				bgra[1] = color.val[1];		//g通道
-				bgra[2] = color.val[2];		//r通道
-				bgra[3] = 255;//alpha通道全部设置为透明完全透明为0，否则为255
-			}
-			else
-			{
-				bgra[3] = 0;//alpha通道全部设置为透明完全透明为0，否则为255
-			}
-			
-			
-			
-		}
-	}
-
-	return 0;
-}
-
-void ImageBinarization(IplImage *src)
-{	/*对灰度图像二值化，自适应门限threshold*/
-	int i,j,width,height,step,chanel,threshold;
-	/*size是图像尺寸，svg是灰度直方图均值，va是方差*/
-	float size,avg,va,maxVa,p,a,s;
-	unsigned char *dataSrc;
-	float histogram[256];
-
-	width = src->width;
-	height = src->height;
-	dataSrc = (unsigned char *)src->imageData;
-	step = src->widthStep/sizeof(char);
-	chanel = src->nChannels;
-	/*计算直方图并归一化histogram*/
-	for(i=0; i<256; i++)
-		histogram[i] = 0;
-	for(i=0; i<height; i++)
-		for(j=0; j<width*chanel; j++)
-		{
-			histogram[dataSrc[i*step+j]-'0'+48]++;
-		}
-		size = width * height;
-		for(i=0; i<256; i++)
-			histogram[i] /=size;
-		/*计算灰度直方图中值和方差*/
-		avg = 0;
-		for(i=0; i<256; i++)
-			avg += i*histogram[i];
-		va = 0;
-		for(i=0; i<256; i++)
-			va += fabs(i*i*histogram[i]-avg*avg);
-		/*利用加权最大方差求门限*/
-		threshold = 20;
-		maxVa = 0;
-		p = a = s = 0;
-		for(i=0; i<256; i++)
-		{
-			p += histogram[i];
-			a += i*histogram[i];
-			s = (avg*p-a)*(avg*p-a)/p/(1-p);
-			if(s > maxVa)
-			{
-				threshold = i;
-				maxVa = s;
-			}
-		}
-		/*二值化*/
-		for(i=0; i<height; i++)
-			for(j=0; j<width*chanel; j++)
-			{
-				if(dataSrc[i*step+j] > threshold)
-					dataSrc[i*step+j] = 255;
-				else
-					dataSrc[i*step+j] = 0;
-			}
-}
-
-Mat binaryzation(Mat &src)
-{
-	Mat des_gray(src.size(),CV_8UC1);
-
-	cvtColor(src,des_gray,CV_BGR2GRAY);
-	
-	//Mat bin_mat();
-	IplImage temp(des_gray);
-	ImageBinarization(&temp);
-
-
-	//threshold(des_gray,des_gray,150,255,THRESH_BINARY);
-	imshow("二值图像",des_gray);
-	return des_gray;
-}
-
-int generate_chinese(const int size_zi, const char *msg ,int number,CvScalar color)
-{
-	//int size_zi = 50;//字体大小
-	CvSize czSize;  //目标图像尺寸
-	float p = 0.5;
-	CvScalar fsize;
-
-
-	//读取TTF字体文件
-	CvxText text("simhei.ttf");     
-
-	//设置字体属性 字体大小/空白比例/间隔比例/旋转角度
-	fsize = cvScalar(size_zi, 1, 0.1, 0);
-	text.setFont(NULL, &fsize, NULL, &p);      
-
-	czSize.width = size_zi*number;
-	czSize.height = size_zi;
-	//加载原图像
-	IplImage* ImageSrc = cvCreateImage(czSize,IPL_DEPTH_8U,3);//cvLoadImage(Imagename, CV_LOAD_IMAGE_UNCHANGED);
-	//Mat image(ImageSrc);
-	//createAlphaMat(image);
-	//ImageSrc = ℑ
-
-	//IplImage temp(image); 
-	//ImageSrc = &temp;
-
-	//设置原图像文字
-	text.putText(ImageSrc, msg, cvPoint(1, size_zi), color); 
-
-	//显示原图像
-	cvShowImage("原图", ImageSrc);
-
-
-	string hanzi = msg;
-	hanzi = hanzi + ".png";
-
-	Mat chinese(ImageSrc,true);
-	Mat gray = binaryzation(chinese);
-
-	imwrite("chinese_gray.jpg",gray);
-
-	Mat mat_png(chinese.size(),CV_8UC4);
-	coloured(gray,mat_png,color);
-	run_test_png(mat_png,hanzi);
-	//
-	////cvSaveImage("hanzi.jpg",reDstImage);
-	//run_test_png(chinese,hanzi);
-	//等待按键事件
-	cvWaitKey();
-	return 0;
-}
-
-int main()
-{
-	CvScalar color = CV_RGB(0,0,0);
-	int size = 200;
-	const char* msg = "你好a";//暂时一行字不要太长
-
-	int number = 3;//字符个数
-
-	generate_chinese(size,msg,number,color);
-	
-
-	return 0;
-}
-
-
-
- 
+  
 完整工程下载：
 http://download.csdn.net/detail/wangyaninglm/8486521
  

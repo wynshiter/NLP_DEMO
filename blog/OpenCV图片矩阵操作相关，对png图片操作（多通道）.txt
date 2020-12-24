@@ -10,102 +10,101 @@ http://blog.csdn.net/u013097499/article/details/30017739
  
 代码：
  
-// writePng.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-#include <iostream>
-
-
-
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/core.hpp>
-
-#pragma comment(lib, "opencv_highgui2410d.lib")
-#pragma comment(lib, "opencv_core2410d.lib")
-
-using namespace cv;
-using namespace std;
-
-
-
-
-
-Mat src;
-Mat image;
-string str = "./";
-
-/*创建alpha表，整体偏红色，左上角到右下角呈现从完全透明到完全不透明变化趋势*/
-void createAlphaMat(Mat &mat)
-{
-	for (int i = 0; i < mat.rows; ++i) 
-	{
-		for (int j = 0; j < mat.cols; ++j) 
-		{
-			Vec4b& rgba = mat.at<Vec4b>(i, j);
-			rgba[0] = UCHAR_MAX;    //r分量一直最大，所以整体偏红
-			rgba[1] = saturate_cast<uchar>((float (mat.cols - j)) / ((float)mat.cols) * UCHAR_MAX);
-			rgba[2] = saturate_cast<uchar>((float (mat.rows - i)) / ((float)mat.rows) * UCHAR_MAX);
-			rgba[3] = saturate_cast<uchar>(0.5 * (rgba[1] + rgba[2]));
-		}
-	}
+// writePng.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+
+
+
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/core/core.hpp>
+
+#pragma comment(lib, "opencv_highgui2410d.lib")
+#pragma comment(lib, "opencv_core2410d.lib")
+
+using namespace cv;
+using namespace std;
+
+
+
+
+
+Mat src;
+Mat image;
+string str = "./";
+
+/*创建alpha表，整体偏红色，左上角到右下角呈现从完全透明到完全不透明变化趋势*/
+void createAlphaMat(Mat &mat)
+{
+	for (int i = 0; i < mat.rows; ++i) 
+	{
+		for (int j = 0; j < mat.cols; ++j) 
+		{
+			Vec4b& rgba = mat.at<Vec4b>(i, j);
+			rgba[0] = UCHAR_MAX;    //r分量一直最大，所以整体偏红
+			rgba[1] = saturate_cast<uchar>((float (mat.cols - j)) / ((float)mat.cols) * UCHAR_MAX);
+			rgba[2] = saturate_cast<uchar>((float (mat.rows - i)) / ((float)mat.rows) * UCHAR_MAX);
+			rgba[3] = saturate_cast<uchar>(0.5 * (rgba[1] + rgba[2]));
+		}
+	}
+}
+
+int run_test_png()
+{
+	
+
+	/*采用自己设置的参数来保存图片*/
+	Mat mat(480, 640, CV_8UC4);
+	createAlphaMat(mat);
+	vector<int> compression_params;
+	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
+	compression_params.push_back(9);    //png格式下，默认的参数为3.
+	try 
+	{
+		imwrite("alpha.png", mat, compression_params);
+	}
+	catch (runtime_error& ex) 
+	{
+		fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
+		return 1;
+	}
+	fprintf(stdout, "Saved PNG file with alpha data.\n");
+
+	waitKey(0);
+	return 0;
+}
+
+int main()
+{
+	cv::Mat image = cv::imread("swan.jpg");
+	cv::Mat logo = cv::imread("swan.jpg");
+	cv::Mat mask = cv::imread("swan.jpg",0);
+
+	Mat temp = image.clone();
+	Rect rect(image.cols/4, image.rows/4, image.cols/2, image.rows/2);
+	Mat small_image = temp(rect);
+
+	imshow("image", small_image);//截取图像，并显示
+
+
+	cv::Mat imageROI;
+
+	imageROI =  image(cv::Rect(10,10,200,100));
+	imshow("imageroi", imageROI);//截取图像，并显示
+
+	logo.copyTo(imageROI,mask);
+	cv::namedWindow("result");
+	cv::imshow("result",imageROI);
+
+	run_test_png();
+	cv::waitKey();
+
+
+	return 0;
 }
-
-int run_test_png()
-{
-	
-
-	/*采用自己设置的参数来保存图片*/
-	Mat mat(480, 640, CV_8UC4);
-	createAlphaMat(mat);
-	vector<int> compression_params;
-	compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
-	compression_params.push_back(9);    //png格式下，默认的参数为3.
-	try 
-	{
-		imwrite("alpha.png", mat, compression_params);
-	}
-	catch (runtime_error& ex) 
-	{
-		fprintf(stderr, "Exception converting image to PNG format: %s\n", ex.what());
-		return 1;
-	}
-	fprintf(stdout, "Saved PNG file with alpha data.\n");
-
-	waitKey(0);
-	return 0;
-}
-
-int main()
-{
-	cv::Mat image = cv::imread("swan.jpg");
-	cv::Mat logo = cv::imread("swan.jpg");
-	cv::Mat mask = cv::imread("swan.jpg",0);
-
-	Mat temp = image.clone();
-	Rect rect(image.cols/4, image.rows/4, image.cols/2, image.rows/2);
-	Mat small_image = temp(rect);
-
-	imshow("image", small_image);//截取图像，并显示
-
-
-	cv::Mat imageROI;
-
-	imageROI =  image(cv::Rect(10,10,200,100));
-	imshow("imageroi", imageROI);//截取图像，并显示
-
-	logo.copyTo(imageROI,mask);
-	cv::namedWindow("result");
-	cv::imshow("result",imageROI);
-
-	run_test_png();
-	cv::waitKey();
-
-
-	return 0;
-}
-
- 
+  
  
  
 

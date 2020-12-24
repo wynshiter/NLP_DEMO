@@ -3,85 +3,85 @@
 
 《多核程序设计技术》
 第五章——线程api，一个使用windows事件的线程应用程序，vs2008下编译调试通过。
-// 线程通信机制.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-#define  NUM_THREADS 10
-#include <windows.h>
-#include <stdio.h>
-#include <process.h>
-
-typedef struct
-{
- int Id;
- HANDLE hTerminate;
-
-}ThreadArgs;
-
-unsigned __stdcall ThreadFunc(void *pArgs)
-{
-	HANDLE hTerminate = ((ThreadArgs *)pArgs)->hTerminate;//参数转换
-	int id = ((ThreadArgs *)pArgs)->Id;
-
-	//运行到我们被告知需要终止的时候
-	while(1)
-	{
-		//检查我们是否需要终止
-		if(WaitForSingleObject(hTerminate,0) == WAIT_OBJECT_0)
-		{
-			//终止线程--我们调用ResetEvent来讲终止的线程返回到非激发状态之后，推出while循环
-			printf("Terminating Thread %d \n",id);
-			ResetEvent(hTerminate);
-			break;
-		}
-		
-		//我们现在可以处理我们的工作，模拟这个情况，假设工作需要1秒钟来做线程需要做的工作
-
-		Sleep(1000);
-
-	}
-
-	_endthreadex(0);
-
-	return 0;
-
-}
-
-int main(int argc ,char * argv[])
-{
-	unsigned int threadID[NUM_THREADS];
-	HANDLE hThread[NUM_THREADS];
-	ThreadArgs threadArgs[NUM_THREADS];
-
-	//创建10个线程 
-	for(int i =0 ; i < NUM_THREADS ; i++)
-	{
-		threadArgs[i].Id = i;
-		threadArgs[i].hTerminate = CreateEvent(NULL, TRUE, FALSE, NULL);
-		hThread[i] = (HANDLE)_beginthreadex(NULL, 0, &ThreadFunc, &threadArgs[i], 0, &threadID[i]);
-	}
-
-	printf("To kill a thread (gracefully), press 0-9, then <Enter>.\n");
-	printf("Press any other key to exit .\n");
-
-	while (1)
-	{
-		int c = getc(stdin);
-		if (c == '\n')
-		{
-			continue;
-		}
-		if (c<'0'||c>'9')
-		{
-			break;
-		}
-		SetEvent(threadArgs[c - '0'].hTerminate);
-	}
-	return 0;
-}
-
-
+// 线程通信机制.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#define  NUM_THREADS 10
+#include <windows.h>
+#include <stdio.h>
+#include <process.h>
+
+typedef struct
+{
+ int Id;
+ HANDLE hTerminate;
+
+}ThreadArgs;
+
+unsigned __stdcall ThreadFunc(void *pArgs)
+{
+	HANDLE hTerminate = ((ThreadArgs *)pArgs)->hTerminate;//参数转换
+	int id = ((ThreadArgs *)pArgs)->Id;
+
+	//运行到我们被告知需要终止的时候
+	while(1)
+	{
+		//检查我们是否需要终止
+		if(WaitForSingleObject(hTerminate,0) == WAIT_OBJECT_0)
+		{
+			//终止线程--我们调用ResetEvent来讲终止的线程返回到非激发状态之后，推出while循环
+			printf("Terminating Thread %d \n",id);
+			ResetEvent(hTerminate);
+			break;
+		}
+		
+		//我们现在可以处理我们的工作，模拟这个情况，假设工作需要1秒钟来做线程需要做的工作
+
+		Sleep(1000);
+
+	}
+
+	_endthreadex(0);
+
+	return 0;
+
+}
+
+int main(int argc ,char * argv[])
+{
+	unsigned int threadID[NUM_THREADS];
+	HANDLE hThread[NUM_THREADS];
+	ThreadArgs threadArgs[NUM_THREADS];
+
+	//创建10个线程 
+	for(int i =0 ; i < NUM_THREADS ; i++)
+	{
+		threadArgs[i].Id = i;
+		threadArgs[i].hTerminate = CreateEvent(NULL, TRUE, FALSE, NULL);
+		hThread[i] = (HANDLE)_beginthreadex(NULL, 0, &ThreadFunc, &threadArgs[i], 0, &threadID[i]);
+	}
+
+	printf("To kill a thread (gracefully), press 0-9, then <Enter>.\n");
+	printf("Press any other key to exit .\n");
+
+	while (1)
+	{
+		int c = getc(stdin);
+		if (c == '\n')
+		{
+			continue;
+		}
+		if (c<'0'||c>'9')
+		{
+			break;
+		}
+		SetEvent(threadArgs[c - '0'].hTerminate);
+	}
+	return 0;
+}
+
+
 
  
 标注与解释：
@@ -89,31 +89,30 @@ WaitForXXX（）可能在事件、作业、互斥量、进程、信号量、线�
 TerminateThread（）函数也可以用来终止线程，但是线程会立即终止，其没有机会释放已经获得的资源
  
 windows获取系统处理器的基本信息：
-#include "stdafx.h"
-#include <Windows.h>
-#include <stdio.h>
+#include "stdafx.h"
+#include <Windows.h>
+#include <stdio.h>
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	SYSTEM_INFO sysInfo;
+	GetSystemInfo( &sysInfo );
+
+	//打印数据项
+	printf("Systme hardware information : \n");
+
+	printf("OME ID : %u\n",sysInfo.dwOemId);
+	printf("Number of processors : %u\n",sysInfo.dwNumberOfProcessors);
+	printf("Processor type : %u\n",sysInfo.dwProcessorType);
+	printf("Active processor mask : %u\n",sysInfo.dwActiveProcessorMask);
+	printf("Page size : %u bytes\n",sysInfo.dwPageSize);
+
+	system("pause");
+	return 0;
+}
+
 
-int _tmain(int argc, _TCHAR* argv[])
-{
-	SYSTEM_INFO sysInfo;
-	GetSystemInfo( &sysInfo );
-
-	//打印数据项
-	printf("Systme hardware information : \n");
-
-	printf("OME ID : %u\n",sysInfo.dwOemId);
-	printf("Number of processors : %u\n",sysInfo.dwNumberOfProcessors);
-	printf("Processor type : %u\n",sysInfo.dwProcessorType);
-	printf("Active processor mask : %u\n",sysInfo.dwActiveProcessorMask);
-	printf("Page size : %u bytes\n",sysInfo.dwPageSize);
-
-	system("pause");
-	return 0;
-}
-
-
-
- 
+   
 
 可以看到，这款i5处理器支持HT超线程技术。
 

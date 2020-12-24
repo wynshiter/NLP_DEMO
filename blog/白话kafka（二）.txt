@@ -1,0 +1,118 @@
+
+
+
+
+前几天在白话kafka（一）中简单介绍了下kafka的大致构成，对几个关键词进行了解释说明，当然在阐述的过程中也存在很多的漏洞，还请大家多多包涵！最近公司在搞封闭，一直没继续写，刚好新的专题，需要搭建一套kafka集群，下面结合搭建过程，说说kafka搭建中可能遇到的一些问题。
+
+环境：虚拟机三台 安装包：zookeeper，kafka，jdk（1.7及以上）
+
+这里先搭建一个zookeeper的管理集群，设置三个节点，跟之后kafka集群的规模相同，此处要注意，zookeeper的节点要设置成单数，这是经验所得，也是为了保证zookeeper集群某台机器宕机之后的一个leader选举的一个保证。网上有一些更详细的资料大家感兴趣的话可以深入了解有关内容。下面就开始搭建本文中涉及的集群，模拟三节点的kafka集群。之前是搭建过单zk节点带3个kafkabroker的情况，用虚拟机搭建zk集群还有几个坑！ 
+！！！！！！敲黑板！！！！！！ 
+虚拟机搭建好了后，先把防火墙都干掉！
+sudo systemctl stop firewalld.servicesudo systemctl disable firewalld.service
+可能还会有些异常得具体问题具体分析了！ 搭建过程可以参照：http://www.cnblogs.com/luotianshuai/p/5206662.html 
+但是kafka毕竟是个流处理平台，其特性是高吞吐量，但是加上业务逻辑后，总显得这一特点表现不出来，但是对于我们要求高精度的数据处理来说，习惯了之前的单条处理模式，批处理的过程也是只是表现在消息的读写上，而真正的批处理没有做到，因此针对kafka进行开发的时候，Spark之类的分布式框架仍然是很有必要的。 
+环境搭建之后，大家可以使用客户端自带的工具对环境进行测试。 之前写过一个关于kafka基本操作的帖子，此处不再赘述。
+BlogUrl：http://blog.csdn.net/roczheng1990/article/details/54599095
+今天主要介绍一下开发中常用的几个kafka的库： 
+● C++开发者可以使用librdkafka：https://github.com/edenhill/librdkafka ● Java开发者也有Java版的API：import kafka.javaapi.*[maven项目中添加依赖，会自动下载jar包的] ● Go开发者可以使用：https://github.com/Shopify/sarama 
+目前我接触的就是这三个了！ 以librdkafka为例简单说明一下该接口的使用吧！ librdkafka的安装可以参照：http://blog.csdn.NET/roczheng1990/article/details/69390341 
+安装完成后会生成一个example文件夹：
+可以通过rdkafka_example来体验一下kafka的生产、消费消息！参数中需要指定集群，所以要保证测试的kafka环境正常! 下面写个librdkafka的demo供大家参考吧！ 使用这个库的时候，要引入rdkafkacpp.h、rdkafkacpp_int.h两个文件，依赖librdkafka.a、librdkafka++.a两个静态库。 本来想用codeblocks编一下来着，好像window下不太好实现。还是在Linux上写写吧！ 
+头文件：rdkfktest.h
+#include <vector>
+
+#include <iostream>
+
+#include <cstdlib>
+
+#include <cstdio>
+
+#include <string>
+
+extern "C"
+
+{    
+#include "rdkafkacpp.h"#include "rdkafkacpp_int.h"
+
+}using namespace std;
+实现代码：rdkfktest.cpp
+#include "rdkfktest.h"
+
+int main()
+{    
+string errstr;
+string topicstr = "test"; 
+string partition = "0";
+string message = "testinfo--testinfo";
+string brokers_str = "10.XX.XX.XX:9092"
+
+RdKafka::Conf global_conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
+RdKafka::Conf topic_conf = RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC);
+global_conf->set("metadata.broker.list", brokers_str, errstr);
+global_conf->set("api.version.request", "true", errstr);
+RdKafka::Producer *producer = RdKafka::Producer::create(m_global_conf, errstr);
+RdKafka::Topic *topic = RdKafka::Topic::create(producer, topic_str, topic_conf, errstr);
+RdKafka::Metadata *metadata;
+
+RdKafka::ErrorCode err = producer->metadata(false, topic, &metadata, 5000);
+RdKafka::ErrorCode resp = producer->produce(topic, partition,   RdKafka::Producer::RK_MSG_COPY, const_cast<char *>(message.c_str()), message.size(), NULL, NULL);    
+return 0;
+}
+消费者开发规则大致与此类似，也是先定义两个conf文件： 头文件：rdkfktest.h
+#include <vector>
+
+#include <iostream>
+
+#include <cstdlib>
+
+#include <cstdio>
+
+#include <string>
+
+extern "C"
+
+{    
+#include "rdkafkacpp.h"#include "rdkafkacpp_int.h"
+
+}
+using namespace std;
+bool message_consume(RdKafka::Message * message, vector<string> v_msg);
+代码实现：rdkfktest.cpp
+#include "rdkfktest.h"
+
+int main()
+{    
+string errstr; 
+vector<string> vec_msg; 
+string topicstr = "test"; 
+string partition = "0";
+string brokers_str = "10.XX.XX.XX:9092"
+
+int64_t begin_offset = "latest";
+ RdKafka::Conf global_conf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
+ RdKafka::Conf topic_conf = RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC);
+ global_conf->set("metadata.broker.list", brokers_str, errstr);
+ global_conf->set("api.version.request", "true", errstr);
+ RdKafka::Consumer *consumer = RdKafka::Consumer::create(m_global_conf, errstr);
+ RdKafka::Topic *topic = RdKafka::Topic::create(consumer, topic_str, topic_conf, errstr);
+ RdKafka::Metadata *metadata;
+
+RdKafka::ErrorCode err = consumer->metadata(false, topic, &metadata, 5000);
+ consumer->start(topic, partition, begin_offset);
+RdKafka::Message *message = consumer->consume(topic, partition, 1000);
+message_consume(msg, vec_msg); 
+return 0;
+}
+bool message_consume(RdKafka::Message * message, vector<string> v_msg)
+{
+v_msg.push_back(static_cast<const char *>(message->payload()));
+}
+
+
+
+
+
+
+
+

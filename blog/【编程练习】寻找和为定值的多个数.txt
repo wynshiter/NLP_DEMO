@@ -1,48 +1,8 @@
 
 
 
-2010 年中兴面试题 
-编程求解： 
-输入两个整数n 和m，从数列1，2，3.......n 中随意取几个数, 
-使其和等于m ,要求将其中所有的可能组合列出来。
-// 21 题递归方法 
-//copyright@ July && yansha 
-//July、yansha，updated。 
-#include<list> 
-#include<iostream> 
-using namespace std; 
-list<int>list1; 
-void find_factor(int sum, int n) 
-{ 
-// 递归出口 
-if(n <= 0 || sum <= 0) 
-return; 
-// 输出找到的结果 
-if(sum == n) 
-{ 
-// 反转list 
-list1.reverse(); 
-for(list<int>::iterator iter = list1.begin(); iter != list1.end(); iter++) 
-cout << *iter << " + "; 
-cout << n << endl; 
-list1.reverse(); 
-} 
-list1.push_front(n); //典型的01 背包问题 
-find_factor(sum-n, n-1); //放n，n-1 个数填满sum-n 
-list1.pop_front(); 
-find_factor(sum, n-1); //不放n，n-1 个数填满sum 
-} 
-int main() 
-{ 
-int sum, n; 
-cout << "请输入你要等于多少的数值sum:" << endl; 
-cin >> sum; 
-cout << "请输入你要从1.....n 数列中取值的n：" << endl; 
-cin >> n; 
-cout << "所有可能的序列，如下：" << endl; 
-find_factor(sum,n); 
-return 0; 
-}
+2010 年中兴面试题  编程求解：  输入两个整数n 和m，从数列1，2，3.......n 中随意取几个数,  使其和等于m ,要求将其中所有的可能组合列出来。
+// 21 题递归方法  //copyright@ July && yansha  //July、yansha，updated。  #include<list>  #include<iostream>  using namespace std;  list<int>list1;  void find_factor(int sum, int n)  {  // 递归出口  if(n <= 0 || sum <= 0)  return;  // 输出找到的结果  if(sum == n)  {  // 反转list  list1.reverse();  for(list<int>::iterator iter = list1.begin(); iter != list1.end(); iter++)  cout << *iter << " + ";  cout << n << endl;  list1.reverse();  }  list1.push_front(n); //典型的01 背包问题  find_factor(sum-n, n-1); //放n，n-1 个数填满sum-n  list1.pop_front();  find_factor(sum, n-1); //不放n，n-1 个数填满sum  }  int main()  {  int sum, n;  cout << "请输入你要等于多少的数值sum:" << endl;  cin >> sum;  cout << "请输入你要从1.....n 数列中取值的n：" << endl;  cin >> n;  cout << "所有可能的序列，如下：" << endl;  find_factor(sum,n);  return 0;  }
  
  
 逻辑分析：
@@ -91,8 +51,7 @@ int main()
 	free(flag);
 	return 0;
 }
-
-注：我们设置flag背包，用来标注对应的n+1是否被选中，1表示被选中，0则表示未选中，每当满足m==n时，则输出一组解。程序容易产生逻辑bug的地方在于length的使用（读者可以思考一下为何需要全局变量length，而不是直接使用n来代替for循环）。
+ 注：我们设置flag背包，用来标注对应的n+1是否被选中，1表示被选中，0则表示未选中，每当满足m==n时，则输出一组解。程序容易产生逻辑bug的地方在于length的使用（读者可以思考一下为何需要全局变量length，而不是直接使用n来代替for循环）。 
 
 
 

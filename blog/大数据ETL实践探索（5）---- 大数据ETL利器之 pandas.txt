@@ -5,7 +5,21 @@
 
 
 
-文章大纲官方文档及权威参考文档其他权威参考文件加载csv文件加载xlsx、xls文件加载添加数据列apply 函数作用生成新列报错索引的那些坑DataFrame创建遍历增按照列增加按照行增加删改查聚合操作保存数据清洗1. 删除多列数据2. 转换 Dtypes3. 将分类变量转换为数值变量4. 检查缺失的数据5. 删除列中的字符串6. 删除列中的空格7. 将两列字符串数据（在一定条件下）拼接起来8. 转换时间戳（从字符串类型转换为日期「DateTime」格式）探索性数据分析百分比计算数据可视化中文显示参考教程杂项pandas 将某一列移动到最前面jupyter notebook 技巧pandas 在jupyter 中显示所有行和列 及内容多行显示代码自动补全参考
+
+文章大纲
+官方文档及权威参考文档其他权威参考
+文件加载csv文件加载xlsx、xls文件加载
+添加数据列apply 函数作用生成新列报错
+索引的那些坑DataFrame创建遍历增按照列增加按照行增加
+删改查聚合操作保存
+数据清洗1. 删除多列数据2. 转换 Dtypes3. 将分类变量转换为数值变量4. 检查缺失的数据5. 删除列中的字符串6. 删除列中的空格7. 将两列字符串数据（在一定条件下）拼接起来8. 转换时间戳（从字符串类型转换为日期「DateTime」格式）
+探索性数据分析百分比计算
+数据可视化中文显示参考教程
+杂项pandas 将某一列移动到最前面jupyter notebook 技巧pandas 在jupyter 中显示所有行和列 及内容多行显示代码自动补全
+
+参考
+
+
 
 官方文档及权威参考
 文档
@@ -14,9 +28,7 @@
 官网快速入门
 其他权威参考
 最近看到的python 杰出的自学资料这个项目里面的例子基本都是开源领域的大咖写的，让你用不到500行的Python代码实现一个非常牛逼实用的功能。
-比如说做一个Python解释器，在比如说做一个光学文字识别系统。听起来就非常高大上。然后500行以内就能搞定，但是这个项目肯定需要大家有了一定水平之后才能去研究了。
-链接：
-http://aosabook.org/en/index.html
+比如说做一个Python解释器，在比如说做一个光学文字识别系统。听起来就非常高大上。然后500行以内就能搞定，但是这个项目肯定需要大家有了一定水平之后才能去研究了。 链接： http://aosabook.org/en/index.html
 
 文件加载
 csv文件加载
@@ -35,11 +47,7 @@ tijian_pdf = pd.read_csv(path_tijian,encoding='utf-8',engine='python',dtype='obj
 官网参数解析：pandas.read_csv
 xlsx、xls文件加载
 pandas 使用第三方库对xlsx、xls 进行解析，可以使用的库有xlrd 或者openpyxl
-
-所有 python 操作work with Excel files 的开源库
-openpyxl 文档：https://openpyxl.readthedocs.io/en/stable/
-xlrd 文档：https://xlrd.readthedocs.io/en/latest/
-
+所有 python 操作work with Excel files 的开源库openpyxl 文档：https://openpyxl.readthedocs.io/en/stable/xlrd 文档：https://xlrd.readthedocs.io/en/latest/
 read_excel()方法使用Python的xlrd模块来读取Excel 2003（.xls)版的文件，而Excel 2007+ （.xlsx)版本的是用xlrd或者openpyxl模块来读取的。to_excel()方法则是用来把DataFrame数据存储为Excel格式。一般来说，它的语法同使用csv数据是类似的，更多高级的用法可以参考cookbook
 测试数据 = '测试数据20200410.xlsx'
 测试数据_pdf = pd.read_excel(测试数据,dtype=object)
@@ -82,11 +90,7 @@ DataFrame
 df_empty = pd.DataFrame(columns=['A', 'B', 'C', 'D'])
 
 遍历
-
-iterrows():  按行遍历，将DataFrame的每一行迭代为(index, Series)对，可以通过row[name]对元素进行访问。
-itertuples():  按行遍历，将DataFrame的每一行迭代为元祖，可以通过row[name]对元素进行访问，比iterrows()效率高。
-iteritems(): 按列遍历，将DataFrame的每一列迭代为(列名, Series)对，可以通过row[index]对元素进行访问。
-
+iterrows(): 按行遍历，将DataFrame的每一行迭代为(index, Series)对，可以通过row[name]对元素进行访问。itertuples(): 按行遍历，将DataFrame的每一行迭代为元祖，可以通过row[name]对元素进行访问，比iterrows()效率高。iteritems(): 按列遍历，将DataFrame的每一列迭代为(列名, Series)对，可以通过row[index]对元素进行访问。
 #遍历每一行
 for row in df.itertuples():
     ID = getattr(row, 'ID')
@@ -201,8 +205,7 @@ def convert_str_datetime(df):
 在处理时间序列数据时，你可能会遇到字符串格式的时间戳列。这意味着我们可能不得不将字符串格式的数据转换为根据我们的需求指定的日期「datetime」格式，以便使用这些数据进行有意义的分析和展示
 
 探索性数据分析
-https://www.jianshu.com/p/8982ad63eb85
-
+https://www.jianshu.com/p/8982ad63eb85 
 https://mp.weixin.qq.com/s?__biz=MjM5MTQzNzU2NA==&mid=2651667552&idx=1&sn=14e11d8ba698d92696cf4a125807564e&chksm=bd4c1bf38a3b92e507cc4464f6a8f90d92132f2af5a72f86939c826362ebfd4803fa39b4d66c&mpshare=1&scene=1&srcid=0209WG9hxbGM0awtUZcvl0dj#rd
 百分比计算
 比如直接由 spark dataframe 统计的结果转化成pandas 的dataframe 两列相除就好
@@ -222,8 +225,7 @@ temp_top_pdf ['百分比'] = temp_top_pdf ['最多金额大类']/temp_lipebigjib
 
 数据可视化
 中文显示
-pandas 处理完成数据后，大家经常使用的可视化库有matplotlib ，seaborn，pyecharts 等
-前两个中文字体显示成问题，最后一个因为是国产库中文支持比较好但是在jupyter notebook中生成的结果是网页，图片不知道怎么显示出来。 以下参考链接为 我博客另一个系列中针对matplotlib ，seaborn中文显示问题的探讨：
+pandas 处理完成数据后，大家经常使用的可视化库有matplotlib ，seaborn，pyecharts 等 前两个中文字体显示成问题，最后一个因为是国产库中文支持比较好但是在jupyter notebook中生成的结果是网页，图片不知道怎么显示出来。 以下参考链接为 我博客另一个系列中针对matplotlib ，seaborn中文显示问题的探讨：
 以 matplotlib 为基础的库的可视化库的中文显示问题 
 参考教程
 https://tianchi.aliyun.com/course/courseDetail?courseId=261
@@ -277,7 +279,6 @@ InteractiveShell.ast_node_interactivity = 'all'
 
 
 参考
-
 机器知心：pandas 数据清洗工具框架代码（还在为数据清洗抓狂？这里有一个简单实用的清洗代码集）
 
 

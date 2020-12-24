@@ -2,8 +2,7 @@
 
 
     
-
-Description:
+ Description:
 
 Count the number of prime numbers less than a non-negative number, n
  
@@ -121,8 +120,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
-
-超时代码：
+  超时代码：
  
 int countPrimes(int n)
     {
@@ -146,6 +144,6 @@ int countPrimes(int n)
 
 纪念一下首次AC
  
-
+ 
 
 

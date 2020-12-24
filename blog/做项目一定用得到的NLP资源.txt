@@ -4,7 +4,6 @@
 
 
 
-
 原文链接：https://github.com/fighting41love/funNLP
 
 最近需要从文本中抽取结构化信息，用到了很多github上的包，遂整理了一下，后续会不断更新。
@@ -87,7 +86,7 @@ phoneNumbers = re.findall(cellphone_pattern, text, flags=0)
 IDCards_pattern = r'^([1-9]\d{5}[12]\d{3}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])\d{3}[0-9xX])$'
 IDs = re.findall(IDCards_pattern, text, flags=0)
 
-10.  人名语料库： wainshine/Chinese-Names-Corpus
+10. 人名语料库： wainshine/Chinese-Names-Corpus
 
 人名抽取功能 python package cocoNLP，欢迎试用
 
@@ -202,33 +201,7 @@ publishTime: 该谣言被举报时间
 35. 句子、QA相似度匹配:MatchZoo github
 文本相似度匹配算法的集合，包含多个深度学习的方法，值得尝试。
 36. bert资源：
-
-
-Bert原作者的slides: link
-提取码: iarj
-
-
-文本分类实践: github
-
-
-bert tutorial文本分类教程: github
-
-
-bert pytorch实现:  github
-
-
-bert用于中文命名实体识别 tensorflow版本: github
-
-
-bert 基于 keras 的封装分类标注框架 Kashgari，几分钟即可搭建一个分类或者序列标注模型: github
-
-
-bert、ELMO的图解： github
-
-
-BERT: Pre-trained models and downstream applications: github
-
-
+ Bert原作者的slides: link 提取码: iarj  文本分类实践: github  bert tutorial文本分类教程: github  bert pytorch实现: github  bert用于中文命名实体识别 tensorflow版本: github  bert 基于 keras 的封装分类标注框架 Kashgari，几分钟即可搭建一个分类或者序列标注模型: github  bert、ELMO的图解： github  BERT: Pre-trained models and downstream applications: github 
 37. Texar - Toolkit for Text Generation and Beyond: github
 基于Tensorflow的开源工具包，旨在支持广泛的机器学习，特别是文本生成任务，如机器翻译、对话、摘要、内容处置、语言建模等
 38. 中文事件抽取： github
@@ -274,139 +247,19 @@ time {"type": "timestamp", "timestamp": "2018-11-27 11:00:00"}
 
 
 40. 国内电话号码正则匹配（三大运营商+虚拟等）: github
-41. 清华大学XLORE:中英文跨语言百科知识图谱: link
-上述链接中包含了所有实体及关系的TTL文件，更多数据将在近期发布。
-概念，实例，属性和上下位关系数目
-
-
-
-
-百度
-中文维基
-英文维基
-总数
-
-
-
-
-概念数量
-32,009
-150,241
-326,518
-508,768
-
-
-实例数量
-1,629,591
-640,622
-1,235,178
-3,505,391
-
-
-属性数量
-157,370
-45,190
-26,723
-229.283
-
-
-InstanceOf
-7,584,931
-1,449,925
-3,032,515
-12,067,371
-
-
-SubClassOf
-2,784
-191,577
-555,538
-749,899
-
-
+41. 清华大学XLORE:中英文跨语言百科知识图谱: link 上述链接中包含了所有实体及关系的TTL文件，更多数据将在近期发布。 概念，实例，属性和上下位关系数目
+百度中文维基英文维基总数概念数量32,009150,241326,518508,768实例数量1,629,591640,6221,235,1783,505,391属性数量157,37045,19026,723229.283InstanceOf7,584,9311,449,9253,032,51512,067,371SubClassOf2,784191,577555,538749,899
 跨语言连接（概念/实例）
-
-
-
-
-百度
-中文维基
-英文维基
-
-
-
-
-百度
--
-10,216/336,890
-4,846/303,108
-
-
-中文维基
-10,216/336,890
--
-28,921/454,579
-
-
-英文维基
-4,846/303,108
-28,921/454,579
--
-
-
-42. 清华大学人工智能技术系列报告： link
-每年会出AI领域相关的报告，内容包含
-
-自然语言处理 link
-知识图谱 link
-数据挖掘 link
-自动驾驶 link
-机器翻译 link
-区块链 link
-机器人 link
-计算机图形学 link
-3D打印 link
-人脸识别 link
-人工智能芯片 link
-等等
-
-43.自然语言生成方面:
-Ehud Reiter教授的博客  北大万小军教授强力推荐，该博客对NLG技术、评价与应用进行了深入的探讨与反思。
-文本生成相关资源大列表
-自然语言生成：让机器掌握自动创作的本领 - 开放域对话生成及在微软小冰中的实践
-文本生成控制
-44.:
-jieba和hanlp就不必介绍了吧。
+百度中文维基英文维基百度-10,216/336,8904,846/303,108中文维基10,216/336,890-28,921/454,579英文维基4,846/303,10828,921/454,579-
+42. 清华大学人工智能技术系列报告： link 每年会出AI领域相关的报告，内容包含
+自然语言处理 link知识图谱 link数据挖掘 link自动驾驶 link机器翻译 link区块链 link机器人 link计算机图形学 link3D打印 link人脸识别 link人工智能芯片 link等等
+43.自然语言生成方面: Ehud Reiter教授的博客 北大万小军教授强力推荐，该博客对NLG技术、评价与应用进行了深入的探讨与反思。 文本生成相关资源大列表 自然语言生成：让机器掌握自动创作的本领 - 开放域对话生成及在微软小冰中的实践 文本生成控制
+44.: jieba和hanlp就不必介绍了吧。
 45.NLP太难了系列: github
-
-来到杨过曾经生活过的地方，小龙女动情地说：“我也想过过过儿过过的生活。” ​​​
-来到儿子等校车的地方，邓超对孙俪说：“我也想等等等等等过的那辆车。”
-赵敏说：我也想控忌忌己不想无忌。
-你也想犯范范范玮琪犯过的错吗
-对叙打击是一次性行为？
-
-46.自动对联数据及机器人:
-70万对联数据 link
-代码 link
-
-
-
-上联
-下联
-
-
-
-
-殷勤怕负三春意
-潇洒难书一字愁
-
-
-如此清秋何吝酒
-这般明月不须钱
-
-
-47.用户名黑名单列表： github
-包含了用户名禁用列表，比如: link
+来到杨过曾经生活过的地方，小龙女动情地说：“我也想过过过儿过过的生活。” ​​​来到儿子等校车的地方，邓超对孙俪说：“我也想等等等等等过的那辆车。”赵敏说：我也想控忌忌己不想无忌。你也想犯范范范玮琪犯过的错吗对叙打击是一次性行为？
+46.自动对联数据及机器人: 70万对联数据 link 代码 link
+上联下联殷勤怕负三春意潇洒难书一字愁如此清秋何吝酒这般明月不须钱
+47.用户名黑名单列表： github 包含了用户名禁用列表，比如: link
 administrator
 administration
 autoconfig
@@ -432,100 +285,37 @@ mail1
 49.微信公众号语料: github
 3G语料，包含部分网络抓取的微信公众号的文章，已经去除HTML，只包含了纯文本。每行一篇，是JSON格式，name是微信公众号名字，account是微信公众号ID，title是题目，content是正文
 50.cs224n深度学习自然语言处理课程：link
-
-课程中模型的pytorch实现 link
-面向深度学习研究人员的自然语言处理实例教程 link
-
+课程中模型的pytorch实现 link面向深度学习研究人员的自然语言处理实例教程 link
 51.中文手写汉字识别：github
-52.中文自然语言处理 语料/数据集：github
-竞品：THUOCL（THU Open Chinese Lexicon）中文词库
+52.中文自然语言处理 语料/数据集：github 竞品：THUOCL（THU Open Chinese Lexicon）中文词库
 53.变量命名神器：github link
 54.分词语料库+代码：百度网盘链接
-
-提取码: pea6
-keras实现的基于Bi-LSTM + CRF的中文分词+词性标注
-基于Universal Transformer + CRF 的中文分词和词性标注
-快速神经网络分词包 java version
-
+提取码: pea6keras实现的基于Bi-LSTM + CRF的中文分词+词性标注基于Universal Transformer + CRF 的中文分词和词性标注快速神经网络分词包 java version
 55. NLP新书推荐《Natural Language Processing》by Jacob Eisenstein： link
-56. 任务型对话英文数据集： github
-【最全任务型对话数据集】主要介绍了一份任务型对话数据集大全，这份数据集大全涵盖了到目前在任务型对话领域的所有常用数据集的主要信息。此外，为了帮助研究者更好的把握领域进展的脉络，我们以Leaderboard的形式给出了几个数据集上的State-of-the-art实验结果。
+56. 任务型对话英文数据集： github 【最全任务型对话数据集】主要介绍了一份任务型对话数据集大全，这份数据集大全涵盖了到目前在任务型对话领域的所有常用数据集的主要信息。此外，为了帮助研究者更好的把握领域进展的脉络，我们以Leaderboard的形式给出了几个数据集上的State-of-the-art实验结果。
 57. ASR 语音数据集 + 基于深度学习的中文语音识别系统： github
-
-
-Data Sets 数据集
-
-
-清华大学THCHS30中文语音数据集
-data_thchs30.tgz
-OpenSLR国内镜像
-OpenSLR国外镜像
-test-noise.tgz
-OpenSLR国内镜像
-OpenSLR国外镜像
-resource.tgz
-OpenSLR国内镜像
-OpenSLR国外镜像
-
-
-Free ST Chinese Mandarin Corpus
-ST-CMDS-20170001_1-OS.tar.gz
-OpenSLR国内镜像
-OpenSLR国外镜像
-
-
-AIShell-1 开源版数据集
-data_aishell.tgz
-OpenSLR国内镜像
-OpenSLR国外镜像
-
-
-注：数据集解压方法
-$ tar xzf data_aishell.tgz
+ Data Sets 数据集
+ 清华大学THCHS30中文语音数据集 data_thchs30.tgz OpenSLR国内镜像 OpenSLR国外镜像 test-noise.tgz OpenSLR国内镜像 OpenSLR国外镜像 resource.tgz OpenSLR国内镜像 OpenSLR国外镜像  Free ST Chinese Mandarin Corpus ST-CMDS-20170001_1-OS.tar.gz OpenSLR国内镜像 OpenSLR国外镜像  AIShell-1 开源版数据集 data_aishell.tgz OpenSLR国内镜像 OpenSLR国外镜像  注：数据集解压方法 $ tar xzf data_aishell.tgz
 $ cd data_aishell/wav
 $ for tar in *.tar.gz;  do tar xvf $tar; done
 
-
-
-Primewords Chinese Corpus Set 1
-primewords_md_2018_set1.tar.gz
-OpenSLR国内镜像
-OpenSLR国外镜像
-
-
-
-
+ Primewords Chinese Corpus Set 1 primewords_md_2018_set1.tar.gz OpenSLR国内镜像 OpenSLR国外镜像  
 58. 笑声检测器： github
 59. Microsoft多语言数字/单位/如日期时间识别包： [github](https://github.com/Microsoft/Recognizers-Text
 60. chinese-xinhua 中华新华字典数据库及api，包括常用歇后语、成语、词语和汉字 github
 61. 文档图谱自动生成 github
-
 TextGrapher - Text Content Grapher based on keyinfo extraction by NLP method。输入一篇文档，将文档进行关键信息提取，进行结构化，并最终组织成图谱组织形式，形成对文章语义信息的图谱化展示
-
 62. SpaCy 中文模型 github
-
 包含Parser, NER, 语法树等功能。有一些英文package使用spacy的英文模型的，如果要适配中文，可能需要使用spacy中文模型。
-
 63. Common Voice语音识别数据集新版 link
-
 包括来自42,000名贡献者超过1,400小时的语音样本，涵github
-
 64. 神经网络关系抽取 pytorch github
-
 暂不支持中文
-
 65. 基于bert的命名实体识别 pytorch github
-
 暂不支持中文
-
-66. 关键词(Keyphrase)抽取包 pke github
-pke: an open source python-based keyphrase extraction toolkit
-
-暂不支持中文，我于近期对其进行修改，使其适配中文。
-请关注我的github动态，谢谢！
-
+66. 关键词(Keyphrase)抽取包 pke github pke: an open source python-based keyphrase extraction toolkit
+暂不支持中文，我于近期对其进行修改，使其适配中文。 请关注我的github动态，谢谢！
 67. 基于医疗领域知识图谱的问答系统 github
-
 该repo参考了github
 
 

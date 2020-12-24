@@ -1,15 +1,13 @@
 
 
 
-
-
-Given a string containing just the characters 
-'(', ')', '{', '}', '[' and']', determine if the input string is valid.
-The brackets must close in the correct order, 
-"()" and "()[]{}" are all valid but "(]" and 
-"([)]" are not.
-
+ 
+ 
+Given a string containing just the characters  '(', ')', '{', '}', '[' and']', determine if the input string is valid.
+The brackets must close in the correct order,  "()" and "()[]{}" are all valid but "(]" and  "([)]" are not.
+ 
 写了一个0ms 的代码：
+ 
 
 
 // 20150630.cpp : 定义控制台应用程序的入口点。
@@ -69,8 +67,8 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
-
-
+ 
+ 
 另外一个看着好看点的：
 class Solution {
     public:
@@ -117,9 +115,10 @@ class Solution {
         }
     };
 
-
-
+ 
+ 
 python代码：
+
 class Solution:
     # @return a boolean
     def isValid(self, s):
@@ -134,6 +133,11 @@ class Solution:
             else:
                 return False
         return stack == []
+
+
+
+
+
 </pre><pre class="python" name="code">class Solution:
     # @param s, a string
     # @return a boolean
@@ -154,6 +158,8 @@ class Solution:
 
         return not stack
 
+ 
+
 class Solution:
     # @param s, a string
     # @return a boolean
@@ -171,6 +177,12 @@ class Solution:
             return False
         return True
 
-﻿﻿
+
+
+
+
+
+ ﻿﻿
+
 
 

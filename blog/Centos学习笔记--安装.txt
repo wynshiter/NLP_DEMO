@@ -3,33 +3,21 @@
 
  
 centos6.0如果采用默认的最小化安装是没有安装桌面环境的，因此需要手动安装桌面环境。
-我们可以用 #yum grouplist 查看已经安装的组件，以及支持安装的组件 首先，安装 X window system# yum groupinstall "
-X Window system"由于centos6.0中只支持KDE组件，因此，安装KDE桌面环境#yum groupinstall "KDE Desktop"
-
-开机为文本界面，由文本界面切换到图形界面：
+我们可以用 #yum grouplist 查看已经安装的组件，以及支持安装的组件 首先，安装 X window system# yum groupinstall " X Window system"由于centos6.0中只支持KDE组件，因此，安装KDE桌面环境#yum groupinstall "KDE Desktop"
+ 开机为文本界面，由文本界面切换到图形界面：
     方法1：运行命令
           #startx ， 需要先配置图形界面信息
     方法2：修改/etc/inittab文件中的 
           id:3:initdefault ， 将3改为5 ，重新启动系统； 
     方法3：进入图形界面： init 5
- 从图形界面进入文本界面： init 3
- 重启： init 6
- 关机： init 3 
-真机环境中，在图形界面和文本界面间快捷键切换：
+ 从图形界面进入文本界面： init 3  重启： init 6
+ 关机： init 3  真机环境中，在图形界面和文本界面间快捷键切换：
     Ctrl+Alt+F(n) , 其中F(n)为F1-F6 ，为6个控制台；
     Ctrl+ALT+F7 ；
 eg:CTRL+ALT+F1是进入文本界面，CTRL+ALT+F7才是图形界面。
  
-
-centos 下shutdown的命令后跟时间的单位是分钟
-shutdown 60是60分钟后关机。
-
-2012-1-20
-从新安装了centos，选择desktop 安装桌面以及xwindows环境。1063个软件包。
-2012-2-2
-1.除了/之外所有字符都合法
-2.有的字符，空格符，制表符，退格符和@#最好不要使用
-3.避免使用.作为普通文件名的第一个字符。（.开头表示隐藏文件）
-4.大小写敏感
+ centos 下shutdown的命令后跟时间的单位是分钟 shutdown 60是60分钟后关机。
+ 2012-1-20 从新安装了centos，选择desktop 安装桌面以及xwindows环境。1063个软件包。
+2012-2-2 1.除了/之外所有字符都合法 2.有的字符，空格符，制表符，退格符和@#最好不要使用 3.避免使用.作为普通文件名的第一个字符。（.开头表示隐藏文件） 4.大小写敏感 
 
 

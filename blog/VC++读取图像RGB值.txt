@@ -2,8 +2,9 @@
 
 
 
-
+ 
 代码：
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -47,6 +48,10 @@ int main()
     GdiplusShutdown(gdiplustoken);
     return 0;
 }
+
+
+
+
 
 
 

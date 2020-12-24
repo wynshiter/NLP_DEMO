@@ -1,15 +1,15 @@
 
 
 
-    
-自然图像抠图/视频抠像技术发展情况梳理（image matting, alpha matting, video matting）--计算机视觉专题1        
      
-分类：             
-Computer Vision              2014-04-14 13:52    
-84人阅读     
-评论(0)    
-收藏    
-举报    
+自然图像抠图/视频抠像技术发展情况梳理（image matting, alpha matting, video matting）--计算机视觉专题1              
+
+分类：              Computer Vision              
+ 2014-04-14 13:52     
+ 84人阅读     
+  评论(0)     
+ 收藏     
+ 举报     
 
 
 
@@ -18,201 +18,109 @@ Computer Vision              2014-04-14 13:52    
 
 Sason@CSDN
 
-
-持续更新.
-
-当前更新日期2013.03.05, 添加Fast Mating、Global Matting、视频扣像。
-
-当前更新日期2013.04.23, 添加2本Computer Vision书籍中相关章节。
-
-当前更新日期2013.07.21, 添加CVPR 2013中2篇论文。
-
-当前更新日期2013.08.19, 强推一个网站“http://www.alphamatting.com”。
-
-
-
-此网站作为初学者研究Matting首选。第一次查到它时，评估做的没有这么详细。所以我自己做了这个调研。
-
-
-
-自然图像抠图：
-
-1. Bayesian Matting, Chuang, CVPR 2001.
-
-http://grail.cs.washington.edu/projects/digital-matting/papers/cvpr2001.pdf  论文下载
-
-http://grail.cs.washington.edu/projects/digital-matting/image-matting/ 项目网址
-
-2. GraphCut Segmentation System, Rother, 2004.
-
-http://pdf.aminer.org/000/292/851/demonstration_of_segmentation_with_interactive_graph_cuts.pdf 论文下载
-
-http://pub.ist.ac.at/~vnk/software.html     Vladimir Kolmogorov
-
-http://vision.csd.uwo.ca/code/ — some graph cut libraries and MATLAB wrappers
-
-http://www.cis.upenn.edu/~jshi/GraphTutorial/ 宾大石建波老师做的教程
-
-http://code.google.com/p/segmentationgraphcut/  Implementation of the articleStar Shape Prior for Graph-Cut Image Segmentation
-
-3. Possion Matting, Sun, 2004.
-
-http://research.microsoft.com/pubs/69117/poissonmatting_siggraph04.pdf 论文下载
-
-http://www.cad.zju.edu.cn/home/zldong/code.html 浙江大学CAD&CG LAB董子龙主页
-
-4. Lazy Snapping, Li, 2004.
-
-http://research.microsoft.com/apps/pubs/default.aspx?id=69040  论文下载
-
-http://lzhj.me/archives/93 一个博客中的相关介绍
-
-https://github.com/zhijie/lazy-snapping-  C++实现
-
-http://cs.brown.edu/courses/csci1950-g/results/final/thale/  一个学生的实现
-
-http://www.cs.cmu.edu/~mohitg/segmentation.htm   "Lazy Snapping"和“GrabCut”的Matlab实现，基于交互式图割
-
-5. Easy Matting, Guan, Eurographics,2006.
-
-http://www.cad.zju.edu.cn/home/chenwei/research/EG2006_paper.pdf 论文下载
-
-6. Flash Matting, Sun,ACM Transactions on Graphics, 2006.
-
-http://research.microsoft.com/en-us/um/people/jiansun/papers/FlashMatting_SIGGRAPH06.pdf 论文下载
-
-7. Robust Matting, Wang,CVPR 2007.
-
-grail.cs.washington.edu/pub/papers/wang2007robust.pdf 论文下载
-
-8. Spectral Matting, Levin, CVPR 2006.
-
-http://www.vision.huji.ac.il/SpectralMatting/  项目网址，包括论文、代码和数据
-
-9. Closed-form Matting, Levin, CVPR 2007.
-
-http://people.csail.mit.edu/alevin/matting.tar.gz  代码下载网址
-
-10. Learning-based Matting, Zheng, ICCV 2009.
-
-http://www.mathworks.com/matlabcentral/fileexchange/31412  代码下载网址
-
-11. Shared Matting, Gastal, Eurographics, 2010.
-
-www.inf.ufrgs.br/~eslgastal/SharedMatting/  项目地址
-
-http://download.csdn.net/detail/jlwyc/4676516  一个OpenCV实现
-
-12. Fast Matting,K. He,CVPR2010.
-
-mmlab.ie.cuhk.edu.hk/2010/CVPR10_FastMatting.pdf 
-
-13. Global Matting, K. He, CVPR 2011.
-
-research.microsoft.com/pubs/147302/heetal.pdf
-
-14. Non-local Matting, Lee, CVPR 2011.
-
-http://users.eecs.northwestern.edu/~pgl622/files/NonlocalMatting_Lee_2011.pdf  论文下载
-
-15. KNN Matting, Chen, CVPR 2012.
-
-http://ihome.ust.hk/~dli/projects/knn/  项目网址，包括论文、代码和数据
-
-
-
-16. Improving Image Matting Using Comprehensive Sampling Sets, CVPR, 2013.
-
-http://www.cv-foundation.org/openaccess/content_cvpr_2013/papers/Shahrian_Improving_Image_Matting_2013_CVPR_paper.pdf
-
-17. Image Matting with Local and Nonlocal Smooth Priors, CVPR, 2013.
+ 持续更新.
+ 当前更新日期2013.03.05, 添加Fast Mating、Global Matting、视频扣像。
+ 当前更新日期2013.04.23, 添加2本Computer Vision书籍中相关章节。 
+ 当前更新日期2013.07.21, 添加CVPR 2013中2篇论文。
+ 当前更新日期2013.08.19, 强推一个网站“http://www.alphamatting.com”。
+  
+ 此网站作为初学者研究Matting首选。第一次查到它时，评估做的没有这么详细。所以我自己做了这个调研。 
+  
+ 自然图像抠图： 
+ 1. Bayesian Matting, Chuang, CVPR 2001.
+ http://grail.cs.washington.edu/projects/digital-matting/papers/cvpr2001.pdf  论文下载 
+ http://grail.cs.washington.edu/projects/digital-matting/image-matting/ 项目网址
+ 2. GraphCut Segmentation System, Rother, 2004.
+ http://pdf.aminer.org/000/292/851/demonstration_of_segmentation_with_interactive_graph_cuts.pdf 论文下载 
+ http://pub.ist.ac.at/~vnk/software.html     Vladimir Kolmogorov 
+ http://vision.csd.uwo.ca/code/ — some graph cut libraries and MATLAB wrappers 
+ http://www.cis.upenn.edu/~jshi/GraphTutorial/ 宾大石建波老师做的教程
+ http://code.google.com/p/segmentationgraphcut/  Implementation of the articleStar Shape Prior for Graph-Cut Image Segmentation 
+ 3. Possion Matting, Sun, 2004.
+ http://research.microsoft.com/pubs/69117/poissonmatting_siggraph04.pdf 论文下载
+ http://www.cad.zju.edu.cn/home/zldong/code.html 浙江大学CAD&CG LAB董子龙主页 
+ 4. Lazy Snapping, Li, 2004.
+ http://research.microsoft.com/apps/pubs/default.aspx?id=69040  论文下载 
+ http://lzhj.me/archives/93 一个博客中的相关介绍
+ https://github.com/zhijie/lazy-snapping-  C++实现 
+ http://cs.brown.edu/courses/csci1950-g/results/final/thale/  一个学生的实现
+ http://www.cs.cmu.edu/~mohitg/segmentation.htm   "Lazy Snapping"和“GrabCut”的Matlab实现，基于交互式图割
+ 5. Easy Matting, Guan, Eurographics,2006. 
+ http://www.cad.zju.edu.cn/home/chenwei/research/EG2006_paper.pdf 论文下载 
+ 6. Flash Matting, Sun,ACM Transactions on Graphics, 2006.
+ http://research.microsoft.com/en-us/um/people/jiansun/papers/FlashMatting_SIGGRAPH06.pdf 论文下载 
+ 7. Robust Matting, Wang,CVPR 2007.
+ grail.cs.washington.edu/pub/papers/wang2007robust.pdf 论文下载 
+ 8. Spectral Matting, Levin, CVPR 2006.
+ http://www.vision.huji.ac.il/SpectralMatting/  项目网址，包括论文、代码和数据 
+ 9. Closed-form Matting, Levin, CVPR 2007.
+ http://people.csail.mit.edu/alevin/matting.tar.gz  代码下载网址 
+ 10. Learning-based Matting, Zheng, ICCV 2009.
+ http://www.mathworks.com/matlabcentral/fileexchange/31412  代码下载网址 
+ 11. Shared Matting, Gastal, Eurographics, 2010.
+ www.inf.ufrgs.br/~eslgastal/SharedMatting/  项目地址
+ http://download.csdn.net/detail/jlwyc/4676516  一个OpenCV实现
+ 12. Fast Matting,K. He,CVPR2010. 
+ mmlab.ie.cuhk.edu.hk/2010/CVPR10_FastMatting.pdf  
+ 13. Global Matting, K. He, CVPR 2011. 
+ research.microsoft.com/pubs/147302/heetal.pdf 
+ 14. Non-local Matting, Lee, CVPR 2011.
+ http://users.eecs.northwestern.edu/~pgl622/files/NonlocalMatting_Lee_2011.pdf  论文下载 
+ 15. KNN Matting, Chen, CVPR 2012.
+ http://ihome.ust.hk/~dli/projects/knn/  项目网址，包括论文、代码和数据
+ 
+ 16. Improving Image Matting Using Comprehensive Sampling Sets, CVPR, 2013. 
+ http://www.cv-foundation.org/openaccess/content_cvpr_2013/papers/Shahrian_Improving_Image_Matting_2013_CVPR_paper.pdf 
+ 17. Image Matting with Local and Nonlocal Smooth Priors, CVPR, 2013. 
 http://www.ece.nus.edu.sg/stfpage/eletp/Papers/cvpr13_matting.pdf
 
-
-视频抠像：
-
-
-
-1. Video Matting of Complex Scenes, ACM Transactions on Graphics, 2002.
+  
+ 视频抠像： 
+ 
+ 1. Video Matting of Complex Scenes, ACM Transactions on Graphics, 2002.
 grail.cs.washington.edu/pub/papers/Chuang-2002-VMC.pdf
 
-2. Bayesian video matting using learnt image priors, CVPR 2004.
-
-www.robots.ox.ac.uk/~nema/publications/Apostoloff04c.pdf
-
-3. Defocus Video Matting, ACM Trans. Graph.2005.
-
-http://dash.harvard.edu/bitstream/handle/1/4101995/mcguire-defocus.pdf?sequence=2
-
-4. Natural video matting using camera arrays, ACM Transactions on Graphics, 2006.
-
-http://graphics.ucsd.edu/papers/camera_array_matting/MultiCameraMatting.pdf
-
-5. Spectral Video Matting, VMV, 2009.
-
-vmv09.tu-bs.de/downloads/papers/eis09.pdf
-
-6. Temporally coherent video matting, Graph.Models, 2010.
-
-visualcomputing.yonsei.ac.kr/papers/2010/matting.pdf
-
-7. Automatic Spectral Video Matting, PR, 2012.
-
-http://www.sciencedirect.com/science/article/pii/S0031320312004463
+ 2. Bayesian video matting using learnt image priors, CVPR 2004.
+ www.robots.ox.ac.uk/~nema/publications/Apostoloff04c.pdf 
+ 3. Defocus Video Matting, ACM Trans. Graph.2005.
+ http://dash.harvard.edu/bitstream/handle/1/4101995/mcguire-defocus.pdf?sequence=2
+ 4. Natural video matting using camera arrays, ACM Transactions on Graphics, 2006. 
+ http://graphics.ucsd.edu/papers/camera_array_matting/MultiCameraMatting.pdf 
+ 5. Spectral Video Matting, VMV, 2009. 
+ vmv09.tu-bs.de/downloads/papers/eis09.pdf
+ 6. Temporally coherent video matting, Graph.Models, 2010.
+ visualcomputing.yonsei.ac.kr/papers/2010/matting.pdf 
+ 7. Automatic Spectral Video Matting, PR, 2012. 
+ http://www.sciencedirect.com/science/article/pii/S0031320312004463 
 8. Video Matting Using Multi-Frame Nonlocal Matting Laplacian, ECCV, 2012.
-yuwing.kaist.ac.kr/papers/eccv12_videomatte.pdf
 
+ yuwing.kaist.ac.kr/papers/eccv12_videomatte.pdf
 
-
-其他资料：
-
-1. Image and Video Matting: A Survey, Wang, 2007
-
-http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.190.1825&rep=rep1&type=pdf
-
-2. A Perceptually Motivated Online Benchmark for ImageMatting
-
-http://www.alphamatting.com/
-
-3. 数字抠像的最新研究进展 - 自动化学报 2012
-
-www.aas.net.cn/qikan/manage/wenzhang/20121002.pdf
-
-4. Bayesian & Robust Matting & Flash Matting的实现
-
-http://mpac.ee.ntu.edu.tw/~sutony/vfx_matting/index.html
-
-5. Image Matting GUI，4 algorithms include Poisson Matting
-
-http://www.cs.unc.edu/~lguan/Research.files/Research.htm#IM
-
-6. Some Techniques of Natural Image and Video Matting
-
-http://www.cad.zju.edu.cn/home/zldong/course/CV2/Image%20Matting.doc
-
-7. Richard J. Radke,Computer Vision forVisual Effects, Cambridge, 2013.
-
-Chapter 2, Image Matting.
-
-8. Richard Szeliski, Computer Vision: Algorithm andApplication, 2010.
-
-Chapter 10. 4, Image matting andcompositing.
-
- 
-
-
-
-自然图像抠图/视频抠像技术发展情况梳理（image matting, alpha matting, video matting）--计算机视觉专题1
-
-http://blog.csdn.net/anshan1984/article/details/8581225
-
-图像/视觉显著性检测技术发展情况梳理(Saliency Detection、Visual Attention）--计算机视觉专题2
-http://blog.csdn.net/anshan1984/article/details/8657176
-
-超像素分割技术发展情况梳理(Superpixel Segmentation）--计算机视觉专题3
-http://blog.csdn.net/anshan1984/article/details/8918167
-
-
+  
+ 其他资料： 
+ 1. Image and Video Matting: A Survey, Wang, 2007 
+ http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.190.1825&rep=rep1&type=pdf 
+ 2. A Perceptually Motivated Online Benchmark for ImageMatting
+ http://www.alphamatting.com/
+ 3. 数字抠像的最新研究进展 - 自动化学报 2012 
+ www.aas.net.cn/qikan/manage/wenzhang/20121002.pdf
+ 4. Bayesian & Robust Matting & Flash Matting的实现 
+ http://mpac.ee.ntu.edu.tw/~sutony/vfx_matting/index.html
+ 5. Image Matting GUI，4 algorithms include Poisson Matting 
+ http://www.cs.unc.edu/~lguan/Research.files/Research.htm#IM 
+ 6. Some Techniques of Natural Image and Video Matting 
+ http://www.cad.zju.edu.cn/home/zldong/course/CV2/Image%20Matting.doc
+ 7. Richard J. Radke,Computer Vision forVisual Effects, Cambridge, 2013.
+ Chapter 2, Image Matting.
+ 8. Richard Szeliski, Computer Vision: Algorithm andApplication, 2010.
+ Chapter 10. 4, Image matting andcompositing. 
+  
+ 
+ 自然图像抠图/视频抠像技术发展情况梳理（image matting, alpha matting, video matting）--计算机视觉专题1 
+ http://blog.csdn.net/anshan1984/article/details/8581225 
+ 图像/视觉显著性检测技术发展情况梳理(Saliency Detection、Visual Attention）--计算机视觉专题2 http://blog.csdn.net/anshan1984/article/details/8657176
+ 超像素分割技术发展情况梳理(Superpixel Segmentation）--计算机视觉专题3 http://blog.csdn.net/anshan1984/article/details/8918167 
+ 
 
 
 
@@ -223,199 +131,107 @@ http://blog.csdn.net/anshan1984/article/details/8918167
 
 Sason@CSDN
 
-
-持续更新.
-
-当前更新日期2013.03.05, 添加Fast Mating、Global Matting、视频扣像。
-
-当前更新日期2013.04.23, 添加2本Computer Vision书籍中相关章节。
-
-当前更新日期2013.07.21, 添加CVPR 2013中2篇论文。
-
-当前更新日期2013.08.19, 强推一个网站“http://www.alphamatting.com”。
-
-
-
-此网站作为初学者研究Matting首选。第一次查到它时，评估做的没有这么详细。所以我自己做了这个调研。
-
-
-
-自然图像抠图：
-
-1. Bayesian Matting, Chuang, CVPR 2001.
-
-http://grail.cs.washington.edu/projects/digital-matting/papers/cvpr2001.pdf  论文下载
-
-http://grail.cs.washington.edu/projects/digital-matting/image-matting/ 项目网址
-
-2. GraphCut Segmentation System, Rother, 2004.
-
-http://pdf.aminer.org/000/292/851/demonstration_of_segmentation_with_interactive_graph_cuts.pdf 论文下载
-
-http://pub.ist.ac.at/~vnk/software.html     Vladimir Kolmogorov
-
-http://vision.csd.uwo.ca/code/ — some graph cut libraries and MATLAB wrappers
-
-http://www.cis.upenn.edu/~jshi/GraphTutorial/ 宾大石建波老师做的教程
-
-http://code.google.com/p/segmentationgraphcut/  Implementation of the articleStar Shape Prior for Graph-Cut Image Segmentation
-
-3. Possion Matting, Sun, 2004.
-
-http://research.microsoft.com/pubs/69117/poissonmatting_siggraph04.pdf 论文下载
-
-http://www.cad.zju.edu.cn/home/zldong/code.html 浙江大学CAD&CG LAB董子龙主页
-
-4. Lazy Snapping, Li, 2004.
-
-http://research.microsoft.com/apps/pubs/default.aspx?id=69040  论文下载
-
-http://lzhj.me/archives/93 一个博客中的相关介绍
-
-https://github.com/zhijie/lazy-snapping-  C++实现
-
-http://cs.brown.edu/courses/csci1950-g/results/final/thale/  一个学生的实现
-
-http://www.cs.cmu.edu/~mohitg/segmentation.htm   "Lazy Snapping"和“GrabCut”的Matlab实现，基于交互式图割
-
-5. Easy Matting, Guan, Eurographics,2006.
-
-http://www.cad.zju.edu.cn/home/chenwei/research/EG2006_paper.pdf 论文下载
-
-6. Flash Matting, Sun,ACM Transactions on Graphics, 2006.
-
-http://research.microsoft.com/en-us/um/people/jiansun/papers/FlashMatting_SIGGRAPH06.pdf 论文下载
-
-7. Robust Matting, Wang,CVPR 2007.
-
-grail.cs.washington.edu/pub/papers/wang2007robust.pdf 论文下载
-
-8. Spectral Matting, Levin, CVPR 2006.
-
-http://www.vision.huji.ac.il/SpectralMatting/  项目网址，包括论文、代码和数据
-
-9. Closed-form Matting, Levin, CVPR 2007.
-
-http://people.csail.mit.edu/alevin/matting.tar.gz  代码下载网址
-
-10. Learning-based Matting, Zheng, ICCV 2009.
-
-http://www.mathworks.com/matlabcentral/fileexchange/31412  代码下载网址
-
-11. Shared Matting, Gastal, Eurographics, 2010.
-
-www.inf.ufrgs.br/~eslgastal/SharedMatting/  项目地址
-
-http://download.csdn.net/detail/jlwyc/4676516  一个OpenCV实现
-
-12. Fast Matting,K. He,CVPR2010.
-
-mmlab.ie.cuhk.edu.hk/2010/CVPR10_FastMatting.pdf 
-
-13. Global Matting, K. He, CVPR 2011.
-
-research.microsoft.com/pubs/147302/heetal.pdf
-
-14. Non-local Matting, Lee, CVPR 2011.
-
-http://users.eecs.northwestern.edu/~pgl622/files/NonlocalMatting_Lee_2011.pdf  论文下载
-
-15. KNN Matting, Chen, CVPR 2012.
-
-http://ihome.ust.hk/~dli/projects/knn/  项目网址，包括论文、代码和数据
-
-
-
-16. Improving Image Matting Using Comprehensive Sampling Sets, CVPR, 2013.
-
-http://www.cv-foundation.org/openaccess/content_cvpr_2013/papers/Shahrian_Improving_Image_Matting_2013_CVPR_paper.pdf
-
-17. Image Matting with Local and Nonlocal Smooth Priors, CVPR, 2013.
+ 持续更新.
+ 当前更新日期2013.03.05, 添加Fast Mating、Global Matting、视频扣像。
+ 当前更新日期2013.04.23, 添加2本Computer Vision书籍中相关章节。 
+ 当前更新日期2013.07.21, 添加CVPR 2013中2篇论文。
+ 当前更新日期2013.08.19, 强推一个网站“http://www.alphamatting.com”。
+  
+ 此网站作为初学者研究Matting首选。第一次查到它时，评估做的没有这么详细。所以我自己做了这个调研。 
+  
+ 自然图像抠图： 
+ 1. Bayesian Matting, Chuang, CVPR 2001.
+ http://grail.cs.washington.edu/projects/digital-matting/papers/cvpr2001.pdf  论文下载 
+ http://grail.cs.washington.edu/projects/digital-matting/image-matting/ 项目网址
+ 2. GraphCut Segmentation System, Rother, 2004.
+ http://pdf.aminer.org/000/292/851/demonstration_of_segmentation_with_interactive_graph_cuts.pdf 论文下载 
+ http://pub.ist.ac.at/~vnk/software.html     Vladimir Kolmogorov 
+ http://vision.csd.uwo.ca/code/ — some graph cut libraries and MATLAB wrappers 
+ http://www.cis.upenn.edu/~jshi/GraphTutorial/ 宾大石建波老师做的教程
+ http://code.google.com/p/segmentationgraphcut/  Implementation of the articleStar Shape Prior for Graph-Cut Image Segmentation 
+ 3. Possion Matting, Sun, 2004.
+ http://research.microsoft.com/pubs/69117/poissonmatting_siggraph04.pdf 论文下载
+ http://www.cad.zju.edu.cn/home/zldong/code.html 浙江大学CAD&CG LAB董子龙主页 
+ 4. Lazy Snapping, Li, 2004.
+ http://research.microsoft.com/apps/pubs/default.aspx?id=69040  论文下载 
+ http://lzhj.me/archives/93 一个博客中的相关介绍
+ https://github.com/zhijie/lazy-snapping-  C++实现 
+ http://cs.brown.edu/courses/csci1950-g/results/final/thale/  一个学生的实现
+ http://www.cs.cmu.edu/~mohitg/segmentation.htm   "Lazy Snapping"和“GrabCut”的Matlab实现，基于交互式图割
+ 5. Easy Matting, Guan, Eurographics,2006. 
+ http://www.cad.zju.edu.cn/home/chenwei/research/EG2006_paper.pdf 论文下载 
+ 6. Flash Matting, Sun,ACM Transactions on Graphics, 2006.
+ http://research.microsoft.com/en-us/um/people/jiansun/papers/FlashMatting_SIGGRAPH06.pdf 论文下载 
+ 7. Robust Matting, Wang,CVPR 2007.
+ grail.cs.washington.edu/pub/papers/wang2007robust.pdf 论文下载 
+ 8. Spectral Matting, Levin, CVPR 2006.
+ http://www.vision.huji.ac.il/SpectralMatting/  项目网址，包括论文、代码和数据 
+ 9. Closed-form Matting, Levin, CVPR 2007.
+ http://people.csail.mit.edu/alevin/matting.tar.gz  代码下载网址 
+ 10. Learning-based Matting, Zheng, ICCV 2009.
+ http://www.mathworks.com/matlabcentral/fileexchange/31412  代码下载网址 
+ 11. Shared Matting, Gastal, Eurographics, 2010.
+ www.inf.ufrgs.br/~eslgastal/SharedMatting/  项目地址
+ http://download.csdn.net/detail/jlwyc/4676516  一个OpenCV实现
+ 12. Fast Matting,K. He,CVPR2010. 
+ mmlab.ie.cuhk.edu.hk/2010/CVPR10_FastMatting.pdf  
+ 13. Global Matting, K. He, CVPR 2011. 
+ research.microsoft.com/pubs/147302/heetal.pdf 
+ 14. Non-local Matting, Lee, CVPR 2011.
+ http://users.eecs.northwestern.edu/~pgl622/files/NonlocalMatting_Lee_2011.pdf  论文下载 
+ 15. KNN Matting, Chen, CVPR 2012.
+ http://ihome.ust.hk/~dli/projects/knn/  项目网址，包括论文、代码和数据
+ 
+ 16. Improving Image Matting Using Comprehensive Sampling Sets, CVPR, 2013. 
+ http://www.cv-foundation.org/openaccess/content_cvpr_2013/papers/Shahrian_Improving_Image_Matting_2013_CVPR_paper.pdf 
+ 17. Image Matting with Local and Nonlocal Smooth Priors, CVPR, 2013. 
 http://www.ece.nus.edu.sg/stfpage/eletp/Papers/cvpr13_matting.pdf
 
-
-视频抠像：
-
-
-
-1. Video Matting of Complex Scenes, ACM Transactions on Graphics, 2002.
+  
+ 视频抠像： 
+ 
+ 1. Video Matting of Complex Scenes, ACM Transactions on Graphics, 2002.
 grail.cs.washington.edu/pub/papers/Chuang-2002-VMC.pdf
 
-2. Bayesian video matting using learnt image priors, CVPR 2004.
-
-www.robots.ox.ac.uk/~nema/publications/Apostoloff04c.pdf
-
-3. Defocus Video Matting, ACM Trans. Graph.2005.
-
-http://dash.harvard.edu/bitstream/handle/1/4101995/mcguire-defocus.pdf?sequence=2
-
-4. Natural video matting using camera arrays, ACM Transactions on Graphics, 2006.
-
-http://graphics.ucsd.edu/papers/camera_array_matting/MultiCameraMatting.pdf
-
-5. Spectral Video Matting, VMV, 2009.
-
-vmv09.tu-bs.de/downloads/papers/eis09.pdf
-
-6. Temporally coherent video matting, Graph.Models, 2010.
-
-visualcomputing.yonsei.ac.kr/papers/2010/matting.pdf
-
-7. Automatic Spectral Video Matting, PR, 2012.
-
-http://www.sciencedirect.com/science/article/pii/S0031320312004463
+ 2. Bayesian video matting using learnt image priors, CVPR 2004.
+ www.robots.ox.ac.uk/~nema/publications/Apostoloff04c.pdf 
+ 3. Defocus Video Matting, ACM Trans. Graph.2005.
+ http://dash.harvard.edu/bitstream/handle/1/4101995/mcguire-defocus.pdf?sequence=2
+ 4. Natural video matting using camera arrays, ACM Transactions on Graphics, 2006. 
+ http://graphics.ucsd.edu/papers/camera_array_matting/MultiCameraMatting.pdf 
+ 5. Spectral Video Matting, VMV, 2009. 
+ vmv09.tu-bs.de/downloads/papers/eis09.pdf
+ 6. Temporally coherent video matting, Graph.Models, 2010.
+ visualcomputing.yonsei.ac.kr/papers/2010/matting.pdf 
+ 7. Automatic Spectral Video Matting, PR, 2012. 
+ http://www.sciencedirect.com/science/article/pii/S0031320312004463 
 8. Video Matting Using Multi-Frame Nonlocal Matting Laplacian, ECCV, 2012.
-yuwing.kaist.ac.kr/papers/eccv12_videomatte.pdf
 
+ yuwing.kaist.ac.kr/papers/eccv12_videomatte.pdf
 
-
-其他资料：
-
-1. Image and Video Matting: A Survey, Wang, 2007
-
-http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.190.1825&rep=rep1&type=pdf
-
-2. A Perceptually Motivated Online Benchmark for ImageMatting
-
-http://www.alphamatting.com/
-
-3. 数字抠像的最新研究进展 - 自动化学报 2012
-
-www.aas.net.cn/qikan/manage/wenzhang/20121002.pdf
-
-4. Bayesian & Robust Matting & Flash Matting的实现
-
-http://mpac.ee.ntu.edu.tw/~sutony/vfx_matting/index.html
-
-5. Image Matting GUI，4 algorithms include Poisson Matting
-
-http://www.cs.unc.edu/~lguan/Research.files/Research.htm#IM
-
-6. Some Techniques of Natural Image and Video Matting
-
-http://www.cad.zju.edu.cn/home/zldong/course/CV2/Image%20Matting.doc
-
-7. Richard J. Radke,Computer Vision forVisual Effects, Cambridge, 2013.
-
-Chapter 2, Image Matting.
-
-8. Richard Szeliski, Computer Vision: Algorithm andApplication, 2010.
-
-Chapter 10. 4, Image matting andcompositing.
-
- 
-
-
-
-自然图像抠图/视频抠像技术发展情况梳理（image matting, alpha matting, video matting）--计算机视觉专题1
-
-http://blog.csdn.net/anshan1984/article/details/8581225
-
-图像/视觉显著性检测技术发展情况梳理(Saliency Detection、Visual Attention）--计算机视觉专题2
-http://blog.csdn.net/anshan1984/article/details/8657176
-
-超像素分割技术发展情况梳理(Superpixel Segmentation）--计算机视觉专题3
-http://blog.csdn.net/anshan1984/article/details/8918167
-
-
+  
+ 其他资料： 
+ 1. Image and Video Matting: A Survey, Wang, 2007 
+ http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.190.1825&rep=rep1&type=pdf 
+ 2. A Perceptually Motivated Online Benchmark for ImageMatting
+ http://www.alphamatting.com/
+ 3. 数字抠像的最新研究进展 - 自动化学报 2012 
+ www.aas.net.cn/qikan/manage/wenzhang/20121002.pdf
+ 4. Bayesian & Robust Matting & Flash Matting的实现 
+ http://mpac.ee.ntu.edu.tw/~sutony/vfx_matting/index.html
+ 5. Image Matting GUI，4 algorithms include Poisson Matting 
+ http://www.cs.unc.edu/~lguan/Research.files/Research.htm#IM 
+ 6. Some Techniques of Natural Image and Video Matting 
+ http://www.cad.zju.edu.cn/home/zldong/course/CV2/Image%20Matting.doc
+ 7. Richard J. Radke,Computer Vision forVisual Effects, Cambridge, 2013.
+ Chapter 2, Image Matting.
+ 8. Richard Szeliski, Computer Vision: Algorithm andApplication, 2010.
+ Chapter 10. 4, Image matting andcompositing. 
+  
+ 
+ 自然图像抠图/视频抠像技术发展情况梳理（image matting, alpha matting, video matting）--计算机视觉专题1 
+ http://blog.csdn.net/anshan1984/article/details/8581225 
+ 图像/视觉显著性检测技术发展情况梳理(Saliency Detection、Visual Attention）--计算机视觉专题2 http://blog.csdn.net/anshan1984/article/details/8657176
+ 超像素分割技术发展情况梳理(Superpixel Segmentation）--计算机视觉专题3 http://blog.csdn.net/anshan1984/article/details/8918167 
+ 
 

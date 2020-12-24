@@ -2,665 +2,825 @@
 
 
 1.Ambari安装
-
-
-Ambari & HDP（Hortonworks Data Platform）
-*****************************************************************************************************
-Base：
-0.操作系统原则与对应的HDP对应的版本。rhel6 or rhel7
-1.操作系统原则完全安装(Desktop)，所有的包都安装。
-2.关闭防火墙，IPV6等服务（海涛Python脚本）。SELinux-->>IPv6-->>Iptables
-_____________________________________________________________
-SELINUX:
-vim /etc/selinux/config
-SELINUX=disabled
-或者：
-sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config;
-_____________________________________________________________
-IPV6：
-chkconfig ip6tables off
-cat>>/etc/modprobe.d/ECS.conf<<EOF
-alias net-pf-10 off
-alias ipv6 off
-EOF
-cat>>/etc/sysconfig/network<<EOF
-NETWORKING_IPV6=off 
-EOF
-cat>>/etc/modprobe.d/disable-ipv6.conf<<EOF
-install ipv6 /bin/true
-EOF
-cat>>/etc/modprobe.d/dist.conf<<EOF
-alias net-pf-10 off
-alias ipv6 off
-EOF
-cat>>/etc/sysctl.conf<<EOF
-net.ipv6.conf.all.disable_ipv6 = 1
-EOF
-_____________________________________________________________
-iptables:
-chkconfig iptables off
-_____________________________________________________________
-ONBOOT:
-sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0
-sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth1
-sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth2
-sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth3
-sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth4
-_____________________________________________________________
-Swap Closed
-cat >> /etc/sysctl.conf << EOF
-vm.swappiness=0
-EOF
-_____________________________________________________________
-Time Zone:
-cp  /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
-_____________________________________________________________
-*****************************************************************************************************
-/etc/sysconfig/network
-Hostname
-*****************************************************************************************************
-/etc/hosts:
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         localhost
-172.31.200.7 data1
-172.31.200.8 data2
-172.31.200.9 data3
-why not?
-127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-172.31.200.7 data1
-172.31.200.8 data2
-172.31.200.9 data3
-*****************************************************************************************************
-PackageKit
-pkill -9 packagekitd
-vim /etc/yum/pluginconf.d/refresh-packagekit.conf
-enabled=0
-*****************************************************************************************************
-THP(Transparent Huge Pages):
-echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
-echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
-*****************************************************************************************************
-ulimit & nproc
-[root@data2 yum.repos.d]# vim /etc/security/limits.conf
-soft nproc 16384
-hard nproc 16384
-soft nofile 65536
-hard nofile 65536
-*****************************************************************************************************
-REBOOT all the machine
-*****************************************************************************************************
-REPO for rhel:
-first:
-[root@server2 opt]# cd /etc/yum.repos.d/
-[root@server2 yum.repos.d]# ls -al
-drwxr-xr-x.   2 root root  4096 3月  22 04:02 .
-drwxr-xr-x. 182 root root 16384 4月  14 22:27 ..
--rw-r--r--.   1 root root  1991 10月 23 2014 CentOS-Base.repo
--rw-r--r--.   1 root root   647 10月 23 2014 CentOS-Debuginfo.repo
--rw-r--r--.   1 root root   289 10月 23 2014 CentOS-fasttrack.repo
--rw-r--r--.   1 root root   630 10月 23 2014 CentOS-Media.repo
--rw-r--r--.   1 root root  5394 10月 23 2014 CentOS-Vault.repo
--rw-r--r--.   1 root root   270 12月 15 14:36 cloudera.repo
--rw-r--r--.   1 root root   134 12月  8 08:31 rhel65.repo
-rm -rf ALL
----->>>>>>we don't get internet connection.
-second:
-[root@data2 yum.repos.d]# cat centos6.6.repo 
-[centos6]
-name=cloudera
-baseurl=http://172.31.200.216/centos6
-enabled=1
-gpgcheck=0
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
-scp /etc/yum.repos.d/centos6.6.repo root@Hostname:/etc/yum.repos.d/
-yum clean all
-yum search lib*
-*****************************************************************************************************
-SSH:
-yum install openssl
-yum upgrade openssl
-rm -rf ~/.ssh/*
-ssh-keygen  -t rsa -f ~/.ssh/id_rsa  -N ''
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-scp -r ~/.ssh root@172.31.200.8:~/.ssh
-chmod 600 ~/.ssh
-注意：chmod 777 为什么不行？？？
-*****************************************************************************************************
-jdk:
-rpm -ivh jdk-7XXX-linux-XXXX.rpm
-echo "JAVA_HOME=/usr/java/latest/">> /etc/environment
-java -version
-*****************************************************************************************************
-NTP:
-ntp-master node
- 
-[root@data1 yum.repos.d]# vim /etc/ntp.conf
-server data1 prefer
-server 127.127.1.0
-fudge 127.127.1.0 stratum 10
-service ntpd restart
-[root@data1 yum.repos.d]# chkconfig --list ntpd
-ntp-master node
-/var/spool/cron/root<<EOF
-*/10 * * * * /usr/sbin/ntpdate NameNode && /sbin/clock -w
-EOF
-service ntpd restart
-ntpdate -u NameNode
-*****************************************************************************************************
-/var/www/html：
-which httpd
-or 
-yum install httpd
-tar -xzf HDP-UTILS-1.1.0.20-centos6.tar.gz
-tar -xzf AMBARI-2.1.2-377-centos6.tar.gz
-tar -xzf HDP-2.3.0.0-centos6-rpm.tar.gz
-check whether the listening port of http service is blocked.
----->>>>netstat -nltp | grep 80
----->>>>vim /etc/httpd/conf/httpd.conf
-change value of the default port
-service httpd start
-*****************************************************************************************************
-Repo for HDP & Ambari
-[root@data2 yum.repos.d]# cat ambari.repo 
-[Updates-ambari-2.1.2]
-name=ambari-2.1.2-Updates
-baseurl=http://data1/AMBARI-2.1.2/centos6
-gpgcheck=0
-enabled=1
-[HDP-2.3.0.0]
-name=HDP Version-HDP-2.3.0.0
-baseurl=http://data1/HDP/centos6/2.x/updates/2.3.0.0
-gpgcheck=0
-enabled=1
-[HDP-UTILS-1.1.0.20]
-name=HDP Utils Version - HDP-UTILS-1.1.0.20
-baseurl=http://data1/HDP-UTILS-1.1.0.20/repos/centos6
-gpgcheck=0
-enabled=1
-scp /etc/yum.repos.d/ambari.repo root@Hostname:/etc/yum.repos.d/
-yum clean all
-yum search ambari-agent
-yum search Oozie
-yum search gangli
-*****************************************************************************************************
-SO Address:
-http://172.31.200.7/HDP/centos6/2.x/updates/2.3.0.0
-http://172.31.200.7/HDP-UTILS-1.1.0.20/repos/centos6
-*****************************************************************************************************
-yum clean all
-yum search ambari-server
-yum search ambari-agent
-yum search oozie
-yum remove *****
-Master：yum install ambari-serveryum install ambari-agentambari-agent startconf of ambari server:/etc/ambari-server/conf/ambari.properties
-Slave:yum install ambari-agentambari-agent start 
-ambari-server start 
-ambari-server setup -j /usr/java/jdk1.7.0_71/   
---->>>>Run the setup command to configure your Ambari Server, Database, JDK, LDAP, and other options:
---->>>>enter numeric number(n means default)
-ambari-server start
-http://MasterHostName:8080
-Account：admin  Password:admin
-*****************************************************************************************************
-Logs to see student:
-See the log:
-cat /var/log/ambari-agent/ambari-agent.lo
-cat /var/log/ambari-server/ambari-server.log
-*****************************************************************************************************
-To Do:
-HDFS:
-[root@data1 yum.repos.d]# su hdfs -c "hadoop fs -ls /"
-[root@data1 yum.repos.d]# su hdfs -c "hadoop fs -mkdir /lgd"
-MR:
-Spark:
-HBase:
-Hive:
-ES:
-*******************************************************************************************************
-FAQ
-1, The hostname of the machine better be Fully Qualified Domain Name---->>>>>>>hoastname.domain,such as,data.hdp.worker1
-2, Zookeeper-Agent端修改Server指向的HOSTNAME, /etc/ambari-agent/conf/ambari-agent.ini,如修改过主机hostname
-安装失败后或重新安装先执行ambari-server reset 后 ambari-setup
-3, 最后一步安装可能会失败,多数原因是下载包错误引起的,可重复安装直到成功,本人反复几个最终成功了,网络,网络,尤其就朝民,各种干扰!
-4, 如果遇到访问https://xxx:8440/ca的错误，升级openssl就可以。
-5，Heartbeat lost for the host错误，检查出错节点的ambari-agent是否停止，ambari-angent是python脚本运行的，
-可能遇到没有捕捉到的异常，导致进程crash或者停止了。
-6，App Timeline server安装出错，retry解决。
-7，如果出现乱码：echo 'LANG="en_US.UTF-8"' > /etc/sysconfig/i18n,修改字符集即可解决！
-8, 如果安装linux的时候基础包未选择，缺包可以制作cdrom挂载，来安装即可解决！
-9, selinux开启 导致本地yum源访问403
-10, centosos6.5 openssh 版本bug 导致 agent安装失败,解决 yum upgrade openssl
-11, 
-*******************************************************************************************************
-总结：
-1，日志查看，追溯问题。
-2，如果要安装一切顺利，可在安装操作系统时把linux基础组件一并安装！补救方案为：yum groupinstall "Compatibility libraries" "Base" "Development tools"yum groupinstall "debugging Tools" "Dial-up Networking Support"
-3，
-*******************************************************************************************************
-备注: + Ambari安装的环境路径:
-各台机器的安装目录:
-/usr/lib/hadoop
-/usr/lib/hbase
-/usr/lib/zookeeper
-/usr/lib/hcatalog
-/usr/lib/hive 
-+ Log路径, 这里需要看出错信息都可以在目录下找到相关的日志 
-/var/log/hadoop
-/var/log/hbase
-+ 配置文件的路径 
-/etc/hadoop
-/etc/hbase
-/etc/hive
-+ HDFS的存储路径 
-/hadoop/hdfs
-*******************************************************************************************************
-其他1：
-安装过程中使用了桌面，火狐等安装命令
-yum install firefox
-yum groupinstall -y “Desktop” “Desktop Platform” “Desktop Platform
-Development”　 “Fonts” 　“General Purpose Desktop”　 “Graphical
-Administration Tools”　 “Graphics Creation Tools” 　“Input Methods” 　“X
-Window System” 　“Chinese Support [zh]”　“Internet Browser”
-iso yum 源来安装一些基础包
-sudo mount -o loop /home/whoami/rhel-server-6.7-x86_64-dvd.iso /mnt/cdimg/
-$ cat rhel-source.repo
-[rhel-Server]
-name=Red Hat Server
-baseurl=file:///mnt/cdimg
-enable=1
-gpgcheck=0
-*******************************************************************************************************
-其他2：
-Ambari配置时在Confirm Hosts的步骤时，中间遇到一个很奇怪的问题：总是报错误：
-Ambari agent machine hostname (localhost.localdomain) does not match expected ambari server hostname (xxx).
-后来修改的/etc/hosts文件中
-修改前：
-127.0.0.1   xxx localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         xxx localhost localhost.localdomain localhost6 localhost6.localdomain6
-修改后：
-127.0.0.1   xxx localhost localhost.localdomain localhost4 localhost4.localdomain4
-::1         xxx
-感觉应该是走的ipv6协议，很奇怪，不过修改后就可以了。
-
+ 
+ 
+Ambari & HDP（Hortonworks Data Platform） ***************************************************************************************************** Base： 0.操作系统原则与对应的HDP对应的版本。rhel6 or rhel7 1.操作系统原则完全安装(Desktop)，所有的包都安装。 2.关闭防火墙，IPV6等服务（海涛Python脚本）。SELinux-->>IPv6-->>Iptables _____________________________________________________________   SELINUX:   vim /etc/selinux/config SELINUX=disabled 或者： sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config; _____________________________________________________________ IPV6：   chkconfig ip6tables off   cat>>/etc/modprobe.d/ECS.conf<<EOF alias net-pf-10 off alias ipv6 off EOF   cat>>/etc/sysconfig/network<<EOF NETWORKING_IPV6=off  EOF   cat>>/etc/modprobe.d/disable-ipv6.conf<<EOF install ipv6 /bin/true EOF   cat>>/etc/modprobe.d/dist.conf<<EOF alias net-pf-10 off alias ipv6 off EOF   cat>>/etc/sysctl.conf<<EOF net.ipv6.conf.all.disable_ipv6 = 1 EOF _____________________________________________________________   iptables:   chkconfig iptables off _____________________________________________________________ ONBOOT: sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth0 sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth1 sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth2 sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth3 sed -i 's/ONBOOT=no/ONBOOT=yes/g' /etc/sysconfig/network-scripts/ifcfg-eth4 _____________________________________________________________   Swap Closed   cat >> /etc/sysctl.conf << EOF vm.swappiness=0 EOF _____________________________________________________________ Time Zone:   cp  /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime _____________________________________________________________   ***************************************************************************************************** /etc/sysconfig/network Hostname *****************************************************************************************************   /etc/hosts:   127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 ::1         localhost 172.31.200.7 data1 172.31.200.8 data2 172.31.200.9 data3   why not?   127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 172.31.200.7 data1 172.31.200.8 data2 172.31.200.9 data3 *****************************************************************************************************   PackageKit   pkill -9 packagekitd vim /etc/yum/pluginconf.d/refresh-packagekit.conf enabled=0   *****************************************************************************************************   THP(Transparent Huge Pages):   echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag   *****************************************************************************************************   ulimit & nproc   [root@data2 yum.repos.d]# vim /etc/security/limits.conf   soft nproc 16384 hard nproc 16384 soft nofile 65536 hard nofile 65536 *****************************************************************************************************   REBOOT all the machine   ***************************************************************************************************** REPO for rhel:   first:   [root@server2 opt]# cd /etc/yum.repos.d/ [root@server2 yum.repos.d]# ls -al   drwxr-xr-x.   2 root root  4096 3月  22 04:02 . drwxr-xr-x. 182 root root 16384 4月  14 22:27 .. -rw-r--r--.   1 root root  1991 10月 23 2014 CentOS-Base.repo -rw-r--r--.   1 root root   647 10月 23 2014 CentOS-Debuginfo.repo -rw-r--r--.   1 root root   289 10月 23 2014 CentOS-fasttrack.repo -rw-r--r--.   1 root root   630 10月 23 2014 CentOS-Media.repo -rw-r--r--.   1 root root  5394 10月 23 2014 CentOS-Vault.repo -rw-r--r--.   1 root root   270 12月 15 14:36 cloudera.repo -rw-r--r--.   1 root root   134 12月  8 08:31 rhel65.repo     rm -rf ALL ---->>>>>>we don't get internet connection.     second:   [root@data2 yum.repos.d]# cat centos6.6.repo  [centos6] name=cloudera baseurl=http://172.31.200.216/centos6 enabled=1 gpgcheck=0 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release   scp /etc/yum.repos.d/centos6.6.repo root@Hostname:/etc/yum.repos.d/   yum clean all yum search lib*   *****************************************************************************************************   SSH: yum install openssl yum upgrade openssl   rm -rf ~/.ssh/* ssh-keygen  -t rsa -f ~/.ssh/id_rsa  -N '' cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys   scp -r ~/.ssh root@172.31.200.8:~/.ssh chmod 600 ~/.ssh 注意：chmod 777 为什么不行？？？ *****************************************************************************************************   jdk:   rpm -ivh jdk-7XXX-linux-XXXX.rpm echo "JAVA_HOME=/usr/java/latest/">> /etc/environment java -version ***************************************************************************************************** NTP:   ntp-master node   [root@data1 yum.repos.d]# vim /etc/ntp.conf   server data1 prefer server 127.127.1.0 fudge 127.127.1.0 stratum 10   service ntpd restart [root@data1 yum.repos.d]# chkconfig --list ntpd       ntp-master node   /var/spool/cron/root<<EOF */10 * * * * /usr/sbin/ntpdate NameNode && /sbin/clock -w EOF   service ntpd restart   ntpdate -u NameNode   *****************************************************************************************************   /var/www/html：   which httpd   or    yum install httpd   tar -xzf HDP-UTILS-1.1.0.20-centos6.tar.gz tar -xzf AMBARI-2.1.2-377-centos6.tar.gz tar -xzf HDP-2.3.0.0-centos6-rpm.tar.gz   check whether the listening port of http service is blocked. ---->>>>netstat -nltp | grep 80 ---->>>>vim /etc/httpd/conf/httpd.conf change value of the default port   service httpd start   ***************************************************************************************************** Repo for HDP & Ambari   [root@data2 yum.repos.d]# cat ambari.repo  [Updates-ambari-2.1.2] name=ambari-2.1.2-Updates baseurl=http://data1/AMBARI-2.1.2/centos6 gpgcheck=0 enabled=1   [HDP-2.3.0.0] name=HDP Version-HDP-2.3.0.0 baseurl=http://data1/HDP/centos6/2.x/updates/2.3.0.0 gpgcheck=0 enabled=1     [HDP-UTILS-1.1.0.20] name=HDP Utils Version - HDP-UTILS-1.1.0.20 baseurl=http://data1/HDP-UTILS-1.1.0.20/repos/centos6 gpgcheck=0 enabled=1   scp /etc/yum.repos.d/ambari.repo root@Hostname:/etc/yum.repos.d/ yum clean all yum search ambari-agent yum search Oozie yum search gangli   *****************************************************************************************************   SO Address:   http://172.31.200.7/HDP/centos6/2.x/updates/2.3.0.0 http://172.31.200.7/HDP-UTILS-1.1.0.20/repos/centos6   ***************************************************************************************************** yum clean all yum search ambari-server yum search ambari-agent yum search oozie yum remove *****       Master： yum install ambari-server yum install ambari-agent ambari-agent start conf of ambari server: /etc/ambari-server/conf/ambari.properties  Slave: yum install ambari-agent ambari-agent start     ambari-server start    ambari-server setup -j /usr/java/jdk1.7.0_71/    --->>>>Run the setup command to configure your Ambari Server, Database, JDK, LDAP, and other options: --->>>>enter numeric number(n means default) ambari-server start     http://MasterHostName:8080 Account：admin  Password:admin   *****************************************************************************************************   Logs to see student: See the log:   cat /var/log/ambari-agent/ambari-agent.lo   cat /var/log/ambari-server/ambari-server.log   *****************************************************************************************************   To Do:   HDFS: [root@data1 yum.repos.d]# su hdfs -c "hadoop fs -ls /" [root@data1 yum.repos.d]# su hdfs -c "hadoop fs -mkdir /lgd"   MR:     Spark:     HBase:     Hive:     ES:   *******************************************************************************************************   FAQ   1, The hostname of the machine better be Fully Qualified Domain Name---->>>>>>>hoastname.domain,such as,data.hdp.worker1   2, Zookeeper-Agent端修改Server指向的HOSTNAME, /etc/ambari-agent/conf/ambari-agent.ini,如修改过主机hostname 安装失败后或重新安装先执行ambari-server reset 后 ambari-setup 3, 最后一步安装可能会失败,多数原因是下载包错误引起的,可重复安装直到成功,本人反复几个最终成功了,网络,网络,尤其就朝民,各种干扰! 4, 如果遇到访问https://xxx:8440/ca的错误，升级openssl就可以。 5，Heartbeat lost for the host错误，检查出错节点的ambari-agent是否停止，ambari-angent是python脚本运行的， 可能遇到没有捕捉到的异常，导致进程crash或者停止了。 6，App Timeline server安装出错，retry解决。 7，如果出现乱码：echo 'LANG="en_US.UTF-8"' > /etc/sysconfig/i18n,修改字符集即可解决！ 8, 如果安装linux的时候基础包未选择，缺包可以制作cdrom挂载，来安装即可解决！ 9, selinux开启 导致本地yum源访问403 10, centosos6.5 openssh 版本bug 导致 agent安装失败,解决 yum upgrade openssl 11,    *******************************************************************************************************   总结：   1，日志查看，追溯问题。 2，如果要安装一切顺利，可在安装操作系统时把linux基础组件一并安装！ 补救方案为： yum groupinstall "Compatibility libraries" "Base" "Development tools" yum groupinstall "debugging Tools" "Dial-up Networking Support"  3，     ******************************************************************************************************* 备注: + Ambari安装的环境路径:   各台机器的安装目录:   /usr/lib/hadoop /usr/lib/hbase /usr/lib/zookeeper /usr/lib/hcatalog /usr/lib/hive    + Log路径, 这里需要看出错信息都可以在目录下找到相关的日志    /var/log/hadoop /var/log/hbase   + 配置文件的路径    /etc/hadoop /etc/hbase /etc/hive   + HDFS的存储路径    /hadoop/hdfs   *******************************************************************************************************       其他1：   安装过程中使用了桌面，火狐等安装命令 yum install firefox yum groupinstall -y “Desktop” “Desktop Platform” “Desktop Platform Development”　 “Fonts” 　“General Purpose Desktop”　 “Graphical Administration Tools”　 “Graphics Creation Tools” 　“Input Methods” 　“X Window System” 　“Chinese Support [zh]”　“Internet Browser” iso yum 源来安装一些基础包 sudo mount -o loop /home/whoami/rhel-server-6.7-x86_64-dvd.iso /mnt/cdimg/ $ cat rhel-source.repo [rhel-Server] name=Red Hat Server baseurl=file:///mnt/cdimg enable=1 gpgcheck=0     *******************************************************************************************************   其他2：   Ambari配置时在Confirm Hosts的步骤时，中间遇到一个很奇怪的问题：总是报错误： Ambari agent machine hostname (localhost.localdomain) does not match expected ambari server hostname (xxx). 后来修改的/etc/hosts文件中 修改前： 127.0.0.1   xxx localhost localhost.localdomain localhost4 localhost4.localdomain4 ::1         xxx localhost localhost.localdomain localhost6 localhost6.localdomain6 修改后： 127.0.0.1   xxx localhost localhost.localdomain localhost4 localhost4.localdomain4 ::1         xxx 感觉应该是走的ipv6协议，很奇怪，不过修改后就可以了。       
+ 
 2.hadoop源代码配置
-首先配置hosts文件关联主机名和ip地址
-host1=
-host2=
-host3=
-=== security shell
-rm -rf ~/.ssh/*
-ssh-keygen  -t rsa -f ~/.ssh/id_rsa  -N ''
-ssh-copy-id -o StrictHostKeyChecking=no $remothostname
-ssh $remothostname hostname
-######################## Hadoop cluster deploy
-1. tar -xzf hadoop-2.7.1.tar.gz
-2. add profile
-Shell> cat << EOF >/etc/profile.d/hadoop.sh
-#!/bin/sh
-export JAVA_HOME=/root/BIGDATA/jdk1.8.0_65
-export HADOOP_PREFIX=/root/BIGDATA/hadoop-2.7.1
-export HADOOP_HOME=\$HADOOP_PREFIX
-export HADOOP_CONF_DIR=\$HADOOP_HOME/etc/hadoop
-export YARN_CONF_DIR=\$HADOOP_HOME/etc/hadoop
-export JAVA_LIBRARY_PATH=\$HADOOP_HOME/lib/native:\$JAVA_LIBRARY_PATH
-export LD_LIBRARY_PATH=\$HADOOP_HOME/lib/native:\$LD_LIBRARY_PATH
-export CLASSPATH=.:\$JAVA_HOME/lib/dt.jar:\$JAVA_HOME/lib/tools.jar:
-export PATH=\$JAVA_HOME/bin:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\${PATH}
-EOFShell> source /etc/profile 
-3. create hdfs dirs on all hostsHADOOP_LOCAL_BASE_DIR=/opt/local/hdfsmkdir -p ${HADOOP_LOCAL_BASE_DIR}mkdir -p ${HADOOP_LOCAL_BASE_DIR}/dfs/datamkdir -p ${HADOOP_LOCAL_BASE_DIR}/dfs/namemkdir -p ${HADOOP_LOCAL_BASE_DIR}/dfs/snnmkdir -p ${HADOOP_LOCAL_BASE_DIR}/tmpmkdir -p ${HADOOP_LOCAL_BASE_DIR}/yarn/logs
-4. config etc/hadoop/1. add all slaves to slavesbigdata1bigdata32.HADOOP_DFS_MASTER=masternodeHADOOP_DFS_SECONDARY_NAMENODE=masternodeYARN_RESOURCE_MANAGER=masternodeJOBHISTORY_SERVER=masternodeJOBTRACKRT_HOST=masternodeHADOOP_TOOL_INSTALL_DIR=/root/BIGDATA/DOCS/hadoop_doc/hadoop_demo#core-site.xmlconf_file=core-site.xmlcp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/sed -i "s^\${HADOOP_LOCAL_BASE_DIR}^${HADOOP_LOCAL_BASE_DIR}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"sed -i "s^\${HADOOP_DFS_MASTER}^${HADOOP_DFS_MASTER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"#hdfs-site.xmlconf_file=hdfs-site.xmlcp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/sed -i "s^\${HADOOP_LOCAL_BASE_DIR}^${HADOOP_LOCAL_BASE_DIR}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"sed -i "s^\${HADOOP_DFS_SECONDARY_NAMENODE}^${HADOOP_DFS_SECONDARY_NAMENODE}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"sed -i "s^\${HADOOP_DFS_MASTER}^${HADOOP_DFS_MASTER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"#mapreducesite.xmlconf_file=mapred-site.xmlcp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/sed -i "s^\${JOBTRACKRT_HOST}^${JOBTRACKRT_HOST}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"sed -i "s^\${JOBHISTORY_SERVER}^${JOBHISTORY_SERVER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"#yarn-site.xmlconf_file=yarn-site.xmlcp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/sed -i "s^\${YARN_RESOURCE_MANAGER}^${YARN_RESOURCE_MANAGER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
-      sed -i "s^\${HADOOP_LOCAL_BASE_DIR}^${HADOOP_LOCAL_BASE_DIR}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
-5. init namenodeShell>hdfs namenode -format cluster1
-6. start allShell>$HADOOP_HOME/sbin/start-all.shShell> $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh  start historyserver
-===Hadoop check
-1. After deploy hadoop.
-   Shell>hadoop checknative -a 
-   Shell>hadoop jar ${HADOOP_HOME}/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar pi 4 100
-   
-   Shell> cat <<EOF >/tmp/file1
-Hello World Bye World
-EOF
-   Shell> cat <<EOF >/tmp/file2
-Hello Hadoop Goodbye Hadoop
-EOF
-   Shell> hadoop fs -mkdir /tmp 
-   Shell> hadoop fs -copyFromLocal -f /tmp/file1  /tmp/file2  /tmp
-   Shell> hadoop jar ${HADOOP_HOME}/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar wordcount  /tmp/file1  /tmp/file2  /tmp/wordcount
-   Shell> hadoop fs -cat /tmp/wordcount/part-r-00000
-===hadoop Daemon Web Interface
-NameNode http://nn_host:port/
-Default HTTP port is 50070.
-ResourceManager http://rm_host:port/
-Default HTTP port is 8088.
-#MapReduce JobHistory Server http://jhs_host:port/
-Default HTTP port is 19888.
-######################## Spark cluster deploy
-1. tar -xzf spark-1.6.1-bin-hadoop2.6.tgz
-2. add profile
-cat << EOF >>/etc/profile.d/hadoop.sh
-export SPARK_HOME=/root/BIGDATA/spark-1.6.1-bin-hadoop2.6
-export PATH=\${SPARK_HOME}/sbin:\${PATH}:\${SPARK_HOME}/bin:
-EOFShell>source /etc/profile
-3. create local dirSPARK_LOCAL_BASE_DIR=/opt/local/sparkShell>mkdir -p ${SPARK_LOCAL_BASE_DIR}/tmpShell>hadoop fs -mkdir /sparkHistoryLogs /sparkEventLogs
-4. config1. add all slaves to slaves
-       Shell>mv slaves.template slavesbigdata1bigdata32.SPARK_MASTER=masternodeHADOOP_DFS_MASTER=masternodeShell> cat << EOF > ${SPARK_HOME}/conf/spark-defaults.conf
-spark.master   spark://${SPARK_MASTER}:7077
-spark.local.dir   ${SPARK_LOCAL_BASE_DIR}/tmp
-spark.master.rest.port   7177
-#Spark UI
-spark.eventLog.enabled   true
-spark.eventLog.dir   hdfs://${HADOOP_DFS_MASTER}:9000/sparkEventLogs
-spark.ui.killEnabled   true
-spark.ui.port   4040
-spark.history.ui.port   18080
-spark.history.fs.logDirectory   hdfs://${HADOOP_DFS_MASTER}:9000/sparkHistoryLogs
-#
-spark.shuffle.service.enabled   false
-#
-spark.yarn.am.extraJavaOptions   -Xmx3g
-spark.executor.extrajavaoptions   -Xmx3g
-#Amount of memory to use for the YARN Application Master in client mode
-spark.yarn.am.memory   2048m
-#The amount of off-heap memory (in megabytes) to be allocated per executor. 
-spark.yarn.driver.memoryOverhead   512
-#The amount of off-heap memory (in megabytes) to be allocated per driver in cluster mode
-spark.yarn.executor.memoryOverhead   512
-#Same as spark.yarn.driver.memoryOverhead, but for the YARN Application Master in client mode, fix yarn-client OOM, "ERROR yarn.ApplicationMaster: RECEIVED SIGNAL 15: SIGTERM"
-spark.yarn.am.memoryOverhead   1024  
-  
-EOFShell> cat << EOF > ${SPARK_HOME}/conf/spark-env.sh
-SPARK_WORKER_WEBUI_PORT=8081
-SPARK_WORKER_DIR=\${SPARK_HOME}/work
-#SPARK_LOCAL_DIRS=\${SPARK_WORKER_DIR}
-EOF
-5. start all
-Shell> ${SPARK_HOME}/sbin/start-all.sh
-check cluster status
-http://${SPARK_MASTER}:8080
-===Spark Daemon Web Interface
-spark.history.ui.port 18080
-spark master 8080
-http://${SPARK_MASTER}:port/
-===Spark check
-1. Spark Standalone (client, cluster(spark.master.rest.port))
-  # Run application locally on 1 cores
-  Shell>  ${SPARK_HOME}/bin/spark-submit \
-  --class org.apache.spark.examples.SparkPi \
-  --master spark://masternode:7077 \
-  --deploy-mode  client \
-   ${SPARK_HOME}/lib/spark-examples*.jar \
-  10
-  # Run on a Spark standalone cluster
-  Shell>  ${SPARK_HOME}/bin/spark-submit \
-  --class org.apache.spark.examples.SparkPi \
-  --master spark://$SPARK_MASTER:7177 \
-  --deploy-mode  cluster \
-  --executor-memory 1G \
-  --total-executor-cores 1 \
-   ${SPARK_HOME}/lib/spark-examples*.jar \
-  10
-  
-   #spark shell
-   Shell> ${SPARK_HOME}/bin/spark-shell --master spark://$SPARK_MASTER:7077
-   
-2. Spark on Yarn (It needn't start spark cluster, only need start hadoop)#run yarn-clientShell> ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi \--master yarn-client \
-    --driver-java-options '-Xmx3096m'  \
-    --conf spark.executor.extrajavaoptions=-Xmx3096m  \
-    --executor-memory 3096m  \
-    --num-executors  1  \
-    --conf spark.yarn.am.memoryOverhead=1024  \
-    ${SPARK_HOME}/lib/spark-examples*.jar \
-    10
-    #run yarn-clusterShell> ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi \--master yarn \--deploy-mode  cluster \
-    --driver-memory 2g \
-    --executor-memory 2g \
-    ${SPARK_HOME}/lib/spark-examples*.jar \
-    10
-######################## Hbase cluster deploy
-1. Shell> tar -xzf hbase-1.1.4-bin.tar.gz
-2. add profile
-cat << EOF >>/etc/profile.d/hadoop.sh
-export HBASE_HOME=/root/BIGDATA/hbase-1.1.4
-export PATH=\${PATH}:\${HBASE_HOME}/bin:
-EOFShell>source /etc/profile
-3. create local dirHBASE_ROOTDIR=/hbaseHBASE_TMP_DIR=/opt/local/hbaseShell> hadoop fs -mkdir ${HBASE_ROOTDIR}Shell> mkdir -p ${HBASE_TMP_DIR}
-4. config1. add all hosts to regionserversbigdata1bigdata22. modify hbase-site.xml
-cat <<EOF >${HBASE_HOME}/conf/hbase-site.xml
-<configuration>
-  <property>
-    <name>hbase.rootdir</name>
-    <value>hdfs://masternode:9000/hbase </value>
-    <description>The directory shared by RegionServers.
-    Default: \${hbase.tmp.dir}/hbase
-    </description>
-  </property>
-  <property>
-    <name>hbase.zookeeper.quorum</name>
-    <value>masternode,slavesnode</value>
-    <description>The directory shared by RegionServers.
-    </description>
-  </property>
-  <property>
-    <name>hbase.tmp.dir</name>
-    <value>/opt/local/hbase</value>
-    <description>Temporary directory on the local filesystem
-    Default: \${java.io.tmpdir}/hbase-${user.name}.
-    </description>
-  </property>
-  <property>
-    <name>hbase.cluster.distributed</name>
-    <value>true</value>
-    <description>The mode the cluster will be in. Possible values are
-      false: standalone and pseudo-distributed setups with managed Zookeeper
-      true: fully-distributed with unmanaged Zookeeper Quorum (see hbase-env.sh)
-    </description>
-  </property>
-  <!--
-  <property>
-    <name>hbase.fs.tmp.dir</name>
-    <value></value>
-    <description>A staging directory in default file system (HDFS) for keeping temporary data
-    Default: /user/\${user.name}/hbase-staging
-    </description>
-  </property>
-  <property>
-    <name>hbase.local.dir</name>
-    <value></value>
-    <description>Directory on the local filesystem to be used as a local storage.
-    Default: ${hbase.tmp.dir}/local/
-    </description>
-  </property>
-  <property>
-    <name>hbase.master.port</name>
-    <value>16000</value>
-    <description>The port the HBase Master should bind to.
-    Default: 16000
-    </description>
-  </property>
-  <property>
-    <name>hbase.master.info.port</name>
-    <value>16010</value>
-    <description>The port for the HBase Master web UI. Set to -1 if you do not want a UI instance run.
-    Default: 16010
-    </description>
-  </property>
-  <property>
-    <name>hbase.regionserver.port</name>
-    <value>16020</value>
-    <description>The port the HBase RegionServer binds to.
-    Default: 16020
-    </description>
-  </property>
-  <property>
-    <name>hbase.regionserver.info.port</name>
-    <value>16030</value>
-    <description>The port for the HBase RegionServer web UI Set to -1 if you do not want the RegionServer UI to run.
-    Default: 16030
-    </description>
-  </property>
-  <property>
-    <name>hbase.zookeeper.peerport</name>
-    <value>2888</value>
-    <description>Port used by ZooKeeper peers to talk to each other
-    Default: 2888
-    </description>
-  </property>
-  <property>
-    <name>hbase.zookeeper.leaderport</name>
-    <value>3888</value>
-    <description>Port used by ZooKeeper for leader election
-    Default: 3888
-    </description>
-  </property>
-  <property>
-    <name>hbase.zookeeper.property.dataDir</name>
-    <value></value>
-    <description>Property from ZooKeeper’s config zoo.cfg. The directory where the snapshot is stored.
-    Default: ${hbase.tmp.dir}/zookeeper
-    </description>
-  </property>
-  <property>
-    <name>hbase.zookeeper.property.clientPort</name>
-    <value>2181</value>
-    <description>Property from ZooKeeper’s config zoo.cfg. The port at which the clients will connect.
-    Default: 2181
-    </description>
-  </property>
-  -->
-  
-</configuration>
-EOF3. ln -s $HADOOP_HOME/etc/hadoop/hdfs-site.xml  ${HBASE_HOME}/conf/hdfs-site.xml 4. ulimit 咿nproccat <<EOF > /etc/security/limits.conf
- root -       nofile  32768
- root soft/hard nproc 32000
-EOF
-5. start allShell> ${HBASE_HOME}/bin/start-hbase.sh
-===Hbase Daemon Web Interface
-hbase.master.info.port  16010
-hbase.regionserver.info.port  16030
-http://${HBASE_MASTER}:port/
-===Hbase check
-1. run hbase shell
-Shell> ${HBASE_HOME}/bin/hbase shell
-hbase(main):003:0> create 'test', 'cf'
-0 row(s) in 1.2200 seconds
-hbase(main):003:0> list 'table'
-test
-1 row(s) in 0.0550 seconds
-hbase(main):004:0> put 'test', 'row1', 'cf:a', 'value1'
-0 row(s) in 0.0560 seconds
-hbase(main):005:0> put 'test', 'row2', 'cf:b', 'value2'
-0 row(s) in 0.0370 seconds
-hbase(main):006:0> put 'test', 'row3', 'cf:c', 'value3'
-0 row(s) in 0.0450 seconds
-hbase(main):007:0> scan 'test'
-ROW        COLUMN+CELL
-row1       column=cf:a, timestamp=1288380727188, value=value1
-row2       column=cf:b, timestamp=1288380738440, value=value2
-row3       column=cf:c, timestamp=1288380747365, value=value3
-3 row(s) in 0.0590 seconds
-hbase(main):008:0> get 'test', 'row1'
-COLUMN      CELL
-cf:a        timestamp=1288380727188, value=value1
-1 row(s) in 0.0400 seconds
-hbase(main):012:0> disable 'test'
-0 row(s) in 1.0930 seconds
-hbase(main):013:0> drop 'test'
-0 row(s) in 0.0770 seconds 
-hbase(main):014:0> exit
-######################## Hive cluster deploy
-1. tar -xzf apache-hive-2.0.0-bin.tar.gz
-2. add profile
-cat << EOF >>/etc/profile.d/hadoop.sh
-export HIVE_HOME=/root/BIGDATA/apache-hive-2.0.0-bin
-export HIVE_CONF_DIR=\${HIVE_HOME}/conf
-export PATH=\${HIVE_HOME}/bin:\${PATH}
-EOFShell>source /etc/profile
-3. create local dir
-   $HADOOP_HOME/bin/hadoop fs -mkdir /tmp
-   $HADOOP_HOME/bin/hadoop fs -mkdir -p /user/hive/warehouse
-   $HADOOP_HOME/bin/hadoop fs -chmod g+w  /tmp
-   $HADOOP_HOME/bin/hadoop fs -chmod g+w  /user/hive/warehouse
-   Shell> mkdir -p  ${HBASE_TMP_DIR}
-4. config =M1. [ Local Embedded Derby ]HIVE_LOCAL_WAREHOUSE=/opt/hive/warehouseShell> mkdir -p  ${HIVE_LOCAL_WAREHOUSE}Shell>cat <<EOF > ${HIVE_CONF_DIR}/hive-site.xml
-<configuration>
-<property>
-  <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:derby:;databaseName=metastore_db;create=true</value>
-  <description>JDBC connect string for a JDBC metastore</description>
-</property>
-<property>
-  <name>javax.jdo.option.ConnectionDriverName</name>
-  <value>org.apache.derby.jdbc.EmbeddedDriver</value>
-  <description>Driver class name for a JDBC metastore</description>
-</property>
-<property>
-  <name>javax.jdo.option.ConnectionUserName</name>
-  <value>APP</value>
-  <description>username to use against metastore database</description>
-</property>
-<property>
-  <name>javax.jdo.option.ConnectionPassword</name>
-  <value>mine</value>
-  <description>password to use against metastore database</description>
-</property>
-<property>
-  <name>hive.metastore.warehouse.dir</name>
-  <value>${HIVE_LOCAL_WAREHOUSE}</value>
-  <description>unit test data goes in here on your local filesystem</description>
-</property>
-</configuration>
-EOFShell> $HIVE_HOME/bin/schematool -initSchema -dbType derbyShell> $HIVE_HOME/bin/schematool -dbType derby-infoShell> $HIVE_HOME/bin/hive=M2. [Remote Metastore Server Derby]Shell> tar -xzf db-derby-10.12.1.1-bin.tar.gzShell> cd db-derby-10.12.1.1-binShell> mkdir dataShell> cd dataShell> ../bin/startNetworkServer  -h 172.31.200.110 -p 1527  &Shell> cp -raf  ../lib/derbyclient.jar   ../lib/derbytools.jar  $HIVE_HOME/lib/DERBY_SERVER_HOST=masternodeShell>cat <<EOF > ${HIVE_CONF_DIR}/hive-site.xml
-<configuration>
-<property>
-  <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:derby://${DERBY_SERVER_HOST}:1527/hive_meta;create=true</value>
-  <description>JDBC connect string for a JDBC metastore</description>
-</property>
-<property>
-  <name>javax.jdo.option.ConnectionDriverName</name>
-  <value>org.apache.derby.jdbc.ClientDriver</value>
-  <description>Driver class name for a JDBC metastore</description>
-</property>
-<property>
-    <name>datanucleus.schema.autoCreateAll</name>
-    <value>true</value>
-    <description>creates necessary schema on a startup if one doesn't exist. set this to false, after creating it once</description>
-</property>
-<property>
-  <name>javax.jdo.option.ConnectionUserName</name>
-  <value>app</value>
-  <description>username to use against metastore database</description>
-</property>
-<property>
-  <name>javax.jdo.option.ConnectionPassword</name>
-  <value>app</value>
-  <description>password to use against metastore database</description>
-</property>
-<property>
-  <name>hive.metastore.warehouse.dir</name>
-  <!-- base hdfs path -->
-  <value>/user/hive/warehouse</value>
-  <description>base hdfs path :location of default database for the warehouse</description>
-</property>
-  
-<!-- hive client -->
- <!-- thrift://<host_name>:<port> -->
- <property>
-      <name>hive.metastore.uris</name>
-      <value>thrift://masternode:9083</value>
- </property>
-</configuration>
-EOF#start metastore service$HIVE_HOME/bin/hive --service metastore &#star thiveserver service$HIVE_HOME/bin/hiveserver2 &
-5. start$HIVE_HOME/bin/hivehive> CREATE TABLE pokes (foo INT, bar STRING);hive> CREATE TABLE invites (foo INT, bar STRING) PARTITIONED BY (ds STRING);hive> SHOW TABLES;hive> SHOW TABLES '.*s';hive> DESCRIBE invites;hive> LOAD DATA LOCAL INPATH '/root/BIGDATA/apache-hive-2.0.0-bin/examples/files/kv1.txt' OVERWRITE INTO TABLE pokes;
-======# #Remote Metastore Server   $HIVE_HOME/bin/hive --service metastore -p 9083#Running HiveServer2 and Beeline   $HIVE_HOME/bin/hiveserver2   $HIVE_HOME/bin/beeline -u jdbc:hive2://localhost:10000#Running HCatalog   $HIVE_HOME/hcatalog/sbin/hcat_server.sh
-   $HIVE_HOME/hcatalog/bin/hcat#Running WebHCat   $HIVE_HOME/hcatalog/sbin/webhcat_server.sh
-####### pig
-2. add profile
-cat << EOF >>/etc/profile.d/hadoop.sh
-export PIG_HOME=/BIGDATA/pig-0.15.0
-export PATH=\${PIG_HOME}/bin:\${PATH}
-EOFShell>source /etc/profile
+
+ 首先配置hosts文件关联主机名和ip地址
+  host1=
+  host2=
+  host3=
+ 
+
+ === security shell
+  rm -rf ~/.ssh/*
+  ssh-keygen  -t rsa -f ~/.ssh/id_rsa  -N ''
+  ssh-copy-id -o StrictHostKeyChecking=no $remothostname
+  ssh $remothostname hostname
+ 
+
+
+
+ ######################## Hadoop cluster deploy
+  1. tar -xzf hadoop-2.7.1.tar.gz
+  2. add profile
+  Shell> cat << EOF >/etc/profile.d/hadoop.sh
+  #!/bin/sh
+  export JAVA_HOME=/root/BIGDATA/jdk1.8.0_65
+  export HADOOP_PREFIX=/root/BIGDATA/hadoop-2.7.1
+ 
+
+ export HADOOP_HOME=\$HADOOP_PREFIX
+  export HADOOP_CONF_DIR=\$HADOOP_HOME/etc/hadoop
+  export YARN_CONF_DIR=\$HADOOP_HOME/etc/hadoop
+ 
+
+ export JAVA_LIBRARY_PATH=\$HADOOP_HOME/lib/native:\$JAVA_LIBRARY_PATH
+  export LD_LIBRARY_PATH=\$HADOOP_HOME/lib/native:\$LD_LIBRARY_PATH
+  export CLASSPATH=.:\$JAVA_HOME/lib/dt.jar:\$JAVA_HOME/lib/tools.jar:
+  export PATH=\$JAVA_HOME/bin:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin:\${PATH}
+  EOF
+ 
+
+
+Shell> source /etc/profile
+ 
+ 
+  3. create hdfs dirs on all hosts
+ 
+
+
+HADOOP_LOCAL_BASE_DIR=/opt/local/hdfs
+ 
+
+
+mkdir -p ${HADOOP_LOCAL_BASE_DIR}
+ 
+mkdir -p ${HADOOP_LOCAL_BASE_DIR}/dfs/data
+ 
+mkdir -p ${HADOOP_LOCAL_BASE_DIR}/dfs/name
+ 
+mkdir -p ${HADOOP_LOCAL_BASE_DIR}/dfs/snn
+ 
+mkdir -p ${HADOOP_LOCAL_BASE_DIR}/tmp
+ 
+mkdir -p ${HADOOP_LOCAL_BASE_DIR}/yarn/logs
+ 
+
+ 4. config etc/hadoop/
+ 
+1. add all slaves to slaves
+ 
+bigdata1
+ 
+bigdata3
+ 
+
+
+2.
+ 
+HADOOP_DFS_MASTER=masternode
+ 
+HADOOP_DFS_SECONDARY_NAMENODE=masternode
+ 
+YARN_RESOURCE_MANAGER=masternode
+ 
+JOBHISTORY_SERVER=masternode
+ 
+JOBTRACKRT_HOST=masternode
+ 
+HADOOP_TOOL_INSTALL_DIR=/root/BIGDATA/DOCS/hadoop_doc/hadoop_demo
+ 
+#core-site.xml
+ 
+conf_file=core-site.xml
+ 
+cp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/
+ 
+sed -i "s^\${HADOOP_LOCAL_BASE_DIR}^${HADOOP_LOCAL_BASE_DIR}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+sed -i "s^\${HADOOP_DFS_MASTER}^${HADOOP_DFS_MASTER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+#hdfs-site.xml
+ 
+conf_file=hdfs-site.xml
+ 
+cp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/
+ 
+sed -i "s^\${HADOOP_LOCAL_BASE_DIR}^${HADOOP_LOCAL_BASE_DIR}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+sed -i "s^\${HADOOP_DFS_SECONDARY_NAMENODE}^${HADOOP_DFS_SECONDARY_NAMENODE}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+sed -i "s^\${HADOOP_DFS_MASTER}^${HADOOP_DFS_MASTER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+#mapreducesite.xml
+ 
+conf_file=mapred-site.xml
+ 
+cp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/
+ 
+sed -i "s^\${JOBTRACKRT_HOST}^${JOBTRACKRT_HOST}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+sed -i "s^\${JOBHISTORY_SERVER}^${JOBHISTORY_SERVER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+#yarn-site.xml
+ 
+conf_file=yarn-site.xml
+ 
+cp -raf ${HADOOP_TOOL_INSTALL_DIR}/${conf_file}  ${HADOOP_PREFIX}/etc/hadoop/
+ 
+sed -i "s^\${YARN_RESOURCE_MANAGER}^${YARN_RESOURCE_MANAGER}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+        sed -i "s^\${HADOOP_LOCAL_BASE_DIR}^${HADOOP_LOCAL_BASE_DIR}^g" "${HADOOP_PREFIX}/etc/hadoop/${conf_file}"
+ 
+
+
+
+
+
+ 5. init namenode
+ 
+Shell>hdfs namenode -format cluster1
+  6. start all
+ 
+Shell>$HADOOP_HOME/sbin/start-all.sh
+ 
+Shell> $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh  start historyserver
+ 
+
+
+
+ ===Hadoop check
+  1. After deploy hadoop.
+     Shell>hadoop checknative -a 
+     Shell>hadoop jar ${HADOOP_HOME}/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar pi 4 100
+     
+     Shell> cat <<EOF >/tmp/file1
+  Hello World Bye World
+  EOF
+     Shell> cat <<EOF >/tmp/file2
+  Hello Hadoop Goodbye Hadoop
+  EOF
+ 
+
+    Shell> hadoop fs -mkdir /tmp 
+     Shell> hadoop fs -copyFromLocal -f /tmp/file1  /tmp/file2  /tmp
+     Shell> hadoop jar ${HADOOP_HOME}/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.1.jar wordcount  /tmp/file1  /tmp/file2  /tmp/wordcount
+     Shell> hadoop fs -cat /tmp/wordcount/part-r-00000
+ 
+
+
+
+ ===hadoop Daemon
+  Web Interface
+  NameNode
+  http://nn_host:port/
+  Default HTTP port is 50070.
+  ResourceManager
+  http://rm_host:port/
+  Default HTTP port is 8088.
+  #MapReduce JobHistory Server
+  http://jhs_host:port/
+  Default HTTP port is 19888.
+ 
+
+
+
+ ######################## Spark cluster deploy
+  1. tar -xzf spark-1.6.1-bin-hadoop2.6.tgz
+  2. add profile
+  cat << EOF >>/etc/profile.d/hadoop.sh
+  export SPARK_HOME=/root/BIGDATA/spark-1.6.1-bin-hadoop2.6
+  export PATH=\${SPARK_HOME}/sbin:\${PATH}:\${SPARK_HOME}/bin:
+ 
+
+ EOF
+ 
+
+
+Shell>source /etc/profile
+ 
+
+ 3. create local dir
+ 
+SPARK_LOCAL_BASE_DIR=/opt/local/spark
+ 
+
+
+Shell>mkdir -p ${SPARK_LOCAL_BASE_DIR}/tmp
+ 
+
+
+Shell>hadoop fs -mkdir /sparkHistoryLogs /sparkEventLogs
+  4. config
+ 
+1. add all slaves to slaves
+         Shell>mv slaves.template slaves
+ 
+bigdata1
+ 
+bigdata3
+ 
+
+
+2.
+ 
+SPARK_MASTER=masternode
+ 
+HADOOP_DFS_MASTER=masternode
+ 
+
+
+Shell> cat << EOF > ${SPARK_HOME}/conf/spark-defaults.conf
+  spark.master  
+  spark://${SPARK_MASTER}:7077
+  spark.local.dir  
+  ${SPARK_LOCAL_BASE_DIR}/tmp
+  spark.master.rest.port  
+  7177
+  #Spark UI
+  spark.eventLog.enabled  
+  true
+  spark.eventLog.dir  
+  hdfs://${HADOOP_DFS_MASTER}:9000/sparkEventLogs
+  spark.ui.killEnabled  
+  true
+  spark.ui.port  
+  4040
+  spark.history.ui.port  
+  18080
+  spark.history.fs.logDirectory  
+  hdfs://${HADOOP_DFS_MASTER}:9000/sparkHistoryLogs
+ 
+
+ #
+  spark.shuffle.service.enabled  
+  false
+ 
+
+ #
+  spark.yarn.am.extraJavaOptions  
+  -Xmx3g
+  spark.executor.extrajavaoptions  
+  -Xmx3g
+ 
+
+ #Amount of memory to use for the YARN Application Master in client mode
+  spark.yarn.am.memory  
+  2048m
+  #The amount of off-heap memory (in megabytes) to be allocated per executor. 
+  spark.yarn.driver.memoryOverhead  
+  512
+  #The amount of off-heap memory (in megabytes) to be allocated per driver in cluster mode
+  spark.yarn.executor.memoryOverhead  
+  512
+  #Same as spark.yarn.driver.memoryOverhead, but for the YARN Application Master in client mode, fix yarn-client OOM, "ERROR yarn.ApplicationMaster: RECEIVED SIGNAL 15: SIGTERM"
+  spark.yarn.am.memoryOverhead  
+  1024  
+    
+  EOF
+ 
+
+
+Shell> cat << EOF > ${SPARK_HOME}/conf/spark-env.sh
+  SPARK_WORKER_WEBUI_PORT=8081
+  SPARK_WORKER_DIR=\${SPARK_HOME}/work
+  #SPARK_LOCAL_DIRS=\${SPARK_WORKER_DIR}
+  EOF
+ 
+
+ 5. start all
+  Shell> ${SPARK_HOME}/sbin/start-all.sh
+  check cluster status
+  http://${SPARK_MASTER}:8080
+ 
+
+ ===Spark Daemon
+  Web Interface
+  spark.history.ui.port
+  18080
+  spark master 8080
+ 
+
+ http://${SPARK_MASTER}:port/
+ 
+
+
+
+ ===Spark check
+ 
+
+ 1. Spark Standalone (client, cluster(spark.master.rest.port))
+    # Run application locally on 1 cores
+    Shell>  ${SPARK_HOME}/bin/spark-submit \
+    --class org.apache.spark.examples.SparkPi \
+    --master spark://masternode:7077 \
+    --deploy-mode  client \
+     ${SPARK_HOME}/lib/spark-examples*.jar \
+    10
+ 
+
+   # Run on a Spark standalone cluster
+    Shell>  ${SPARK_HOME}/bin/spark-submit \
+    --class org.apache.spark.examples.SparkPi \
+    --master spark://$SPARK_MASTER:7177 \
+    --deploy-mode  cluster \
+    --executor-memory 1G \
+    --total-executor-cores 1 \
+     ${SPARK_HOME}/lib/spark-examples*.jar \
+    10
+    
+     #spark shell
+     Shell> ${SPARK_HOME}/bin/spark-shell --master spark://$SPARK_MASTER:7077
+     
+ 
+
+ 2. Spark on Yarn (It needn't start spark cluster, only need start hadoop)
+ 
+#run yarn-client
+ 
+Shell> ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi \
+ 
+--master yarn-client \
+      --driver-java-options '-Xmx3096m'  \
+      --conf spark.executor.extrajavaoptions=-Xmx3096m  \
+      --executor-memory 3096m  \
+      --num-executors  1  \
+      --conf spark.yarn.am.memoryOverhead=1024  \
+      ${SPARK_HOME}/lib/spark-examples*.jar \
+      10
+      
+ 
+
+
+#run yarn-cluster
+ 
+Shell> ${SPARK_HOME}/bin/spark-submit --class org.apache.spark.examples.SparkPi \
+ 
+--master yarn \
+ 
+--deploy-mode  cluster \
+      --driver-memory 2g \
+      --executor-memory 2g \
+      ${SPARK_HOME}/lib/spark-examples*.jar \
+      10
+ 
+
+
+
+ ######################## Hbase cluster deploy
+  1. Shell> tar -xzf hbase-1.1.4-bin.tar.gz
+  2. add profile
+  cat << EOF >>/etc/profile.d/hadoop.sh
+  export HBASE_HOME=/root/BIGDATA/hbase-1.1.4
+  export PATH=\${PATH}:\${HBASE_HOME}/bin:
+ 
+
+ EOF
+ 
+
+
+Shell>source /etc/profile
+ 
+
+ 3. create local dir
+ 
+HBASE_ROOTDIR=/hbase
+ 
+HBASE_TMP_DIR=/opt/local/hbase
+ 
+
+
+Shell> hadoop fs -mkdir ${HBASE_ROOTDIR}
+ 
+Shell> mkdir -p ${HBASE_TMP_DIR}
+  4. config
+ 
+1. add all hosts to regionservers
+ 
+bigdata1
+ 
+bigdata2
+ 
+
+
+2. modify hbase-site.xml
+  cat <<EOF >${HBASE_HOME}/conf/hbase-site.xml
+  <configuration>
+    <property>
+      <name>hbase.rootdir</name>
+      <value>hdfs://masternode:9000/hbase </value>
+      <description>The directory shared by RegionServers.
+      Default: \${hbase.tmp.dir}/hbase
+      </description>
+    </property>
+    <property>
+      <name>hbase.zookeeper.quorum</name>
+      <value>masternode,slavesnode</value>
+      <description>The directory shared by RegionServers.
+      </description>
+    </property>
+    <property>
+      <name>hbase.tmp.dir</name>
+      <value>/opt/local/hbase</value>
+      <description>Temporary directory on the local filesystem
+      Default: \${java.io.tmpdir}/hbase-${user.name}.
+      </description>
+    </property>
+    <property>
+      <name>hbase.cluster.distributed</name>
+      <value>true</value>
+      <description>The mode the cluster will be in. Possible values are
+        false: standalone and pseudo-distributed setups with managed Zookeeper
+        true: fully-distributed with unmanaged Zookeeper Quorum (see hbase-env.sh)
+      </description>
+    </property>
+    <!--
+    <property>
+      <name>hbase.fs.tmp.dir</name>
+      <value></value>
+      <description>A staging directory in default file system (HDFS) for keeping temporary data
+      Default: /user/\${user.name}/hbase-staging
+      </description>
+    </property>
+    <property>
+      <name>hbase.local.dir</name>
+      <value></value>
+      <description>Directory on the local filesystem to be used as a local storage.
+      Default: ${hbase.tmp.dir}/local/
+      </description>
+    </property>
+    <property>
+      <name>hbase.master.port</name>
+      <value>16000</value>
+      <description>The port the HBase Master should bind to.
+      Default: 16000
+      </description>
+    </property>
+    <property>
+      <name>hbase.master.info.port</name>
+      <value>16010</value>
+      <description>The port for the HBase Master web UI. Set to -1 if you do not want a UI instance run.
+      Default: 16010
+      </description>
+    </property>
+    <property>
+      <name>hbase.regionserver.port</name>
+      <value>16020</value>
+      <description>The port the HBase RegionServer binds to.
+      Default: 16020
+      </description>
+    </property>
+    <property>
+      <name>hbase.regionserver.info.port</name>
+      <value>16030</value>
+      <description>The port for the HBase RegionServer web UI Set to -1 if you do not want the RegionServer UI to run.
+      Default: 16030
+      </description>
+    </property>
+    <property>
+      <name>hbase.zookeeper.peerport</name>
+      <value>2888</value>
+      <description>Port used by ZooKeeper peers to talk to each other
+      Default: 2888
+      </description>
+    </property>
+    <property>
+      <name>hbase.zookeeper.leaderport</name>
+      <value>3888</value>
+      <description>Port used by ZooKeeper for leader election
+      Default: 3888
+      </description>
+    </property>
+    <property>
+      <name>hbase.zookeeper.property.dataDir</name>
+      <value></value>
+      <description>Property from ZooKeeper’s config zoo.cfg. The directory where the snapshot is stored.
+      Default: ${hbase.tmp.dir}/zookeeper
+      </description>
+    </property>
+    <property>
+      <name>hbase.zookeeper.property.clientPort</name>
+      <value>2181</value>
+      <description>Property from ZooKeeper’s config zoo.cfg. The port at which the clients will connect.
+      Default: 2181
+      </description>
+    </property>
+    -->
+    
+  </configuration>
+  EOF
+ 
+3. ln -s $HADOOP_HOME/etc/hadoop/hdfs-site.xml  ${HBASE_HOME}/conf/hdfs-site.xml 
+ 
+4. ulimit 咿nproc
+ 
+cat <<EOF > /etc/security/limits.conf
+   root -       nofile  32768
+   root soft/hard nproc 32000
+  EOF
+ 
+
+ 5. start all
+ 
+Shell> ${HBASE_HOME}/bin/start-hbase.sh
+ 
+
+ ===Hbase Daemon
+  Web Interface
+  hbase.master.info.port  16010
+  hbase.regionserver.info.port  16030
+ 
+
+ http://${HBASE_MASTER}:port/
+ 
+
+ ===Hbase check
+ 
+
+ 1. run hbase shell
+  Shell> ${HBASE_HOME}/bin/hbase shell
+ 
+
+ hbase(main):003:0> create 'test', 'cf'
+  0 row(s) in 1.2200 seconds
+  hbase(main):003:0> list 'table'
+  test
+  1 row(s) in 0.0550 seconds
+  hbase(main):004:0> put 'test', 'row1', 'cf:a', 'value1'
+  0 row(s) in 0.0560 seconds
+  hbase(main):005:0> put 'test', 'row2', 'cf:b', 'value2'
+  0 row(s) in 0.0370 seconds
+  hbase(main):006:0> put 'test', 'row3', 'cf:c', 'value3'
+  0 row(s) in 0.0450 seconds
+ 
+
+ hbase(main):007:0> scan 'test'
+  ROW        COLUMN+CELL
+  row1       column=cf:a, timestamp=1288380727188, value=value1
+  row2       column=cf:b, timestamp=1288380738440, value=value2
+  row3       column=cf:c, timestamp=1288380747365, value=value3
+  3 row(s) in 0.0590 seconds
+ 
+
+ hbase(main):008:0> get 'test', 'row1'
+  COLUMN      CELL
+  cf:a        timestamp=1288380727188, value=value1
+  1 row(s) in 0.0400 seconds
+ 
+
+ hbase(main):012:0> disable 'test'
+  0 row(s) in 1.0930 seconds
+  hbase(main):013:0> drop 'test'
+  0 row(s) in 0.0770 seconds 
+ 
+
+ hbase(main):014:0> exit
+ 
+
+
+
+ ######################## Hive cluster deploy
+  1. tar -xzf apache-hive-2.0.0-bin.tar.gz
+  2. add profile
+  cat << EOF >>/etc/profile.d/hadoop.sh
+  export HIVE_HOME=/root/BIGDATA/apache-hive-2.0.0-bin
+  export HIVE_CONF_DIR=\${HIVE_HOME}/conf
+  export PATH=\${HIVE_HOME}/bin:\${PATH}
+ 
+
+ EOF
+ 
+
+
+Shell>source /etc/profile
+ 
+
+ 3. create local dir
+     $HADOOP_HOME/bin/hadoop fs -mkdir /tmp
+     $HADOOP_HOME/bin/hadoop fs -mkdir -p /user/hive/warehouse
+     $HADOOP_HOME/bin/hadoop fs -chmod g+w  /tmp
+     $HADOOP_HOME/bin/hadoop fs -chmod g+w  /user/hive/warehouse
+ 
+
+    Shell> mkdir -p  ${HBASE_TMP_DIR}
+ 
+
+ 4. config 
+ 
+=M1. [ Local Embedded Derby ]
+ 
+HIVE_LOCAL_WAREHOUSE=/opt/hive/warehouse
+ 
+Shell> mkdir -p  ${HIVE_LOCAL_WAREHOUSE}
+ 
+
+
+Shell>cat <<EOF > ${HIVE_CONF_DIR}/hive-site.xml
+  <configuration>
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:derby:;databaseName=metastore_db;create=true</value>
+    <description>JDBC connect string for a JDBC metastore</description>
+  </property>
+ 
+
+ <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>org.apache.derby.jdbc.EmbeddedDriver</value>
+    <description>Driver class name for a JDBC metastore</description>
+  </property>
+ 
+
+ <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>APP</value>
+    <description>username to use against metastore database</description>
+  </property>
+ 
+
+ <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>mine</value>
+    <description>password to use against metastore database</description>
+  </property>
+ 
+
+ <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>${HIVE_LOCAL_WAREHOUSE}</value>
+    <description>unit test data goes in here on your local filesystem</description>
+  </property>
+ 
+
+ </configuration>
+  EOF
+ 
+
+
+Shell> $HIVE_HOME/bin/schematool -initSchema -dbType derby
+ 
+Shell> $HIVE_HOME/bin/schematool -dbType derby-info
+ 
+Shell> $HIVE_HOME/bin/hive
+ 
+
+
+
+
+
+
+=M2. [Remote Metastore Server Derby]
+ 
+Shell> tar -xzf db-derby-10.12.1.1-bin.tar.gz
+ 
+Shell> cd db-derby-10.12.1.1-bin
+ 
+Shell> mkdir data
+ 
+Shell> cd data
+ 
+Shell> ../bin/startNetworkServer  -h 172.31.200.110 -p 1527  &
+ 
+Shell> cp -raf  ../lib/derbyclient.jar   ../lib/derbytools.jar  $HIVE_HOME/lib/
+ 
+
+
+DERBY_SERVER_HOST=masternode
+ 
+
+
+Shell>cat <<EOF > ${HIVE_CONF_DIR}/hive-site.xml
+  <configuration>
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:derby://${DERBY_SERVER_HOST}:1527/hive_meta;create=true</value>
+    <description>JDBC connect string for a JDBC metastore</description>
+  </property>
+ 
+
+ <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>org.apache.derby.jdbc.ClientDriver</value>
+    <description>Driver class name for a JDBC metastore</description>
+  </property>
+ 
+
+ <property>
+      <name>datanucleus.schema.autoCreateAll</name>
+      <value>true</value>
+      <description>creates necessary schema on a startup if one doesn't exist. set this to false, after creating it once</description>
+  </property>
+ 
+
+ <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>app</value>
+    <description>username to use against metastore database</description>
+  </property>
+ 
+
+ <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>app</value>
+    <description>password to use against metastore database</description>
+  </property>
+ 
+
+ <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <!-- base hdfs path -->
+    <value>/user/hive/warehouse</value>
+    <description>base hdfs path :location of default database for the warehouse</description>
+  </property>
+    
+  <!-- hive client -->
+   <!-- thrift://<host_name>:<port> -->
+   <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://masternode:9083</value>
+   </property>
+  </configuration>
+  EOF
+ 
+
+
+#start metastore service
+ 
+$HIVE_HOME/bin/hive --service metastore &
+ 
+
+
+#star thiveserver service
+ 
+$HIVE_HOME/bin/hiveserver2 &
+ 
+
+ 5. start
+ 
+$HIVE_HOME/bin/hive
+ 
+hive> CREATE TABLE pokes (foo INT, bar STRING);
+ 
+hive> CREATE TABLE invites (foo INT, bar STRING) PARTITIONED BY (ds STRING);
+ 
+hive> SHOW TABLES;
+ 
+hive> SHOW TABLES '.*s';
+ 
+hive> DESCRIBE invites;
+ 
+
+
+hive> LOAD DATA LOCAL INPATH '/root/BIGDATA/apache-hive-2.0.0-bin/examples/files/kv1.txt' OVERWRITE INTO TABLE pokes;
+ 
+
+ ======#
+  
+
+#Remote Metastore Server
+ 
+   $HIVE_HOME/bin/hive --service metastore -p 9083
+ 
+#Running HiveServer2 and Beeline
+ 
+   $HIVE_HOME/bin/hiveserver2
+ 
+   $HIVE_HOME/bin/beeline -u jdbc:hive2://localhost:10000
+ 
+#Running HCatalog
+ 
+   $HIVE_HOME/hcatalog/sbin/hcat_server.sh
+  
+
+   $HIVE_HOME/hcatalog/bin/hcat
+ 
+#Running WebHCat
+ 
+   $HIVE_HOME/hcatalog/sbin/webhcat_server.sh
+ 
+
+
+
+
+
+ ####### pig
+  2. add profile
+  cat << EOF >>/etc/profile.d/hadoop.sh
+  export PIG_HOME=/BIGDATA/pig-0.15.0
+  export PATH=\${PIG_HOME}/bin:\${PATH}
+ 
+
+ EOF
+ 
+
+
+Shell>source /etc/profile
+ 
+
+
+
 
 
 

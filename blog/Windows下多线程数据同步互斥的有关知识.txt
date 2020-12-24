@@ -1,82 +1,166 @@
 
 
 
-﻿﻿
+
+ ﻿﻿
+
+
+
+
+
+ 
 
 
 对于操作系统而言，在并行程序设计中难免会遇到数据同步和共享的问题，本文针对这个问题，以windows系统为例回顾一下资源同步的相关问题。要点如下：
 
 
+ 
+
+
+ 
+
+
 1.同步和数据共享
+
+
  数据征用
 
+
+ 
+
+
 2.同步原语
+
+
     1.互斥和临界区
+
+
     2.自旋锁
+
+
     3.信号量
+
+
     4.读写锁
+
+
     5.屏障
+
+
     6.原子操作与无锁代码
 
+
+ 
+
+
 3.进程和进程间通信
+
+
     1.共享内存和映射文件
+
+
     2.条件变量
+
+
     3.信号和事件
+
+
     4.消息队列
+
+
     5.命名管道
+
+
     6.socket网络栈
 
 
+ 
+
+
+ 
+
 一，基础知识
+ 
+
+ 
 
 
+ 
+
+
+ 
 
 
 知识点：句柄
 
+
+ 
+
+
 许多windows API函数都返回句柄。句柄只是无符号整数，但却有特殊的用途。返回句柄的windows API 调用实际上是在内核空间创建某个资源，句柄只是这个资源的索引。当应用程序使用完该资源后，就可调用CloseHandle()使内核释放相关的内核空间资源。
 
+
+ 
+
+
 创建线程的3种不同的方式
+
+
  
 
-#include "stdafx.h"
 
-#include<windows.h>
-#include<process.h>
 
-DWORD WINAPI mywork1( LPVOID lpParameter)
-{
-    printf("CreatThread thread %i\n",GetCurrentThreadId());
-    return 0;
+
+#include "stdafx.h"
+
+#include<windows.h>
+#include<process.h>
+
+DWORD WINAPI mywork1( LPVOID lpParameter)
+{
+    printf("CreatThread thread %i\n",GetCurrentThreadId());
+    return 0;
+}
+
+unsigned int __stdcall mywork2(void *data)
+{
+    printf("_beginthreadex thread %i\n",GetCurrentThreadId());
+    return 0;
+}
+
+void mywork3(void * data)
+{
+    printf("_beginthreade thread %i\n",GetCurrentThreadId());
+
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+
+    HANDLE h1,h2,h3;
+    h1 = CreateThread(0,0,mywork1,0,0,0);
+
+    h2 = (HANDLE)_beginthreadex(0,0,&mywork2,0,0,0);
+    WaitForSingleObject(h2,INFINITE);
+    CloseHandle(h2);
+
+    h3 = (HANDLE)_beginthread(&mywork3,0,0);
+    getchar();
+    return 0;
 }
 
-unsigned int __stdcall mywork2(void *data)
-{
-    printf("_beginthreadex thread %i\n",GetCurrentThreadId());
-    return 0;
-}
 
-void mywork3(void * data)
-{
-    printf("_beginthreade thread %i\n",GetCurrentThreadId());
 
-}
 
-int _tmain(int argc, _TCHAR* argv[])
-{
-
-    HANDLE h1,h2,h3;
-    h1 = CreateThread(0,0,mywork1,0,0,0);
-
-    h2 = (HANDLE)_beginthreadex(0,0,&mywork2,0,0,0);
-    WaitForSingleObject(h2,INFINITE);
-    CloseHandle(h2);
-
-    h3 = (HANDLE)_beginthread(&mywork3,0,0);
-    getchar();
-    return 0;
-}
        调用_beginthread()是个吸引人的选择，这个函数的参数较少，并且在线程退出后清除句柄。但是，如果线程终止，则_beginthread()调用返回的句柄将是无效的，或是被重用的，因此无法查询线程的状态，甚至无法肯定线程句柄是最初指向同一线程的句柄。
+
+
+ 
+
+
+
+ 
+
 
 
 
@@ -84,128 +168,234 @@ int _tmain(int argc, _TCHAR* argv[])
 加上getchar（）的区别
 
 
+ 
 
+
+
+
+
+ 
+
+
+ 
 
 二，同步和资源共享的方式
 
+ 
+
+
+ 
+
 
 判断一个数是否为素数：
+
+
 #include<math.h>
+
+
 int isprime(int number)
+
+
 {
+
+
 int i;
+
+
 for( i = 2; i < (int) (sqrt((float)number) + 1.0); i++)
+
+
 {
+
+
     if(number % i == 0 ){ return 0;}
+
+
 }
+
+
 return 1;
+
+
 }
+
+
+ 
+
 
 测试给定范围内数字是否为素数的算法,如果两个线程同时访问变量counter，这将导致数据征用，正确的代码需要对递增变量counter的操作进行保护。
 
+
+ 
+
+
 volatile int counter = 0;
+
+
 unsigned int __stdcall test(void *)
+
+
 {
+
+
 while(counter < 100)
+
+
 {
+
+
     int number = counter++;
+
+
 //c++格式话输出要用cout对象的方法来控制
+
+
     printf（"ThreadID %i value = %i    is prime  = %i  \n", GetCurrentThreadId(), number , isprime(number) );
 
-}
-return 0;
+
+ 
+
+
 }
 
+
+return 0;
+
+
+}
+
+
+ 
+
+
+ 
+
+
+ 
 
 
 1.保护对临界区代码的访问：
 
 
+ 
+
+
+
 
 // testofCriticalSection.cpp : 定义控制台应用程序的入口点。
+
+
 //
-#include "stdafx.h"
-#include <windows.h>
-#include <process.h>
-#include <math.h>
 
-volatile int counter = 0;
-CRITICAL_SECTION critical;
 
-int isprime(int number)
-{
-
-    int i;
-    for( i = 2; i < (int) (sqrt((float)number) + 1.0); i++)
-    {
-        if(number % i == 0 ){ return 0;}
-    }
-    return 1;
+#include "stdafx.h"
+#include <windows.h>
+#include <process.h>
+#include <math.h>
+
+volatile int counter = 0;
+CRITICAL_SECTION critical;
+
+int isprime(int number)
+{
+
+    int i;
+    for( i = 2; i < (int) (sqrt((float)number) + 1.0); i++)
+    {
+        if(number % i == 0 ){ return 0;}
+    }
+    return 1;
+}
+
+
+unsigned int __stdcall test(void *)
+{
+    while (counter < 100)
+    {    
+        while ( !TryEnterCriticalSection( &critical)){}
+        int number = counter++;
+        LeaveCriticalSection( &critical);
+        printf("ThreadID %i; value = %i, is prime = %i\n",
+            GetCurrentThreadId(), number, isprime(number));
+    }
+    return 0;
+}
+
+/*
+unsigned int __stdcall test(void *)
+{
+    while (counter < 100)
+    {
+        EnterCriticalSection( &critical);
+        int number = counter++;
+        LeaveCriticalSection( &critical);
+        printf("ThreadID %i; value = %i, is prime = %i\n",
+            GetCurrentThreadId(), number, isprime(number));
+    }
+    return 0;
+}
+*/
+int _tmain(int argc, _TCHAR* argv[])
+{
+    HANDLE h1, h2;
+    InitializeCriticalSection( &critical);
+    h1 = (HANDLE)_beginthreadex(0, 0, &test,(void*)0, 0, 0);
+    h2 = (HANDLE)_beginthreadex(0, 0, &test,(void*)0, 0, 0);
+    WaitForSingleObject(h1,INFINITE);//
+    WaitForSingleObject(h2,INFINITE);
+    CloseHandle(h1);
+    CloseHandle(h2);
+    getchar();
+    DeleteCriticalSection( &critical);
+    return 0;
 }
 
 
-unsigned int __stdcall test(void *)
-{
-    while (counter < 100)
-    {    
-        while ( !TryEnterCriticalSection( &critical)){}
-        int number = counter++;
-        LeaveCriticalSection( &critical);
-        printf("ThreadID %i; value = %i, is prime = %i\n",
-            GetCurrentThreadId(), number, isprime(number));
-    }
-    return 0;
-}
 
-/*
-unsigned int __stdcall test(void *)
-{
-    while (counter < 100)
-    {
-        EnterCriticalSection( &critical);
-        int number = counter++;
-        LeaveCriticalSection( &critical);
-        printf("ThreadID %i; value = %i, is prime = %i\n",
-            GetCurrentThreadId(), number, isprime(number));
-    }
-    return 0;
-}
-*/
-int _tmain(int argc, _TCHAR* argv[])
-{
-    HANDLE h1, h2;
-    InitializeCriticalSection( &critical);
-    h1 = (HANDLE)_beginthreadex(0, 0, &test,(void*)0, 0, 0);
-    h2 = (HANDLE)_beginthreadex(0, 0, &test,(void*)0, 0, 0);
-    WaitForSingleObject(h1,INFINITE);//
-    WaitForSingleObject(h2,INFINITE);
-    CloseHandle(h1);
-    CloseHandle(h2);
-    getchar();
-    DeleteCriticalSection( &critical);
-    return 0;
-}
+ 
 
 
 
 
+
+ 
+
+
+ 
+
+
+
+ 
 
 
 使线程休眠然后再唤醒线程非常耗时，因为这涉及进入内核。所有临界区在设计上都应保证耗时尽可能短。要谨记，很可能线程进入休眠时，原处于临界区的线程已经离开。因此，令等待线程休眠后再唤醒浪费了很多时间。
 
+
+
 有两种选择解决上述问题：
+
+
 1.使用TryEnterCriticalSection()避免让调用线程休眠
+
+
 2.面向临界区设定旋转计数的方法
+
+
 InitializeCriticalSetionAndSpinCount（ &critical，1000）
+
+
 SetCriticalSectionSpinCount( &critical, 1000)
 
 
+ 
 
 
-
-参考文献：
+  
+ 参考文献：
 
 戈夫. 多核应用编程实战[M]. 人民邮电出版社, 2013.
 
- 
+
+
+
 

@@ -1,5 +1,73 @@
 
 
 
-2014.5.29 问题1：如何封装一个图像处理库？ 可以参照学习OpenCV2，第三章的内容来进行处理 问题2：封装好了之后，如何关联显示？做到跨平台？ 处理完后返回一块内存，根据不同的格式进行打包。 2014.5.30 问题1：实现鼠标标记图像前景与背景的业务逻辑如何实现？ 这里提供一个类：用来实现图像在windows下与设备上下文的绘制工作 #pragma once class CImageHolder { public: CImageHolder(void); ~CImageHolder(void); int initialize(int Width, int Height); public: inline CDC* GetDC(void) {return &m_DC;} inline void fillSolid(COLORREF clr)  {m_DC.FillSolidRect(0,0,m_Width,m_Height,clr);} inline void drawDC(CDC* pDC, int x, int y, DWORD dwRop = SRCCOPY) { pDC->BitBlt(x,y,m_Width,m_Height,&m_DC,0,0,dwRop); } inline void strechDC(CDC* pDC, int x, int y, int scale, DWORD dwRop = SRCCOPY) { pDC->StretchBlt(x,y,m_Width*scale,m_Height*scale,&m_DC,0,0,m_Width, m_Height, dwRop); } void setPixel(int x, int y, int size, COLORREF color); private: CDC m_DC; CBitmap m_Bitmap; int m_Width; int m_Height; }; int CImageHolder::initialize(int Width, int Height) { CDC dc; dc.m_hDC = ::GetDC(NULL); m_DC.CreateCompatibleDC(&dc); m_Bitmap.CreateCompatibleBitmap(&dc, Width, Height); m_DC.SelectObject(&m_Bitmap); fillSolid(RGB(0,0,0)); m_Width = Width; m_Height = Height; return 0; } CImageHolder::CImageHolder(void) { } CImageHolder::~CImageHolder(void) { } void CImageHolder::setPixel(int x, int y, int size, COLORREF color)  { int i,j; for (i=x-size;i<=x+size;i++) for (j=y-size;j<=y+size;j++) m_DC.SetPixel(i,j,color); } MFC —— CWnd::SetCapture  调用此函数后，接下来所有的鼠标事件都被发送到当前的CWnd对象，发送给CWnd对象的事件中不包括鼠标的坐标信息。   函数原型：    CWnd* SetCapture( );    返回值：    返回一个指针，该指针指向之前接受所有鼠标输入的窗口对象。如果返回值为空，则说明这样的窗口不存在。这个返回值可能是临时的，所以不能将它存储下来在后面使用。    关键点：    当CWnd的对象不再要求所有的鼠标输入时，应用程序应该调用ReleaseCapture函数，从而让别的窗口可以接受鼠标输入。 WM_CTLCOLOR和OnCtlColor消息的用法 很多人都觉得自己的程序的界面不那么美观，往往VC默认产生的对话框比较单调，因此很多人往往找到很多其它的控件对对话框进行美化修饰，例如给静态控件设置字体，设置背景颜色等等，其实这些完全可以由VC自己的WM_CTLCOLOR消息来完成！ WM_CTLCOLOR消息用来完成对EDIT、STATIC、BUTTON等控件设置背景和字体颜色，其用法如下： 1.首先在自己需要设置界面的对话框上点击右键-->建立类向导-->加入WM_CTLCOLOR消息-->自动生成OnCtlColor（）函数，此函数可以对本对话框的控件的界面外观做修饰，用法如下：   将类向导产生的函数做如下修改： HBRUSH CDialogColor::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)    {    HBRUSH hbr = CDialog::OnCtlColor(pDC,pWnd, nCtlColor);    // TODO: Change any attributes of theDC here    //设置显示字体    CFont * cFont=new CFont;    cFont->CreateFont(16,0,0,0,FW_SEMIBOLD,FALSE,FALSE,0,     ANSI_CHARSET,OUT_DEFAULT_PRECIS,    CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,    DEFAULT_PITCH&FF_SWISS,"Arial");    //对特定的控件做修改    switch(nCtlColor)    {    case CTLCOLOR_STATIC: //对所有静态文本控件的设置    {    pDC->SetBkMode(TRANSPARENT);     //设置背景为透明    pDC->SetTextColor(RGB(255,255,0)); //设置字体颜色    pWnd->SetFont(cFont); //设置字体    HBRUSH B = CreateSolidBrush(RGB(125,125,255));     //创建画刷    return (HBRUSH) B; //返回画刷句柄    }    case CTLCOLOR_EDIT: //对所有编辑框的设置    {    pDC->SetBkMode(TRANSPARENT);     pDC->SetTextColor(RGB(255,255,0));     pWnd->SetFont(cFont);     HBRUSH B = CreateSolidBrush(RGB(125,125,255));     return (HBRUSH) B;     }    default:    return CDialog::OnCtlColor(pDC,pWnd, nCtlColor);    }    } 注：case的类别有以下几种：   CTLCOLOR_BTN 按钮控件    CTLCOLOR_DLG 对话框    CTLCOLOR_EDIT 编辑框    CTLCOLOR_LISTBOX 列表框    CTLCOLOR_MSGBOX 消息框    CTLCOLOR_SCROLLBAR 滚动条    CTLCOLOR_STATIC 静态文本    2.你可能觉得对所有的控件使用统一的界面设置觉得不自由，其实VC同样可以对特定的ID的控件进行设置，方法如下： switch (pWnd->GetDlgCtrlID())    {     //针对ID为IDC_CTL1、IDC_CTL2和IDC_CTL3的控件进行同样的设置    case IDC_CTL1:    case IDC_CTL2:    case IDC_CTL3:     {    pDC->SetBkMode(TRANSPARENT);    pDC->SetTextColor(RGB(255,255, 0));    pWnd->SetFont(cFont);    HBRUSH B = CreateSolidBrush(RGB(125,125,255));    return (HBRUSH) B;    }    default:    return CDialog::OnCtlColor(pDC, pWnd, nCtlColor);    } 通过消息WM_CTLCOLOR我们可以改变对话框或一些特殊控件的背景颜色   1、添加WM_CTLCOLOR消息映射。    2、在CWnd::OnCtlColor里面作相应的处理    HRESULT CWnd::OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor)    {    switch (nCtlColor)    {    case CTLCOLOR_BTN: // Button control     {    pDC->SetBkColor( RGB( 255, 0, 0) );    }    break;    case CTLCOLOR_DLG: // Dialog box     break;    case CTLCOLOR_EDIT: // Edit control     {    COLORREF bkColor = RGB(255,0,0);    CRect rect;    pWnd->GetClientRect(&rect);     CBrush br;    br.CreateSolidBrush(bkColor);    pDC->FillRect(rect, &br);*/    pDC->SetBkColor(bkColor);    }    break;    case CTLCOLOR_LISTBOX: // List-box control     break;    case CTLCOLOR_MSGBOX: // Message box    break;    case CTLCOLOR_SCROLLBAR: // Scroll-bar control     break;    case CTLCOLOR_STATIC: // Static control    break;    default:    break;    }    return CWnd::OnCtlColor(pDC, pWnd, nCtlColor);    } 2014.6.1 问题：实现图片缩放，还是窗口缩放？ 原作者代码中实际上实现的是窗口缩放 
+2014.5.29
+问题1：如何封装一个图像处理库？
+可以参照学习OpenCV2，第三章的内容来进行处理
+问题2：封装好了之后，如何关联显示？做到跨平台？
+处理完后返回一块内存，根据不同的格式进行打包。
+2014.5.30
+问题1：实现鼠标标记图像前景与背景的业务逻辑如何实现？
+这里提供一个类：用来实现图像在windows下与设备上下文的绘制工作
+#pragma once
+class CImageHolder
+{
+public:
+CImageHolder(void);
+~CImageHolder(void);
+int initialize(int Width, int Height);
+public:
+inline CDC* GetDC(void) {return &m_DC;}
+inline void fillSolid(COLORREF clr) 
+{m_DC.FillSolidRect(0,0,m_Width,m_Height,clr);}
+inline void drawDC(CDC* pDC, int x, int y, DWORD dwRop = SRCCOPY)
+{ pDC->BitBlt(x,y,m_Width,m_Height,&m_DC,0,0,dwRop); }
+inline void strechDC(CDC* pDC, int x, int y, int scale, DWORD dwRop = SRCCOPY)
+{ pDC->StretchBlt(x,y,m_Width*scale,m_Height*scale,&m_DC,0,0,m_Width, m_Height, dwRop); }
+void setPixel(int x, int y, int size, COLORREF color);
+private:
+CDC m_DC;
+CBitmap m_Bitmap;
+int m_Width;
+int m_Height;
+};
+int CImageHolder::initialize(int Width, int Height)
+{
+CDC dc;
+dc.m_hDC = ::GetDC(NULL);
+m_DC.CreateCompatibleDC(&dc);
+m_Bitmap.CreateCompatibleBitmap(&dc, Width, Height);
+m_DC.SelectObject(&m_Bitmap);
+fillSolid(RGB(0,0,0));
+m_Width = Width;
+m_Height = Height;
+return 0;
+}
+CImageHolder::CImageHolder(void)
+{
+}
+CImageHolder::~CImageHolder(void)
+{
+}
+void CImageHolder::setPixel(int x, int y, int size, COLORREF color) 
+{
+int i,j;
+for (i=x-size;i<=x+size;i++)
+for (j=y-size;j<=y+size;j++)
+m_DC.SetPixel(i,j,color);
+}
+MFC —— CWnd::SetCapture 
+调用此函数后，接下来所有的鼠标事件都被发送到当前的CWnd对象，发送给CWnd对象的事件中不包括鼠标的坐标信息。 函数原型： CWnd* SetCapture( ); 返回值： 返回一个指针，该指针指向之前接受所有鼠标输入的窗口对象。如果返回值为空，则说明这样的窗口不存在。这个返回值可能是临时的，所以不能将它存储下来在后面使用。 关键点： 当CWnd的对象不再要求所有的鼠标输入时，应用程序应该调用ReleaseCapture函数，从而让别的窗口可以接受鼠标输入。
+WM_CTLCOLOR和OnCtlColor消息的用法
+很多人都觉得自己的程序的界面不那么美观，往往VC默认产生的对话框比较单调，因此很多人往往找到很多其它的控件对对话框进行美化修饰，例如给静态控件设置字体，设置背景颜色等等，其实这些完全可以由VC自己的WM_CTLCOLOR消息来完成！
+WM_CTLCOLOR消息用来完成对EDIT、STATIC、BUTTON等控件设置背景和字体颜色，其用法如下：
+1.首先在自己需要设置界面的对话框上点击右键-->建立类向导-->加入WM_CTLCOLOR消息-->自动生成OnCtlColor（）函数，此函数可以对本对话框的控件的界面外观做修饰，用法如下： 将类向导产生的函数做如下修改：
+HBRUSH CDialogColor::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor) { HBRUSH hbr = CDialog::OnCtlColor(pDC,pWnd, nCtlColor); // TODO: Change any attributes of theDC here //设置显示字体 CFont * cFont=new CFont; cFont->CreateFont(16,0,0,0,FW_SEMIBOLD,FALSE,FALSE,0, ANSI_CHARSET,OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY, DEFAULT_PITCH&FF_SWISS,"Arial"); //对特定的控件做修改 switch(nCtlColor) { case CTLCOLOR_STATIC: //对所有静态文本控件的设置 { pDC->SetBkMode(TRANSPARENT); //设置背景为透明 pDC->SetTextColor(RGB(255,255,0)); //设置字体颜色 pWnd->SetFont(cFont); //设置字体 HBRUSH B = CreateSolidBrush(RGB(125,125,255)); //创建画刷 return (HBRUSH) B; //返回画刷句柄 } case CTLCOLOR_EDIT: //对所有编辑框的设置 { pDC->SetBkMode(TRANSPARENT); pDC->SetTextColor(RGB(255,255,0)); pWnd->SetFont(cFont); HBRUSH B = CreateSolidBrush(RGB(125,125,255)); return (HBRUSH) B; } default: return CDialog::OnCtlColor(pDC,pWnd, nCtlColor); } }
+注：case的类别有以下几种： CTLCOLOR_BTN 按钮控件 CTLCOLOR_DLG 对话框 CTLCOLOR_EDIT 编辑框 CTLCOLOR_LISTBOX 列表框 CTLCOLOR_MSGBOX 消息框 CTLCOLOR_SCROLLBAR 滚动条 CTLCOLOR_STATIC 静态文本 2.你可能觉得对所有的控件使用统一的界面设置觉得不自由，其实VC同样可以对特定的ID的控件进行设置，方法如下：
+switch (pWnd->GetDlgCtrlID()) { //针对ID为IDC_CTL1、IDC_CTL2和IDC_CTL3的控件进行同样的设置 case IDC_CTL1: case IDC_CTL2: case IDC_CTL3: { pDC->SetBkMode(TRANSPARENT); pDC->SetTextColor(RGB(255,255, 0)); pWnd->SetFont(cFont); HBRUSH B = CreateSolidBrush(RGB(125,125,255)); return (HBRUSH) B; } default: return CDialog::OnCtlColor(pDC, pWnd, nCtlColor); }
+通过消息WM_CTLCOLOR我们可以改变对话框或一些特殊控件的背景颜色 1、添加WM_CTLCOLOR消息映射。 2、在CWnd::OnCtlColor里面作相应的处理 HRESULT CWnd::OnCtlColor(CDC *pDC, CWnd *pWnd, UINT nCtlColor) { switch (nCtlColor) { case CTLCOLOR_BTN: // Button control { pDC->SetBkColor( RGB( 255, 0, 0) ); } break; case CTLCOLOR_DLG: // Dialog box break; case CTLCOLOR_EDIT: // Edit control { COLORREF bkColor = RGB(255,0,0); CRect rect; pWnd->GetClientRect(&rect); CBrush br; br.CreateSolidBrush(bkColor); pDC->FillRect(rect, &br);*/ pDC->SetBkColor(bkColor); } break; case CTLCOLOR_LISTBOX: // List-box control break; case CTLCOLOR_MSGBOX: // Message box break; case CTLCOLOR_SCROLLBAR: // Scroll-bar control break; case CTLCOLOR_STATIC: // Static control break; default: break; } return CWnd::OnCtlColor(pDC, pWnd, nCtlColor); }
+2014.6.1
+问题：实现图片缩放，还是窗口缩放？
+原作者代码中实际上实现的是窗口缩放
+
 

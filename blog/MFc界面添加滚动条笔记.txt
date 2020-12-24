@@ -1,145 +1,46 @@
 
 
 
-2012-4-23
+2012-4-23 
 2.The Fingerprint Contrast and Analysis System
 3.参照书上代码将程序背景图片处理好。
  
 4.add new image 窗口出现时大小正好为整个客户区
-CRect rect;
-pView->GetClientRect(rect);
-ClientToScreen(rect);
-pDlg->MoveWindow(rect);
+CRect rect; pView->GetClientRect(rect); ClientToScreen(rect); pDlg->MoveWindow(rect);
  
  
-5.vc6的风格转换为 vs2008的风格
-解决方案：stdafx.h文件里
-加上
-#if defined _M_IX86
-#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#elif defined _M_IA64
-#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='ia64' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#elif defined _M_X64
-#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#else
-#pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
-#endif
+ 5.vc6的风格转换为 vs2008的风格
+解决方案：stdafx.h文件里 加上 #if defined _M_IX86 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"") #elif defined _M_IA64 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='ia64' publicKeyToken='6595b64144ccf1df' language='*'\"") #elif defined _M_X64 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'\"") #else #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"") #endif
  
- 
-7.改变程序tittle
-----在程序创建之前，框架类中可以如下形式创建：
-        cs.style&=~FWS_ADDTOTITLE;//取反后与，现有类型做于操作即可去掉这个类型
- cs.lpszName=_T("The Fingerprint Contrast and Analysis System");
------在程序创建之后，可以再oncreat()函数中如下创建
-SetWindowLong();
------程序创建之前：
- WNDCLASS wndcls;
- wndcls.cbClsExtra=0;
- wndcls.cbWndExtra=0;
- wndcls.hbrBackground=(HBRUSH)GetStockObject(BLACK_BRUSH);   //创建有颜色的背景画刷,这一句必须有。
- wndcls.hCursor=LoadCursor(NULL,IDC_HELP);          //选择help的cursor
- wndcls.hIcon=LoadIcon(NULL,IDI_ERROR);
- wndcls.hInstance=AfxGetInstanceHandle();
- wndcls.lpfnWndProc=::DefWindowProc;
- wndcls.lpszClassName=_T("The Fingerprint Contrast and Analysis System");
- wndcls.lpszMenuName=NULL; 
- wndcls.style=CS_HREDRAW |CS_VREDRAW;          //横向重绘，纵向重绘
+  
+7.改变程序tittle ----在程序创建之前，框架类中可以如下形式创建：         cs.style&=~FWS_ADDTOTITLE;//取反后与，现有类型做于操作即可去掉这个类型  cs.lpszName=_T("The Fingerprint Contrast and Analysis System");
+-----在程序创建之后，可以再oncreat()函数中如下创建 SetWindowLong();
+-----程序创建之前：  WNDCLASS wndcls;  wndcls.cbClsExtra=0;  wndcls.cbWndExtra=0;  wndcls.hbrBackground=(HBRUSH)GetStockObject(BLACK_BRUSH);   //创建有颜色的背景画刷,这一句必须有。  wndcls.hCursor=LoadCursor(NULL,IDC_HELP);          //选择help的cursor  wndcls.hIcon=LoadIcon(NULL,IDI_ERROR);  wndcls.hInstance=AfxGetInstanceHandle();  wndcls.lpfnWndProc=::DefWindowProc;  wndcls.lpszClassName=_T("The Fingerprint Contrast and Analysis System");  wndcls.lpszMenuName=NULL;   wndcls.style=CS_HREDRAW |CS_VREDRAW;          //横向重绘，纵向重绘
  RegisterClass(&wndcls);
  cs.lpszClass=_T("The Fingerprint Contrast and Analysis System");
-在框架窗口中，只能改变窗口title的图标。
-而改变背景和，鼠标的图标应该在view类中改变
+在框架窗口中，只能改变窗口title的图标。 而改变背景和，鼠标的图标应该在view类中改变
 cs.lpszClass=AfxRegisterWndClass(CS_HREDRAW|CS_VREDRAW,0,0,LoadIcon(NUll,IDI_WARING));
-----程序创建之后：框架类Oncreat()中
+ ----程序创建之后：框架类Oncreat()中
 SetClassLong
----动态图标的创建
-----1.首先导入图标，添加HICON变量类型m_hicons[]
-----2.oncreate()函数中
- m_hicons[0]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON1));
- m_hicons[1]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON2));
- m_hicons[2]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON3));
- m_hicons[3]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON4));
- m_hicons[4]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON5));
- SetTimer(1,500,NULL);
-----3.相应onTime()时间
- static int index=0;
- SetClassLong(m_hWnd,GCL_HICON,(LONG)m_hicons[index]);
- index=++index%5;
-8.创建菜单快捷按钮只需要id何菜单相同即可
+---动态图标的创建 ----1.首先导入图标，添加HICON变量类型m_hicons[] ----2.oncreate()函数中  m_hicons[0]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON1));  m_hicons[1]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON2));  m_hicons[2]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON3));  m_hicons[3]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON4));  m_hicons[4]=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON5));
+ SetTimer(1,500,NULL); ----3.相应onTime()时间  static int index=0;  SetClassLong(m_hWnd,GCL_HICON,(LONG)m_hicons[index]);  index=++index%5;
+ 8.创建菜单快捷按钮只需要id何菜单相同即可
  
-9.给程序右下角添加时间，在框架类中添加
-------1，添加静态字符串资源
- static UINT indicators[] =
- {
- ID_SEPARATOR,           // status line indicator
- IDS_TIMER,
- IDS_PROGRESS,
- ID_INDICATOR_CAPS,
- ID_INDICATOR_NUM,
- ID_INDICATOR_SCRL,
- };
- 并注册
------2，添加下列代码获取时间，需要在timer中添加
-   CTime t=CTime::GetCurrentTime();
- CString str=t.Format("%H:%M:%S");//得到时间后格式化
- CClientDC dc(this);
- CSize sz=dc.GetTextExtent(str);//得到字体时间的长度
- m_wndStatusBar.SetPaneInfo(1,IDS_TIMER,SBPS_NORMAL,sz.cx);
- m_wndStatusBar.SetPaneText(1,str);
+9.给程序右下角添加时间，在框架类中添加 ------1，添加静态字符串资源  static UINT indicators[] =  {  ID_SEPARATOR,           // status line indicator  IDS_TIMER,  IDS_PROGRESS,  ID_INDICATOR_CAPS,  ID_INDICATOR_NUM,  ID_INDICATOR_SCRL,  };  并注册 -----2，添加下列代码获取时间，需要在timer中添加    CTime t=CTime::GetCurrentTime();  CString str=t.Format("%H:%M:%S");//得到时间后格式化  CClientDC dc(this);  CSize sz=dc.GetTextExtent(str);//得到字体时间的长度  m_wndStatusBar.SetPaneInfo(1,IDS_TIMER,SBPS_NORMAL,sz.cx);  m_wndStatusBar.SetPaneText(1,str);
  
-10.创建进度栏
-----1.首先构造进度栏对象CProgressCtrl m_progress;
-----2.oncreat()函数返回之前创建进度栏
-----3.自定义一个消息，只要比WM_USER 大即可，
- #define UM_PROGRESS  WM_USER+1
- 并且做消息响应函数原型的声明，(注释宏的下面)
- afx_msg LRESULT OnProgress(WPARAM wParam, LPARAM lParam);
-        
-----4.进行消息映射ON_MESSAGE
-----5.定义函数
- LRESULT CMainFrame::OnProgress(WPARAM wParam, LPARAM lParam)
-{
- CRect rect;
- m_wndStatusBar.GetItemRect(2,&rect);
+10.创建进度栏 ----1.首先构造进度栏对象CProgressCtrl m_progress; ----2.oncreat()函数返回之前创建进度栏 ----3.自定义一个消息，只要比WM_USER 大即可，  #define UM_PROGRESS  WM_USER+1  并且做消息响应函数原型的声明，(注释宏的下面)  afx_msg LRESULT OnProgress(WPARAM wParam, LPARAM lParam);          ----4.进行消息映射ON_MESSAGE ----5.定义函数  LRESULT CMainFrame::OnProgress(WPARAM wParam, LPARAM lParam) {  CRect rect;  m_wndStatusBar.GetItemRect(2,&rect);    m_progress.Create( WS_CHILD | WS_VISIBLE | PBS_SMOOTH,    rect,&m_wndStatusBar,123);  m_progress.SetPos(0);  return true; } ----6.onCreate()后发送消息 SendMessage(UM_PROGRESS);直接把消息响应函数发送给消息响应函数，完后再返回。没有达到直接从此处发送消息的目的 PostMessage(UM_PROGRESS);将消息放置在消息队列当中，执行时间靠后，等create完成后再创建滚动条 若注释起来，则上述函数便不会执行。
+ ----7.增加OnPaint()消息处理  在窗口重绘的时候，从新让进度条出现  复制定义函数的代码，会出现问题----进度条已经创建了，并且和类进行了关联，再次创建会出现问题 所以需要如下代码：  CRect rect;  m_wndStatusBar.GetItemRect(2,&rect);  if(!m_progress.m_hWnd)   m_progress.Create(WS_CHILD | WS_VISIBLE ,//| PBS_SMOOTH,    rect,&m_wndStatusBar,123);  else   m_progress.MoveWindow(rect);  m_progress.SetPos(50);
  
- m_progress.Create( WS_CHILD | WS_VISIBLE | PBS_SMOOTH, 
-  rect,&m_wndStatusBar,123);
- m_progress.SetPos(0);
- return true;
-}
-----6.onCreate()后发送消息
-SendMessage(UM_PROGRESS);直接把消息响应函数发送给消息响应函数，完后再返回。没有达到直接从此处发送消息的目的
-PostMessage(UM_PROGRESS);将消息放置在消息队列当中，执行时间靠后，等create完成后再创建滚动条
-若注释起来，则上述函数便不会执行。
-----7.增加OnPaint()消息处理
- 在窗口重绘的时候，从新让进度条出现
- 复制定义函数的代码，会出现问题----进度条已经创建了，并且和类进行了关联，再次创建会出现问题
-所以需要如下代码：
- CRect rect;
- m_wndStatusBar.GetItemRect(2,&rect);
- if(!m_progress.m_hWnd)
-  m_progress.Create(WS_CHILD | WS_VISIBLE ,//| PBS_SMOOTH,
-   rect,&m_wndStatusBar,123);
- else
-  m_progress.MoveWindow(rect);
- m_progress.SetPos(50);
- 
-----8.进度条的移动
- timer中////////////////////////////////////////////////进度条显示
- m_progress.StepIt();
+ ----8.进度条的移动  timer中进度条显示  m_progress.StepIt();
 
  
  
-SkinSharp收费，但是可以使用试用版，还是可以满足咱的需求的，总比MFC本身的界面好，那颜色...拿不出手啊....
-使用很简单，就下面几个步骤：
-1.
-拷贝.h文件和.lib文件到程序目录下；
-2. 在工程的stdafx.h 头文件，添加以下代码：
-        #include "SkinH.h"
-#pragma comment (lib,"SkinHu.lib") 
-     3. 对话框初始化函数OnInitDialog()里面添加以下代码，加载皮肤：SkinH_Attach(); 这个方法只加载试用版默认的皮肤。
-     4. 编译下工程，产生Debug或Release文件夹，把DLL文件(SkinHu.dll )和皮肤文件(skinh.she )拷贝到此。
-     这样就行了。其实很多皮肤的使用方法都很简单，基本上就是拷贝一下.dll和.lib以及头文件，然后在程序中加几行代码。但是由于绝大部分皮肤都收费，还有可能因为版本、编程环境等原因，很多皮肤都用不上，目前为止在我电脑上能用的皮肤就SkinSharp和SkinPlusPlus，这两个使用都简单。但SkinPlusPlus会截获OnTimer()等方法，很让人郁闷，不知道SkinSharp如何，用着再说。
+ SkinSharp收费，但是可以使用试用版，还是可以满足咱的需求的，总比MFC本身的界面好，那颜色...拿不出手啊.... 使用很简单，就下面几个步骤：
+ 1. 拷贝.h文件和.lib文件到程序目录下；
+ 2. 在工程的stdafx.h 头文件，添加以下代码：         #include "SkinH.h" #pragma comment (lib,"SkinHu.lib") 
+      3. 对话框初始化函数OnInitDialog()里面添加以下代码，加载皮肤：SkinH_Attach(); 这个方法只加载试用版默认的皮肤。
+      4. 编译下工程，产生Debug或Release文件夹，把DLL文件(SkinHu.dll )和皮肤文件(skinh.she )拷贝到此。      这样就行了。其实很多皮肤的使用方法都很简单，基本上就是拷贝一下.dll和.lib以及头文件，然后在程序中加几行代码。但是由于绝大部分皮肤都收费，还有可能因为版本、编程环境等原因，很多皮肤都用不上，目前为止在我电脑上能用的皮肤就SkinSharp和SkinPlusPlus，这两个使用都简单。但SkinPlusPlus会截获OnTimer()等方法，很让人郁闷，不知道SkinSharp如何，用着再说。
 
- 
+  
 
 

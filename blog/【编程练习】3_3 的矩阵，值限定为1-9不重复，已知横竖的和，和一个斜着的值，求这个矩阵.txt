@@ -1,15 +1,15 @@
 
 
 
-﻿﻿
-x     x     x 11
-x     x     x 15
-x     x     x 19
-16  14   15 15
 
+ ﻿﻿
+
+x     x     x 11 x     x     x 15 x     x     x 19
+16  14   15 15
+ 
 讨论贴：
 http://bbs.csdn.net/topics/391816265
-
+ 
 先求横竖斜三行的精确匹配方法：
 // puzzl.cpp : 定义控制台应用程序的入口点。
 //
@@ -237,11 +237,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
-
-
-
+ 
+ 
+ 
 排列组合的方法：
-
+ 
 
 template <typename T>
 void swap(T* array, unsigned int i, unsigned int j)
@@ -290,6 +290,8 @@ int main(int argc, char* argv[])
 
 
 
-模仿人做的方法，任意填写3个空位，保证不同行不同列，或者不在一个斜线。就可以算出来剩下的。
+ 
+ 
+模仿人做的方法，任意填写3个空位，保证不同行不同列，或者不在一个斜线。就可以算出来剩下的。 
 
 

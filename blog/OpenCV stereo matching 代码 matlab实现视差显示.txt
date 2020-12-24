@@ -2,14 +2,13 @@
 
 
 
-
-转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
-
-来自：shiter编写程序的艺术
+ 转载请注明出处：http://blog.csdn.net/wangyaninglm/article/details/44151213，
+ 来自：shiter编写程序的艺术
 
 
-基础知识
-计算机视觉是一门研究使用计算机来模拟人的视觉系统的学科。“一图胜千言”，人类对于图像中的信息感知效率远超文字等其他媒介，人类获取的信息总量中更是有高达80%依靠视觉系统[1]。相对于人类高效的图像信息提取能力，计算机在图像信息的理解上仍然效率低下。 计算机视觉作为一门交叉学科，综合了生物学，心理学，数学，计算机科学等学科，从20世纪60年代至今其在科学研究领域中的大量成果已经应用于工程领域，并影响了我们每个人生活的方方面面。 双目立体视觉是计算机视觉领域的重要分支，它通过模拟人的视觉系统来处理现实世界。以机器人，无人汽车导航为例，由于双目立体匹配在非接触测量中的优秀性能，视觉测量在探月工程，火星探测工程中起到了重要作用[2]，如图所示的我国嫦娥探月工程的巡航车就配备了立体视觉导航系统，来进行行进间的运动控制和路径规划[3]。 
+
+基础知识 
+计算机视觉是一门研究使用计算机来模拟人的视觉系统的学科。“一图胜千言”，人类对于图像中的信息感知效率远超文字等其他媒介，人类获取的信息总量中更是有高达80%依靠视觉系统[1]。相对于人类高效的图像信息提取能力，计算机在图像信息的理解上仍然效率低下。  计算机视觉作为一门交叉学科，综合了生物学，心理学，数学，计算机科学等学科，从20世纪60年代至今其在科学研究领域中的大量成果已经应用于工程领域，并影响了我们每个人生活的方方面面。  双目立体视觉是计算机视觉领域的重要分支，它通过模拟人的视觉系统来处理现实世界。以机器人，无人汽车导航为例，由于双目立体匹配在非接触测量中的优秀性能，视觉测量在探月工程，火星探测工程中起到了重要作用[2]，如图所示的我国嫦娥探月工程的巡航车就配备了立体视觉导航系统，来进行行进间的运动控制和路径规划[3]。  
 主要参考：http://blog.csdn.net/wangyaninglm/article/details/51533549
  
  之前在网上也没有现成的代码，现在把库中的sample拿出来，分享下
@@ -326,8 +325,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-
- 
+  
  调试参数：
  
 view_l.png view_r.png --algorithm=bm --blocksize=5 --max-disparity=256  --scale=1.0 --no-display -o disparity.bmp
@@ -371,29 +369,26 @@ mesh(disp);
 set(gca,'YDir','reverse');  % 通过 mesh 方式绘图时，需倒置 Y 轴方向
 axis tight; % 使坐标轴显示范围与数据范围相贴合，去除空白显示区
 
-
- 
-
-
-实现效果
+  
 
 
- 
- 
+实现效果 
 
 
  
  
+
+  
+ 
  
  
 
-大牛博客中的解释
+大牛博客中的解释 
 
 
 1． opencv2.1和opencv2.0在做stereo vision方面有什么区别了？
 2.1版增强了Stereo Vision方面的功能：
-(1) 新增了 SGBM 立体匹配算法（源自Heiko Hirschmuller的《Stereo Processing by Semi-global Matching and Mutual Information》），可以获得比 BM 算法物体轮廓更清晰的视差图（但低纹理区域容易出现横/斜纹路，在
- GCstate->fullDP 选项使能时可消减这种异常纹路，但对应区域视差变为0，且运行速度会有所下降），速度比 BM 稍慢， 352*288的帧处理速度大约是 5 帧/秒；
+(1) 新增了 SGBM 立体匹配算法（源自Heiko Hirschmuller的《Stereo Processing by Semi-global Matching and Mutual Information》），可以获得比 BM 算法物体轮廓更清晰的视差图（但低纹理区域容易出现横/斜纹路，在 GCstate->fullDP 选项使能时可消减这种异常纹路，但对应区域视差变为0，且运行速度会有所下降），速度比 BM 稍慢， 352*288的帧处理速度大约是 5 帧/秒；
 (2) 视差效果：BM < SGBM < GC；处理速度：BM > SGBM > GC ；
 (3) BM 算法比2.0版性能有所提升，其状态参数新增了对左右视图感兴趣区域 ROI 的支持（roi1 和 roi2，由stereoRectify函数产生）；
 (4) BM 算法和 GC 算法的核心代码改动不大，主要是面向多线程运算方面的（由 OpenMP 转向 Intel TBB）；
@@ -405,37 +400,38 @@ axis tight; % 使坐标轴显示范围与数据范围相贴合，去除空白显
  
 
 
-int color_mode = alg == STEREO_SGBM ? 1 : 0;
-//////////////////////////////////////////////////////////////////////////
-// 载入图像
-cvGrabFrame( lfCam );
-cvGrabFrame( riCam );
-frame1 = cvRetrieveFrame( lfCam );
-frame2 = cvRetrieveFrame( riCam );
-if(frame1.empty()) break;
-resize(frame1, img1, img_size, 0, 0);
-resize(frame2, img2, img_size, 0, 0);
-// 选择彩色或灰度格式作为双目匹配的处理图像
-if (!color_mode && cn>1)
-{
-cvtColor(img1, img1gray, CV_BGR2GRAY);
-cvtColor(img2, img2gray, CV_BGR2GRAY);
-img1p = img1gray;
-img2p = img2gray;
-}
-else
-{
-img1p = img1;
-img2p = img2;
-}
+  int color_mode = alg == STEREO_SGBM ? 1 : 0;
+  //
+  // 载入图像
+  cvGrabFrame( lfCam );
+  cvGrabFrame( riCam );
+  frame1 = cvRetrieveFrame( lfCam );
+  frame2 = cvRetrieveFrame( riCam );
+  if(frame1.empty()) break;
+  resize(frame1, img1, img_size, 0, 0);
+  resize(frame2, img2, img_size, 0, 0);
+  // 选择彩色或灰度格式作为双目匹配的处理图像
+  if (!color_mode && cn>1)
+  {
+  cvtColor(img1, img1gray, CV_BGR2GRAY);
+  cvtColor(img2, img2gray, CV_BGR2GRAY);
+  img1p = img1gray;
+  img2p = img2gray;
+  }
+  else
+  {
+  img1p = img1;
+  img2p = img2;
+  }
+ 
+
 
  
 
  
  
 3． 怎样获取与原图像有效像素区域相同的视差图？
-在OpenCV2.0及以前的版本中，所获取的视差图总是在左侧和右侧有明显的黑色区域，这些区域没有有效的视差数据。视差图有效像素区域与视差窗口（ndisp，一般取正值且能被16整除）和最小视差值（mindisp，一般取0或负值）相关，视差窗口越大，视差图左侧的黑色区域越大，最小视差值越小，视差图右侧的黑色区域越大。其原因是为了保证参考图像（一般是左视图）的像素点能在目标图像（右视图）中按照设定的视差匹配窗口匹配对应点，OpenCV
- 只从参考图像的第 (ndisp - 1 + mindisp) 列开始向右计算视差，第 0 列到第 (ndisp - 1 + mindisp) 列的区域视差统一设置为 (mindisp - 1) *16；视差计算到第 width + mindisp 列时停止，余下的右侧区域视差值也统一设置为 (mindisp - 1) *16。  
+在OpenCV2.0及以前的版本中，所获取的视差图总是在左侧和右侧有明显的黑色区域，这些区域没有有效的视差数据。视差图有效像素区域与视差窗口（ndisp，一般取正值且能被16整除）和最小视差值（mindisp，一般取0或负值）相关，视差窗口越大，视差图左侧的黑色区域越大，最小视差值越小，视差图右侧的黑色区域越大。其原因是为了保证参考图像（一般是左视图）的像素点能在目标图像（右视图）中按照设定的视差匹配窗口匹配对应点，OpenCV 只从参考图像的第 (ndisp - 1 + mindisp) 列开始向右计算视差，第 0 列到第 (ndisp - 1 + mindisp) 列的区域视差统一设置为 (mindisp - 1) *16；视差计算到第 width + mindisp 列时停止，余下的右侧区域视差值也统一设置为 (mindisp - 1) *16。  
 
 00177 static const int DISPARITY_SHIFT = 4;
 …
@@ -462,16 +458,17 @@ img2p = img2;
 
 …
 
+
  
 这样的设置很明显是不符合实际应用的需求的，它相当于把摄像头的视场范围缩窄了。因此，OpenCV2.1 做了明显的改进，不再要求左右视图和视差图的大小（size）一致，允许对视差图进行左右边界延拓，这样，虽然计算视差时还是按上面的代码思路来处理左右边界，但是视差图的边界得到延拓后，有效视差的范围就能够与对应视图完全对应。具体的实现代码范例如下：
  
 
-//////////////////////////////////////////////////////////////////////////
+//
 // 对左右视图的左边进行边界延拓，以获取与原始视图相同大小的有效视差区域
 copyMakeBorder(img1r, img1b, 0, 0, m_nMaxDisp, 0, IPL_BORDER_REPLICATE);
 copyMakeBorder(img2r, img2b, 0, 0, m_nMaxDisp, 0, IPL_BORDER_REPLICATE);
 
-//////////////////////////////////////////////////////////////////////////
+//
 // 计算视差
 if( alg == STEREO_BM )
 {
@@ -484,6 +481,7 @@ else if(alg == STEREO_SGBM)
 	sgbm(img1b, img2b, dispb);
 	displf = dispb.colRange(m_nMaxDisp, img1b.cols);
 }
+
 
  
 
@@ -503,18 +501,22 @@ dptr[y*dstep] = (short)(((ndisp - mind - 1 + mindisp)*256 + (d != 0 ? (p-n)*128/
 
 （1）StereoBMState
 // 预处理滤波参数
-preFilterType：预处理滤波器的类型，主要是用于降低亮度失真（photometric distortions）、消除噪声和增强纹理等, 有两种可选类型：CV_STEREO_BM_NORMALIZED_RESPONSE（归一化响应） 或者CV_STEREO_BM_XSOBEL（水平方向Sobel算子，默认类型）, 该参数为 int 型；preFilterSize：预处理滤波器窗口大小，容许范围是[5,255]，一般应该在 5x5..21x21 之间，参数必须为奇数值, int 型preFilterCap：预处理滤波器的截断值，预处理的输出值仅保留[-preFilterCap, preFilterCap]范围内的值，参数范围：1 - 31（文档中是31，但代码中是 63）, int// SAD 参数
-SADWindowSize：SAD窗口大小，容许范围是[5,255]，一般应该在 5x5 至 21x21 之间，参数必须是奇数，int 型minDisparity：最小视差，默认值为 0, 可以是负值，int 型 numberOfDisparities：视差窗口，即最大视差值与最小视差值之差, 窗口大小必须是 16 的整数倍，int 型// 后处理参数
-textureThreshold：低纹理区域的判断阈值。如果当前SAD窗口内所有邻居像素点的x导数绝对值之和小于指定阈值，则该窗口对应的像素点的视差值为 0（That is, if the sum of absolute values of x-derivatives computed over SADWindowSize by SADWindowSize pixel neighborhood is smaller than the parameter, no disparity
- is computed at the pixel），该参数不能为负值，int 型 uniquenessRatio：视差唯一性百分比， 视差窗口范围内最低代价是次低代价的(1 + uniquenessRatio/100)倍时，最低代价对应的视差值才是该像素点的视差，否则该像素点的视差为 0 （the minimum margin in percents between the best (minimum) cost function value and the second best value to accept the computed disparity,
- that is, accept the computed disparity d^ only if SAD(d) >= SAD(d^) x (1 + uniquenessRatio/100.) for any d != d*+/-1 within the search range ），该参数不能为负值，一般5-15左右的值比较合适，int 型speckleWindowSize：检查视差连通区域变化度的窗口大小, 值为 0 时取消 speckle 检查，int 型speckleRange：视差变化阈值，当窗口内视差变化大于阈值时，该窗口内的视差清零，int 型 // OpenCV2.1 新增的状态参数
-roi1, roi2：左右视图的有效像素区域，一般由双目校正阶段的 cvStereoRectify 函数传递，也可以自行设定。一旦在状态参数中设定了 roi1 和 roi2，OpenCV 会通过cvGetValidDisparityROI 函数计算出视差图的有效区域，在有效区域外的视差值将被清零。disp12MaxDiff：左视差图（直接计算得出）和右视差图（通过cvValidateDisparity计算得出）之间的最大容许差异。超过该阈值的视差值将被清零。该参数默认为 -1，即不执行左右视差检查。int 型。注意在程序调试阶段最好保持该值为 -1，以便查看不同视差窗口生成的视差效果。具体请参见《使用OpenGL动态显示双目视觉三维重构效果示例》一文中的讨论。在上述参数中，对视差生成效果影响较大的主要参数是 SADWindowSize、numberOfDisparities 和 uniquenessRatio 三个，一般只需对这三个参数进行调整，其余参数按默认设置即可。
+preFilterType：预处理滤波器的类型，主要是用于降低亮度失真（photometric distortions）、消除噪声和增强纹理等, 有两种可选类型：CV_STEREO_BM_NORMALIZED_RESPONSE（归一化响应） 或者CV_STEREO_BM_XSOBEL（水平方向Sobel算子，默认类型）, 该参数为 int 型；preFilterSize：预处理滤波器窗口大小，容许范围是[5,255]，一般应该在 5x5..21x21 之间，参数必须为奇数值, int 型preFilterCap：预处理滤波器的截断值，预处理的输出值仅保留[-preFilterCap, preFilterCap]范围内的值，参数范围：1 - 31（文档中是31，但代码中是 63）, int
+// SAD 参数
+SADWindowSize：SAD窗口大小，容许范围是[5,255]，一般应该在 5x5 至 21x21 之间，参数必须是奇数，int 型minDisparity：最小视差，默认值为 0, 可以是负值，int 型 numberOfDisparities：视差窗口，即最大视差值与最小视差值之差, 窗口大小必须是 16 的整数倍，int 型
+// 后处理参数
+textureThreshold：低纹理区域的判断阈值。如果当前SAD窗口内所有邻居像素点的x导数绝对值之和小于指定阈值，则该窗口对应的像素点的视差值为 0（That is, if the sum of absolute values of x-derivatives computed over SADWindowSize by SADWindowSize pixel neighborhood is smaller than the parameter, no disparity is computed at the pixel），该参数不能为负值，int 型 uniquenessRatio：视差唯一性百分比， 视差窗口范围内最低代价是次低代价的(1 + uniquenessRatio/100)倍时，最低代价对应的视差值才是该像素点的视差，否则该像素点的视差为 0 （the minimum margin in percents between the best (minimum) cost function value and the second best value to accept the computed disparity, that is, accept the computed disparity d^ only if SAD(d) >= SAD(d^) x (1 + uniquenessRatio/100.) for any d != d*+/-1 within the search range ），该参数不能为负值，一般5-15左右的值比较合适，int 型speckleWindowSize：检查视差连通区域变化度的窗口大小, 值为 0 时取消 speckle 检查，int 型speckleRange：视差变化阈值，当窗口内视差变化大于阈值时，该窗口内的视差清零，int 型 
+// OpenCV2.1 新增的状态参数
+roi1, roi2：左右视图的有效像素区域，一般由双目校正阶段的 cvStereoRectify 函数传递，也可以自行设定。一旦在状态参数中设定了 roi1 和 roi2，OpenCV 会通过cvGetValidDisparityROI 函数计算出视差图的有效区域，在有效区域外的视差值将被清零。disp12MaxDiff：左视差图（直接计算得出）和右视差图（通过cvValidateDisparity计算得出）之间的最大容许差异。超过该阈值的视差值将被清零。该参数默认为 -1，即不执行左右视差检查。int 型。注意在程序调试阶段最好保持该值为 -1，以便查看不同视差窗口生成的视差效果。具体请参见《使用OpenGL动态显示双目视觉三维重构效果示例》一文中的讨论。
+在上述参数中，对视差生成效果影响较大的主要参数是 SADWindowSize、numberOfDisparities 和 uniquenessRatio 三个，一般只需对这三个参数进行调整，其余参数按默认设置即可。
 在OpenCV2.1中，BM算法有C和C++ 两种实现模块。
  
 （2）StereoSGBMState
 SGBM算法的状态参数大部分与BM算法的一致，下面只解释不同的部分：
-SADWindowSize：SAD窗口大小，容许范围是[1,11]，一般应该在 3x3 至 11x11 之间，参数必须是奇数，int 型P1, P2：控制视差变化平滑性的参数。P1、P2的值越大，视差越平滑。P1是相邻像素点视差增/减 1 时的惩罚系数；P2是相邻像素点视差变化值大于1时的惩罚系数。P2必须大于P1。OpenCV2.1提供的例程stereo_match.cpp 给出了 P1 和 P2 比较合适的数值。fullDP：布尔值，当设置为 TRUE 时，运行双通道动态编程算法（full-scale 2-pass dynamic programming algorithm），会占用O(W*H*numDisparities)个字节，对于高分辨率图像将占用较大的内存空间。一般设置为 FALSE。注意OpenCV2.1的SGBM算法是用C++ 语言编写的，没有C实现模块。与H. Hirschmuller提出的原算法相比，主要有如下变化：
+SADWindowSize：SAD窗口大小，容许范围是[1,11]，一般应该在 3x3 至 11x11 之间，参数必须是奇数，int 型P1, P2：控制视差变化平滑性的参数。P1、P2的值越大，视差越平滑。P1是相邻像素点视差增/减 1 时的惩罚系数；P2是相邻像素点视差变化值大于1时的惩罚系数。P2必须大于P1。OpenCV2.1提供的例程stereo_match.cpp 给出了 P1 和 P2 比较合适的数值。fullDP：布尔值，当设置为 TRUE 时，运行双通道动态编程算法（full-scale 2-pass dynamic programming algorithm），会占用O(W*H*numDisparities)个字节，对于高分辨率图像将占用较大的内存空间。一般设置为 FALSE。
+注意OpenCV2.1的SGBM算法是用C++ 语言编写的，没有C实现模块。与H. Hirschmuller提出的原算法相比，主要有如下变化：
 算法默认运行单通道DP算法，只用了5个方向，而fullDP使能时则使用8个方向（可能需要占用大量内存）。 算法在计算匹配代价函数时，采用块匹配方法而非像素匹配（不过SADWindowSize=1时就等于像素匹配了）。 匹配代价的计算采用BT算法（"Depth Discontinuities by Pixel-to-Pixel Stereo" by S. Birchfield and C. Tomasi），并没有实现基于互熵信息的匹配代价计算。增加了一些BM算法中的预处理和后处理程序。 
+
 （3）StereoGCState
 GC算法的状态参数只有两个：numberOfDisparities 和 maxIters ，并且只能通过 cvCreateStereoGCState 在创建算法状态结构体时一次性确定，不能在循环中更新状态信息。GC算法并不是一种实时算法，但可以得到物体轮廓清晰准确的视差图，适用于静态环境物体的深度重构。
 注意GC算法只能在C语言模式下运行，并且不能对视差图进行预先的边界延拓，左右视图和左右视差矩阵的大小必须一致。
@@ -535,6 +537,7 @@ else
 	displf.convertTo(disp8, CV_8U, 255/(m_nMaxDisp*16.));
 }
 F_Gray2Color(&disp8cv, vdispRGB);
+
 
  
  
@@ -579,6 +582,7 @@ void F_Gray2Color(CvMat* gray_mat, CvMat* color_mat)
 	}
 }
 
+
  
 
 
@@ -602,6 +606,7 @@ void saveDisp(const char* filename, const Mat& mat)
 	fclose(fp);
 }
 
+
  
 相应的Matlab代码为：
   
@@ -621,19 +626,22 @@ mesh(disp);
 set(gca,'YDir','reverse');  % 通过 mesh 方式绘图时，需倒置 Y 轴方向
 axis tight; % 使坐标轴显示范围与数据范围相贴合，去除空白显示区
 
+
  
-﻿﻿
-科普一下，很好的stereo Vision 资料200多页的pdf：
+
+ ﻿﻿ 
+ 科普一下，很好的stereo Vision 资料200多页的pdf：
 http://www.vision.deis.unibo.it/smatt/Seminars/StereoVision.pdf
 结合大牛的博客，好好学习下：
  http://blog.csdn.net/chenyusiyuan/article/details/5967291
+ 
 
 
-
-需要注意的点
+需要注意的点 
 
 OpenCV自带的cvStereoCalibrate感觉不怎么好用，用这个函数求出的内参外参和旋转平移矩阵进行校准，往往无法达到行对准，有时甚至会出现比较可怕的畸变。在看了piao的http://www.opencv.org.cn/forum/viewtopic.php?f=1&t=4603帖子之后，也曾经尝试过现用cvCalibrateCamera2单独标定(左右各20幅图)，得出的结果基本和Matlab单独标定的相同，然后再在cvStereoCalibrate中将参数设成CV_CALIB_USE_INTRINSIC_GUESS，用来细化内参数和畸变参数，结果得出的标定结果就又走样了。
 不知道有谁在这方面有过成功经验的，可以出来分享一下。毕竟用Matlab工具箱还是麻烦了些。
+
 参考：http://blog.lehu.shu.edu.cn/byman/A263366.html
 
 

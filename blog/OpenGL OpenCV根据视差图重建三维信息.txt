@@ -5,147 +5,146 @@
  
 代码如下：
  
-// disparity_to_3d_reconstruction.cpp : 定义控制台应用程序的入口点。
-//
+// disparity_to_3d_reconstruction.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+
+
+//Huang,Haiqiao coded on Dec.2009代码出处：
+//http://www.opencv.org.cn/forum.php?mod=viewthread&tid=8722&extra=&page=1
+#include "stdafx.h"
+#include <iostream>
+#include <stdlib.h>
+//#include <cv.h>
+//#include <cxcore.h>
+//#include <highgui.h>
+#include "opencv2/calib3d/calib3d.hpp"  
+#include "opencv2/imgproc/imgproc.hpp"  
+#include "opencv2/highgui/highgui.hpp"  
+#include "opencv2/contrib/contrib.hpp" 
+
+#pragma comment(lib,"opencv_highgui2410d.lib")  
+#pragma comment(lib,"opencv_core2410d.lib")  
+#pragma comment(lib,"opencv_imgproc2410d.lib")  
+ 
+
+
+#include <math.h>
+#include <GL/glut.h>  
+#include <iostream>
+using namespace cv;
+
+using namespace std;
+
+#define MAX_SIZE 1024
+
+float imgdata[MAX_SIZE][MAX_SIZE];
+
+int w=0;
+int h=0;
+float scalar=50;//scalar of converting pixel color to float coordinates
+
+void renderScene(void) 
+{
+
+	glClear (GL_COLOR_BUFFER_BIT);
+	glLoadIdentity();				// Reset the coordinate system before modifying
+	gluLookAt (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	glRotatef(-30, 0.0, 1.0, 0.0); //rotate about the x axis
+	glRotatef(-180, 0.0, 0.0, 1.0); //rotate about the z axis
+	glRotatef(-180, 0.0, 1.0, 0.0); //rotate about the y axis
+
+	float imageCenterX = w*.5;
+	float imageCenterY = h*.5;
+	float x,y,z;
+	glPointSize(1.0);
+	glBegin(GL_POINTS);//GL_POINTS
+	for (int i=0;i<h;i++)
+	{
+		for (int j=0;j<w;j++)
+		{
+			// color interpolation
+			glColor3f(1-imgdata[i][j]/255, imgdata[i][j]/255, imgdata[i][j]/255);
+			x=((float)j-imageCenterX)/scalar;
+			y=((float)i-imageCenterY)/scalar;
+			z=imgdata[i][j]/scalar;
+			glVertex3f(x,y,z);
+		}
+	}
+	glEnd();
+	glFlush();
+}
+void reshape (int w, int h)
+{
+	glViewport (0, 0, (GLsizei)w, (GLsizei)h);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	gluPerspective (60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
+	glMatrixMode (GL_MODELVIEW);
+}
+
+void displayDisparity(IplImage* disparity)
+{
+	double xyscale=100;
+	int j=0;
+	int i=0;
+	CvScalar s;
+
+	//accessing the image pixels
+	for (i=0;i<h;i++)
+	{
+		for (j=0;j<w;j++)
+		{
+			s = cvGet2D(disparity,i,j);
+			imgdata[i][j] = s.val[0];//for disparity is a grey image.
+		}
+	}
+}
+int main(int argc, char *argv)
+{  
+	cout << "OpenCV and OpenGL working together!"<<endl;
+	//char* filename = "tsuDisparity.bmp;";
+
+	string image_name;
+	cout<<"input image name:"<<endl;
+	cin>>image_name;
+	IplImage* imgGrey = cvLoadImage(image_name.c_str(),0); //read image as a grey one
+	if (imgGrey==NULL)
+	{
+		cout << "No valid image input."<<endl;
+		char c=getchar();
+		return 1;
+	}
+	w = imgGrey->width;
+	h = imgGrey->height;
+
+	displayDisparity(imgGrey);
+	cvNamedWindow("original", CV_WINDOW_AUTOSIZE );
+	cvShowImage("original", imgGrey );
+
+	//------------------OpenGL-------------------------
+	glutInit(&argc,(char**)argv);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
+	glutInitWindowPosition(100,100);
+	glutInitWindowSize(500,500);
+	glutCreateWindow("3D disparity image");
+	glutDisplayFunc(renderScene);
+	glutReshapeFunc (reshape);
+	glutMainLoop();
+	cvWaitKey(0);
+	//release opencv stuff.
+	cvReleaseImage(&imgGrey);
+	cvDestroyWindow("Original");
+
+	return 0;
+}
+
+
+
 
-#include "stdafx.h"
-
-
-
-//Huang,Haiqiao coded on Dec.2009代码出处：
-//http://www.opencv.org.cn/forum.php?mod=viewthread&tid=8722&extra=&page=1
-#include "stdafx.h"
-#include <iostream>
-#include <stdlib.h>
-//#include <cv.h>
-//#include <cxcore.h>
-//#include <highgui.h>
-#include "opencv2/calib3d/calib3d.hpp"  
-#include "opencv2/imgproc/imgproc.hpp"  
-#include "opencv2/highgui/highgui.hpp"  
-#include "opencv2/contrib/contrib.hpp" 
-
-#pragma comment(lib,"opencv_highgui2410d.lib")  
-#pragma comment(lib,"opencv_core2410d.lib")  
-#pragma comment(lib,"opencv_imgproc2410d.lib")  
- 
-
-
-#include <math.h>
-#include <GL/glut.h>  
-#include <iostream>
-using namespace cv;
-
-using namespace std;
-
-#define MAX_SIZE 1024
-
-float imgdata[MAX_SIZE][MAX_SIZE];
-
-int w=0;
-int h=0;
-float scalar=50;//scalar of converting pixel color to float coordinates
-
-void renderScene(void) 
-{
-
-	glClear (GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();				// Reset the coordinate system before modifying
-	gluLookAt (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	glRotatef(-30, 0.0, 1.0, 0.0); //rotate about the x axis
-	glRotatef(-180, 0.0, 0.0, 1.0); //rotate about the z axis
-	glRotatef(-180, 0.0, 1.0, 0.0); //rotate about the y axis
-
-	float imageCenterX = w*.5;
-	float imageCenterY = h*.5;
-	float x,y,z;
-	glPointSize(1.0);
-	glBegin(GL_POINTS);//GL_POINTS
-	for (int i=0;i<h;i++)
-	{
-		for (int j=0;j<w;j++)
-		{
-			// color interpolation
-			glColor3f(1-imgdata[i][j]/255, imgdata[i][j]/255, imgdata[i][j]/255);
-			x=((float)j-imageCenterX)/scalar;
-			y=((float)i-imageCenterY)/scalar;
-			z=imgdata[i][j]/scalar;
-			glVertex3f(x,y,z);
-		}
-	}
-	glEnd();
-	glFlush();
-}
-void reshape (int w, int h)
-{
-	glViewport (0, 0, (GLsizei)w, (GLsizei)h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluPerspective (60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
-	glMatrixMode (GL_MODELVIEW);
-}
-
-void displayDisparity(IplImage* disparity)
-{
-	double xyscale=100;
-	int j=0;
-	int i=0;
-	CvScalar s;
-
-	//accessing the image pixels
-	for (i=0;i<h;i++)
-	{
-		for (j=0;j<w;j++)
-		{
-			s = cvGet2D(disparity,i,j);
-			imgdata[i][j] = s.val[0];//for disparity is a grey image.
-		}
-	}
-}
-int main(int argc, char *argv)
-{  
-	cout << "OpenCV and OpenGL working together!"<<endl;
-	//char* filename = "tsuDisparity.bmp;";
-
-	string image_name;
-	cout<<"input image name:"<<endl;
-	cin>>image_name;
-	IplImage* imgGrey = cvLoadImage(image_name.c_str(),0); //read image as a grey one
-	if (imgGrey==NULL)
-	{
-		cout << "No valid image input."<<endl;
-		char c=getchar();
-		return 1;
-	}
-	w = imgGrey->width;
-	h = imgGrey->height;
-
-	displayDisparity(imgGrey);
-	cvNamedWindow("original", CV_WINDOW_AUTOSIZE );
-	cvShowImage("original", imgGrey );
-
-	//------------------OpenGL-------------------------
-	glutInit(&argc,(char**)argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
-	glutInitWindowPosition(100,100);
-	glutInitWindowSize(500,500);
-	glutCreateWindow("3D disparity image");
-	glutDisplayFunc(renderScene);
-	glutReshapeFunc (reshape);
-	glutMainLoop();
-	cvWaitKey(0);
-	//release opencv stuff.
-	cvReleaseImage(&imgGrey);
-	cvDestroyWindow("Original");
-
-	return 0;
-}
-
-
-
-
-
- 
+  
  
  
  
@@ -161,238 +160,238 @@ int main(int argc, char *argv)
  
 添加鼠标移动事件，代码如下：
  
-// disparity_to_3d_reconstruction.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-
-
-
-//Huang,Haiqiao coded on Dec.2009代码出处：
-//http://www.opencv.org.cn/forum.php?mod=viewthread&tid=8722&extra=&page=1
-#include "stdafx.h"
-#include <iostream>
-#include <stdlib.h>
-//#include <cv.h>
-//#include <cxcore.h>
-//#include <highgui.h>
-#include "opencv2/calib3d/calib3d.hpp"  
-#include "opencv2/imgproc/imgproc.hpp"  
-#include "opencv2/highgui/highgui.hpp"  
-#include "opencv2/contrib/contrib.hpp" 
-
-#pragma comment(lib,"opencv_highgui2410d.lib")  
-#pragma comment(lib,"opencv_core2410d.lib")  
-#pragma comment(lib,"opencv_imgproc2410d.lib")  
-
-
-
-#include <math.h>
-#include <GL/glut.h>  
-#include <iostream>
-using namespace cv;
-
-using namespace std;
-
-#define MAX_SIZE 1024
-
-float imgdata[MAX_SIZE][MAX_SIZE];
-
-int w=0;
-int h=0;
-float scalar=50;//scalar of converting pixel color to float coordinates
-
-#define pi 3.1415926
-bool mouseisdown=false;
-bool loopr=false;
-int mx,my;
-int ry=10;
-int rx=10;
-
-
-void timer(int p)
-{
-	ry-=5;
-	//marks the current window as needing to be redisplayed.
-	glutPostRedisplay();
-	if (loopr)
-		glutTimerFunc(200,timer,0);
-}
-
-
-void mouse(int button, int state, int x, int y)
-{
-	if(button == GLUT_LEFT_BUTTON)
-	{
-		if(state == GLUT_DOWN)
-		{
-			mouseisdown=true;
-			loopr=false;
-		}
-		else
-		{
-			mouseisdown=false;
-		}
-	}
-
-	if (button== GLUT_RIGHT_BUTTON)
-		if(state == GLUT_DOWN)
-		{
-			loopr=true;
-			glutTimerFunc(200,timer,0);
-		}
-}
-
-void motion(int x, int y)
-{
-	if(mouseisdown==true)
-	{
-		ry+=x-mx;
-		rx+=y-my;
-		mx=x;
-		my=y;
-		glutPostRedisplay();
-	}
-}
-
-void special(int key, int x, int y)
-{
-	switch(key)
-	{
-	case GLUT_KEY_LEFT:
-		ry-=5;
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_RIGHT:
-		ry+=5;
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_UP:
-		rx+=5;
-		glutPostRedisplay();
-		break;
-	case GLUT_KEY_DOWN:
-		rx-=5;
-		glutPostRedisplay();
-		break;
-	}
-}
-
-
-void renderScene(void) 
-{
-
-	glClear (GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();				// Reset the coordinate system before modifying
-	gluLookAt (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	//gluLookAt (0.0, 0.0, 7.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0);
-	//glRotatef(-30, 0.0, 1.0, 0.0); //rotate about the x axis
-	//glRotatef(-180, 0.0, 0.0, 1.0); //rotate about the z axis
-	//glRotatef(-180, 0.0, 1.0, 0.0); //rotate about the y axis
-
-	glRotatef(ry,0,1,0);
-	glRotatef(rx-180,1,0,0);
-
-	float imageCenterX = w*.5;
-	float imageCenterY = h*.5;
-	float x,y,z;
-
-	glPointSize(1.0);
-	glBegin(GL_POINTS);//GL_POINTS
-
-	for (int i=0;i<h;i++)
-	{
-		for (int j=0;j<w;j++)
-		{
-			// color interpolation
-			glColor3f(1-imgdata[i][j]/255, imgdata[i][j]/255, imgdata[i][j]/255);
-			x=((float)j-imageCenterX)/scalar;
-			y=((float)i-imageCenterY)/scalar;
-			z=imgdata[i][j]/scalar;
-			glVertex3f(x,y,z);
-		}
-	}
-	glEnd();
-	glFlush();
-}
-void reshape (int w, int h)
-{
-	glViewport (0, 0, (GLsizei)w, (GLsizei)h);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	gluPerspective (60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
-	glMatrixMode (GL_MODELVIEW);
-}
-
-void displayDisparity(IplImage* disparity)
-{
-	double xyscale=100;
-	int j=0;
-	int i=0;
-	CvScalar s;
-
-	//accessing the image pixels
-	for (i=0;i<h;i++)
-	{
-		for (j=0;j<w;j++)
-		{
-			s = cvGet2D(disparity,i,j);
-			imgdata[i][j] = s.val[0];//for disparity is a grey image.
-		}
-	}
-}
-int main(int argc, char *argv)
-{  
-	cout << "OpenCV and OpenGL working together!"<<endl;
-	//char* filename = "tsuDisparity.bmp;";
-
-	string image_name;
-	cout<<"input image name:"<<endl;
-	cin>>image_name;
-	IplImage* imgGrey = cvLoadImage(image_name.c_str(),0); //read image as a grey one
-	if (imgGrey==NULL)
-	{
-		cout << "No valid image input."<<endl;
-		char c=getchar();
-		return 1;
-	}
-	w = imgGrey->width;
-	h = imgGrey->height;
-
-	displayDisparity(imgGrey);
-	cvNamedWindow("original", CV_WINDOW_AUTOSIZE );
-	cvShowImage("original", imgGrey );
-
-	//------------------OpenGL-------------------------
-	glutInit(&argc,(char**)argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
-	glutInitWindowPosition(100,100);
-	glutInitWindowSize(500,500);
-	glutCreateWindow("3D disparity image");
-	glutDisplayFunc(renderScene);
-	glutReshapeFunc (reshape);
-
-	glutMouseFunc(mouse);
-	glutMotionFunc(motion);
-	glutSpecialFunc(special);
-
-	glutMainLoop();
-
-	cvWaitKey(0);
-	//release opencv stuff.
-	cvReleaseImage(&imgGrey);
-	cvDestroyWindow("Original");
-
-	return 0;
-}
-
-
-
+// disparity_to_3d_reconstruction.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+
+
+//Huang,Haiqiao coded on Dec.2009代码出处：
+//http://www.opencv.org.cn/forum.php?mod=viewthread&tid=8722&extra=&page=1
+#include "stdafx.h"
+#include <iostream>
+#include <stdlib.h>
+//#include <cv.h>
+//#include <cxcore.h>
+//#include <highgui.h>
+#include "opencv2/calib3d/calib3d.hpp"  
+#include "opencv2/imgproc/imgproc.hpp"  
+#include "opencv2/highgui/highgui.hpp"  
+#include "opencv2/contrib/contrib.hpp" 
+
+#pragma comment(lib,"opencv_highgui2410d.lib")  
+#pragma comment(lib,"opencv_core2410d.lib")  
+#pragma comment(lib,"opencv_imgproc2410d.lib")  
+
+
+
+#include <math.h>
+#include <GL/glut.h>  
+#include <iostream>
+using namespace cv;
+
+using namespace std;
+
+#define MAX_SIZE 1024
+
+float imgdata[MAX_SIZE][MAX_SIZE];
+
+int w=0;
+int h=0;
+float scalar=50;//scalar of converting pixel color to float coordinates
+
+#define pi 3.1415926
+bool mouseisdown=false;
+bool loopr=false;
+int mx,my;
+int ry=10;
+int rx=10;
+
+
+void timer(int p)
+{
+	ry-=5;
+	//marks the current window as needing to be redisplayed.
+	glutPostRedisplay();
+	if (loopr)
+		glutTimerFunc(200,timer,0);
+}
+
+
+void mouse(int button, int state, int x, int y)
+{
+	if(button == GLUT_LEFT_BUTTON)
+	{
+		if(state == GLUT_DOWN)
+		{
+			mouseisdown=true;
+			loopr=false;
+		}
+		else
+		{
+			mouseisdown=false;
+		}
+	}
+
+	if (button== GLUT_RIGHT_BUTTON)
+		if(state == GLUT_DOWN)
+		{
+			loopr=true;
+			glutTimerFunc(200,timer,0);
+		}
+}
+
+void motion(int x, int y)
+{
+	if(mouseisdown==true)
+	{
+		ry+=x-mx;
+		rx+=y-my;
+		mx=x;
+		my=y;
+		glutPostRedisplay();
+	}
+}
+
+void special(int key, int x, int y)
+{
+	switch(key)
+	{
+	case GLUT_KEY_LEFT:
+		ry-=5;
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_RIGHT:
+		ry+=5;
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_UP:
+		rx+=5;
+		glutPostRedisplay();
+		break;
+	case GLUT_KEY_DOWN:
+		rx-=5;
+		glutPostRedisplay();
+		break;
+	}
+}
+
+
+void renderScene(void) 
+{
+
+	glClear (GL_COLOR_BUFFER_BIT);
+	glLoadIdentity();				// Reset the coordinate system before modifying
+	gluLookAt (0.0, 0.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	//gluLookAt (0.0, 0.0, 7.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0);
+	//glRotatef(-30, 0.0, 1.0, 0.0); //rotate about the x axis
+	//glRotatef(-180, 0.0, 0.0, 1.0); //rotate about the z axis
+	//glRotatef(-180, 0.0, 1.0, 0.0); //rotate about the y axis
+
+	glRotatef(ry,0,1,0);
+	glRotatef(rx-180,1,0,0);
+
+	float imageCenterX = w*.5;
+	float imageCenterY = h*.5;
+	float x,y,z;
+
+	glPointSize(1.0);
+	glBegin(GL_POINTS);//GL_POINTS
+
+	for (int i=0;i<h;i++)
+	{
+		for (int j=0;j<w;j++)
+		{
+			// color interpolation
+			glColor3f(1-imgdata[i][j]/255, imgdata[i][j]/255, imgdata[i][j]/255);
+			x=((float)j-imageCenterX)/scalar;
+			y=((float)i-imageCenterY)/scalar;
+			z=imgdata[i][j]/scalar;
+			glVertex3f(x,y,z);
+		}
+	}
+	glEnd();
+	glFlush();
+}
+void reshape (int w, int h)
+{
+	glViewport (0, 0, (GLsizei)w, (GLsizei)h);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	gluPerspective (60, (GLfloat)w / (GLfloat)h, 1.0, 100.0);
+	glMatrixMode (GL_MODELVIEW);
+}
+
+void displayDisparity(IplImage* disparity)
+{
+	double xyscale=100;
+	int j=0;
+	int i=0;
+	CvScalar s;
+
+	//accessing the image pixels
+	for (i=0;i<h;i++)
+	{
+		for (j=0;j<w;j++)
+		{
+			s = cvGet2D(disparity,i,j);
+			imgdata[i][j] = s.val[0];//for disparity is a grey image.
+		}
+	}
+}
+int main(int argc, char *argv)
+{  
+	cout << "OpenCV and OpenGL working together!"<<endl;
+	//char* filename = "tsuDisparity.bmp;";
+
+	string image_name;
+	cout<<"input image name:"<<endl;
+	cin>>image_name;
+	IplImage* imgGrey = cvLoadImage(image_name.c_str(),0); //read image as a grey one
+	if (imgGrey==NULL)
+	{
+		cout << "No valid image input."<<endl;
+		char c=getchar();
+		return 1;
+	}
+	w = imgGrey->width;
+	h = imgGrey->height;
+
+	displayDisparity(imgGrey);
+	cvNamedWindow("original", CV_WINDOW_AUTOSIZE );
+	cvShowImage("original", imgGrey );
+
+	//------------------OpenGL-------------------------
+	glutInit(&argc,(char**)argv);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_SINGLE | GLUT_RGBA);
+	glutInitWindowPosition(100,100);
+	glutInitWindowSize(500,500);
+	glutCreateWindow("3D disparity image");
+	glutDisplayFunc(renderScene);
+	glutReshapeFunc (reshape);
+
+	glutMouseFunc(mouse);
+	glutMotionFunc(motion);
+	glutSpecialFunc(special);
+
+	glutMainLoop();
+
+	cvWaitKey(0);
+	//release opencv stuff.
+	cvReleaseImage(&imgGrey);
+	cvDestroyWindow("Original");
+
+	return 0;
+}
+
+
+
 
  
  
 效果如下：
  
-
+ 
 
 

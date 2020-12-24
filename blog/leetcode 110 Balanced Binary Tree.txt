@@ -13,7 +13,6 @@ For this problem, a height-balanced binary tree is defined as a binary tree in w
 我的解决方案：一个非递归一个递归，居然比全递归的版本慢。
  
  
-
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -68,7 +67,6 @@ int Depth(TreeNode* root)
  
  
  
-
 This problem is generally believed to have two solutions: the top down approach and the bottom up way.
 
 1.The first method checks whether the tree is balanced strictly according to the definition of balanced binary tree: the difference between the heights of the two sub trees are not bigger than 1, and both the left sub tree and right sub tree are also balanced. With the helper function depth(), we could easily write the code; 
@@ -120,7 +118,6 @@ In this bottom up approach, each node in the tree only need to be accessed once.
  
  
  
-
 class Solution {
 public:
     bool isBalanced(TreeNode *root) {
@@ -145,7 +142,6 @@ public:
  
  
  
-
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -184,7 +180,6 @@ bool isBalanced(struct TreeNode* root) {
  
  
  
-
 def depth(self,root):
         if root == None:
             return 0
@@ -208,5 +203,6 @@ def depth(self,root):
  
  
  
-﻿﻿ 
+﻿﻿
+
 

@@ -4,7 +4,6 @@
 
 
 
-
 实现效果：
 
 这个其实是一个非常常见的功能，大家都会考虑给自己简单的工程做一个背景界面。其实只要在view类中重载OnEraseBkgnd（）这个函数就好了。
@@ -52,7 +51,8 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
     return TRUE;
 }
-加载位图时候有的格式可能还有点问题，下面是讨论贴： 
-http://bbs.csdn.net/topics/391027250?page=1#post-399164597 
+加载位图时候有的格式可能还有点问题，下面是讨论贴：  http://bbs.csdn.net/topics/391027250?page=1#post-399164597
+
+
 
 

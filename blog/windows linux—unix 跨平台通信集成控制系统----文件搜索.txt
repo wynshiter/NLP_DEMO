@@ -84,8 +84,7 @@ void Search_File(char *path,char *name);
 
 #endif
 
-
-Filesearch.cpp:
+ Filesearch.cpp:
 //
 //  Filesearch.cpp
 //  mac_client
@@ -211,8 +210,7 @@ void setOutFiles(const char * path)//得到指定目录下面所有文件, 传�
 
 
 
-
- 
+  
  
 搭建传输的socket平台参考下面博文：
  

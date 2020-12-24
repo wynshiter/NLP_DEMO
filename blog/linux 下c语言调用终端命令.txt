@@ -34,7 +34,7 @@ int main()
 }
 
 上面的函数功能，就是ls -r这个命令的结果输出到调试窗口
-
+ 
 下面是输入的版本：主要是调用popen函数，这个函数的缺点是要默认的开启一个sh
 
 #include <unistd.h>
@@ -83,5 +83,8 @@ int main()
     return EXIT_FAILURE;
 }
 
- 
+
+
+
+
 

@@ -4,9 +4,7 @@
 
 
 
-
 在我的小 rmbp 256G的硬盘里，实在是装不下100多个G的虚拟机了，所以想把一些东西迁移到这两年很火的Docker下，Docker以前也有过一两次，只是按着别人给的用法用的，具体的一些细节并没有深入，和git一样，这么牛掰的东西怎么能不好好学一些呢？
-
 
 Docker和虚拟机的区别
 
@@ -15,43 +13,19 @@ Docker是一种容器，虚拟机是一种管理程序虚拟机化(hypervisor vi
 目前Windows上的Docker可以跑Linux的Docker容器，是因为底下跑了Linux的VM，但是马上就可以支持Windows Server 2016了，如链接[Introducing the Technical Preview of Docker Engine for Windows Server 2016](http://Introducing the Technical Preview of Docker Engine for Windows Server 2016)。
 
 容器的优点：
-
-一次save，到处运行。
-启动速度快，消耗资源少。Docker与虚拟机性能比较
-
+一次save，到处运行。启动速度快，消耗资源少。Docker与虚拟机性能比较
 容器缺点：
-
-资源隔离方面不如虚拟机。
-安全性问题，“权限隔离”做的不够好，只要有Docker的命令权限，就可以操作所有的Docker实例。
-
+资源隔离方面不如虚拟机。安全性问题，“权限隔离”做的不够好，只要有Docker的命令权限，就可以操作所有的Docker实例。
 Docker的目标
 
-
-提供一个简单、轻量的建模方式。
-职责的逻辑分离，防止开发环境和部署环境不一致，导致出现“开发时一切正常，肯定是运维问题”的情况。
-快速、高效的开发生命周期。
-
+提供一个简单、轻量的建模方式。职责的逻辑分离，防止开发环境和部署环境不一致，导致出现“开发时一切正常，肯定是运维问题”的情况。快速、高效的开发生命周期。
 Docker的核心组件
 
-
-Docker客户端和服务器
-Docker是一个C/S架构的程序，Docker客户端需要向Docker服务器发出请求，服务器完成请求后返回信息。一个本地Docker客户端可以连接远端的Docker服务器进行操作，如下图。
-
-Docker镜像
-镜像是构建Docker世界的基石。用户基于镜像来维护自己的容器。Docker镜像是Docker容器运行时的只读模板，每一个镜像由一系列的层 (layers) 组成。Docker使用 UnionFS来将这些层联合到单独的镜像中。UnionFS允许独立文件系统中的文件和文件夹(称之为分支)被透明覆盖，形成一个单独连贯的文件系统。正因为有了这些层的存在，Docker是如此的轻量。当你改变了一个Docker镜像，比如升级到某个程序到新的版本，一个新的层会被创建。因此，不用替换整个原先的镜像或者重新建立(在使用虚拟机的时候你可能会这么做)，只是一个新的层被添加或升级了。现在你不用重新发布整个镜像，只需要升级，层使得分发Docker镜像变得简单和快速。
-Docker仓库(Registry)
-Docker使用Registry来保存用户构建的镜像，就像苹果的apple store。Registry分为私有和公有两种，Docker公司自己运营的Registry叫做Docker Hub。
-Docker容器
-Docker可以帮你构建和部署容器，用户只需要把自己的应用程序或服务打包放进容器即可。每一个Docker容器都是从Docker镜像创建的。Docker容器可以运行、开始、停止、移动和删除。每一个Docker容器都是独立和安全的应用平台，Docker容器是Docker的运行部分。
-Docker的技术组件
-Docker可以被安装在x64架构，内核3.10以上的linux系主机、win10以上windows和OS X 10.10.3且2010年以后的Mac上。在2013年Docker刚发布的时候，它是一款基于LXC的开源容器管理引擎。把LXC复杂的容器创建与使用方式简化为Docker自己的一套命令体系。 随着Docker的不断发展，它开始有了更为远大的目标，那就是反向定义容器的实现标准，将底层实现都抽象化到Libcontainer的接口。这就意味 着，底层容器的实现方式变成了一种可变的方案，无论是使用namespace、cgroups技术抑或是使用systemd等其他方案，只要实现了 Libcontainer定义的一组接口，Docker都可以运行。
-
+Docker客户端和服务器 Docker是一个C/S架构的程序，Docker客户端需要向Docker服务器发出请求，服务器完成请求后返回信息。一个本地Docker客户端可以连接远端的Docker服务器进行操作，如下图。 Docker镜像 镜像是构建Docker世界的基石。用户基于镜像来维护自己的容器。Docker镜像是Docker容器运行时的只读模板，每一个镜像由一系列的层 (layers) 组成。Docker使用 UnionFS来将这些层联合到单独的镜像中。UnionFS允许独立文件系统中的文件和文件夹(称之为分支)被透明覆盖，形成一个单独连贯的文件系统。正因为有了这些层的存在，Docker是如此的轻量。当你改变了一个Docker镜像，比如升级到某个程序到新的版本，一个新的层会被创建。因此，不用替换整个原先的镜像或者重新建立(在使用虚拟机的时候你可能会这么做)，只是一个新的层被添加或升级了。现在你不用重新发布整个镜像，只需要升级，层使得分发Docker镜像变得简单和快速。Docker仓库(Registry) Docker使用Registry来保存用户构建的镜像，就像苹果的apple store。Registry分为私有和公有两种，Docker公司自己运营的Registry叫做Docker Hub。Docker容器 Docker可以帮你构建和部署容器，用户只需要把自己的应用程序或服务打包放进容器即可。每一个Docker容器都是从Docker镜像创建的。Docker容器可以运行、开始、停止、移动和删除。每一个Docker容器都是独立和安全的应用平台，Docker容器是Docker的运行部分。Docker的技术组件 Docker可以被安装在x64架构，内核3.10以上的linux系主机、win10以上windows和OS X 10.10.3且2010年以后的Mac上。在2013年Docker刚发布的时候，它是一款基于LXC的开源容器管理引擎。把LXC复杂的容器创建与使用方式简化为Docker自己的一套命令体系。 随着Docker的不断发展，它开始有了更为远大的目标，那就是反向定义容器的实现标准，将底层实现都抽象化到Libcontainer的接口。这就意味 着，底层容器的实现方式变成了一种可变的方案，无论是使用namespace、cgroups技术抑或是使用systemd等其他方案，只要实现了 Libcontainer定义的一组接口，Docker都可以运行。
 安装
 
 安装方法都很简单，值得注意的是当前Docker版本的安装需求，比如现在Linux下安装的需求就上x64架构，内核3.10以上。
-Mac下安装方法，直接在官网上下载docker app，安装即可。 
-Linux下安装方法，Linux下最简单的安装方法就是apt和yum包管理工具进行安装了。 
-Windows下安装方法
+Mac下安装方法，直接在官网上下载docker app，安装即可。  Linux下安装方法，Linux下最简单的安装方法就是apt和yum包管理工具进行安装了。  Windows下安装方法
 还有一个比较好用的安装脚本，这个脚本只支持在lsb、debian、fedora、oracle、centos、redhat、os这几个发行版中使用。
 在安装结束后，可以使用docker info命令来查看Docker是否装好了。Mac下的docker info结果：
 ~  docker info
@@ -182,20 +156,9 @@ docker run -it ubuntu bash
 更多内容尽在docker-learn1。
 参考链接
 
+[Introducing the Technical Preview of Docker Engine for Windows Server 2016](http://Introducing the Technical Preview of Docker Engine for Windows Server 2016)Docker与虚拟机性能比较第一本Docker书5分钟弄懂Docker一次“奇幻”的Docker libcontainer代码阅读之旅Docker背后的容器管理—Libcontainer深度解析LXC：Linux 容器工具阿里云Registry加速器docker使用阿里云Docker镜像库加速非常好的一篇Docker教程，比较全面知乎_Docker的应用场景在哪里一个比较详细的命令用法
+原文链接：http://dengnanyi.com/2016/09/28/docker-learn-0/
 
-[Introducing the Technical Preview of Docker Engine for Windows Server 2016](http://Introducing the Technical Preview of Docker Engine for Windows Server 2016)
-Docker与虚拟机性能比较
-第一本Docker书
-5分钟弄懂Docker
-一次“奇幻”的Docker libcontainer代码阅读之旅
-Docker背后的容器管理—Libcontainer深度解析
-LXC：Linux 容器工具
-阿里云Registry加速器
-docker使用阿里云Docker镜像库加速
-非常好的一篇Docker教程，比较全面
-知乎_Docker的应用场景在哪里
-一个比较详细的命令用法
 
-原文链接：http://dengnanyi.com/2016/09/28/docker-learn-0/ 
 
 

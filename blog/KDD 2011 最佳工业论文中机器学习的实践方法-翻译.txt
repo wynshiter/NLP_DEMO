@@ -4,7 +4,6 @@
 
 
 
-
 作者：黄永刚
 Practical machine learning tricks from the KDD 2011 best industry paper
 
@@ -14,18 +13,13 @@ Practical machine learning tricks from the KDD 2011 best industry paper
 因此，对于在工业系统中应用论文中的方法所必须的实现细节，论文中很少进行描述。机器学习的这些方面，被称为‘平民智慧’，大多数来自同事间的讨论、博客、论坛、开源库等一手的经验之谈。
 不同于以上的描述，有些会议设有专题对工业界的方法进行追踪，提出了很多能够提高机器学习在实践应用中效率的见解。我们下来要介绍的这篇文章，它来自于goolge荣获KDD 2011 最佳工业论文，关于检测广告作弊。
 
-Detecting Adversarial Advertisements in the Wild \ 
-  D. Sculley, Matthew Otey, Michael Pohl, Bridget Spitznagel, \ 
-  John Hainsworth, Yunkai Zhou \ 
-http://research.google.com/pubs/archive/37195.pdf
+Detecting Adversarial Advertisements in the Wild \  D. Sculley, Matthew Otey, Michael Pohl, Bridget Spitznagel, \  John Hainsworth, Yunkai Zhou \  http://research.google.com/pubs/archive/37195.pdf
 
 看到这个主题，第一个想法，这不就是机器学习界的“hello world”吗！随便找一本相关的书籍或者教程里面都有，对于正样本集和负样本集分别训练一个朴素贝叶斯，就OK了。很显然，这和Google的应用场景相差甚远，这篇文章阐述了现实当中的许多挑战，是google商业应用需要解决的关键问题。
-这篇文章提出了很多不同的方法和技巧，我在这里只简单的描述文章中的重点，我极力鼓励对此感兴趣的读者直接去查看他们的论文1和演示文稿[^slide]。 
-2:https://www.eecs.tufts.edu/~dsculley/papers/adversarial-ads.pdf 
-http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.pdf
+这篇文章提出了很多不同的方法和技巧，我在这里只简单的描述文章中的重点，我极力鼓励对此感兴趣的读者直接去查看他们的论文1和演示文稿[^slide]。  2:https://www.eecs.tufts.edu/~dsculley/papers/adversarial-ads.pdf  http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.pdf
 
 1. 分类（Classification）
-机器学习的核心方法是分类：这个广告展示给用户是不是OK？这里有一些源代码关于机器学习的核心方法3
+机器学习的核心方法是分类：这个广告展示给用户是不是OK？这里有一些源代码关于机器学习的核心方法3 
 
 方法集成
 获得Netflix奖的方法、微软的Kinect及IBM Watson,这些系统都使用了集成方法，将许多不同模型产生的结果集合起来做出最终的预测。这个方法在当前众多的方法中可以称得上是最省心的方法了，如果你的目标是预测精确度，至少也应该考虑使用集成的方法。
@@ -45,12 +39,7 @@ http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.
 MapReduce:预处理(map), 算法训练(reduce)
 稍微有些意外，他们发现性能瓶颈是来自于从磁盘加载数据和提取特征的阶段。因此，他们使用多个map作业并行执行，用一个reduce来做随机梯度下降分类训练（Stochastic Gradient Descent, SGD）
 部署监控
-为了使系统始终如一的工作，需要监控一些数据，以便于一些异常出现的时候能够做进一步的研究，如： 
-- 持有数据上的precision/recall  
-- 输入特征的分布 
-- 输出值的分布 
-- 输出类别的分布 
-- 人工定期评价系统质量
+为了使系统始终如一的工作，需要监控一些数据，以便于一些异常出现的时候能够做进一步的研究，如：  - 持有数据上的precision/recall  - 输入特征的分布  - 输出值的分布  - 输出类别的分布  - 人工定期评价系统质量
 丰富模型对象
 在机器学习的论文中，一个预测模型经常归结于数学思想即学习到的特征权重向量。然而，在软件工程实践中，作者认为将“模型对象”拓展更广泛的范围会十分有用，例如包含特征转换、概率校准、训练超参等。
 
@@ -63,8 +52,11 @@ MapReduce:预处理(map), 算法训练(reduce)
 人为评估
 专家的判断也不能理解为事情的本质,专家提供的标签也会因人为因素产生错误，不同的专家对于各个类别理解的也不一样。为了调整这种不确定性， 请多个专家对同一事物进行判别来调整标签的可信度。如果有兴趣可以参考这里4.
 最后，他们阶段性进行非专业评估以确保系统对于大众来说工作正常。用户满意是最终目标，如果进行量化衡量就完美了。
-https://www.eecs.tufts.edu/~dsculley/papers/adversarial-ads.pdf 
-[^slide]:http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.pdf ↩https://www.eecs.tufts.edu/~dsculley/papers/adversarial-ads.pdf 
-[^slide]:http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.pdf ↩http://code.google.com/p/sofia-ml/ ↩http://web.stanford.edu/~jurafsky/amt.pdf ↩ 
+
+
+https://www.eecs.tufts.edu/~dsculley/papers/adversarial-ads.pdf  [^slide]:http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.pdf ↩https://www.eecs.tufts.edu/~dsculley/papers/adversarial-ads.pdf  [^slide]:http://www.eecs.tufts.edu/~dsculley/papers/Detecting_Adversarial_Advertisements.pdf ↩http://code.google.com/p/sofia-ml/ ↩http://web.stanford.edu/~jurafsky/amt.pdf ↩
+
+
+
 
 

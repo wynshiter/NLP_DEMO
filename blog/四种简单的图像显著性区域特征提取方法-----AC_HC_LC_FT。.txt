@@ -2,22 +2,16 @@
 
 
 四种简单的图像显著性区域特征提取方法-----> AC/HC/LC/FT。
-分类： 
-图像处理 2014-08-03 12:40 4088人阅读 
-评论(4) 收藏 
-举报
+分类：  图像处理 2014-08-03 12:40 4088人阅读  评论(4) 收藏  举报
 salient region detec显著性检测
 laviewpbt  2014.8.3 编辑
 Email：laviewpbt@sina.com   QQ：33184777
 最近闲来蛋痛，看了一些显著性检测的文章，只是简单的看看，并没有深入的研究，以下将研究的一些收获和经验共享。
      先从最简单的最容易实现的算法说起吧：
 1、 LC算法
-参考论文：Visual Attention Detection in Video Sequences Using Spatiotemporal Cues。 Yun Zhai
- and Mubarak Shah.  Page 4-5。 
+参考论文：Visual Attention Detection in Video Sequences Using Spatiotemporal Cues。 Yun Zhai and Mubarak Shah.  Page 4-5。 
     算法原理部分见论文的第四第五页。
-      When viewers watch a video sequence, they are attracted not only by the interesting events, but also sometimes by the interesting objects in still images. This is referred as the spatial attention. Based on the psychological studies, human perception
- system is sensitive to the contrast of visual signals, such as color, intensity and texture. Taking this as the underlying assumption, we propose an e±cient method for computing the spatial saliency maps using the color statistics of images. The algorithm
- is designed with a linear computational complexity with respect to the number of image pixels. The saliency map of an image is built upon the color contrast between image pixels. The saliency value of a pixel Ik in an image I is defined as,
+      When viewers watch a video sequence, they are attracted not only by the interesting events, but also sometimes by the interesting objects in still images. This is referred as the spatial attention. Based on the psychological studies, human perception system is sensitive to the contrast of visual signals, such as color, intensity and texture. Taking this as the underlying assumption, we propose an e±cient method for computing the spatial saliency maps using the color statistics of images. The algorithm is designed with a linear computational complexity with respect to the number of image pixels. The saliency map of an image is built upon the color contrast between image pixels. The saliency value of a pixel Ik in an image I is defined as,
 
      where the value of Ii is in the range of [0; 255], and || * ||represent the color distance metric。
 要实现这个算法，只要有这个公式(7)就完全足够了。就是每个像素的显著性值是其和图像中其他的所有像素的某个距离的总和，这个距离一般使用欧式距离。
@@ -88,12 +82,8 @@ void __stdcall SalientRegionDetectionBasedonLC(unsigned char *Src, unsigned char
     free(DistMap);
 }
 算法效果：
-
-
-
-
-
-
+  
+  
 
 这篇论文并没有提到是否在LAB空间进行处理，有兴趣的朋友也可以试试LAB的效果。
 2、HC算法
@@ -102,25 +92,17 @@ void __stdcall SalientRegionDetectionBasedonLC(unsigned char *Src, unsigned char
       论文提出了HC和RC两种显著性检测的算法，我这里只实现了HC。
       在本质上，HC和上面的LC没有区别，但是HC考虑了彩色信息，而不是像LC那样只用像素的灰度信息，由于彩色图像最多有256*256*256种颜色，因此直接基于直方图技术的方案不太可行了。但是实际上一幅彩色图像并不会用到那么多种颜色，因此，作者提出了降低颜色数量的方案，将RGB各分量分别映射成12等份，则隐射后的图最多只有12*12*12种颜色，这样就可以构造一个较小的直方图用来加速，但是由于过渡量化会对结果带来一定的瑕疵。因此作者又用了一个平滑的过程。 最后和LC不同的是，作者的处理时在Lab空间进行的，而由于Lab空间和RGB并不是完全对应的，其量化过程还是在RGB空间完成的。
      我们简单看看这个量化过程，对于一幅彩色图像，减少其RGB各分量的值，可以用Photoshop的色调分离功能直接看到其结果，如下所示：    
-
-
-
-
-
+    
 原图：共有64330种颜色 色调分离  结果图：共有1143种颜色
 （上图由于保存为JPG格式了，你们下载分析后实际颜色的数量肯定会有所不同了）。
 对于上面的图，似乎觉得量化后区别不是特别大，但是我们在看一个例子：
-
-
-
+  
   原图：172373种颜色 结果图：共有1143种颜色
       这种转换后的区别就比较大了，这就是作者说的瑕疵。
       在作者的附带代码中，有这个算法的实现，我只随便看了下，觉得写的比较复杂， 于是我自己构思了自己的想法。
       可以肯定的一点就是，为了加快处理速度必须降低图像的彩色信息量，但是我得控制这个降低的程度，那么我想到了我最那首的一些东西：图像的位深处理。在我的Imageshop中，可以将24位真彩色图像用尽量少的视觉损失降低为8位的索引图像。因此，我的思路就是这样，但是不用降低位深而已。
       那么这个处理的第一步就是找到彩色图像的中最具有代表性的颜色值，这个过程可以用8叉树实现，或者用高4位等方式获取。 第二，就是在量化的过程中必须采用相关的抖动技术，比如ordered dither或者FloydSteinberg error diffuse等。更进一步，可以超越8位索引的概念，可以实现诸如大于256的调色板，1024或者4096都是可以的，但是这将稍微加大计算量以及编码的复杂度。我就采用256种颜色的方式。量化的结果如下图：
-
-
-
+  
 原图：172373种颜色 结果图：共有256种颜色
 可以看到256种颜色的效果比上面的色调分离的1143种颜色的视觉效果还要好很多的。
      从速度角度考虑，用8叉树得到调色板是个比较耗时的过程，一种处理方式就是从原图的小图中获取，一半来说256*256大小的小图获取的调色板和原图相比基本没有啥区别，不过这个获取小图的插值方式最好是使用最近邻插值：第一：速度快；第二：不会产生新的颜色。
@@ -209,29 +191,12 @@ void __stdcall SalientRegionDetectionBasedonHC(unsigned char *Src, unsigned char
     FreeRGBLAB();
 }
 上述方式比直接的Bruce-force的实现方式快了NNNN倍，比原作者的代码也快一些。并且效果基本没有啥区别。
-
-
-
-
-
-
-
+      
 原图 HC结果,用时20ms 直接实现：150000ms 原作者的效果
-
-
-
-
-
-
-
-
-
-
-
+          
 我做的HC和原作者的结果有所区别，我没仔细看代码，初步怀疑是不是LAB空间的处理不同造成的，也有可能是最后的浮点数量化到[0,255]算法不同造成的。
 三：AC算法
-参考论文：Salient Region Detection and Segmentation Radhakrishna Achanta,
- Francisco Estrada, Patricia Wils, and Sabine SÄusstrunk 2008 , Page 4-5
+参考论文：Salient Region Detection and Segmentation Radhakrishna Achanta, Francisco Estrada, Patricia Wils, and Sabine SÄusstrunk 2008 , Page 4-5
 这篇论文提出的算法的思想用其论文的一句话表达就是：
 saliency is determined as the local contrast of an image region with respect to its neighborhood at various scales.
 具体实现上，用这个公式表示：
@@ -239,8 +204,7 @@ saliency is determined as the local contrast of an image region with respect to 
 以及：
 
 其实很简单，就是用多个尺度的模糊图的显著性相加来获得最终的显著性。关于这个算法的理论分析，FT算法那个论文里有这样一段话：
-     Objects that are smaller than a ﬁlter size are detected ompletely, while objects larger than a ﬁlter size are only artially detected (closer to edges). Smaller objects that are well detected by the smallest ﬁlter are detected by all three ﬁlters, while
- larger objects are only detected by the larger ﬁlters. Since the ﬁnal saliency map is an average of the three feature maps (corresponding to detections of he three ﬁlters), small objects will almost always be better highlighted.
+     Objects that are smaller than a ﬁlter size are detected ompletely, while objects larger than a ﬁlter size are only artially detected (closer to edges). Smaller objects that are well detected by the smallest ﬁlter are detected by all three ﬁlters, while larger objects are only detected by the larger ﬁlters. Since the ﬁnal saliency map is an average of the three feature maps (corresponding to detections of he three ﬁlters), small objects will almost always be better highlighted.
     这个算法编码上也非常简单：
 /// <summary>
 /// 实现功能： saliency is determined as the local contrast of an image region with respect to its neighborhood at various scales
@@ -302,20 +266,12 @@ void __stdcall SalientRegionDetectionBasedonAC(unsigned char *Src, unsigned char
     FreeRGBLAB();
 }
 核心就是一个 boxblur,注意他也是在LAB空间做的处理。
-
-
-
-
-
-
-
-
-
+  
+  
+  
 以上检测均是在R1 =0 , MinR2 = Min(Width,Height) / 8 . MaxR2 = Min(Width,Height) / 2, Scale = 3的结果。
 4、FT算法
-参考论文： 
-Frequency-tuned Salient Region Detection， Radhakrishna Achantay， Page 4-5, 2009 CVPR
-
+参考论文：  Frequency-tuned Salient Region Detection， Radhakrishna Achantay， Page 4-5, 2009 CVPR 
 这篇论文对显著性检测提出了以下5个指标：
            1、 Emphasize the largest salient objects.
            2、Uniformly highlight whole salient regions.
@@ -324,8 +280,7 @@ Frequency-tuned Salient Region Detection， Radhakrishna Achantay， Page 4-5, 2
            5、Efﬁciently output full resolution saliency maps.
     而起最后提出的显著性检测的计算方式也很简答 ：
 
-       where I is the mean image feature vector, I!hc (x; y) is the corresponding image pixel vector value in the Gaussian blurred version (using a 55 separable binomial kernel) of the original image, and || *|| is the L2 norm.
-
+       where I is the mean image feature vector, I!hc (x; y) is the corresponding image pixel vector value in the Gaussian blurred version (using a 55 separable binomial kernel) of the original image, and || *|| is the L2 norm. 
 这个公式和上面的五点式如何对应的，论文里讲的蛮清楚，我就是觉得那个为什么第一项要用平局值其实直观的理解就是当高斯模糊的半径为无限大时，就相当于求一幅图像的平均值了。
      这篇论文作者提供了M代码和VC的代码，但是M代码实际上和VC的代码是不是对应的, M代码是有错误的,他求平均值的对象不对。
      我试着用我优化的整形的LAB空间来实现这个代码，结果和原作者的效果有些图有较大的区别，最后我还是采用了作者的代码里提供的浮点版本的RGBTOLAB。
@@ -388,34 +343,17 @@ void __stdcall SalientRegionDetectionBasedOnFT(unsigned char *Src, unsigned char
 
 }
     检测效果如下图:
-
-
-
-
-
-
+  
+  
 五、四种算法的综合比较
 通过一些试验图像，我到时觉得4种算法，FT的效果最为明显，举例如下：
-
-
-
-
-
+    
 原图   FT(50ms) AC(25ms)
-
-
-
+  
 LC(2ms) AC(23ms) 
 只有FT检测出了那个叶。
-
-
-
-
-
-原图            FT         AC 
-
-
-
+    
+原图            FT         AC    
 LC AC
 六、下一步工作
 这里我研究的几种显著性分析都是很简单很基础的算法，实现起来也比较方便，现在还有很多效果显著但是算法比较复杂的论文，等有空或者有能力的是在去看看他们。在这显著性分析只是很多其他处理的第一步，有了这个基础，我也想看看后续的分割或者再感知缩放方面的应用吧。

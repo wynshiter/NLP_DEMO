@@ -71,8 +71,7 @@ public:
         return head;
     }
 };
-
- 
+  
 递归c++解法：
 class Solution {
 public:
@@ -90,8 +89,7 @@ public:
     }
 };
 
-
- 
+  
  
 python递归解决方案：
  
@@ -141,8 +139,7 @@ class Solution:
             q.next = p2
         return guard.next
 
-
- 
+   
 python递归解决方案2：
 If both lists are non-empty, I first make sure a starts smaller, use its head as result, and merge the remainders behind it. Otherwise, i.e., if one or both are empty, I just return what's there.
 
@@ -154,7 +151,6 @@ class Solution:
             a.next = self.mergeTwoLists(a.next, b)
         return a or b
 
-
- 
+  
 
 

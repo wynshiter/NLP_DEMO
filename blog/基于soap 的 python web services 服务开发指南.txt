@@ -5,24 +5,24 @@
 
 
 
-文章大纲序言相关概念SOAweb servicesSOAPWSDLUDDI环境搭建我们使用 python 3.6 这个较新python 版本服务端开发客户端开发suds-jurkosuds-py3客户端样例代码参考文献
+
+文章大纲
+序言相关概念SOAweb servicesSOAPWSDLUDDI
+环境搭建我们使用 python 3.6 这个较新python 版本
+服务端开发客户端开发suds-jurkosuds-py3客户端样例代码
+参考文献
+
+
 
 序言
 web services 已经不再流行，但是，由于它的在接口技术中有着非常重要的地位，同时现在最主要的Web 服务设计模型REST其实也属于web services 技术范畴。所以我们还是有必要学习一下。
 其实 Web Serive 是一项不太容易讲清楚技术。他的相关概念包括：
-
-SOA Service-Oriented Architecture
-Web Services
-SOAP (Simple Object Access Protocol)
-WSDL (Web Services Description Language)
-UDDI (Universal Description Discovery and Integration)
-
+SOA Service-Oriented ArchitectureWeb ServicesSOAP (Simple Object Access Protocol)WSDL (Web Services Description Language)UDDI (Universal Description Discovery and Integration)
 
 相关概念
 web services 这套复杂的技术如上文所述已经算是过时，但了解相关概念还是必要的
 SOA
-Service Oriented Ambiguity 中文一般理解为，面向服务架构，简称 SOA。
-SOA 的提出是在企业计算领域，就是要将紧耦合的系统，划分为面向业务的，粗粒度，松耦合，无状态的服务。
+Service Oriented Ambiguity 中文一般理解为，面向服务架构，简称 SOA。 SOA 的提出是在企业计算领域，就是要将紧耦合的系统，划分为面向业务的，粗粒度，松耦合，无状态的服务。
 SOA 的几个关键特性
 特性：
 
@@ -77,16 +77,11 @@ wincertstore=0.2=py36h7fe50ca_0
 pip install -r requirements.txt
 conda install --yes --file requirements.txt
 
-
-但是注意，async=False ，这个参数问题在3.7版本中有问题，spyne 库会有报错。因为在Python3.7里async变成了关键字，关键字是不能做变量名的，只要把这个名字改成任意不是关键字的词就好了。
+ 但是注意，async=False ，这个参数问题在3.7版本中有问题，spyne 库会有报错。因为在Python3.7里async变成了关键字，关键字是不能做变量名的，只要把这个名字改成任意不是关键字的词就好了。
 
 服务端开发
-针对Python的WebService开发，最早开发者使用最多的库是soaplib
-（官方地址：http://soaplib.github.io/soaplib/2_0/index.html ），
-但从其官网可知，其最新版本“soaplib-2.0.0-beta2”从2011年3月发布后就不再进行更新了。
-通过阅读soaplib的官方文档，可知其不再维护后已经转向了一个新的项目：rpclib
-（官方地址：http://github.com/arskom/rpclib ）
-进行后续开发，但在rpclib的readme中，介绍了rpclib已经更名为spyne，并将持续进行更新。
+针对Python的WebService开发，最早开发者使用最多的库是soaplib （官方地址：http://soaplib.github.io/soaplib/2_0/index.html ）， 但从其官网可知，其最新版本“soaplib-2.0.0-beta2”从2011年3月发布后就不再进行更新了。
+通过阅读soaplib的官方文档，可知其不再维护后已经转向了一个新的项目：rpclib （官方地址：http://github.com/arskom/rpclib ） 进行后续开发，但在rpclib的readme中，介绍了rpclib已经更名为spyne，并将持续进行更新。
 综上，所以选用spyne进行开发了。
 服务端样例代码:
 https://github.com/arskom/spyne/blob/master/examples/helloworld_soap.py
@@ -189,14 +184,10 @@ if __name__ == '__main__':
 
 客户端开发
 这方面有两个python 组件可以使用，分别是：
-
-suds-jurko
-suds-py3
-
+suds-jurkosuds-py3
 suds-jurko
 pip install suds-jurko
-文档
-https://bitbucket.org/jurko/suds/wiki/Original%20Documentation
+文档 https://bitbucket.org/jurko/suds/wiki/Original%20Documentation
 suds-py3
 https://github.com/cackharot/suds-py3
 pip3 install suds-py3
@@ -279,8 +270,8 @@ if __name__ == '__main__':
 
 
 参考文献
-1.《web 接口开发与自动化测试  基于Python语言》
-2. https://www.cnblogs.com/guanfuchang/p/5985070.html
+1.《web 接口开发与自动化测试 基于Python语言》 2. https://www.cnblogs.com/guanfuchang/p/5985070.html
+
 
 
 

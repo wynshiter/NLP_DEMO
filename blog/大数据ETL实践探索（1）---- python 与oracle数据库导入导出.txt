@@ -5,40 +5,32 @@
 
 
 
-文章大纲大数据ETL 系列文章简介ETL 简介1. oracle数据泵 导入导出实战1.1 数据库创建1.2. installs Oracle1.3 export / import data from oracle2.  将数据库表导出成 CSV, 并批量上传至 AWS2.1 export all table to CSV3. python 与oracle 交互4. oracle table-视图 windows 批处理 导出4.1 使用win32 脚本调用sqlplus 导出视图4.2 使用python 执行视图导出参考
+
+文章大纲
+大数据ETL 系列文章简介ETL 简介1. oracle数据泵 导入导出实战1.1 数据库创建1.2. installs Oracle1.3 export / import data from oracle
+2. 将数据库表导出成 CSV, 并批量上传至 AWS2.1 export all table to CSV
+3. python 与oracle 交互4. oracle table-视图 windows 批处理 导出4.1 使用win32 脚本调用sqlplus 导出视图4.2 使用python 执行视图导出
+参考
+
+
 
 大数据ETL 系列文章简介
 本系列文章主要针对ETL大数据处理这一典型场景，基于python语言使用Oracle、aws、Elastic search 、Spark 相关组件进行一些基本的数据导入导出实战，如：
-
-oracle使用数据泵impdp进行导入操作。
-aws使用awscli进行上传下载操作。
-本地文件上传至aws es
-spark dataframe录入ElasticSearch
-
+oracle使用数据泵impdp进行导入操作。aws使用awscli进行上传下载操作。本地文件上传至aws esspark dataframe录入ElasticSearch
 等典型数据ETL功能的探索。
-系列文章：
-1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出
-2.大数据ETL实践探索（2）---- python 与aws 交互
-3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器
-4.大数据ETL实践探索（4）---- 之 搜索神器elastic search
-5.使用python对数据库，云平台，oracle，aws，es导入导出实战
-6.aws ec2 配置ftp----使用vsftp
-7.浅谈pandas，pyspark 的大数据ETL实践经验
+系列文章： 1.大数据ETL实践探索（1）---- python 与oracle数据库导入导出 2.大数据ETL实践探索（2）---- python 与aws 交互 3.大数据ETL实践探索（3）---- pyspark 之大数据ETL利器 4.大数据ETL实践探索（4）---- 之 搜索神器elastic search 5.使用python对数据库，云平台，oracle，aws，es导入导出实战 6.aws ec2 配置ftp----使用vsftp 7.浅谈pandas，pyspark 的大数据ETL实践经验
 
 ETL 简介
 ETL，是英文 Extract-Transform-Load 的缩写，用来描述将数据从来源端经过抽取（extract）、交互转换（transform）、加载（load）至目的端的过程。
-之前有一段时间一直在使用python 与oracle 进行交互，具体内容参见：
-windows下python3 使用cx_Oracle，xlrd插件进行excel数据清洗录入
+之前有一段时间一直在使用python 与oracle 进行交互，具体内容参见： windows下python3 使用cx_Oracle，xlrd插件进行excel数据清洗录入
 可以说使用python 不但能够在后期的数据分析进行相当多的工作，而且可以针对前面大数据的相关组件进行一个有效的整合。在一个初创型的公司来讲，分析团队和数据团队可以有效结合，进行代码复用，并高效运转。
 
 1. oracle数据泵 导入导出实战
 1.1 数据库创建
 本文主要使用最新版本的oracle 12c，如果创建oracle数据库时候使用了数据库容器（CDB）承载多个可插拔数据库（PDB）的模式，那么数据库的用户名需要用c##开头，使用数据泵进行操作 的时候也有一些不同：
 在CDB中，只能创建以c##或C##开头的用户，如果不加c##，则会提示错误“ORA-65096：公用用户名或角色名无效”,只有在PDB数据库中才能创建我们习惯性命名的用户，oracle称之为Local User,前者称之为Common User。
-创建的时候不要勾选：
-
-https://www.cnblogs.com/xqzt/p/5034261.html
-https://www.cnblogs.com/fanyongbin/p/5699482.html
+创建的时候不要勾选： 
+https://www.cnblogs.com/xqzt/p/5034261.html https://www.cnblogs.com/fanyongbin/p/5699482.html
 
 1.2. installs Oracle
 Download and install Oracle 12C,
@@ -65,8 +57,7 @@ Temporary tablespace temp;
 
 Grant DBA to username;
 
-.
-由于全库导入的时候oracle_home和之前的数据库发生了改变，所以原来数据库的表空间需要提前建立。可以根据导出日志或者导入日志的报错，查看原来数据库中到底有那些表空间。特别注意有关视图和索引的表空间和用户也需要提起建立好。当然如果你只要数据的话就不太影像了。基本上使用表空间就可以全部导入。
+. 由于全库导入的时候oracle_home和之前的数据库发生了改变，所以原来数据库的表空间需要提前建立。可以根据导出日志或者导入日志的报错，查看原来数据库中到底有那些表空间。特别注意有关视图和索引的表空间和用户也需要提起建立好。当然如果你只要数据的话就不太影像了。基本上使用表空间就可以全部导入。
 Create table space :
 E.g
 Create tablespace xxx datafile'f:\xxx.dbf'size 200M AUTOEXTEND on;
@@ -85,16 +76,12 @@ command as follow:
 Impdp username/password@orcl full=y directory=dir_yiliao dumpfile=full1%U.dmp remap_schema=username_old:username_new exclude=GRANT remap_tablespace='(t1:tempt1, t2:tempt2) '  tablespaces=tempt1,temp2
 
 以下两种导入方式只能二选一：
+full=ytablespaces=tempt1,temp2
+整体说明 https://www.2cto.com/database/201605/508212.html
 
-full=y
-tablespaces=tempt1,temp2
-
-整体说明
-https://www.2cto.com/database/201605/508212.html
-
-2.  将数据库表导出成 CSV, 并批量上传至 AWS
+2. 将数据库表导出成 CSV, 并批量上传至 AWS
 2.1 export all table to CSV
-使用oracle函数 utl_file  进行快速导入导出（一分钟300万条的量级），这个比spool快多啦
+使用oracle函数 utl_file 进行快速导入导出（一分钟300万条的量级），这个比spool快多啦
 CREATE OR REPLACE PROCEDURE SQL_TO_CSV
 (
  P_QUERY IN VARCHAR2, -- PLSQL文
@@ -171,7 +158,7 @@ For reference, the links are as follows
 Https://blog.csdn.net/huangzhijie3918/article/details/72732816
 
 3. python 与oracle 交互
-cx_oracle  的安装
+cx_oracle 的安装
 windows10，redhat6.5下python3.5.2使用cx_Oracle链接oracle
 其实主要的要点是，不管是windows 平台还是linux 平台，首要任务是安装好oracle client
 
@@ -218,8 +205,7 @@ quit;
 
 后来发现一个问题，比如上面的第2小节的存储过程 SQL_TO_CSV，死活没法成功执行，只好安装cx_oracle ,用python 导出了，代码如下。
 4.2 使用python 执行视图导出
-主要逻辑是，按照月份 ，执行视图生成这个月每天的数据插入到表中，当一个月的数据执行完毕，将这个月份表导出。
-类似这种流程化的东西，python果然还是利器
+主要逻辑是，按照月份 ，执行视图生成这个月每天的数据插入到表中，当一个月的数据执行完毕，将这个月份表导出。 类似这种流程化的东西，python果然还是利器
 # -*- coding:utf-8 -*-
 """@author:season@file:export_view.py@time:2018/5/211:19"""
 
@@ -312,12 +298,11 @@ if __name__ == '__main__':
 
 
 参考
-OS.ENVIRON详解
-python编码
+OS.ENVIRON详解 python编码
 再次强烈推荐，精通oracle+python系列：官方文档
 http://www.oracle.com/technetwork/cn/articles/dsl/mastering-oracle-python-1391323-zhs.html
-离线版本下载链接：
-http://download.csdn.net/detail/wangyaninglm/9815726
+离线版本下载链接： http://download.csdn.net/detail/wangyaninglm/9815726
+
 
 
 

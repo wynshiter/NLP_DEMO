@@ -4,7 +4,6 @@
 
 
 
-
 我们在做数据分析，清洗的过程中，很多时候会面对各种各样的数据源，要针对不同的数据源进行清洗，入库的工作。当然python这个语言，我比较喜欢，开发效率高，基本上怎么写都能运行，而且安装配置简单，基本上有网的环境pip install全部都搞定，没网的话，把whl包copy过来一行命令也就解决了( windows下python3.5使用pip离线安装whl包)。
 本篇博客就针对，在windows平台下使用python3（python2社区将要停止支持，使用3是大势所趋），读取xls，xlsx格式的数据进行清洗入库做一个小例子。
 初步业务流程
@@ -12,7 +11,11 @@
 1. 读取xlsx数据进行清洗
 2. cx_Oracle批量入库
 
- 
+
+
+
+
+
 
 建表语句：
 create table temp_table
@@ -238,9 +241,8 @@ table.cell(0,0).value #单元格的值'
 参考链接
 [OS.ENVIRON详解]: http://blog.csdn.net/junweifan/article/details/7615591
 [python编码]:http://www.cnblogs.com/fkissx/p/5417363.html
-再次强烈推荐，精通oracle+python系列：官方文档 
-http://www.oracle.com/technetwork/cn/articles/dsl/mastering-oracle-python-1391323-zhs.html 
-离线版本下载链接： 
-http://download.csdn.net/detail/wangyaninglm/9815726 
+再次强烈推荐，精通oracle+python系列：官方文档  http://www.oracle.com/technetwork/cn/articles/dsl/mastering-oracle-python-1391323-zhs.html  离线版本下载链接：  http://download.csdn.net/detail/wangyaninglm/9815726
+
+
 
 

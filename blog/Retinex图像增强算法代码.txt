@@ -50,9 +50,9 @@ using namespace cv;
 #define PI 3.1415926
 #define ALPHA_c 1
 
-//////////////////////////
+//
 //  Read a 8 bit bmp File
-//////////////////////////
+//
 BYTE *Read8BitBmpFile2Img(const char * filename,int *width,int *height)
 {   FILE * BinFile;
 BITMAPFILEHEADER FileHeader;
@@ -84,9 +84,9 @@ fclose(BinFile);
 return img;
 }
 
-/////////////////////////
+/
 // Write a 8 bit bmp File
-/////////////////////////
+/
 int Write8BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
 {   FILE * BinFile;
 BITMAPFILEHEADER FileHeader;
@@ -130,9 +130,9 @@ fclose(BinFile);
 return Suc;
 }
 
-//////////////////////////
+//
 //  Read a 24 bit bmp File
-//////////////////////////
+//
 BYTE *Read24BitBmpFile2Img(const char * filename,int *width,int *height)
 {  
 	FILE * BinFile;
@@ -167,9 +167,9 @@ BYTE *Read24BitBmpFile2Img(const char * filename,int *width,int *height)
 	fclose(BinFile);
 	return img;
 }
-//////////////////////////
+//
 //  write a 24 bit bmp File
-//////////////////////////
+//
 bool Write24BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
 {   
 	FILE * BinFile;
@@ -225,13 +225,13 @@ bool Write24BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
 	return Suc;
 }
 
-//////////////////////////
+//
 // Logarithm Transform
 // OrgImg: point to original image
 // widht: the width of the image
 // height:the height of the image
 // LogImg: point to logarithm transform  of the image
-//////////////////////////
+//
 void LogarithmTransform(int *OrgImg,int width,int height,int *LogImg)
 {
 	int *pLog=LogImg,*pCur=OrgImg;
@@ -245,9 +245,9 @@ void LogarithmTransform(int *OrgImg,int width,int height,int *LogImg)
 	}
 	return;
 }
-////////////////////////////////
+
 //  计算窗口内像素灰度和
-////////////////////////////////
+
 void Ini(BYTE *pOrgImg,int width,int height,int *sum)
 {
 	int i,j;
@@ -268,9 +268,9 @@ void Ini(BYTE *pOrgImg,int width,int height,int *sum)
 	return;
 }
 
-//////////////////////////
+//
 // 局部非线性对比度增强
-//////////////////////////
+//
 void LocalNonlinearStretch(BYTE *OrgImg,int width,int height,int *ResData)
 {
 	int i,j,k,s,size=width*height;
@@ -321,9 +321,9 @@ void LocalNonlinearStretch(BYTE *OrgImg,int width,int height,int *ResData)
 	delete sum;
 	return;
 }
-//////////////////////////
+//
 //  Gaussian Template
-//////////////////////////
+//
 void GaussianTemplate(int *Template,int Tsize,double c)
 {
 	int *pCur;
@@ -347,9 +347,9 @@ void GaussianTemplate(int *Template,int Tsize,double c)
 	return;
 }
 
-//////////////////////////
+//
 //  3*3 Gaussian Template
-//////////////////////////
+//
 void GaussianTemplate2(int *Template,double c)
 {
 	int *pCur;
@@ -367,13 +367,13 @@ void GaussianTemplate2(int *Template,double c)
 	return;
 }
 
-//////////////////////////
+//
 // 单尺度Retinex
 // OrgImg: point to  original image
 // widht: the width of the image
 // height: the height of the image
 // ResImg: point to the result image
-//////////////////////////
+//
 void SSR(int *LogImg,BYTE *OrgImg,int width,int height,int *ResData,int *Template,int Tsize)
 {
 	BYTE *pCur=OrgImg;
@@ -431,9 +431,9 @@ void SSR(int *LogImg,BYTE *OrgImg,int width,int height,int *ResData,int *Templat
 	}
 	return;
 }
-/////////////////////////
+/
 //  Get Mean And Deviance
-/////////////////////////
+/
 void GetMeanAndDeviance(int *Temp,int width,int height,int Tsize,int *mean,int *dev)
 {
 	int i,j,size;
@@ -459,13 +459,13 @@ void GetMeanAndDeviance(int *Temp,int width,int height,int Tsize,int *mean,int *
 	return;
 }
 
-/////////////////////////
+/
 //  Linear Stretch
 // Temp: point to the image before stratching
 // widht: the width of the image
 // height: the height of the image
 // ResImg: point to the resultant image
-/////////////////////////
+/
 void LinearStretch(int *Temp,int width,int height,int *mean,int *dev,BYTE *ResImg)
 {
 	BYTE *pRes;
@@ -486,9 +486,9 @@ void LinearStretch(int *Temp,int width,int height,int *mean,int *dev,BYTE *ResIm
 }
 
 /*
-//////////////////////////
+//
 // GAMMA Correction
-//////////////////////////
+//
 void GammaCorrection(double *OrgData,int width,int heihgt,double *ResData)
 {
 int i,size;
@@ -499,9 +499,9 @@ for(i=0,pOrg=OrgDat,pRes=ResData;i<size;i++)
 } 
 }
 */
-//////////////////////////
+//
 // Contrast
-//////////////////////////
+//
 void Contrast(BYTE *OrgImg,int x,int y,int width,int height,int blockw,int blockh,double &wcontrast,double &mcontrast)
 {
 	BYTE *pCur=OrgImg+x*blockw+y*width*blockh;
@@ -523,9 +523,9 @@ void Contrast(BYTE *OrgImg,int x,int y,int width,int height,int blockw,int block
 	return;
 }
 
-//////////////////////////
+//
 //  Measure of Performance
-//////////////////////////
+//
 void Measure(BYTE *ResImg,int width,int height,double &emee,double &ame)
 {
 	int k1=8,k2=8,i,j,blockw,blockh;
@@ -548,9 +548,9 @@ void Measure(BYTE *ResImg,int width,int height,double &emee,double &ame)
 	return ;
 }
 
-/////////////////////////
+/
 // Gray Image Process
-/////////////////////////
+/
 void GrayImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 {
 	int *Data,*LogImg,*Template,mean,dev;
@@ -574,9 +574,9 @@ void GrayImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 	return;
 }
 
-/////////////////////////
+/
 // Color Image Process
-/////////////////////////
+/
 void ColorImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 {
 	BYTE *Value;
@@ -632,10 +632,10 @@ void ColorImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 }
 
 
-//////////////////////////
+//
 //  Color Image process 2
 //  三通道分别处理
-//////////////////////////
+//
 void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 {
 	BYTE *Value;
@@ -677,9 +677,9 @@ void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 	delete LogImg;
 	return;
 }
-//////////////////////////
+//
 //  main
-//////////////////////////
+//
 int main()
 {   
 	BYTE *OrgImg,*ResImg,*p1,*p2;
@@ -839,8 +839,7 @@ int main()
 
 
 
-
- 
+  
  
 后面用opencv改写了一下主要想把像素数据写到BYTE *指向的内存空间中，这样的话可以加载其他格式的图像文件了:但是出现了一些问题，可能跟之前作者代码里面的限制有关，必须是64的倍数。还写了一个功能实现把像素数据写到txt中保存下来，各位凑活看。
 参见帖子：
@@ -876,9 +875,9 @@ using namespace cv;
 
 int size_mem = 0;
 
-//////////////////////////
+//
 //  Read a 8 bit bmp File
-//////////////////////////
+//
 BYTE *Read8BitBmpFile2Img(const char * filename,int *width,int *height)
 {   FILE * BinFile;
 BITMAPFILEHEADER FileHeader;
@@ -910,9 +909,9 @@ fclose(BinFile);
 return img;
 }
 
-/////////////////////////
+/
 // Write a 8 bit bmp File
-/////////////////////////
+/
 int Write8BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
 {   FILE * BinFile;
 BITMAPFILEHEADER FileHeader;
@@ -956,9 +955,9 @@ fclose(BinFile);
 return Suc;
 }
 
-//////////////////////////
+//
 //  Read a 24 bit bmp File
-//////////////////////////
+//
 BYTE *Read24BitBmpFile2Img(const char * filename,int *width,int *height)
 {  
 	FILE * BinFile;
@@ -994,9 +993,9 @@ BYTE *Read24BitBmpFile2Img(const char * filename,int *width,int *height)
 	fclose(BinFile);
 	return img;
 }
-//////////////////////////
+//
 //  write a 24 bit bmp File
-//////////////////////////
+//
 bool Write24BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
 {   
 	FILE * BinFile;
@@ -1052,13 +1051,13 @@ bool Write24BitImg2BmpFile(BYTE *img,int width,int height,const char * filename)
 	return Suc;
 }
 
-//////////////////////////
+//
 // Logarithm Transform
 // OrgImg: point to original image
 // widht: the width of the image
 // height:the height of the image
 // LogImg: point to logarithm transform  of the image
-//////////////////////////
+//
 void LogarithmTransform(int *OrgImg,int width,int height,int *LogImg)
 {
 	int *pLog=LogImg,*pCur=OrgImg;
@@ -1072,9 +1071,9 @@ void LogarithmTransform(int *OrgImg,int width,int height,int *LogImg)
 	}
 	return;
 }
-////////////////////////////////
+
 //  计算窗口内像素灰度和
-////////////////////////////////
+
 void Ini(BYTE *pOrgImg,int width,int height,int *sum)
 {
 	int i,j;
@@ -1095,9 +1094,9 @@ void Ini(BYTE *pOrgImg,int width,int height,int *sum)
 	return;
 }
 
-//////////////////////////
+//
 // 局部非线性对比度增强
-//////////////////////////
+//
 void LocalNonlinearStretch(BYTE *OrgImg,int width,int height,int *ResData)
 {
 	int i,j,k,s,size=width*height;
@@ -1148,9 +1147,9 @@ void LocalNonlinearStretch(BYTE *OrgImg,int width,int height,int *ResData)
 	delete sum;
 	return;
 }
-//////////////////////////
+//
 //  Gaussian Template
-//////////////////////////
+//
 void GaussianTemplate(int *Template,int Tsize,double c)
 {
 	int *pCur;
@@ -1174,9 +1173,9 @@ void GaussianTemplate(int *Template,int Tsize,double c)
 	return;
 }
 
-//////////////////////////
+//
 //  3*3 Gaussian Template
-//////////////////////////
+//
 void GaussianTemplate2(int *Template,double c)
 {
 	int *pCur;
@@ -1194,13 +1193,13 @@ void GaussianTemplate2(int *Template,double c)
 	return;
 }
 
-//////////////////////////
+//
 // 单尺度Retinex
 // OrgImg: point to  original image
 // widht: the width of the image
 // height: the height of the image
 // ResImg: point to the result image
-//////////////////////////
+//
 void SSR(int *LogImg,BYTE *OrgImg,int width,int height,int *ResData,int *Template,int Tsize)
 {
 	BYTE *pCur=OrgImg;
@@ -1258,9 +1257,9 @@ void SSR(int *LogImg,BYTE *OrgImg,int width,int height,int *ResData,int *Templat
 	}
 	return;
 }
-/////////////////////////
+/
 //  Get Mean And Deviance
-/////////////////////////
+/
 void GetMeanAndDeviance(int *Temp,int width,int height,int Tsize,int *mean,int *dev)
 {
 	int i,j,size;
@@ -1286,13 +1285,13 @@ void GetMeanAndDeviance(int *Temp,int width,int height,int Tsize,int *mean,int *
 	return;
 }
 
-/////////////////////////
+/
 //  Linear Stretch
 // Temp: point to the image before stratching
 // widht: the width of the image
 // height: the height of the image
 // ResImg: point to the resultant image
-/////////////////////////
+/
 void LinearStretch(int *Temp,int width,int height,int *mean,int *dev,BYTE *ResImg)
 {
 	BYTE *pRes;
@@ -1313,9 +1312,9 @@ void LinearStretch(int *Temp,int width,int height,int *mean,int *dev,BYTE *ResIm
 }
 
 /*
-//////////////////////////
+//
 // GAMMA Correction
-//////////////////////////
+//
 void GammaCorrection(double *OrgData,int width,int heihgt,double *ResData)
 {
 int i,size;
@@ -1326,9 +1325,9 @@ for(i=0,pOrg=OrgDat,pRes=ResData;i<size;i++)
 } 
 }
 */
-//////////////////////////
+//
 // Contrast
-//////////////////////////
+//
 void Contrast(BYTE *OrgImg,int x,int y,int width,int height,int blockw,int blockh,double &wcontrast,double &mcontrast)
 {
 	BYTE *pCur=OrgImg+x*blockw+y*width*blockh;
@@ -1350,9 +1349,9 @@ void Contrast(BYTE *OrgImg,int x,int y,int width,int height,int blockw,int block
 	return;
 }
 
-//////////////////////////
+//
 //  Measure of Performance
-//////////////////////////
+//
 void Measure(BYTE *ResImg,int width,int height,double &emee,double &ame)
 {
 	int k1=8,k2=8,i,j,blockw,blockh;
@@ -1375,9 +1374,9 @@ void Measure(BYTE *ResImg,int width,int height,double &emee,double &ame)
 	return ;
 }
 
-/////////////////////////
+/
 // Gray Image Process
-/////////////////////////
+/
 void GrayImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 {
 	int *Data,*LogImg,*Template,mean,dev;
@@ -1401,9 +1400,9 @@ void GrayImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 	return;
 }
 
-/////////////////////////
+/
 // Color Image Process
-/////////////////////////
+/
 void ColorImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 {
 	BYTE *Value;
@@ -1459,10 +1458,10 @@ void ColorImageProcess(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 }
 
 
-//////////////////////////
+//
 //  Color Image process 2
 //  三通道分别处理
-//////////////////////////
+//
 void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 {
 	BYTE *Value;
@@ -1504,8 +1503,7 @@ void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 	delete LogImg;
 	return;
 }
-
- 
+  
  
  
  
@@ -1515,9 +1513,9 @@ void ColorImageProcess2(BYTE *OrgImg,int width,int height,BYTE *ResImg)
 #include "stdafx.h"
 
 #include "Retinex.h"
-//////////////////////////
+//
 //  main
-//////////////////////////
+//
 int main()
 {   
 	BYTE *OrgImg,*ResImg,*p1,*p2;
@@ -1715,8 +1713,7 @@ int main()
 
 
 
-
- 
+  
  
  
    

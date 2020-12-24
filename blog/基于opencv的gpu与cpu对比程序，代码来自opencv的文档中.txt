@@ -287,7 +287,7 @@ Scalar getMSSIM( const Mat& i1, const Mat& i2)
 	GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
 	sigma12 -= mu1_mu2;
 
-	///////////////////////////////// FORMULA ////////////////////////////////
+	/ FORMULA 
 	Mat t1, t2, t3; 
 
 	t1 = 2 * mu1_mu2 + C1; 
@@ -353,7 +353,7 @@ Scalar getMSSIM_GPU( const Mat& i1, const Mat& i2)
 		(Mat)sigma12 =(Mat)sigma12 - (Mat)mu1_mu2;
 		//sigma12 = sigma12 - mu1_mu2
 
-		///////////////////////////////// FORMULA ////////////////////////////////
+		/ FORMULA 
 		gpu::GpuMat t1, t2, t3; 
 
 // 		t1 = 2 * mu1_mu2 + C1; 
@@ -444,7 +444,7 @@ Scalar getMSSIM_GPU_optimized( const Mat& i1, const Mat& i2, BufferMSSIM& b)
 	}
 	return mssim; 
 }</span>
- 
+  
  
 实现效果：
 

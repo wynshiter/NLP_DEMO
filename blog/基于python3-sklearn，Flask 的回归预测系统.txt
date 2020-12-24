@@ -4,37 +4,24 @@
 
 
 
-
-看到一副图片挺有意思，放在片头 
-
+看到一副图片挺有意思，放在片头  
 序
 “傍晚小街路面上沁出微雨后的湿润，和煦的西风吹来，抬头看看天边的晚霞，嗯明天又是一个好天气。走到水果摊旁，挑了个根蒂蜷缩、敲起来声音浊响的青绿西瓜，一边满心期待着皮薄肉厚瓤甜的爽落感，一边愉快地想着，这学期狠下了工夫，基础概念弄得很清楚，算法作业也是信手拈来，这门课成绩一定差不了!”
 上面的经验是靠我们人类自身完成的，计算机能帮忙么？机器学习正是这样一门学科，它致力于研究如何通过计算的手段，利用经验来改善系统自身的性能。
 现在各行各业强调使用大数据手段进行数据分析，大数据的上帝视角带给我们的核心竞争力是对于个体甚至群体行为的预测，那么我们就来看看使用回归类算法对于数值型的数据如何来进行预测
 什么是回归？
-优点：结果易于理解，计算上不复杂。 
-缺点：对非线性的数据拟合不好。 
-适用数据类型：数值型和标称型数据。
+优点：结果易于理解，计算上不复杂。  缺点：对非线性的数据拟合不好。  适用数据类型：数值型和标称型数据。
 使用算法：使用回归，可以在给定输入的时候预测出一个数值，这是对分类方法的提升，因为这样可以预测连续型数据而不仅仅是离散的类别标签
-回归的一般方法： 
-（1）收集数据：采用任意方法收集数据； 
-（2）准备数据：回归需要数值型数据，标称型数据将被转换成二值型数据； 
-（3）分析数据：绘出数据的可视化二维图，有助于对数据做出理解和分析。在采用缩减法求得新回归系数后，可以将新拟合线绘在图上进行对比； 
-（4）训练算法：找到回归系数； 
-（5）测试算法：使用R2（相关系数的平方）或顶测值和数据的拟合度，来分析模型的效果； 
-使用算法：使用回归，可以在给定输入的时候预测出一个数值，这是对分类方法的提升，因为这样可以预测出连续型数据而不仅仅是离散型的类别标签
-原理简介 
-普通最小二乘法（ordinary least squares）
+回归的一般方法：  （1）收集数据：采用任意方法收集数据；  （2）准备数据：回归需要数值型数据，标称型数据将被转换成二值型数据；  （3）分析数据：绘出数据的可视化二维图，有助于对数据做出理解和分析。在采用缩减法求得新回归系数后，可以将新拟合线绘在图上进行对比；  （4）训练算法：找到回归系数；  （5）测试算法：使用R2（相关系数的平方）或顶测值和数据的拟合度，来分析模型的效果；  使用算法：使用回归，可以在给定输入的时候预测出一个数值，这是对分类方法的提升，因为这样可以预测出连续型数据而不仅仅是离散型的类别标签
+原理简介  普通最小二乘法（ordinary least squares）
 问题：如何知道sklearn拟合公式的参数结果是多少y=ax+b怎么知道a，b？
 #
 线性回归（Linear regression）是利用称为线性回归方程的最小二乘函数（最小化误差平方和）对一个或多个自变量和因变量之间关系进行建模的一种回归分析。这种函数是一个或多个称为回归系数的模型参数的线性组合。只有一个自变量的情况称为简单回归，大于一个自变量情况的叫做多元回归。
 
 典型业务场景
-假设一路公交，在其始发站每小时会来很多人等车，坐车人数会和很多因素相关（天气，是否节假日）。 
-为了方便调度人员预测下一个小时，或者当天的坐车人数，可以采用回归算法制作基于时间的预测系统。
+假设一路公交，在其始发站每小时会来很多人等车，坐车人数会和很多因素相关（天气，是否节假日）。  为了方便调度人员预测下一个小时，或者当天的坐车人数，可以采用回归算法制作基于时间的预测系统。
 可能要有的功能
-1.出现异常增量时候的预警，异常增量，概念的定义。 
-2.预测值和真实值的差别
+1.出现异常增量时候的预警，异常增量，概念的定义。  2.预测值和真实值的差别
 数据准备
 history 表中记录了所有公交卡历史记录
 建表语句，从已经采集的数据中构建,主要为两列
@@ -152,8 +139,7 @@ def generateAllresult():
 
 Flask页面展示
 还有一个3js需要下载
-整个项目的目录结果如下图所示： 
-在windows上cmd中居然也有tree命令，使用tree  /f显示如下结构：
+整个项目的目录结果如下图所示：  在windows上cmd中居然也有tree命令，使用tree /f显示如下结构：
 
 页面html：
 
@@ -166,8 +152,7 @@ Flask页面展示
 
          <script type="text/javascript" src="../static/js/jquery-1.8.2.min.js"></script>
          <style type="text/css">
- ${demo.css}
-         </style>
+ ${demo.css} </style>
          <script type="text/javascript">
  $(function () {
      $.getJSON('/data?callback=?', function (data) {
@@ -314,33 +299,18 @@ def today_Regression():
 if __name__ =='__main__':
 
     app.run(host="0.0.0.0", port=55555, debug=True)
-使用一天的数据绘制一个二次函数，保存到本地作为一张图片 
- 
-但是sklearn怎么输出二次函数的参数呢，我一直没有找到
+使用一天的数据绘制一个二次函数，保存到本地作为一张图片    但是sklearn怎么输出二次函数的参数呢，我一直没有找到
 
-未完待续，将来将这个小项目共享出来 
-js文件下载地址：
-1： 
-http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js 
-2：2.js 
-http://cdnjs.cloudflare.com/ajax/libs/highstock/2.0.4/highstock.js
-3：3.js 
-http://code.highcharts.com/modules/exporting.js
-大数据框架下的回归预测 
-官方文档 
-http://spark.apache.org/docs/latest/ml-classification-regression.html#regression 
-中文翻译 
-http://www.apache.wiki/display/Spark/ML+Pipelines 
-python接口： 
-http://spark.apache.org/docs/latest/api/python/pyspark.ml.html#module-pyspark.ml.regression
-spark mllib 全面介绍： 
-http://www.cnblogs.com/shishanyuan/p/4747761.html
-python实现： 
-http://www.cnblogs.com/adienhsuan/p/5654481.html
-学习笔记： 
-http://www.cnblogs.com/charlotte77/p/5518368.html
+未完待续，将来将这个小项目共享出来  js文件下载地址：
+1：  http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js  2：2.js  http://cdnjs.cloudflare.com/ajax/libs/highstock/2.0.4/highstock.js
+3：3.js  http://code.highcharts.com/modules/exporting.js
+大数据框架下的回归预测  官方文档  http://spark.apache.org/docs/latest/ml-classification-regression.html#regression  中文翻译  http://www.apache.wiki/display/Spark/ML+Pipelines  python接口：  http://spark.apache.org/docs/latest/api/python/pyspark.ml.html#module-pyspark.ml.regression
+spark mllib 全面介绍：  http://www.cnblogs.com/shishanyuan/p/4747761.html
+python实现：  http://www.cnblogs.com/adienhsuan/p/5654481.html
+学习笔记：  http://www.cnblogs.com/charlotte77/p/5518368.html
 参考文献
-机器学习实战，第八章 
-周志华，机器学习 
+机器学习实战，第八章  周志华，机器学习
+
+
 
 

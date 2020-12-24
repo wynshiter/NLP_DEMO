@@ -37,7 +37,7 @@ int main()
 	threshold(gray,gray,128,255,THRESH_BINARY);//转换成2值图像
 	imshow("binary",gray);
 
-	/////////////////////////////////////////////////////////////////////
+	/
 	std::vector<std::vector<cv::Point>> contours;
 	cv::findContours(gray, 
 		contours, // a vector of contours 
@@ -91,8 +91,7 @@ int main()
 }
 
 
-
- 
+  
  
  
 实现效果：
@@ -114,7 +113,7 @@ int main()
 			++itc;   
 
 	}    
-
+ 
  
  
  
@@ -124,10 +123,14 @@ http://blog.sina.com.cn/s/blog_8fc98fe501017ypb.html
 
 
 
-[cpp] 
-view plaincopy
+
+[cpp]
+ view plain
+copy
+
 
 Mat image = imread("D:/picture/images/binaryGroup.bmp",0);  if(!image.data)       return -1;  imshow("源图像",image);      //获取轮廓   std::vector> contours;   //获取轮廓：   findContours(image,         //图像      contours,               //轮廓点                      //包含图像拓扑结构的信息（可选参数，这里没有选）      CV_RETR_EXTERNAL,           //获取轮廓的方法（这里获取外围轮廓）      CV_CHAIN_APPROX_NONE);      //轮廓近似的方法（这里不近似，获取全部轮廓）  //打印轮廓信息   std::cout<<"共有外围轮廓："<<contours.size()<<"条"<<std::endl;  std::vector>::const_iterator itContours = contours.begin();  for(;itContours != contours.end();++itContours)  {       std::cout<<"每个轮廓的长度: "<<itContours->size()<<std::endl;  }   
+
 
 注意到轮廓的存储格式为std::vector>，他说明整个轮廓是若干条轮廓按一定顺序组成的，而每个轮廓中的点也是有顺序的。
 
@@ -135,48 +138,65 @@ Mat image = imread("D:/picture/images/binaryGroup.bmp",0);  if(!image.data)
 
 
 
-[cpp] 
-view plaincopy
+
+[cpp]
+ view plain
+copy
+
 
 //画出轮廓   Mat result(image.size(),CV_8U,Scalar(255));   //画出轮廓，参数为：画板，轮廓，轮廓指示（这里画出所有轮廓），颜色，线粗  drawContours(result,contours,-1,Scalar(0),2);   imshow("提取外围轮廓",result);   
+
 
 还要注意提取轮廓的方法还有很多种，比如CV_RETR_LIST代表所有轮廓
 
 
 
-[cpp] 
-view plaincopy
+
+[cpp]
+ view plain
+copy
+
 
 findContours(image,         //图像      contours,               //轮廓点                      //包含图像拓扑结构的信息（可选参数，这里没有选）      CV_RETR_LIST,           //获取轮廓的方法（这里获取所有轮廓）      CV_CHAIN_APPROX_NONE);      //轮廓近似的方法（这里不近似，获取全部轮廓  //画出轮廓   drawContours(result,contours,-1,Scalar(0),2);   imshow("提取所有轮廓",result);   
+
 
 通常，这样提取的轮廓包含一些我们不希望的轮廓（比如一些小洞），或者假如我们知道我们感兴趣的物体轮廓的大概范围时，我们就可以用下面的办法缩小目标范围：
 
 
 
-[cpp] 
-view plaincopy
 
-//除去太长或者太短的轮廓   int cmin = 100;  int cmax = 1000;  std::vector>::const_iterator itc = contours.begin();  while(itc != contours.end())  {       if(itc->size() < cmin || itc->size() > cmax)          itc = contours.erase(itc);      else          ++itc;  }      //把结果画在源图像上：   Mat original = imread("D:/picture/images/group.jpg");  if(!original.data)       return -1;  drawContours(original,contours,-1,Scalar(255,255,255),2);  imshow("动物的轮廓",original);      //将轮廓重绘于白板上   result.setTo(Scalar(255));   drawContours(result,contours,-1,Scalar(0),1);   
-
-
-怎么提取轮廓的特征呢？OpenCV提供了很多函数，我们展示其中的几个：
+[cpp]
+ view plain
+copy
 
 
+//除去太长或者太短的轮廓   int cmin = 100;  int cmax = 1000;  std::vector>::const_iterator itc = contours.begin();  while(itc != contours.end())  {       if(itc->size() < cmin || itc->size() > cmax)          itc = contours.erase(itc);      else          ++itc;   }          //把结果画在源图像上：   Mat original = imread("D:/picture/images/group.jpg");  if(!original.data)       return -1;  drawContours(original,contours,-1,Scalar(255,255,255),2);  imshow("动物的轮廓",original);      //将轮廓重绘于白板上   result.setTo(Scalar(255));   drawContours(result,contours,-1,Scalar(0),1);   
 
-[cpp] 
-view plaincopy
+
+ 怎么提取轮廓的特征呢？OpenCV提供了很多函数，我们展示其中的几个：
+
+
+
+
+[cpp]
+ view plain
+copy
+
 
 //轮廓的形状描述子   //外接矩形   Rect r0 = boundingRect(Mat(contours[0]));  rectangle(result,r0,Scalar(0),2);      //最小外接圆   float radius;   Point2f center;   minEnclosingCircle(Mat(contours[1]),center,radius);   circle(result,Point(center),static_cast<</span>int>(radius),Scalar(0),2);     //多边形估计   std::vector poly;   //参数为：输入图像的2维点集，输出结果，估计精度，是否闭合  approxPolyDP(Mat(contours[2]),poly,5,true);  std::cout<<"多边形大小："<<poly.size()<<std::endl;  //画出结果   std::vector::const_iterator itp = poly.begin();  while(itp != poly.end()-1)  {       line(result,*itp,*(itp+1),Scalar(0),2);      ++itp;   }   //将第一个点和最后一点连起来   line(result,*(poly.begin()),*(poly.end()-1),Scalar(128),2);        //计算凸包   std::vector hull;   convexHull(Mat(contours[3]),hull);   std::vector::const_iterator it= hull.begin();  while(it != (hull.end()-1))  {       line(result,*it,*(it+1),Scalar(0),2);      ++it;   }   line(result,*(hull.begin()),*(hull.end()-1),Scalar(0),2);        //计算矩信息   itc = contours.begin();   while(itc != contours.end())  {       //计算所有的距      Moments mom = moments(Mat(*itc++));      //计算并画出质心      circle(result,Point(mom.m10/mom.m00,mom.m01/mom.m00),2,Scalar(2),2);  }   imshow("形状描述子",result);   
+
 
 我们再次看到，轮廓的确是有顺序的。值得注意的是矩信息：OpenCV提供了一个结构体Moments，它的元素就是计算好的矩信息，里面存放了常用的距。
 其实，OpenCV还提供了许多其他的形状描述子，比如函数cv::minAreaRect计算了最小外界倾斜的矩形。函数 cv::contourArea估计轮廓区域的面积（里面的像素数）。函数cv::pointPolygonTest计算一个点是否在轮廓内，cv::matchShapes测量了2两个轮廓的相似程度等等。这里就不一一介绍了。
  
 
-原文地址：findContours函数参数说明及相关函数作者：鸳都学童
+
+原文地址：findContours函数参数说明及相关函数
+作者：鸳都学童
+
 
 findContours函数，这个函数的原型为：
-void findContours(InputOutputArray image, OutputArrayOfArrays contours, OutputArray hierar-
-chy, int mode, int method, Point offset=Point())
+void findContours(InputOutputArray image, OutputArrayOfArrays contours, OutputArray hierar- chy, int mode, int method, Point offset=Point())
 参数说明
 输入图像image必须为一个2值单通道图像
 contours参数为检测的轮廓数组，每一个轮廓用一个point类型的vector表示
@@ -280,12 +300,11 @@ static int getContoursByCplus(char* Imgname, double minarea, double whRatio)
 	
 	return 0;
 }
- 
-
-cvDrawContours(gray_image,c,cvScalarAll(0),cvScalarAll(0),0,CV_FILLED);
-用参数CV_FILLED就可以了 ，这样可以填充轮廓，进而得到模版有点类似图像分割了。
+   
+ 
+cvDrawContours(gray_image,c,cvScalarAll(0),cvScalarAll(0),0,CV_FILLED);  用参数CV_FILLED就可以了 ，这样可以填充轮廓，进而得到模版有点类似图像分割了。
 还有一种方法就是：
-http://blog.csdn.net/augusdi/article/details/9011935
+http://blog.csdn.net/augusdi/article/details/9011935 
  
 
 

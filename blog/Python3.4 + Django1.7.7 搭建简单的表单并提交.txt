@@ -2,20 +2,19 @@
 
 
 
-
-
+ 
+ 
 后面还有一个问题，是我把txt生成了，但是网页没有返回我还不知道，现在怎么直接返回txt并且展示出来txt 的内容，希望大牛不吝赐教
-
+ 
 首先有一个问题
 django1.7之前，这样用：
-
+ 
 HttpResponse(simplejson.dumps({“status”: ‘200’, “message”:u’登录成功’}), mimetype=’application/json’)
-
+ 
 没问题，但是django1,7之后就报错了，查了下问题发现应该这样用：
-
-HttpResponse(simplejson.dumps({“status”: ‘200’, “message”:u’登录成功’}), 
-content_type=’application/json’)
-
+ 
+HttpResponse(simplejson.dumps({“status”: ‘200’, “message”:u’登录成功’}),  content_type=’application/json’)
+ 
 html模版：
 <html>
 <style type="text/css">
@@ -80,9 +79,10 @@ html模版：
     </form>
 </body>
 </html>
-
-
+ 
+ 
 form.py
+
 #coding： gb2312
 from django import forms
 
@@ -101,7 +101,11 @@ class ContactForm(forms.Form):
 
 
 
+
+ 
+ 
 views.py
+ 
 
 #coding： gb2312
 from django.http import HttpResponse
@@ -196,12 +200,19 @@ def download_file(request):
     
 
 
+
+
+
  参考文献：
-
+ 
 http://blog.chedushi.com/archives/7538
+ 
+ 
+
+ ﻿﻿
 
 
-﻿﻿
-﻿﻿
+ ﻿﻿
+
 
 

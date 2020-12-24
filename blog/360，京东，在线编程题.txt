@@ -1,13 +1,14 @@
 
 
 
-
-
-
+ 
+ 
+ 
 题目：
 讨论帖：
 点击打开链接
 
+ 
 
 int main()
 {
@@ -21,6 +22,11 @@ case 6: puts("46651"); break;
 case 7: puts("823537"); break;
 case 8: puts("16777209"); break;
 }
+
+
+
+ 
+
 #include <stdio.h>
 #include <math.h>
 size_t apple(size_t b)
@@ -34,7 +40,8 @@ int main()
 }
 
 
-
+ 
+ 
 void apple(short bear, short apple_sum, short count){
 	if(count == bear){
 		return;
@@ -43,10 +50,15 @@ void apple(short bear, short apple_sum, short count){
 	count++;
 	apple(bear, apple_sum, count);
 }
+
+
+
+
 2.
 讨论帖子：
 http://bbs.csdn.net/topics/391830032
 
+ 
 
 void print(vector<char>& vData)
 {
@@ -193,7 +205,15 @@ print(vRes);
 return 0;
 }
 
-﻿﻿
-﻿﻿
+
+
+
+ 
+
+ ﻿﻿
+
+
+ ﻿﻿
+
 
 

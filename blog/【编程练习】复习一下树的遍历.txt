@@ -1,7 +1,7 @@
 
 
 
-
+ 
 深度有限遍历记录层数：增加一个level
 
 //深度优先遍历
@@ -25,6 +25,8 @@ void depthFirstSearch(Tree root){
 
 
 
+ 
+ 
 #include <iostream>
 #include <stack>
 #include <queue>
@@ -196,10 +198,10 @@ int main() {
 ///      \
 ///       G
 
-
-
+ 
+ 
 深度优先遍历：
-
+ 
 //深度优先遍历
 void depthFirstSearch(Tree root){
     stack<Node *> nodeStack;  //使用C++的STL标准模板库
@@ -217,7 +219,9 @@ void depthFirstSearch(Tree root){
         }
     }
 }<pre class="cpp" name="code">
-</pre><pre class="cpp" name="code">  
+
+</pre><pre class="cpp" name="code">
+  
 /**
  * <!--
  * File   : binarytree.h
@@ -295,6 +299,8 @@ void breadthFirstSearch(Tree root){
   
 
 
+
+
 广度优先遍历：
 
 //广度优先遍历
@@ -315,10 +321,10 @@ void breadthFirstSearch(Tree root){
     }
 }
 
-
-
+ 
+ 
 完整代码：
-
-
+ 
+ 
 
 

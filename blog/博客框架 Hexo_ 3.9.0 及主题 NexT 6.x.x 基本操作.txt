@@ -5,38 +5,37 @@
 
 
 
-文章大纲1. 不同代码仓库部署coding部署方式项目名称配置 SSH 公钥访问 git 仓库github码云2. 手动cdn，智能解析3. 添加评论系统4. 博客置顶5. 页脚统计信息5. NexT 6 添加字数和阅读时间统计本人博客效果主页内容及评论系统优秀博客链接参考
+
+文章大纲
+1. 不同代码仓库部署coding部署方式项目名称配置 SSH 公钥访问 git 仓库
+github码云
+2. 手动cdn，智能解析3. 添加评论系统4. 博客置顶5. 页脚统计信息5. NexT 6 添加字数和阅读时间统计本人博客效果主页内容及评论系统优秀博客链接参考
+
+
+
 
 1. 不同代码仓库部署
 不同代码仓库部署，并发布的主要原因如下；
-
-代码备份  （哪天贸易战打的，github 不能用了也不是没有可能）
-相当于手动智能解析与CDN加速  （国外ip 转发到github，国内转发到coding）
-
+代码备份 （哪天贸易战打的，github 不能用了也不是没有可能）相当于手动智能解析与CDN加速 （国外ip 转发到github，国内转发到coding）
 以下主要介绍使用 腾讯云开发者平台的coding 进行部署博客，github 教程网上很多，就不列举了。
 整体过程也可以参考：Hexo系列：（三）Hexo博客部署到GitHub和Coding
 
 coding
 coding 之前 和腾讯云达成了战略合作协议，还有web IDE，运行环境的切换、发布和分享
-
-上图是一个在线命令行贪吃蛇，内置的，很有意思。
+ 上图是一个在线命令行贪吃蛇，内置的，很有意思。
 部署方式
 在Coding上部署博客网上提供有两种方式，我们直接用和github 一样的方式pages。
 通过coding pages的方式进行博客的部署.coding为每个项目都推出了pages,不管是公有的还是私有的都有pages功能.推荐这种方式去搭建Hexo Coding博客.有很多好处,比如说免费,比如说可以绑定域名等等吧.
 项目名称
-最好创建跟Global Key相同的项目这样访问起来直接就是
-http://yourGlobalKey.coding.me
-比如说我的Coding的博客wynshtier, 否则的话后面得加上项目名.
+最好创建跟Global Key相同的项目这样访问起来直接就是 http://yourGlobalKey.coding.me 比如说我的Coding的博客wynshtier, 否则的话后面得加上项目名.
 配置 SSH 公钥访问 git 仓库
-coding 中配置ssh 公钥访问git仓库：（官方文档）
-https://coding.net/help/doc/git/ssh-key.html
+coding 中配置ssh 公钥访问git仓库：（官方文档） https://coding.net/help/doc/git/ssh-key.html
 首先打开命令行终端输入ssh-keygen -t rsa -C your_email@example.com( 你的邮箱)，连续点击 Enter 键即可。
 ssh-keygen -t rsa -C "shiter@live.cn" 
 
 Coding 提供账户 SSH 公钥和项目 SSH 公钥设置。本质上账户公钥和部署公钥是一样的，只是关联的方式不同。同一个 SSH 公钥文件，如果和 Coding 账户关联，便称为账户 SSH 公钥，配置后拥有账户下所有项目的读写权限；如果和具体的某一个项目关联，则称为部署公钥，配置后默认拥有该项目的只读权限。
 在终端输入open ~/.ssh，用文本编辑器打开「id_rsa.pub」文件（此处是生成公钥的默认名称，如果生成公钥时采用了其他名称，打开相对应的文件即可），复制全部内容，然后粘贴即可。
-
-完成后测试
+ 完成后测试
 ssh -T git@git.coding.net 
 
 
@@ -47,89 +46,28 @@ hexo deploy
 
 github
 github 教程网上很多，就不列举了。
-在百度搜索，添加网站，由于我拥有域名，所以直接添加解析
-https://ziyuan.baidu.com/site/index
+在百度搜索，添加网站，由于我拥有域名，所以直接添加解析 https://ziyuan.baidu.com/site/index
 码云
 由于专业版才支持绑定域名，所以对于有域名的还得交钱，算了。forget it
 
 2. 手动cdn，智能解析
-原理其实很简单，主要是针对来访IP 进行设置，国内IP 访问coding，国外的ip 访问github。
-当然收费版的域名解析服务提供了此项内容。我们只买个域名没有这个服务。除了域名配置境内境外（好像还可以使用dnspod）
-
-
+原理其实很简单，主要是针对来访IP 进行设置，国内IP 访问coding，国外的ip 访问github。 当然收费版的域名解析服务提供了此项内容。我们只买个域名没有这个服务。除了域名配置境内境外（好像还可以使用dnspod）
+ 
 
 3. 添加评论系统
 评论系统对比表， 网上多方搜寻，其实推荐Valine及git 开头的几个。
-
-
-
-名称
-推荐指数
-介绍
-
-
-
-
-来必力
-3
-国外的，不能匿名评论，支持邮箱账号注册评论，据说容易出现乱码。
-
-
-DISQUS
-2
-国外的，界面又丑，加载又慢。
-
-
-畅言
-4
-国内的，不能匿名评论，，需要手机号验证。需要你的备案号，不然你网站没法长时间使用畅言。据说灌水厉害，这个功能目前已经是出于失灵与半失灵的状态，官方估计也没怎么维护了。
-
-
-有言
-3
-国内的，支持匿名评论（默认关闭，需手动开启），但只是匿名，没有留联系方式的地方。
-
-
-Facebook Comments
-3
-国外的，个人网站很少见人用，不做评论。
-
-
-HyperComments
-3
-国外的，支持匿名评论，可以评论上传图片、影片等。功能还是比较强大，设置界面是英文，且没有中文支持。收费，只能免费试用14天。界面美观。
-
-
-Valine
-5
-国内的，不能匿名评论，但也不需要注册那么麻烦，简单风格。
-
-
-gitment
-4
-基于 GitHub Issues 的评论系统。支持在前端直接引入，不需要任何后端代码。可以在页面进行登录、查看、评论、点赞等操作，同时有完整的 Markdown / GFM 和代码高亮支持。尤为适合各种基于 GitHub Pages 的静态博客或项目页面。
-
-
-gitalk
-3
-支持Markdown。 基于 GitHub Issues 的评论系统 ，面向程序员，不能匿名评论，需博主初始化话题，用户需登录 github 账号评论。
-
-
+名称推荐指数介绍来必力3国外的，不能匿名评论，支持邮箱账号注册评论，据说容易出现乱码。DISQUS2国外的，界面又丑，加载又慢。畅言4国内的，不能匿名评论，，需要手机号验证。需要你的备案号，不然你网站没法长时间使用畅言。据说灌水厉害，这个功能目前已经是出于失灵与半失灵的状态，官方估计也没怎么维护了。有言3国内的，支持匿名评论（默认关闭，需手动开启），但只是匿名，没有留联系方式的地方。Facebook Comments3国外的，个人网站很少见人用，不做评论。HyperComments3国外的，支持匿名评论，可以评论上传图片、影片等。功能还是比较强大，设置界面是英文，且没有中文支持。收费，只能免费试用14天。界面美观。Valine5国内的，不能匿名评论，但也不需要注册那么麻烦，简单风格。gitment4基于 GitHub Issues 的评论系统。支持在前端直接引入，不需要任何后端代码。可以在页面进行登录、查看、评论、点赞等操作，同时有完整的 Markdown / GFM 和代码高亮支持。尤为适合各种基于 GitHub Pages 的静态博客或项目页面。gitalk3支持Markdown。 基于 GitHub Issues 的评论系统 ，面向程序员，不能匿名评论，需博主初始化话题，用户需登录 github 账号评论。
 由于我见最多自建博客评论系统的是Valine，所以我暂定的 Valine 。
 添加valine 评论系统
 https://valine.js.org/
 
 4. 博客置顶
-参考：
-https://blog.csdn.net/qwerty200696/article/details/79010629
-两点：
-1.安装插件hexo-generator-index-pin-top
-2.修改/blog/themes/next/layout/_macro 目录下的post.swig文件
+参考： https://blog.csdn.net/qwerty200696/article/details/79010629
+两点： 1.安装插件hexo-generator-index-pin-top 2.修改/blog/themes/next/layout/_macro 目录下的post.swig文件
 
 5. 页脚统计信息
-参考
-https://www.jianshu.com/p/1ff2fcbdd155
-NexT 6.x.x 直接添加了统计的信息，直接将next主题文件夹中的 _config.yml 中  busuanzi 统计打开 即可。
+参考 https://www.jianshu.com/p/1ff2fcbdd155
+NexT 6.x.x 直接添加了统计的信息，直接将next主题文件夹中的 _config.yml 中 busuanzi 统计打开 即可。
 写上下面的代码也是ok
 <!-- 以下代码 https 内容更改 20190618 -->
 <!-- 新增访客统计代码 -->
@@ -154,8 +92,7 @@ NexT 6.x.x 直接添加了统计的信息，直接将next主题文件夹中的 _
 
 5. NexT 6 添加字数和阅读时间统计
 https://blog.csdn.net/coder_jeremy/article/details/83588674
-Hexo添加字数统计、阅读时长
-https://www.jianshu.com/p/6908ac34bbb2
+Hexo添加字数统计、阅读时长 https://www.jianshu.com/p/6908ac34bbb2
 以上可能都失效了，新的是：
 https://github.com/theme-next/hexo-symbols-count-time
 
@@ -167,8 +104,8 @@ http://www.wynshiter.cn/
 内容及评论系统
 
 优秀博客链接参考
-博客的整体风格及网页留言对话系统
-https://blog.pangao.vip/
+博客的整体风格及网页留言对话系统 https://blog.pangao.vip/
+
 
 
 

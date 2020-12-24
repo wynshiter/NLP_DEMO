@@ -2144,8 +2144,7 @@ private:
 
 #endif // TINYXML2_INCLUDED
 
-
- 
+  
 tinyxml2.cpp
 /*
 Original code by Lee Thomason (www.grinninglizard.com)
@@ -4508,8 +4507,7 @@ bool XMLPrinter::Visit( const XMLUnknown& unknown )
 }   // namespace tinyxml2
 
 
-
- 
+  
 测试用例代码：
 #if defined( _MSC_VER )
 	#if !defined( _CRT_SECURE_NO_WARNINGS )
@@ -5398,7 +5396,7 @@ int main( int argc, const char ** argv )
 	{
 		// Low entities
 		XMLDocument doc;
-		doc.Parse( "<test></test>" );
+		doc.Parse( "<test></test>" );
 		const char result[] = { 0x0e, 0 };
 		XMLTest( "Low entities.", doc.FirstChildElement()->GetText(), result );
 		doc.Print();
@@ -6036,8 +6034,7 @@ int main( int argc, const char ** argv )
 	return gFail;
 }
 
-
- 
+  
  
 <?xml version="1.0" encoding="utf-8"?>
 <Questions Project="simple_survey" Version="" Language="ENU" Context="Question" LabelType="Label" CustomPropertiesContext="Question,QC">
@@ -6073,8 +6070,7 @@ int main( int argc, const char ** argv )
     <Label>Thanks for your time!</Label>
   </Question>
 </Questions>
-
- 
+  
 讨论帖：
  
 如何设计自己的类和tinyxml2交互：(观察者模式访问节点)

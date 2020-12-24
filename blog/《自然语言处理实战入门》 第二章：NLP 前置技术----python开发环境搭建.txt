@@ -5,11 +5,20 @@
 
 
 
-文章大纲1.python 开发简介1.1 python 集成开发环境1.1.1 pycharm1.1.2 spyder1.1.3 jupyter notebook1.1.4 jupyter lab1.1.5 Colaboratory1.2 python虚拟环境准备1.2.1 Anaconda1.2.2 虚拟环境与包管理1.2.3 conda1.2.4 conda基本环境配置1.2.5 jupyter notebook 中使用conda 的虚环境1.3 编码规范1.3.1 PEP81.3.2 pylint1.4 对象关系映射1.4.1 简介1.4.2  博客相关信息与对象映射2. 实战环境搭建jupyter notebook 配置conda 虚环境配置pip 配置TensorFlow 安装jupyter notebook 中 matplotlib seaborn 中文字体显示参考文献
+
+文章大纲
+1.python 开发简介1.1 python 集成开发环境1.1.1 pycharm1.1.2 spyder1.1.3 jupyter notebook1.1.4 jupyter lab1.1.5 Colaboratory
+1.2 python虚拟环境准备1.2.1 Anaconda1.2.2 虚拟环境与包管理1.2.3 conda1.2.4 conda基本环境配置1.2.5 jupyter notebook 中使用conda 的虚环境
+1.3 编码规范1.3.1 PEP81.3.2 pylint
+1.4 对象关系映射1.4.1 简介1.4.2 博客相关信息与对象映射
+
+2. 实战环境搭建jupyter notebook 配置conda 虚环境配置pip 配置TensorFlow 安装jupyter notebook 中 matplotlib seaborn 中文字体显示
+参考文献
+
+
 
 系列文章：
-《自然语言处理实战入门》 第1课： 自然语言处理（NLP）技术简介
-《自然语言处理实战入门》 第2课：NLP 前置技术----环境搭建
+《自然语言处理实战入门》 第1课： 自然语言处理（NLP）技术简介 《自然语言处理实战入门》 第2课：NLP 前置技术----环境搭建
 
 1.python 开发简介
 本节课的主要内容介绍python 工程化开发的实践经验，为后续网络爬虫，正则表达式，分词，可视化等功能进行铺垫。
@@ -17,95 +26,53 @@
 语料的积累，以及进一步的自然语言处理工作首先得要做好工程化 的开发准备，下面我们就进一步的针对python 工程化开发实战经验进行一个分享。
 1.1 python 集成开发环境
 之前课程的内容稍微有点纸上谈兵，旨在给大家热热身。本届课程进入实战环节，下面我们先来看一下python开发环境 的搭建，集成开发环境IDE 不用说了，都大同小异，下面几个是我经常用到的，推荐给大家：
-
-1.pycharm
-2.spyder
-3.jupyter notebook
-4.JupyterLab
-
+1.pycharm2.spyder3.jupyter notebook4.JupyterLab
 1.1.1 pycharm
 
 pycharm 或者我们后面介绍的anaconda自带的spyder，甚至Sublime Text 都能作为集成开发环境，听说VS CODE 也非常好用，宇宙最强编译器 visual studio 最新版的直接继承了python 开发的插件也可以 说是非常方便，由windows平台开发者直接转python 的朋友一定会上手很快。
 1.1.2 spyder
-下面介绍一个 非常像matlab 的编译器：
-
-Spyder is a powerful scientific environment written in Python, for Python, and designed by and for scientists, engineers and data analysts. It features a unique combination of the advanced editing, analysis, debugging, and profiling functionality of a comprehensive development tool with the data exploration, interactive execution, deep inspection, and beautiful visualization capabilities of a scientific package.
-写了这么长一个从句，其实就是说spyder 其实是给分析人员用的。实际开发中我推荐，首选使用pycharm，其次spyder，最后我想说的是 jupyter notebook 也得会。
+下面介绍一个 非常像matlab 的编译器：  Spyder is a powerful scientific environment written in Python, for Python, and designed by and for scientists, engineers and data analysts. It features a unique combination of the advanced editing, analysis, debugging, and profiling functionality of a comprehensive development tool with the data exploration, interactive execution, deep inspection, and beautiful visualization capabilities of a scientific package. 写了这么长一个从句，其实就是说spyder 其实是给分析人员用的。实际开发中我推荐，首选使用pycharm，其次spyder，最后我想说的是 jupyter notebook 也得会。
 1.1.3 jupyter notebook
-Project Jupyter exists to develop open-source software, open-standards, and services for interactive computing across dozens of programming languages.
-jupyter 项目是一个开源web 服务开发计划，主要提供使用多种语言进行交互式计算服务。
-Reveal.js 可以将notebook或者markdown直接转化为演示文稿
-
-优点：
-1.整合多种资源
-2.交互式的编程体验
-3.结果重现与可视化
-他的多用户版本叫做jupyterhub
-https://github.com/jupyterhub/jupyterhub
+Project Jupyter exists to develop open-source software, open-standards, and services for interactive computing across dozens of programming languages. jupyter 项目是一个开源web 服务开发计划，主要提供使用多种语言进行交互式计算服务。
+Reveal.js 可以将notebook或者markdown直接转化为演示文稿  优点： 1.整合多种资源 2.交互式的编程体验 3.结果重现与可视化
+他的多用户版本叫做jupyterhub https://github.com/jupyterhub/jupyterhub
 1.1.4 jupyter lab
 这是jupyter lab 中对于洛伦兹方程(Lorenz equation)，x, y(吸引子)，系统的演化轨迹。
-
-https://jupyterlab.readthedocs.io/en/latest/getting_started/installation.html
-
-基于项目工作方式。
-它的用户体验更好。
-Jupyter Lab连接Google Drive
-
+ https://jupyterlab.readthedocs.io/en/latest/getting_started/installation.html
+基于项目工作方式。它的用户体验更好。Jupyter Lab连接Google Drive
 JupyterLab的特色是允许用户在一个窗口内安排笔记本、终端、文本文件和输出的工作区。你可以把窗口拖到你想要的位置，也可以通过实时预览编辑常用文件格式，如Markdown、CSV和JSON，实时查看项目进展。
 1.1.5 Colaboratory
-
-Colaboratory 是一款研究工具，用于进行机器学习培训和研究。它是一个 Jupyter 笔记本环境，不需要进行任何设置就可以使用。Colaboratory 若果你用的比较好的话，其实是可以薅羊毛的，google 提供了免费的云GPU使用，勉强做个测试还是可以的。
-常见问题解答：
-https://research.google.com/colaboratory/faq.html
+ Colaboratory 是一款研究工具，用于进行机器学习培训和研究。它是一个 Jupyter 笔记本环境，不需要进行任何设置就可以使用。Colaboratory 若果你用的比较好的话，其实是可以薅羊毛的，google 提供了免费的云GPU使用，勉强做个测试还是可以的。
+常见问题解答： https://research.google.com/colaboratory/faq.html
 中文说明：
 https://colab.research.google.com/notebooks/welcome.ipynb
 
 1.2 python虚拟环境准备
 有了集成开发环境，还要准备搭建python 的编译环境以及虚环境。这是由于开源软件目前更新换代非常快，不同开发包之间相互依赖和更新可能引起的冲突及连锁反应。
 进行Python开发时，多个项目可能使用到不同的依赖，例如：
-A项目需要1.8版本的tensorflow，2.2版本的OpenCV
-B项目需要2.0版本的tensorflow，3.2版本的OpenCV
-这种：
-为了给不同的工程创建互相独立的运行环境技术
+A项目需要1.8版本的tensorflow，2.2版本的OpenCV B项目需要2.0版本的tensorflow，3.2版本的OpenCV
+这种： 为了给不同的工程创建互相独立的运行环境技术
 我们称之为python 虚环境技术。 其主要优点是：
-
-避免库之间的相互干扰
-系统原生环境过于庞大
-
+避免库之间的相互干扰系统原生环境过于庞大
 python部分开发包，有属于开源组织或商业组织。不同开发包之间相互依赖和更新可能引起的冲突及连锁反应，比如升级scrapy就可能导致matplotlit 失效。一旦我不使用了，可以直接删除虚拟环境，而不用管各种文件残留，关联问题了。
 综上使用虚环境进行python 开发是我们的不二选择。
 1.2.1 Anaconda
-Anaconda is a package manager, an environment manager, a Python/R data science distribution, and a collection of over 1,500+ open source packages.
-Anaconda是一个包管理器、一个环境管理器、一个python/R数据科学发行版和一个超过1500个开放源代码包的集合。
+Anaconda is a package manager, an environment manager, a Python/R data science distribution, and a collection of over 1,500+ open source packages. Anaconda是一个包管理器、一个环境管理器、一个python/R数据科学发行版和一个超过1500个开放源代码包的集合。
 1.2.2 虚拟环境与包管理
 虚环境有：
-
-conda
-virtualenv
-pipenv
-virtualenvwrapper
-
+condavirtualenvpipenvvirtualenvwrapper
 包管理有：
-
-conda
-pip
-
-virtualenv不便于对环境的集中管理，virtualenvwrapper很好的解决了这个问题
-conda结合了pip和virtualenv的功能
+condapip
+virtualenv不便于对环境的集中管理，virtualenvwrapper很好的解决了这个问题 conda结合了pip和virtualenv的功能
 1.2.3 conda
 Package, dependency and environment management for any language—Python, R, Ruby, Lua, Scala, Java, JavaScript, C/ C++, FORTRAN
 https://conda.io/en/latest/
 Conda是一个开源软件包管理系统和环境管理系统，运行在Windows、MacOS和Linux上。Conda可以快速安装、运行和更新包及其依赖项。Conda可以在本地计算机上轻松创建、保存、加载和切换环境。它是为Python程序创建的，但它可以为任何语言打包和分发软件。
 关于conda 的特点：https://blog.csdn.net/zhouchen1998/article/details/84671528 这篇文章讲的非常清楚，我再来概括一下，conda 的主要特有：
-
-pip只能安装Python的包，conda可以安装一些工具软件，即使这些软件不是基于Python开发的
-相比其他venv一般占用项目文件夹空间，conda每个虚拟环境不会占用项目文件夹的空间，它创建在用户设定的一个位置，这使得多个项目共享一个虚拟环境更加方便。
-图形化管理界面，自动集成主流科学分析开发包numpy，pandas 等安装方便。
-
+pip只能安装Python的包，conda可以安装一些工具软件，即使这些软件不是基于Python开发的相比其他venv一般占用项目文件夹空间，conda每个虚拟环境不会占用项目文件夹的空间，它创建在用户设定的一个位置，这使得多个项目共享一个虚拟环境更加方便。图形化管理界面，自动集成主流科学分析开发包numpy，pandas 等安装方便。
 
 1.2.4 conda基本环境配置
-基本python 开发环境要求我们针对本课程单独创建一个隔离环境，使用conda进行管理。
-该环境使用的python开发包可以完成，网络爬虫，数据分析，NLP 等功能任务。
+基本python 开发环境要求我们针对本课程单独创建一个隔离环境，使用conda进行管理。 该环境使用的python开发包可以完成，网络爬虫，数据分析，NLP 等功能任务。
 0. 基本设置
 由于anaconda 的conda 请求源在国外，我们配置为清华镜像，这样速度更快。如果自己也不知后面都要用什么开发包，先随便指定一个。
 2019年5月左右，清华，中科大先后无限期关闭了conda 源， 以后只能使用官方的了。
@@ -127,8 +94,7 @@ conda activate NLP_DEMO
 
 
 
-1. 创建环境
-使用如下命令，并准备好requirements.txt （这个文件罗列了，该环境的基本开发包及版本）
+1. 创建环境 使用如下命令，并准备好requirements.txt （这个文件罗列了，该环境的基本开发包及版本）
 # 创建隔离环境
 conda create --name <env> --file <this file>
 
@@ -178,13 +144,11 @@ conda install --yes --file requirements.txt
 浏览器输入以下地址，查看chrome 版本
 chrome://version/
 
-我的版本：Google Chrome	72.0.3626.96 (正式版本) （32 位）
-在下面地址中找到对应版本
+我的版本：Google Chrome 72.0.3626.96 (正式版本) （32 位） 在下面地址中找到对应版本
 https://sites.google.com/a/chromium.org/chromedriver/downloads
 下载后把压缩包中的exe 放在：
 D:\ProgramData\Anaconda3\envs\NLP_DEMO\Scripts
-4.pycharm  设置使用conda 环境
-
+4.pycharm 设置使用conda 环境 
 1.2.5 jupyter notebook 中使用conda 的虚环境
 
 # 在基本环境中安装nb_conda
@@ -193,15 +157,12 @@ D:\ProgramData\Anaconda3\envs\NLP_DEMO\Scripts
 (fast_claim) D:\ProgramData\Anaconda3\envs>conda install ipykernel 
 
 
-这下就可以用jupyter notebook 中加载了
-
+这下就可以用jupyter notebook 中加载了 
 1.3 编码规范
 1.3.1 PEP8
 https://www.python.org/dev/peps/pep-0008/
 1.3.2 pylint
-代码分析插件
-
-
+代码分析插件  
 1.4 对象关系映射
 1.4.1 简介
 ORM框架的作用就是把数据库表的一行记录与一个对象互相做自动转换。
@@ -212,21 +173,14 @@ https://www.sqlalchemy.org/
 ORM的全称是:Object Relational Mapping,即对象/关系数据库映射.
 当使用一种面向对象的编程语言来进行应用开发时,从项目一开始就采用的是面向对象分析,面向对象设计,面向对象编程,但到了持久层数据库访问时,又必须重返关系数据库的访问方式,这是一种非常糟糕的感觉.于是人们需要一种工具,它可以把关系型数据库包装成面向对象的模型.它就是ORM.
 ORM框架是面向对象程序设计语言与关系数据库发展不同步时的中间解决方案.随着面向对象数据库的发展,其理论逐步完善,最终面向对象数据库会取代关系型数据库.只是这个过程不可一蹴而就,ORM框架在此期间会蓬勃发展.但随着面向对象数据库的广泛使用,ORM工具会逐渐消亡.
-1.4.2  博客相关信息与对象映射
+1.4.2 博客相关信息与对象映射
 下图罗列我们需要后序分析的关键信息数据，主要包括两方面内容：
-1.分页页面显示的重要信息
-2.博客相关属性数据的相关信息
-
+1.分页页面显示的重要信息 2.博客相关属性数据的相关信息
 分页内容
-
-
 
 博客属性
 
-
-
 对象映射
-
 根据图示中的信息，我们很容易抽象出一篇博客所有的 属性信息，并很容易的构造出一个博客类，并最终对应到数据库表结构中去。
 class CsdnBlog(Base):
     '''
@@ -284,8 +238,7 @@ class CsdnBlog(Base):
 
 2. 实战环境搭建
 jupyter notebook 配置
-正好我手里面有个虚拟机，CentOs 7 版本的
-之前写过一个 CentOS 7 下使用虚拟环境Virtualenv安装Tensorflow cpu版记录
+正好我手里面有个虚拟机，CentOs 7 版本的 之前写过一个 CentOS 7 下使用虚拟环境Virtualenv安装Tensorflow cpu版记录
 但是，目前的话，我们用conda 管理环境，所以这块我再针对conda 重新梳理一下，
 安装anaconda ，首先去官网
 
@@ -313,8 +266,7 @@ c.NotebookApp.port = 9999            #默认访问的端口是9999
 jupyter notebook --allow-root >jupyter_notebook.log 2>&1 &
 
 
-windows 下设置时候，系统多加了一个变量 “%USERPROFILE%”，所以造成修改c.NotebookApp.notebook_dir 没有生效，删除即可
-
+windows 下设置时候，系统多加了一个变量 “%USERPROFILE%”，所以造成修改c.NotebookApp.notebook_dir 没有生效，删除即可 
 conda 虚环境配置
 
 # 单次使用
@@ -354,6 +306,8 @@ matplotlib seaborn 中文字体显示
 
 参考文献
 https://blog.csdn.net/zhouchen1998/article/details/84671528
+瞧瞧，这样的代码才叫Pythonic
+
 
 
 

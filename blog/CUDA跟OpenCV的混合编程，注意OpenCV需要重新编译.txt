@@ -1,7 +1,15 @@
 
 
 
-1.注意事项编译的办法参见：http://blog.csdn.net/wangyaninglm/article/details/39997113 以下是程序代码，网上搜的例子：注意事项：32位工程添加64位的支持（主要取决于你编译的版本），配置好cuda的项目路径include2.代码//swap.cu
+1.注意事项
+编译的办法参见：
+http://blog.csdn.net/wangyaninglm/article/details/39997113
+ 
+以下是程序代码，网上搜的例子：
+注意事项：32位工程添加64位的支持（主要取决于你编译的版本），配置好cuda的项目路径include
+
+2.代码
+//swap.cu
 
 
 #include "cuda_runtime.h"
@@ -32,7 +40,10 @@ extern "C" void swap_rb_caller(const PtrStepSz<uchar3>& src,PtrStep<uchar3> dst,
     swap_rb_kernel<<<grid,block,0,stream>>>(src,dst);
     if(stream == 0)
         cudaDeviceSynchronize();
-}  //swap.cpp
+}
+ 
+ 
+//swap.cpp
 
 
 
@@ -52,7 +63,9 @@ extern "C" void swap_rb(const GpuMat& src,GpuMat& dst,Stream& stream = Stream::N
 	cudaStream_t s = StreamAccessor::getStream(stream);
 	swap_rb_caller(src,dst,s);
 }
- //main.cpp
+
+ 
+//main.cpp
 
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -81,5 +94,73 @@ int main()
 	getchar();
 	waitKey(0);
 	return 0;
-} 3.实现效果： 4.其他注意事项假设有两个工程：CUDA工程TestCuda；C++工程CallCuda 1. 在CUDA工程TestCuda中， （1）.cpp文件（类成员函数定义）调用.cu文件下的函数例如.cu文件下的函数void run_kernel(); 其前面必须用 extern “C” 修饰。而.cpp文件（类成员函数定义）下的类成员函数，如，void cpp_run();如果它想调用 run_kernel()，则首先可在.h文件（类定义）中的类定义的外面先声明.cu文件下的C函数，例如，extern “C” void run_kernel();（2）CUDA工程属性-->常规中，选择配置类型为“静态库(.lib)”-->应用； 同时在工程属性下的库管理器-->常规项下的附加依赖项中，添加CUDA库：cudart.lib，curand.lib等；在附加库目录添加相应的库所在目录。2.另外的C++工程CallCuda 在CallCuda工程属性下，找到附加依赖项，添加：CUDA库(cudart.lib等)和TestCuda生成的静态库(TestCuda.lib)；以及添加附加库目录。 至此，该工程下的.cpp文件下的函数，就可以调用CUDA工程下的cpp_run()函数了，不过首先要实例化类。1.将example.cu添加到工程中。在已有工程上右键单击，选择添加已有项。2.添加编译规则。右键单击工程文件，选择“自定义生成规则”，在弹出的对话框中选择CUDA Build Rule x.x。3.修改.cu文件的编译器。右键单击.cu文件，单击属性，修改编译规则，选择刚才添加的CUDA编译器。4.添加包含目录。在项目属性-》C++->常规->附加包含目录中添加CUDA SDK的目录。例如"C:\Program Files\NVIDIA Corporation\NVIDIA GPU Computing SDK 3.2\C\common\inc";"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.0\include"5.添加.lib文件。在链接器-》输入中添加cudart.lib cutil32D.lib6.修改代码生成为多线程(/MT)方式。7.Done.  以上是工程配置。 除此之外，还要把调用cuda代码的c++函数在.cu文件中用extern "C" 包含起来。并且在调用文件.cpp中用extern "C"声明该函数，然后调用。   
+}
+
+ 3.实现效果：
+
+ 
+4.其他注意事项
+
+
+
+假设有两个工程：CUDA工程TestCuda；C++工程CallCuda
+ 
+1. 在CUDA工程TestCuda中，
+ 
+（1）.cpp文件（类成员函数定义）调用.cu文件下的函数
+例如.cu文件下的函数void run_kernel(); 其前面必须用 extern “C” 修饰。
+而.cpp文件（类成员函数定义）下的类成员函数，如，void cpp_run();
+如果它想调用 run_kernel()，则首先可在.h文件（类定义）中的类定义的外面先声明.cu文件下的C函数，例如，extern “C” void run_kernel();
+
+（2）CUDA工程属性-->常规中，选择配置类型为“静态库(.lib)”-->应用；
+ 
+同时在工程属性下的库管理器-->常规项下的附加依赖项中，添加CUDA库：cudart.lib，curand.lib等；在附加库目录添加相应的库所在目录。
+
+2.另外的C++工程CallCuda
+ 
+在CallCuda工程属性下，找到附加依赖项，添加：CUDA库(cudart.lib等)和TestCuda生成的静态库(TestCuda.lib)；以及添加附加库目录。
+ 
+至此，该工程下的.cpp文件下的函数，就可以调用CUDA工程下的cpp_run()函数了，不过首先要实例化类。
+
+
+
+
+
+
+
+
+
+
+1.将example.cu添加到工程中。在已有工程上右键单击，选择添加已有项。
+
+
+2.添加编译规则。右键单击工程文件，选择“自定义生成规则”，在弹出的对话框中选择CUDA Build Rule x.x。
+
+
+3.修改.cu文件的编译器。右键单击.cu文件，单击属性，修改编译规则，选择刚才添加的CUDA编译器。
+
+
+4.添加包含目录。在项目属性-》C++->常规->附加包含目录中添加CUDA SDK的目录。例如"C:\Program Files\NVIDIA Corporation\NVIDIA GPU Computing SDK 3.2\C\common\inc";"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v4.0\include"
+
+
+5.添加.lib文件。在链接器-》输入中添加cudart.lib cutil32D.lib
+
+
+6.修改代码生成为多线程(/MT)方式。
+
+
+7.Done. 
+
+
+ 
+
+
+以上是工程配置。 
+
+
+除此之外，还要把调用cuda代码的c++函数在.cu文件中用extern "C" 包含起来。并且在调用文件.cpp中用extern "C"声明该函数，然后调用。 
+
+
+ 
+
 

@@ -55,8 +55,7 @@ int run()
 	return 0;
 }
 
-
- 
+  
 <span style="font-family:Microsoft YaHei;font-size:18px;">//#include "stdafx.h"
 #include <stdio.h>
 #include <vector>
@@ -295,6 +294,6 @@ shader.txt
     int idx = get_global_id(0);
     result[idx] = a[idx] + b[idx];
 }</span>
- 
+   
 
 

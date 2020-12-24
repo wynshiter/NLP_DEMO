@@ -5,7 +5,13 @@
 
 
 
-文章大纲ssh登录设置并安装vsftp使用本地用户模式 配置vsftp conf编辑允许访问ftp服务器的用户列表：非受限用户启动ftp服务ec2 权限设置客户端安装与说明报错处理530 Login incorrect. Login failed.参考文献
+
+文章大纲
+ssh登录设置并安装vsftp使用本地用户模式 配置vsftp conf编辑允许访问ftp服务器的用户列表：非受限用户
+启动ftp服务ec2 权限设置客户端安装与说明报错处理530 Login incorrect. Login failed.
+参考文献
+
+
 
 ssh登录
 pem 文件下载：
@@ -147,8 +153,7 @@ sudo service vsftpd start
 
 ec2 权限设置
 最后，需要在EC2控制台中设置Security Group，增加ftp所需端口
-20，21以及60000-60020
-
+20，21以及60000-60020 
 客户端安装与说明
 https://filezilla-project.org/
 推荐使用FileZilla，并设置为被动模式
@@ -168,9 +173,7 @@ local: test.txt remote: test.txt
 ftp> bye
 421 Timeout.
 
-有可能是windows 本地防火墙的问题，可以关闭防火墙
-或者首先使用被动模式
-quote PASV
+有可能是windows 本地防火墙的问题，可以关闭防火墙 或者首先使用被动模式 quote PASV
 解决问题的思路如下：
 1、防火墙（本机、客户机）
 2、FTP目录的权限
@@ -181,7 +184,7 @@ quote PASV
 530 Login incorrect. Login failed.
 在客户端登录vsftpd时报530 login incorret 错误，发现是PAM鉴权造成的，解决方法如下：
 方法（1）：注释掉/etc/pam.d/vsftpd文件里这后一行：
-auth    required        pam_shells.so，这样不去鉴权
+auth required pam_shells.so，这样不去鉴权
 方法（2）：在/etc/shells文件里面增加一行：
 /sbin/nologin,这样允许不能登录系统的用户通过鉴权
 按照方法（1）操作
@@ -205,6 +208,7 @@ vim /etc/pam.d/vsftpd
 参考文献
 userlist_enable和userlist_deny两个配置项的解释
 Linux_vsftpd服务安装及配置（三种登陆方式）
+
 
 
 

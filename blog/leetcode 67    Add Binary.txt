@@ -1,24 +1,20 @@
 
 
 
-Add Binary 
-Total Accepted: 46815 
-Total Submissions: 189215 
-My Submissions 
-                      
+Add Binary  Total Accepted: 46815  Total Submissions: 189215  My Submissions 
+
+                       
+
 
 
 
 
 Given two binary strings, return their sum (also a binary string). 
-For example,
-a = "11"
-b = "1"
-Return "100". 
+For example, a = "11" b = "1" Return "100". 
 
 
 
-
+ 
 
 我的解决方案：
 class Solution {
@@ -45,8 +41,9 @@ public:
         
     }
 };
-
+ 
 c语言解决方案：
+
 char* addBinary(char* a, char* b) {
     int n, m;
     for (n=0; *a; a++, n++) ;
@@ -74,11 +71,15 @@ char* addBinary(char* a, char* b) {
         *last=t;
     }
     return p;
-}数字电路版本代码：加法器的实现https://leetcode.com/discuss/40846/c-4ms-solution-inspired-by-hardware-full-adder-circuit
+}
 
 
+数字电路版本代码：加法器的实现 https://leetcode.com/discuss/40846/c-4ms-solution-inspired-by-hardware-full-adder-circuit
+ 
 
+ 
 python 的三个版本：
+ 
 
 class Solution:
     # @param {string} a
@@ -119,6 +120,12 @@ class Solution:
     def addBinary(self, a, b):
         return bin(int(a,2) + int(b,2))[2:]
 
-﻿﻿
+
+
+ 
+ 
+
+ ﻿﻿
+
 
 

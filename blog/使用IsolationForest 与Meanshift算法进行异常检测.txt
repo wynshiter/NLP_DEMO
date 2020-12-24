@@ -4,9 +4,14 @@
 
 
 
-
 未完待续
-文章大纲什么是异常检测异常定义异常发掘异常检测的一般步骤数据加载Meanshift 聚类IsolationForest 异常检测参考
+
+
+文章大纲
+什么是异常检测异常定义异常发掘异常检测的一般步骤
+数据加载Meanshift 聚类IsolationForest 异常检测参考
+
+
 
 什么是异常检测
 异常定义
@@ -15,43 +20,28 @@ https://blog.csdn.net/App_12062011/article/details/84797641
 如在欺诈检测中，异常数据可能意味欺诈行为的发生，在入侵检测中异常数据可能意味入侵行为的发生。
 
 异常发掘
-异常挖掘可以描述为：给定N个数据对象和所期望的异常数据个数，发现明显不同、意外，或与其它数据不一致的前k个对象。
-异常挖掘问题由两个子问题构成：
-(1)如何度量异常；
-(2)如何有效发现异常。
+异常挖掘可以描述为：给定N个数据对象和所期望的异常数据个数，发现明显不同、意外，或与其它数据不一致的前k个对象。 异常挖掘问题由两个子问题构成： (1)如何度量异常； (2)如何有效发现异常。
 异常检测的一般步骤
 一般步骤
-
 构建“正常”行为的资料集
-
 
 资料集可以是针对数据整体的图案或者汇总统计- 资料集可以是针对数据整体的图案或者汇总统计
 
-
 通过使用“正常”资料集检测异常行为
-
 
 异常行为是特征与“正常”资料有显著差别的观察对象
 
+ 异常检测方法的类型
 
-异常检测方法的类型
-
-
-分类和聚类
-基于统计的方法
-基于距离和基于密度的方法
-基于图形的方法
-
+分类和聚类基于统计的方法基于距离和基于密度的方法基于图形的方法
 
 
 
 数据加载
 
 Meanshift 聚类
-从源代码可以看出：
-https://github.com/scikit-learn/scikit-learn/blob/7389dba/sklearn/cluster/mean_shift_.py#L298
-<class ‘sklearn.cluster.mean_shift_.MeanShift’>
-中显示不能分类的数据其类别标签就是-1
+从源代码可以看出： https://github.com/scikit-learn/scikit-learn/blob/7389dba/sklearn/cluster/mean_shift_.py#L298
+<class ‘sklearn.cluster.mean_shift_.MeanShift’> 中显示不能分类的数据其类别标签就是-1
 def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,
                min_bin_freq=1, cluster_all=True, max_iter=300,
                n_jobs=None):
@@ -175,13 +165,11 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,
     return cluster_centers, labels
 
 
-代码注释参考：
-https://blog.csdn.net/jiaqiangbandongg/article/details/53557500
+代码注释参考： https://blog.csdn.net/jiaqiangbandongg/article/details/53557500
 IsolationForest 异常检测
 
 参考
-
-《数据挖掘与商务智能》-第八章   异常检测 【西安电子科技大学　软件学院】主讲人：黄健斌
+《数据挖掘与商务智能》-第八章 异常检测 【西安电子科技大学　软件学院】主讲人：黄健斌
 
 
 

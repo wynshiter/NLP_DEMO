@@ -4,15 +4,10 @@
 
 
 
-
 1.首先安装pip-install
 在使用centos7的软件包管理程序yum安装python-pip的时候会报一下错误：
-No package python-pip available. 
-Error: Nothing to do 
-说没有python-pip软件包可以安装。
-这是因为像centos这类衍生出来的发行版，他们的源有时候内容更新的比较滞后，或者说有时候一些扩展的源根本就没有。所以在使用yum来search  python-pip的时候，会说没有找到该软件包。 
-因此为了能够安装这些包，需要先安装扩展源EPEL。EPEL(http://fedoraproject.org/wiki/EPEL) 是由 Fedora 社区打造，为 RHEL 及衍生发行版如 CentOS、Scientific Linux 等提供高质量软件包的项目。 
-首先安装epel扩展源：
+No package python-pip available.  Error: Nothing to do  说没有python-pip软件包可以安装。
+这是因为像centos这类衍生出来的发行版，他们的源有时候内容更新的比较滞后，或者说有时候一些扩展的源根本就没有。所以在使用yum来search python-pip的时候，会说没有找到该软件包。  因此为了能够安装这些包，需要先安装扩展源EPEL。EPEL(http://fedoraproject.org/wiki/EPEL) 是由 Fedora 社区打造，为 RHEL 及衍生发行版如 CentOS、Scientific Linux 等提供高质量软件包的项目。  首先安装epel扩展源：
 sudo yum -y install epel-release
 
 然后安装python-pip：
@@ -23,15 +18,8 @@ sudo yum clean all
 
 搞定！
 2.在隔离容器中安装TensorFlow
-推荐使用virtualenv 创建一个隔离的容器, 来安装 TensorFlow. 这是可选的, 但是这样做能使排查安装问 
-题变得更容易，照着敲命令就行了
-安装主要分成下面四个步骤： 
-  ● Install pip and Virtualenv.（这一步装过了） 
-  ● Create a Virtualenv environment. 
-  ● Activate the Virtualenv environment and install TensorFlow in it. 
-  ● After the install you will activate the Virtualenv environment each time you want to use TensorFlow. 
-Install pip and Virtualenv: 
- # Ubuntu/Linux 64-bit
+推荐使用virtualenv 创建一个隔离的容器, 来安装 TensorFlow. 这是可选的, 但是这样做能使排查安装问  题变得更容易，照着敲命令就行了
+安装主要分成下面四个步骤：  ● Install pip and Virtualenv.（这一步装过了）  ● Create a Virtualenv environment.  ● Activate the Virtualenv environment and install TensorFlow in it.  ● After the install you will activate the Virtualenv environment each time you want to use TensorFlow.  Install pip and Virtualenv:  # Ubuntu/Linux 64-bit
 $ sudo apt-get install python-pip python-dev python-virtualenv
 
 # Mac OS X
@@ -45,20 +33,17 @@ Activate the environment:
 $ source ~/tensorflow/bin/activate  # If using bash
 $ source ~/tensorflow/bin/activate.csh  # If using csh
 
-(tensorflow)$  # Your prompt should change
-Now, install TensorFlow just as you would for a regular Pip installation. First select the correct binary to install: 
- # Ubuntu/Linux 64-bit, CPU only, Python 2.7
+(tensorflow)$ # Your prompt should change
+Now, install TensorFlow just as you would for a regular Pip installation. First select the correct binary to install:  # Ubuntu/Linux 64-bit, CPU only, Python 2.7
     (tensorflow)$ export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.10.0rc0-cp27-none-linux_x86_64.whl
 
-Finally install TensorFlow: 
- # Python 2
+Finally install TensorFlow:  # Python 2
 (tensorflow)$ pip install --upgrade $TF_BINARY_URL
 
 出现了如下错误：
 InstallationError: Command python setup.py egg_info failed with error code 1 in /root/tensorflow/build/mock
 
-解决方案是： 
-Distribute has been merged into Setuptools as of version 0.7. If you are using a version <=0.6, upgrade using :
+解决方案是：  Distribute has been merged into Setuptools as of version 0.7. If you are using a version <=0.6, upgrade using :
 pip install --upgrade setuptools 
 
 or 
@@ -68,11 +53,7 @@ easy_install -U setuptools.
 升级之后重新 ：
 (tensorflow)$ pip install --upgrade $TF_BINARY_URL
 
-等待一段时间，（我似乎看到tensorflow在用gcc编译c++，c，时间还挺长大概十来分钟） 
-看到 
-Successfully installed tensorflow protobuf six wheel mock numpy funcsigs pbr 
-Cleaning up… 
-就ok
+等待一段时间，（我似乎看到tensorflow在用gcc编译c++，c，时间还挺长大概十来分钟）  看到  Successfully installed tensorflow protobuf six wheel mock numpy funcsigs pbr  Cleaning up…  就ok
 3.测试代码
 import tensorflow as tf
 import numpy as np
@@ -114,9 +95,9 @@ source ~/tensorflow/bin/activate
 
 参考文献
 
-https://github.com/tensorflow/tensorflow/blob/8cb0558da924e891aa1bb5d79a6c0c846301e4eb/tensorflow/g3doc/get_started/os_setup.md 
-https://github.com/jikexueyuanwiki/tensorflow-zh 
-http://www.tensorflow.org/（需要梯子）
- 
+https://github.com/tensorflow/tensorflow/blob/8cb0558da924e891aa1bb5d79a6c0c846301e4eb/tensorflow/g3doc/get_started/os_setup.md  https://github.com/jikexueyuanwiki/tensorflow-zh  http://www.tensorflow.org/（需要梯子）
+
+
+
 
 

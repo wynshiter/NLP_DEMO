@@ -1,11 +1,11 @@
 
 
 
-
+ 
 给大家推荐两个学习的地址：
 极客学院的视频：http://www.jikexueyuan.com/path/ios/
 一个博客：http://blog.csdn.net/lizhongfu2013/article/details/29210015
-
+ 
 主要想要实现一个模仿的登陆界面
 代码：
 
@@ -109,6 +109,8 @@ override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
 
 
 
+ 
+ 
  实现根据xml进行布局：
 
 import UIkit
@@ -576,6 +578,9 @@ class LoginViewController :  UIViewController,NSXMLParserDelegate
 
 
 
+
+
+ 
 xml：
 
 <LoginLayout>
@@ -597,11 +602,11 @@ xml：
     <Forget x="200" y="250" Width="200" Height="30">
     </Forget>
 </LoginLayout>
-
-
+ 
+ 
  对xml解析类的封装：
 NSXMLParser(data: data)，这个有几种初始化的方法，但是string就不行，得转换成NSdata，还是比较蛋疼的
-
+ 
 //
 //  VMXMLParser.swift
 //  XMLParserTest
@@ -866,6 +871,9 @@ class VMXMLParser: NSObject,NSXMLParserDelegate{
     
 }
 
+
+
+ 
 
 
 

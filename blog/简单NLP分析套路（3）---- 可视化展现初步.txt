@@ -5,13 +5,16 @@
 
 
 
-文章大纲NLP 可视化wordCloudLDA 主题模型matplotlib seaborn 绘图加载中文字体CentOS 安装中文字体查看matplotlib 字体目录查看系统可用的中英文字体matplotlib  设置中文字体seaborn设置中文字体其他解决 matplotlib 中文显示的思路NLP系列文章
+
+文章大纲
+NLP 可视化wordCloudLDA 主题模型matplotlib seaborn 绘图加载中文字体CentOS 安装中文字体查看matplotlib 字体目录查看系统可用的中英文字体matplotlib 设置中文字体seaborn设置中文字体其他解决 matplotlib 中文显示的思路
+
+NLP系列文章
+
+
 
 构思这个系列的初衷是很明显的，之前我是从图论起家搞起了计算机视觉，后来发现深度学习下的计算机视觉没的搞了，后来正好单位的语料很丰富就尝试了NLP 的一些东西，早期非常痴迷于分词等等的技术，后来发现NLP 里面是有广阔天地的。
-如果你现在打开微信，可能很多公众号都在推送从哪里爬取了一些语料数据如下图，
-
-
-原文链接：透过评论看Runningman
+如果你现在打开微信，可能很多公众号都在推送从哪里爬取了一些语料数据如下图，   原文链接：透过评论看Runningman
 比如豆瓣电影的评论，对某某最新上映的电影做了如下一些分析，看起来花花绿绿很是高端，当然我们也能做，而且要做的更高端一些!!!
 
 NLP 可视化
@@ -135,9 +138,8 @@ def show_WordCloud(str_all):
 show_WordCloud(text_from_file_with_apath)
 
 
-词云结果：(值得一提的是我们可以分别用TFIDF  或者TEXTRANK 算法提取关键词)
-
-本人博客关键词 TF-IDF
+词云结果：(值得一提的是我们可以分别用TFIDF 或者TEXTRANK 算法提取关键词)
+ 本人博客关键词 TF-IDF
 算法	0.08393536068790623
 图像	0.06798005803851344
 数据	0.05240655130424626
@@ -186,8 +188,7 @@ show_WordCloud(text_from_file_with_apath)
 数据库	0.016960979586574783
 
 LDA 主题模型
-LDA 据说非常复杂，我看了半天好像也没有太懂
-不过有代码可以跑，这一点是很好的。 用我的所有博客跑出来的5个主题如下:
+LDA 据说非常复杂，我看了半天好像也没有太懂 不过有代码可以跑，这一点是很好的。 用我的所有博客跑出来的5个主题如下:
 Topic #0:
 我们 自己 如果 时候 就是 没有 数据 问题 进行 排序 选择 需要 函数 什么 学习 x2 工作 知道 这样 时间
 Topic #1:
@@ -203,8 +204,7 @@ string self left cout include right def array result root push vector class endl
 具体代码详见：NLP 学习仓库
 
 matplotlib seaborn 绘图加载中文字体
-如果系统，及matplotlib 本身有中文字体
-可以在代码中使用
+如果系统，及matplotlib 本身有中文字体 可以在代码中使用
 import matplotlib.pyplot as plt
 plt.rcParams['font.sans-serif']=['Microsoft YaHei'] 
 
@@ -227,9 +227,7 @@ matplotlib.matplotlib_fname()
 '/home/hadoop/anaconda/envs/playground_py36/lib/python3.6/site-packages/matplotlib/mpl-data/matplotlibrc'
 
 查看系统可用的中英文字体
-
 centos linux 下查看中文字体
-
 fc-list  :lang=zh
 
 
@@ -239,9 +237,7 @@ Microsoft YaHei UI:style=Regular,Normal,obyčejné,Standard,Κανονικά,Nor
 
 
 
-
 matplotlib 可用字体
-
 from matplotlib.font_manager import FontManager
 import subprocess
  
@@ -296,10 +292,8 @@ Chinese font list get from fc-list:
 the fonts we can use:
 	Microsoft YaHei
 
-matplotlib  设置中文字体
-效果图：
-
-matplotlit可以采用设置字体的办法
+matplotlib 设置中文字体
+效果图：  matplotlit可以采用设置字体的办法
 %load_ext autoreload
 %autoreload 2
 %matplotlib inline
@@ -336,21 +330,7 @@ seaborn设置中文字体
 （以 matplotlib 为基础的库的可视化库的中文显示问题，都可以这么设置）
 seaborn就麻烦一点，先把matplotlib调试好，才有修改配置文件，并下载相关字体的办法进行配置
 配置方法：
-
-
-1.下载字体SimHei，放在matplotlib文件夹中
-
-
-
-2.修改配置文件，在matplotlib/mpl-data/目录下面matplotlibrc ，修改下面三项配置
-font.family  : sans-serif
-font.sans-serif   : SimHei, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif
-axes.unicode_minus:False，#作用就是解决负号’-'显示为方块的问题
-
-
-3.命令行重新载入字体
-
-
+ 1.下载字体SimHei，放在matplotlib文件夹中   2.修改配置文件，在matplotlib/mpl-data/目录下面matplotlibrc ，修改下面三项配置 font.family : sans-serif font.sans-serif : SimHei, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Arial, Helvetica, Avant Garde, sans-serif axes.unicode_minus:False，#作用就是解决负号’-'显示为方块的问题  3.命令行重新载入字体 
 from matplotlib.font_manager import _rebuild
 
 _rebuild() #reload一下
@@ -393,7 +373,7 @@ sns.set_style('whitegrid',{'font.sans-serif':['SimHei','Arial']})
 
 效果：
 
-参考：  天池整体可视化教程
+参考： 天池整体可视化教程
 其他解决 matplotlib 中文显示的思路
 安装包：
 #安装开源库pyplotz
@@ -410,14 +390,7 @@ pltz.enable_chinese()
 上述方案和这个方案都有一个最大的问题，就是pandas直接调用的时候还是出问题，现在还没有找到参数传递的口子。 猜想在pandas 中还有配置文件的目录，这个目录的配置文件优先级高于matplotlib的自带配置文件，有待进一步验证。
 
 NLP系列文章
-
-深度学习与中文短文本分析总结与梳理
-错误使用tf-idf的实例分享
-知识图谱技术分享会----有关知识图谱构建的部分关键技术简介及思考
-基于分布式的短文本命题实体识别之----人名识别（python实现）
-简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站
-简单NLP分析套路（2）----分词，词频，命名实体识别与关键词抽取
-简单NLP分析套路（3）---- 可视化展现初步
+深度学习与中文短文本分析总结与梳理错误使用tf-idf的实例分享知识图谱技术分享会----有关知识图谱构建的部分关键技术简介及思考基于分布式的短文本命题实体识别之----人名识别（python实现）简单NLP分析套路（1）----语料库积累之3种简单爬虫应对大部分网站简单NLP分析套路（2）----分词，词频，命名实体识别与关键词抽取简单NLP分析套路（3）---- 可视化展现初步
 
 
 

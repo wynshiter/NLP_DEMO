@@ -1,0 +1,233 @@
+
+
+
+
+
+
+
+
+文章大纲
+大数据思维考察sparkCluster Mode OverviewSpark作业基本运行原理Spark shufflespark 3.0 中对数据倾斜问题的解决
+参考资料
+hadoophdfshdfs shell
+YARN参考资料
+hive参考资料
+Elasticsearch排错思路
+
+
+
+
+大数据思维考察
+下列哪项通常是集群的最主要瓶颈
+
+a)CPU b)网络 c)磁盘 IO d)内存
+
+
+两个文件合并的问题：给定a、b两个文件，各存放50亿个url，每个url各占用64字节，内存限制是4G，如何找出a、b文件共同的url？
+
+主要的思想是把文件分开进行计算，在对每个文件进行对比，得出相同的URL,因为以上说是含有相同的URL所以不用考虑数据倾斜的问题。详细的解题思路如下： a、可以估计每个文件的大小为5G*64=300G，远大于4G。所以不可能将其完全加载到内存中处理。考虑采取分而治之的方法。 b、遍历文件a，对每个url求取hash(url)%1000，然后根据所得值将url分别存储到1000个小文件（设为a0,a1,…a999）当中。这样每个小文件的大小约为300M。 b、遍历文件b，采取和a相同的方法将url分别存储到1000个小文件(b0,b1…b999)中。这样处理后，所有可能相同的url都在对应的小文件(a0 vs b0, a1 vs b1…a999 vs b999)当中，不对应的小文件（比如a0 vs b99）不可能有相同的url。然后我们只要求出1000对小文件中相同的url即可。 c、比如对于a0 vs b0，我们可以遍历a0，将其中的url存储到hash_map当中。然后遍历b0，如果url在hash_map中，则说明此url在a和b中同时存在，保存到文件中即可。 d、如果分成的小文件不均匀，导致有些小文件太大（比如大于2G），可以考虑将这些太大的小文件再按类似的方法分成小小文件即可
+
+
+腾讯面试题：给 40 亿个不重复的 unsigned int 的整数，没排过序的，然后再给一个数，如何快速判断这个数是否在那 40 亿个数当中？
+
+1）方案 1： 申请 512M 的内存，一个 bit 位代表一个 unsigned int 值。读入 40 亿个数，设置相应的 bit 位，读入要查询的数，查看相应 bit 位是否为 1，为 1 表示存在，为 0 表示不存在。
+
+
+2）方案 2： 这个问题在《编程珠玑》里有很好的描述，大家可以参考下面的思路，探讨一下：
+因为 2^32 为 40 亿多，所以给定一个数可能在，也可能不在其中； 这里我们把 40 亿个数中的每一个用 32 位的二进制来表示 ，假设这 40 亿个数开始放在一个文件中。 然后将这 40 亿个数分成两类: 1.最高位为 0 2.最高位为 1 并将这两类分别写入到两个文件中，其中一个文件中数的个数<=20 亿，而另一个>=20 亿（这相当于折半了）； 与要查找的数的最高位比较并接着进入相应的文件再查找 再然后把这个文件为又分成两类: 1.次最高位为 0 2.次最高位为 1 并将这两类分别写入到两个文件中，其中一个文件中数的个数<=10 亿，而另一个>=10 亿（这相当于折半了）； 与要查找的数的次最高位比较并接着进入相应的文件再查找。 … 以此类推，就可以找到了,而且时间复杂度为 O(logn)，方案 2 完。
+
+
+3)附：这里，再简单介绍下，位图方法： 使用位图法判断整形数组是否存在重复 ,判断集合中存在重复是常见编程任务之一，当集合中数据量比较大时我们通常希望少进行几次扫描，这时双重循环法就不可取了。 位图法比较适合于这种情况，它的做法是按照集合中最大元素 max 创建一个长度为 max+1的新数组，然后再次扫描原数组，遇到几就给新数组的第几位置上 1，如遇到 5 就给新数组的第六个元素置 1，这样下次再遇到 5 想置位时发现新数组的第六个元素已经是 1 了，这说明这次的数据肯定和以前的数据存在着重复。这 种给新数组初始化时置零其后置一的做法类似于位图的处理方法故称位图法。它的运算次数最坏的情况为 2N。如果已知数组的最大值即能事先给新数组定长的话效 率还能提高一倍。
+
+
+spark
+Spark作为计算框架的优势是什么？
+
+1、Spark的中间数据放到内存中，对于迭代运算效率更高 2、Spark比Hadoop更通用 3、Spark提供了统一的编程接口 4、容错性– 在分布式数据集计算时通过checkpoint来实现容错 5、可用性– Spark通过提供丰富的Scala, Java，Python API及交互式Shell来提高可用性
+
+Spark作业提交流程是怎么样的
+
+1.spark-submit 提交代码，执行 new SparkContext()，在 SparkContext 里构造 DAGScheduler 和 TaskScheduler。 2.TaskScheduler 会通过后台的一个进程，连接 Master，向 Master 注册 Application。 3.Master 接收到 Application 请求后，会使用相应的资源调度算法，在 Worker 上为这个 Application 启动多个 Executer。 4.Executor 启动后，会自己反向注册到 TaskScheduler 中。 所有 Executor 都注册到 Driver 上之后，SparkContext 结束初始化，接下来往下执行我们自己的代码。 5.每执行到一个 Action，就会创建一个 Job。Job 会提交给 DAGScheduler。 6.DAGScheduler 会将 Job划分为多个 stage，然后每个 stage 创建一个 TaskSet。 7.TaskScheduler 会把每一个 TaskSet 里的 Task，提交到 Executor 上执行。 8.Executor 上有线程池，每接收到一个 Task，就用 TaskRunner 封装，然后从线程池里取出一个线程执行这个 task。(TaskRunner 将我们编写的代码，拷贝，反序列化，执行 Task，每个 Task 执行 RDD 里的一个 partition)
+
+spark中的RDD是什么，有哪些特性？
+
+RDD（Resilient Distributed Dataset）叫做分布式数据集，是spark中最基本的数据抽象，它代表一个不可变，可分区，里面的元素可以并行计算的集合
+Resilient：表示弹性的，弹性表示 Destributed：分布式，可以并行在集群计算 Dataset：就是一个集合，用于存放数据的
+
+
+1.RDD中的数据可以存储在内存或者磁盘中； 2.RDD中的分区是可以改变的；
+
+
+五大特性 1.A list of partitions：一个分区列表，RDD中的数据都存储在一个分区列表中 2.A function for computing each split：作用在每一个分区中的函数 3.A list of dependencies on other RDDs：一个RDD依赖于其他多个RDD，这个点很重要，RDD的容错机制就是依据这个特性而来的 4.Optionally,a Partitioner for key-value RDDs(eg:to say that the RDD is hash-partitioned)：可选的，针对于kv类型的RDD才有这个特性，作用是决定了数据的来源以及数据处理后的去向 5.可选项，数据本地性，数据位置最优
+
+谈谈spark中的宽窄依赖
+
+宽依赖： 指的是多个子RDD的Partition会依赖于同一个父RDD的Partition，关系是一对多，父RDD的一个分区的数据去到了子RDD的不同分区里面，会有shuffle产生。
+窄依赖： 指的是每一个父的Partition最多被子RDD的一个Partition使用，是一对一的，也就是父RDD的一个分区去到了子RDD的一个分区中，这个过程没有shuffle产生。
+
+分区的标准就是看父RDD的一个分区的数据流的流向，要是流向一个partition的话就是窄依赖，否则就是宽依赖，如图所示：
+
+spark中的数据倾斜的现象，原因，后果
+
+1）数据倾斜的现象：   多数task执行速度较快，少数task执行时间非常长，或者等待很长时间后提示你内存不足，执行失败。 2）数据倾斜的原因：   数据问题：key本身分布不均匀（包括大量的key为空）；key的设置不合理。   Spark使用问题：shuffle时的并发度不够；计算方式有误。 3）数据倾斜的后果：   spark中的stage的执行时间受限于最后那个执行完成的task，因此运行缓慢的任务会拖垮整个程序运行的速度（分布式程序运行的速度是由最慢的那个task决定的）。   过多的数据在同一个task中运行，会把executor撑爆。
+
+spark数据倾斜的处理
+
+发生数据倾斜的时候，不要急于提高executor的资源，修改参数或是修改程序，首先要检查数据本身，是否存在异常数据。
+
+（一）数据问题造成的数据倾斜
+
+1）找出异常的key值 a.如果任务长时间卡在最后一个或最后几个任务，首先要对key进行抽样分析，判断是哪些key造成的。选取key，对数据进行抽样，统计出现的次数，根据出现的次数大小排列数前几个。 b.比如：df.select(“key”).sample(false,0.1).(k=>(k,1)).reduceBykey(+).map(k=>(k._2,k._1)).sortByKey(false).take(10) c.如果发现多数数据分布都较为均匀，二个别数据比其他数据大上若干个数量级，则说明发生了数据倾斜。 2）经过分析，倾斜的数据主要有以下三种情况: a.null（空值）或是一些无意义的信息()之类的,大多是这个原因引起。 b.无效数据，大量重复的测试数据或是对结果影响不大的有效数据。 c.有效数据，业务导致的正常数据分布。 3）解决办法： a.第1，2种情况，直接对数据进行过滤即可（因为该数据对当前业务不会产生影响）。 b.第3种情况则需要进行一些特殊操作，常见的有以下几种做法 :   (1) 隔离执行，将异常的key过滤出来单独处理，最后与正常数据的处理结果进行union操作。   (2) 对key先添加随机值，进行操作后，去掉随机值，再进行一次操作。   (3) 使用reduceByKey 代替 groupByKey(reduceByKey用于对每个key对应的多个value进行merge操作，最重要的是它能够在本地先进行merge操作，并且merge操作可以通过函数自定义.)   (4) 使用map join。
+
+（二）spark使用不当造成的数据倾斜
+
+1）提高shuffle并行度   a. DataFrame和sparkSql可以设置spark.sql.shuffle.partitions参数控制shuffle的并发度，默认为20.   b. RDD操作可以设置spark.default.parallelism控制并发度，默认参数头不同的ClusterManager控制。   c. 局限性：只是让每个task执行更少的不同的key。无法解决个别key特别大的情况造成的倾斜，如果某些key的大小非常大，即使一个task单独执行它，也会受到数据倾斜的困扰。 2）使用map join 代替 reduce join   a. 在校表不是特别大（取决于你的executor大小）的情况下使用，可以使程序避免shuffle的过程，自然也就没有数据倾斜的困扰了。   b. 局限性：因为先是将小数据发送到每个executor上，所以数据量不能太大。
+
+注：解决数据倾斜的问题是一个系统性工程，上述内容仅供参考
+
+Cluster Mode Overview
+Spark applications run as independent sets of processes on a cluster, coordinated by the SparkContext object in your main program (called the driver program).
+Specifically, to run on a cluster, the SparkContext can connect to several types of cluster managers (either Spark’s own standalone cluster manager, Mesos or YARN), which allocate resources across applications. Once connected, Spark acquires executors on nodes in the cluster, which are processes that run computations and store data for your application. Next, it sends your application code (defined by JAR or Python files passed to SparkContext) to the executors. Finally, SparkContext sends tasks to the executors to run.
+
+Spark cluster components
+There are several useful things to note about this architecture:
+Each application gets its own executor processes, which stay up for the duration of the whole application and run tasks in multiple threads. This has the benefit of isolating applications from each other, on both the scheduling side (each driver schedules its own tasks) and executor side (tasks from different applications run in different JVMs). However, it also means that data cannot be shared across different Spark applications (instances of SparkContext) without writing it to an external storage system. Spark is agnostic to the underlying cluster manager. As long as it can acquire executor processes, and these communicate with each other, it is relatively easy to run it even on a cluster manager that also supports other applications (e.g. Mesos/YARN). The driver program must listen for and accept incoming connections from its executors throughout its lifetime (e.g., see spark.driver.port in the network config section). As such, the driver program must be network addressable from the worker nodes. Because the driver schedules tasks on the cluster, it should be run close to the worker nodes, preferably on the same local area network. If you’d like to send requests to the cluster remotely, it’s better to open an RPC to the driver and have it submit operations from nearby than to run a driver far away from the worker nodes.
+Spark作业基本运行原理
+ 详细原理见上图。 我们使用spark-submit提交一个Spark作业之后，这个作业就会启动一个对应的Driver进程。根据你使用的部署模式（deploy-mode）不同，Driver进程可能在本地启动，也可能在集群中某个工作节点上启动。
+Driver进程本身会根据我们设置的参数，占有一定数量的内存和CPU core。而Driver进程要做的第一件事情，就是向集群管理器（可以是Spark Standalone集群，也可以是其他的资源管理集群，美团•大众点评使用的是YARN作为资源管理集群）申请运行Spark作业需要使用的资源，这里的资源指的就是Executor进程。
+YARN集群管理器会根据我们为Spark作业设置的资源参数，在各个工作节点上，启动一定数量的Executor进程，每个Executor进程都占有一定数量的内存和CPU core。
+在申请到了作业执行所需的资源之后，Driver进程就会开始调度和执行我们编写的作业代码了。Driver进程会将我们编写的Spark作业代码分拆为多个stage，每个stage执行一部分代码片段，并为每个stage创建一批task，然后将这些task分配到各个Executor进程中执行。task是最小的计算单元，负责执行一模一样的计算逻辑（也就是我们自己编写的某个代码片段），只是每个task处理的数据不同而已。一个stage的所有task都执行完毕之后，会在各个节点本地的磁盘文件中写入计算中间结果，然后Driver就会调度运行下一个stage。
+下一个stage的task的输入数据就是上一个stage输出的中间结果。如此循环往复，直到将我们自己编写的代码逻辑全部执行完，并且计算完所有的数据，得到我们想要的结果为止。
+Spark是根据shuffle类算子来进行stage的划分。如果我们的代码中执行了某个shuffle类算子（比如reduceByKey、join等），那么就会在该算子处，划分出一个stage界限来。可以大致理解为，shuffle算子执行之前的代码会被划分为一个stage，shuffle算子执行以及之后的代码会被划分为下一个stage。因此一个stage刚开始执行的时候，它的每个task可能都会从上一个stage的task所在的节点，去通过网络传输拉取需要自己处理的所有key，然后对拉取到的所有相同的key使用我们自己编写的算子函数执行聚合操作（比如reduceByKey()算子接收的函数）。这个过程就是shuffle。
+当我们在代码中执行了cache/persist等持久化操作时，根据我们选择的持久化级别的不同，每个task计算出来的数据也会保存到Executor进程的内存或者所在节点的磁盘文件中。
+因此Executor的内存主要分为三块： 第一块是让task执行我们自己编写的代码时使用，默认是占Executor总内存的20%； 第二块是让task通过shuffle过程拉取了上一个stage的task的输出后，进行聚合等操作时使用，默认也是占Executor总内存的20%； 第三块是让RDD持久化时使用，默认占Executor总内存的60%。
+task的执行速度是跟每个Executor进程的CPU core数量有直接关系的。一个CPU core同一时间只能执行一个线程。而每个Executor进程上分配到的多个task，都是以每个task一条线程的方式，多线程并发运行的。如果CPU core数量比较充足，而且分配到的task数量比较合理，那么通常来说，可以比较快速和高效地执行完这些task线程。
+以上就是Spark作业的基本运行原理的说明，大家可以结合上图来理解。理解作业基本原理，是我们进行资源参数调优的基本前提。
+
+Spark shuffle
+Spark Shuffle 是 spark job 中某些算子触发的操作。当 rdd 依赖中出现宽依赖的时候，就会触发 Shuffle 操作，Shuffle 操作通常会伴随着不同 executor/host 之间数据的传输。
+Shuffle 操作可能涉及的过程包括数据的排序，聚合，溢写，合并，传输，磁盘IO，网络的 IO 等等。Shuffle 是连接 MapTask 和 ReduceTask 之间的桥梁，Map 的输出到 Reduce 中须经过 Shuffle 环节，Shuffle 的性能高低直接影响了整个程序的性能和吞吐量。
+通常 Shuffle 分为两部分：Map 阶段的数据准备( ShuffleMapTask )和Reduce(ShuffleReduceTask) 阶段的数据拷贝处理。一般将在 Map 端的 Shuffle 称之为 Shuffle Write，在 Reduce 端的 Shuffle 称之为 Shuffle Read。
+
+假如我们有个 spark job 依赖关系如下
+我们抽象出来其中的rdd和依赖关系，如果对这块不太清楚的可以参考我们之前的 彻底搞懂spark stage 划分
+E <-------n------,
+                  \
+C <--n---D---n-----F--s---,
+                           \
+A <-------s------ B <--n----`-- G
+
+对应的 划分后的RDD结构为：  最终我们得到了整个执行过程：  中间就涉及到shuffle 过程，前一个stage 的 ShuffleMapTask 进行 shuffle write， 把数据存储在 blockManager 上面， 并且把数据位置元信息上报到 driver 的 mapOutTrack 组件中， 下一个 stage 根据数据位置元信息， 进行 shuffle read， 拉取上个stage 的输出数据。
+spark 3.0 中对数据倾斜问题的解决
+一个比较迷惑的故事是，我们在spark 2.0 或者1.0 版本的时候花费了比较多的力气去解决数据倾斜，或者说不合理shuffle 的问题，spark 3.0 通过引入新的机制帮助我们解决了，是该高兴还是呵呵。。。
+AQE Adaptive Query Execution 机制
+spark 3.0 新特性
+参考资料
+ spark python api  大数据ETL实践探索（3）---- 大数据ETL利器之pyspark  spark 在美团中的实践  Spark性能优化指南——基础篇  Spark性能优化指南——高级篇  Spark 存储原理–shuffle 过程  彻底搞懂 Spark 的 shuffle 过程（shuffle write） 
+
+hadoop
+HDFS 默认 Block Size
+
+a)32MB b)64MB c)128MB 注：旧版本是64MB
+
+Client 端上传文件的时候下列哪项正确
+
+a)数据经过 NameNode 传递给 DataNode b)Client 端将文件切分为 Block，依次上传 c)Client 只上传数据到一台 DataNode，然后由 NameNode 负责 Block 复制工作
+分析：Client 向 NameNode 发起文件写入的请求。NameNode 根据文件大小和文件块配置情况，返回给 Client 它所管理部分 DataNode 的信息。Client 将文件划分为多个 Block，根据 DataNode 的地址信息，按顺序写入到每一个 DataNode 块中。
+
+请列出正常工作的hadoop集群中hadoop都分别需要启动那些进程，他们的作用分别是什么，尽可能写的全面些。
+
+NameNode: HDFS的守护进程，负责记录文件是如何分割成数据块，以及这些数据块分别被存储到那些数据节点上，它的主要功能是对内存及IO进行集中管理Secondary NameNode：辅助后台程序，与NameNode进行通信，以便定期保存HDFS元数据的快照。DataNode：负责把HDFS数据块读写到本地的文件系统。JobTracker：负责分配task，并监控所有运行的task。TaskTracker：负责执行具体的task，并与JobTracker进行交互。
+
+解释MapReduce中的Partition和Shuffle？
+
+在MapReduce过程中需要将任务进行分片，Shuffle:是描述数据从map端输入到reduce的过程, 在hadoop中,大部分map task和reducetask是在不同的node执行,重要开销是网络开销和磁盘IO开销,因此,shuffle的作用主要是:完整的从map task端传输到reduce端;跨节点传输数据时,尽可能的减少对带宽的消耗
+
+请列出你所知道的大数据应用的中间件及用途，例如 hdfs 分布式文件系统？
+
+Hdfs是广泛使用的hadoop生态圈中的 分布式文件系统，很多其他组件都是依赖于hdfs进行实现，比如hadoop 的map reduce算法，hbase。 HDFS就像一个传统的分级文件系统。可以创建、删除、移动或重命名文件 HDFS: Hadoop分布式文件系统(Distributed File System)
+Spark的rdd也是一个非常有用的中间件，它为spark各类组件提供在内存中表示数据的基本存储格式。
+
+
+( b) MapReduce：MapReduce是处理大量半结构化数据集合的编程模型 ( c) HBase: 类似Google BigTable的分布式NoSQL列数据库。 ( d) Hive：数据仓库工具，由Facebook贡献。 ( e) Zookeeper：分布式锁设施，提供类似Google Chubby的功能，由Facebook贡献。
+
+hdfs
+
+hdfs shell
+e.g. cat 命令
+Usage: hadoop fs -cat [-ignoreCrc] URI [URI ...]
+
+Copies source paths to stdout.
+
+Options
+
+The -ignoreCrc option disables checkshum verification.
+Example:
+
+hadoop fs -cat hdfs://nn1.example.com/file1 hdfs://nn2.example.com/file2
+hadoop fs -cat file:///file3 /user/hadoop/file4
+Exit Code:
+
+Returns 0 on success and -1 on error.
+
+FileSystemShell.html
+YARN
+ 下面的话来自官网，可以默写并背诵： The fundamental idea of YARN is to split up the functionalities of resource management and job scheduling/monitoring into separate daemons. The idea is to have a global ResourceManager (RM) and per-application ApplicationMaster (AM). An application is either a single job or a DAG of jobs.
+The ResourceManager and the NodeManager form the data-computation framework. The ResourceManager is the ultimate authority that arbitrates resources among all the applications in the system. The NodeManager is the per-machine framework agent who is responsible for containers, monitoring their resource usage (cpu, memory, disk, network) and reporting the same to the ResourceManager/Scheduler.
+The per-application ApplicationMaster is, in effect, a framework specific library and is tasked with negotiating resources from the ResourceManager and working with the NodeManager(s) to execute and monitor the tasks.
+The ResourceManager has two main components: Scheduler and ApplicationsManager.
+The Scheduler is responsible for allocating resources to the various running applications subject to familiar constraints of capacities, queues etc. The Scheduler is pure scheduler in the sense that it performs no monitoring or tracking of status for the application. Also, it offers no guarantees about restarting failed tasks either due to application failure or hardware failures. The Scheduler performs its scheduling function based on the resource requirements of the applications; it does so based on the abstract notion of a resource Container which incorporates elements such as memory, cpu, disk, network etc.
+The Scheduler has a pluggable policy which is responsible for partitioning the cluster resources among the various queues, applications etc. The current schedulers such as the CapacityScheduler and the FairScheduler would be some examples of plug-ins.
+The ApplicationsManager is responsible for accepting job-submissions, negotiating the first container for executing the application specific ApplicationMaster and provides the service for restarting the ApplicationMaster container on failure. The per-application ApplicationMaster has the responsibility of negotiating appropriate resource containers from the Scheduler, tracking their status and monitoring for progress.
+MapReduce in hadoop-2.x maintains API compatibility with previous stable release (hadoop-1.x). This means that all MapReduce jobs should still run unchanged on top of YARN with just a recompile.
+YARN supports the notion of resource reservation via the ReservationSystem, a component that allows users to specify a profile of resources over-time and temporal constraints (e.g., deadlines), and reserve resources to ensure the predictable execution of important jobs.The ReservationSystem tracks resources over-time, performs admission control for reservations, and dynamically instruct the underlying scheduler to ensure that the reservation is fullfilled.
+In order to scale YARN beyond few thousands nodes, YARN supports the notion of Federation via the YARN Federation feature. Federation allows to transparently wire together multiple yarn (sub-)clusters, and make them appear as a single massive cluster. This can be used to achieve larger scale, and/or to allow multiple independent clusters to be used together for very large jobs, or for tenants who have capacity across all of them.
+参考资料
+ HDFS Architecture  Hadoop YARN：调度性能优化实践  Apache Hadoop YARN architecture 
+
+hive
+Hive有哪些方式保存元数据，各有哪些特点？
+
+Hive支持三种不同的元存储服务器，分别为： 内嵌式元存储服务器; 本地元存储服务器; 远程元存储服务器; 每种存储方式使用不同的配置参数。 内嵌式元存储主要用于单元测试，在该模式下每次只有一个进程可以连接到元存储，Derby是内嵌式元存储的默认数据库。 在本地模式下，每个Hive客户端都会打开到数据存储的连接并在该连接上请求SQL查询。 在远程模式下，所有的Hive客户端都将打开一个到元数据服务器的连接，该服务器依次查询元数据，元数据服务器和客户端之间使用Thrift协议通信。
+
+Hive内部表和外部表的区别？
+
+创建表时： 创建内部表时，会将数据移动到数据仓库指向的路径；若创建外部表，仅记录数据所在的路径，不对数据的位置做任何改变。
+
+
+删除表时： 在删除表的时候，内部表的元数据和数据会被一起删除， 而外部表只删除元数据，不删除数据。这样外部表相对来说更加安全些，数据组织也更加灵活，方便共享源数据。
+
+Hive 中的压缩格式TextFile、SequenceFile、RCfile 、ORCfile各有什么区别？
+1、TextFile
+默认格式，存储方式为行存储，数据不做压缩，磁盘开销大，数据解析开销大。可结合Gzip、Bzip2使用(系统自动检查，执行查询时自动解压)，但使用这种方式，压缩后的文件不支持split，Hive不会对数据进行切分，从而无法对数据进行并行操作。并且在反序列化过程中，必须逐个字符判断是不是分隔符和行结束符，因此反序列化开销会比SequenceFile高几十倍。
+2、SequenceFile
+SequenceFile是Hadoop API提供的一种二进制文件支持，存储方式为行存储，其具有使用方便、可分割、可压缩的特点。
+SequenceFile支持三种压缩选择：NONE，RECORD，BLOCK。Record压缩率低，一般建议使用BLOCK压缩。
+优势是文件和hadoop api中的MapFile是相互兼容的
+3、RCFile
+存储方式：数据按行分块，每块按列存储。结合了行存储和列存储的优点：
+首先，RCFile 保证同一行的数据位于同一节点，因此元组重构的开销很低；
+其次，像列存储一样，RCFile 能够利用列维度的数据压缩，并且能跳过不必要的列读取；
+4、ORCFile
+存储方式：数据按行分块 每块按照列存储。
+压缩快、快速列存取。
+效率比rcfile高，是rcfile的改良版本。
+总结：
+相比TEXTFILE和SEQUENCEFILE，RCFILE由于列式存储方式，数据加载时性能消耗较大，但是具有较好的压缩比和查询响应。
+数据仓库的特点是一次写入、多次读取，因此，整体来看，RCFILE相比其余两种格式具有较明显的优势
+你理解的Hive和传统数据库有什么不同？各有什么试用场景。
+
+1、数据存储位置。Hive是建立在Hadoop之上的，所有的Hive的数据都是存储在HDFS中的。而数据库则可以将数据保存在块设备或本地文件系统中。 2、数据格式。Hive中没有定义专门的数据格式，由用户指定，需要指定三个属性：列分隔符，行分隔符，以及读取文件数据的方法。数据库中，存储引擎定义了自己的数据格式。所有数据都会按照一定的组织存储。 3、数据更新。Hive的内容是读多写少的，因此，不支持对数据的改写和删除，数据都在加载的时候中确定好的。数据库中的数据通常是需要经常进行修改。 4、执行延迟。Hive在查询数据的时候，需要扫描整个表（或分区），因此延迟较高，只有在处理大数据是才有优势。数据库在处理小数据是执行延迟较低。 5、索引。Hive没有，数据库有 6、执行。Hive是MapReduce，数据库是Executor 7、可扩展性。Hive高，数据库低 8、数据规模。Hive大，数据库小
+
+Hive的实用场景如下： 1、Data Ingestion (数据摄取) 2、Data Discovery(数据发现) 3、Data analytics(数据分析) 4、Data Visualization & Collaboration(数据可视化和协同开发)
+
+参考资料
+hive 官网基本使用说明
+
+Elasticsearch
+排错思路
+Elasticsearch 集群和索引健康状态及常见错误说明 
+
+
+
+

@@ -4,8 +4,7 @@
  
 Before my introduction, I have to express my great gratitude to the opportunity of this phone interview your company give to me.
 First of all, I’d like to give you a brief introduction of my educational background I was admitted by Xi’an university of Art and Science 2008.
-Major in software Engineering,which is a famous one in china.in all my 4 years college life I have learned programming languages such as c,c plus plus ,java,html,and SQL.computer basic theory ,such
- as data structures,computer organization theory ,computer network,operating system,database,artificial intelligence and so on.
+Major in software Engineering,which is a famous one in china.in all my 4 years college life I have learned programming languages such as c,c plus plus ,java,html,and SQL.computer basic theory ,such as data structures,computer organization theory ,computer network,operating system,database,artificial intelligence and so on.
 I am also familiar with windows mfc,Microsoft sql server,adobe photoshop.knowing a little bit about linux ,basic graphics and image processing theory.
 I develop several personal interests,like playing basketball and watching films at my spare time.
 Generally speaking , I am a active ,innovation and hard working man especially to deal with the thing which is challengeable or I am interested in.
@@ -14,28 +13,11 @@ I suppose not only my qualifications and knowledge make me a perfect candidate f
 新版本2014.11.23
  
 Personal Statement
-I would like to build on my solid education and experience as an engineer for a Ph.D. degree in computer science
- at a distinguished university. I wish in particular to be trained at an advance level in software system, image process, and three-dimensional
- reconstruction. My ultimate goal is to become an outstanding software engineer, and create excellent product to make people live a better life. As an applicant to Carnegie Mellon University’s doctoral program in Computer Science, I am very glad to have this
- opportunity to give you a brief introduction of myself.
-  I received a bachelor degree from Xi’an University of Arts and Science in 2012, major in Software Engineering. Throughout
- four years of undergraduate study, I
- completed the whole fundamental courses related to both software and hardware areas of research, such as, Data Structures, Software Engineering, Computer Network, Operating System, programming
- languages: c, c++, java. Moreover, as a term project, I
- designed and developed a student information management system, using MFC and Microsoft SQL 2005 edition’s database.
- My graduate design is Fingerprint Contrast and Analysis System. In this design, I adopt the Visual Studio 2008 edition’s MFC, in accordance with software development which
- uses top-to-down process and gradual refinement of the classic model, successfully achieve enhancement, binarization, thinning of fingerprint image which is based on BMP format. These achievements build a foundation for my choice of direction in postgraduate
- study.
-       After graduate from school, I was employed by a company which is specializing in network and communication security
- testing products. During the work time, I was not only learned the standardization process of software development, but also participated in research a remote control system based on Mac OS 10.8 named Mac-Shell. This new system, implement a typical remote
- monitoring system’s basic function, document management, remote command line and so on.
-       When I was in the workplace, besides what I had mentioned above, I did several other projects which greatly enhanced
- my ability of programming and debugging skills. However when I am faced up with some practical problems, for instance, Queue Scheduling, Parallel Programming, and other algorithm issues, due to lack of related knowledge, the solution I designed always seems
- imperfect and occurs all kinds of problems. So in order to improve my theoretical cognition, I went to Shaanxi Normal University for further education. My research directions include image processing, pattern recognition, three-dimensional reconstruction.
- After all these years of study, I am glad to say that my competence at independent research will serve me well, as I try to put my ideas into practice.
-       As far as I am concerned, a deeper exploit in my area can only be accomplished in a quality doctoral program like
- yours. In view of the above, I would greatly appreciate it, if you could accept me into your program and offer me whatever financial you might be able to. By giving me an opportunity to study under your seasoned guidance, you will produce not only another
- computer scientist but also a computer scientist who will spawn many other computer scientists.
+I would like to build on my solid education and experience as an engineer for a Ph.D. degree in computer science at a distinguished university. I wish in particular to be trained at an advance level in software system, image process, and three-dimensional reconstruction. My ultimate goal is to become an outstanding software engineer, and create excellent product to make people live a better life. As an applicant to Carnegie Mellon University’s doctoral program in Computer Science, I am very glad to have this opportunity to give you a brief introduction of myself.
+  I received a bachelor degree from Xi’an University of Arts and Science in 2012, major in Software Engineering. Throughout four years of undergraduate study, I completed the whole fundamental courses related to both software and hardware areas of research, such as, Data Structures, Software Engineering, Computer Network, Operating System, programming languages: c, c++, java. Moreover, as a term project, I designed and developed a student information management system, using MFC and Microsoft SQL 2005 edition’s database. My graduate design is Fingerprint Contrast and Analysis System. In this design, I adopt the Visual Studio 2008 edition’s MFC, in accordance with software development which uses top-to-down process and gradual refinement of the classic model, successfully achieve enhancement, binarization, thinning of fingerprint image which is based on BMP format. These achievements build a foundation for my choice of direction in postgraduate study.
+       After graduate from school, I was employed by a company which is specializing in network and communication security testing products. During the work time, I was not only learned the standardization process of software development, but also participated in research a remote control system based on Mac OS 10.8 named Mac-Shell. This new system, implement a typical remote monitoring system’s basic function, document management, remote command line and so on.
+       When I was in the workplace, besides what I had mentioned above, I did several other projects which greatly enhanced my ability of programming and debugging skills. However when I am faced up with some practical problems, for instance, Queue Scheduling, Parallel Programming, and other algorithm issues, due to lack of related knowledge, the solution I designed always seems imperfect and occurs all kinds of problems. So in order to improve my theoretical cognition, I went to Shaanxi Normal University for further education. My research directions include image processing, pattern recognition, three-dimensional reconstruction. After all these years of study, I am glad to say that my competence at independent research will serve me well, as I try to put my ideas into practice.
+       As far as I am concerned, a deeper exploit in my area can only be accomplished in a quality doctoral program like yours. In view of the above, I would greatly appreciate it, if you could accept me into your program and offer me whatever financial you might be able to. By giving me an opportunity to study under your seasoned guidance, you will produce not only another computer scientist but also a computer scientist who will spawn many other computer scientists.
  
  
 

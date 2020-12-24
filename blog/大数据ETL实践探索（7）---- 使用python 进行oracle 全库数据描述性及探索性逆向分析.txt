@@ -5,7 +5,12 @@
 
 
 
-文章大纲0.简介1. cx_Oracle 简介与数据类型2.Oracle 12c 新特性容器数据库3.Oracle 12c 新建表空间、用户、表3.0 设置oracle sid 数据库实例名3.1 以管理员账户登录3.2 创建表空间3.3 创建用户并指定表空间3.4 用户授权3.5 创建样例表格3.6 数据导入导出4.python 环境准备5.Oracle  SQL 全库全表字段分析6.Oracle python 操作辅助类7.python 链接Oracle 全库数据采样8.python missingno 缺失值可视化分析
+
+文章大纲
+0.简介1. cx_Oracle 简介与数据类型2.Oracle 12c 新特性容器数据库3.Oracle 12c 新建表空间、用户、表3.0 设置oracle sid 数据库实例名3.1 以管理员账户登录3.2 创建表空间3.3 创建用户并指定表空间3.4 用户授权3.5 创建样例表格3.6 数据导入导出
+4.python 环境准备5.Oracle SQL 全库全表字段分析6.Oracle python 操作辅助类7.python 链接Oracle 全库数据采样8.python missingno 缺失值可视化分析
+
+
 
 0.简介
 想象如下一个场景，一个合作伙伴想让你分析一下自己的业务数据，比较慷慨的给出了数据全库。但是对方的IT 人员没有精力去协助我们逐个了解数据怎么办呢，这时候就需要进行一些针对数据库的探索性、描述性的数据分析 帮我们更好的了解对方的数据内涵了。
@@ -14,95 +19,20 @@
 1. cx_Oracle 简介与数据类型
 说到python 链接Oracle ，就不得不提到cx_Oracle ，cx_Oracle is a module that enables access to Oracle Database and conforms to the Python database API specification.
 cx_Oracle 目前是oracle 官方 出品的python Oracle链接管理包
-cx_Oracle 源代码：https://github.com/oracle/python-cx_Oracle
-文档：https://cx-oracle.readthedocs.io/en/latest/index.html
+cx_Oracle 源代码：https://github.com/oracle/python-cx_Oracle 文档：https://cx-oracle.readthedocs.io/en/latest/index.html
 Oracle - cx_Oracle - Python 映射为：
-Oracle
-
-
-cx_Oracle
-
-
-Python
-
-
-VARCHAR2
-NVARCHAR2
-LONG
-
-cx_Oracle.STRING
-
-
-str
-
-
-CHAR
-
-
-cx_Oracle.FIXED_CHAR
-
-
-NUMBER
-
-
-cx_Oracle.NUMBER
-
-
-int
-
-
-FLOAT
-
-
-float
-
-
-DATE
-
-
-cx_Oracle.DATETIME
-
-
-datetime.datetime
-
-
-TIMESTAMP
-
-
-cx_Oracle.TIMESTAMP
-
-
-CLOB
-
-
-cx_Oracle.CLOB
-
-
-cx_Oracle.LOB
-
-
-BLOB
-
-
-cx_Oracle.BLOB
-
-
+Oracle  cx_Oracle  Python  VARCHAR2 NVARCHAR2 LONG cx_Oracle.STRING  str  CHAR  cx_Oracle.FIXED_CHAR  NUMBER  cx_Oracle.NUMBER  int  FLOAT  float  DATE  cx_Oracle.DATETIME  datetime.datetime  TIMESTAMP  cx_Oracle.TIMESTAMP  CLOB  cx_Oracle.CLOB  cx_Oracle.LOB  BLOB  cx_Oracle.BLOB 
 
 2.Oracle 12c 新特性容器数据库
-一般来说对于Oracle 高版本的数据库是向下兼容的，所以我们目前使用Oracle 12c  进行本次说明。
-Oracle 12C引入了CDB与PDB的新特性，在ORACLE 12C数据库引入的多租用户环境（Multitenant Environment）中，允许一个数据库容器（CDB）承载多个可插拔数据库（PDB）。CDB全称为Container Database，中文翻译为数据库容器，PDB全称为Pluggable Database，即可插拔数据库。在ORACLE 12C之前，实例与数据库是一对一或多对一关系（RAC）：即一个实例只能与一个数据库相关联，数据库可以被多个实例所加载。而实例与数据库不可能是一对多的关系。当进入ORACLE 12C后，实例与数据库可以是一对多的关系。下面是官方文档关于CDB与PDB的关系图。
-
-简介详见：
-https://www.cnblogs.com/kerrycode/p/3386917.html
-及官方文档：
-https://docs.oracle.com/en/database/oracle/oracle-database/12.2/index.html
-oracle 执行 SQL ：
-https://docs.oracle.com/en/database/oracle/oracle-database/12.2/cncpt/sql.html#GUID-DA48618A-A6BB-421A-A10A-02859D8ED9AD
+一般来说对于Oracle 高版本的数据库是向下兼容的，所以我们目前使用Oracle 12c 进行本次说明。
+Oracle 12C引入了CDB与PDB的新特性，在ORACLE 12C数据库引入的多租用户环境（Multitenant Environment）中，允许一个数据库容器（CDB）承载多个可插拔数据库（PDB）。CDB全称为Container Database，中文翻译为数据库容器，PDB全称为Pluggable Database，即可插拔数据库。在ORACLE 12C之前，实例与数据库是一对一或多对一关系（RAC）：即一个实例只能与一个数据库相关联，数据库可以被多个实例所加载。而实例与数据库不可能是一对多的关系。当进入ORACLE 12C后，实例与数据库可以是一对多的关系。下面是官方文档关于CDB与PDB的关系图。  简介详见： https://www.cnblogs.com/kerrycode/p/3386917.html
+及官方文档： https://docs.oracle.com/en/database/oracle/oracle-database/12.2/index.html
+oracle 执行 SQL ： https://docs.oracle.com/en/database/oracle/oracle-database/12.2/cncpt/sql.html#GUID-DA48618A-A6BB-421A-A10A-02859D8ED9AD
 
 3.Oracle 12c 新建表空间、用户、表
-在windows 下，我们使用PL/sql  以及sqlplus 进行Oracle 的管理工作，sqlplus  是安装好Oracle 就自带了。
+在windows 下，我们使用PL/sql 以及sqlplus 进行Oracle 的管理工作，sqlplus 是安装好Oracle 就自带了。
 3.0 设置oracle sid 数据库实例名
-在cmd 命令行窗口使用sqlplus  之前需要进行数据库实例名 的指定。
+在cmd 命令行窗口使用sqlplus 之前需要进行数据库实例名 的指定。
 set oracle_sid=orcl
 
 3.1 以管理员账户登录
@@ -227,7 +157,7 @@ select * from emp;
 select * from dept;
 
 3.6 数据导入导出
-imp/exp  ，impdp/expdp需要成对使用
+imp/exp ，impdp/expdp需要成对使用
 以下分别给出两个导入样例
 imp c##test/test@orcl file=D:20190506.DMP full=y log=01.log
 
@@ -236,8 +166,7 @@ impdp c##test/test@orcl directory=dir logfile=p_street_area.log  job_name=my_job
 
 
 4.python 环境准备
-参考该文章：1.2.4 小节conda基本环境配置
-https://blog.csdn.net/wangyaninglm/article/details/89440922
+参考该文章：1.2.4 小节conda基本环境配置 https://blog.csdn.net/wangyaninglm/article/details/89440922
 使用如下 requirements.txt 初始化环境
 conda create --name DATABASE --file requirements.txt
 
@@ -296,21 +225,14 @@ conda install ipykernel
 conda install -n python_env ipykernel
 
 
-5.Oracle  SQL 全库全表字段分析
+5.Oracle SQL 全库全表字段分析
 在Oracle 中进行 全库全表字段分析需要用的一个非常重要的表：USER_TABLES
 什么是USER_TABLES ？
 USER_TABLES describes the relational tables owned by the current user. Its columns (except for OWNER) are the same as those in ALL_TABLES.
-USER_TABLES  和ALL_TABLES 字段一样，我们来看看文档里面ALL_TABLES  有哪些有用的字段：
+USER_TABLES 和ALL_TABLES 字段一样，我们来看看文档里面ALL_TABLES 有哪些有用的字段：
 ALL_TABLES
 Related Views
-
-
-DBA_TABLES describes all relational tables in the database.
-
-
-USER_TABLES describes the relational tables owned by the current user. This view does not display the OWNER column.
-
-
+ DBA_TABLES describes all relational tables in the database.  USER_TABLES describes the relational tables owned by the current user. This view does not display the OWNER column. 
 
 Note:Columns marked with an asterisk (*) are populated only if you collect statistics on the table with the DBMS_STATS package.
 
@@ -321,12 +243,8 @@ Note:Columns marked with an asterisk (*) are populated only if you collect stati
  WHERE a.table_name = b.table_name
  ORDER BY num_rows DESC
 
-可以看到 写了注释的表，都展现出来注释了。
-
-可以看到刚刚插入完数据，num_rows 没有更新
-隔了一天以后， 数据就有了：
-
-如果想要立即更新USER_TABLES   或者参照下面链接
+可以看到 写了注释的表，都展现出来注释了。  可以看到刚刚插入完数据，num_rows 没有更新
+隔了一天以后， 数据就有了：  如果想要立即更新USER_TABLES 或者参照下面链接
 Oracle manually update statistics on all tables
 运行，手动更新：
 exec DBMS_STATS.GATHER_DATABASE_STATS;
@@ -349,16 +267,11 @@ SELECT t_column_comments.table_name,
  WHERE t_table_comments.table_name = t_column_comments.table_name
  ORDER BY t_column_comments.table_name
 
-可以看到如下的导出表基本上符合人的观察规范，适合进行Oracle 全库的描述性、探索性数据分析。比如合作伙伴将全库共享，我们如何第一时间通过数据了解合作伙伴的业务情况和设计呢。我想可以通过这样的手段，首先有一个大致的认识，接下来就是进一步看看样例数据的样子了。那么我们用这个导出表作为基础，写点python代码进一步进行数据探索性分析。
-
+可以看到如下的导出表基本上符合人的观察规范，适合进行Oracle 全库的描述性、探索性数据分析。比如合作伙伴将全库共享，我们如何第一时间通过数据了解合作伙伴的业务情况和设计呢。我想可以通过这样的手段，首先有一个大致的认识，接下来就是进一步看看样例数据的样子了。那么我们用这个导出表作为基础，写点python代码进一步进行数据探索性分析。 
 
 6.Oracle python 操作辅助类
 通过编写OracleBaseTool， 这个操作辅助类，主要目的是对于以下一些动作进行封装：
-
-1.数据库的链接（初始化）
-2.数据库链接的管理
-3.数据库的查询管理
-
+1.数据库的链接（初始化）2.数据库链接的管理3.数据库的查询管理
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 #-------------------------------------------------------------------------------
@@ -488,10 +401,7 @@ class OracleBaseTool():
 其中采样的功能主要用到了Oracle 中的sample 函数，具体大家可以查看文档：
 Oracle 表采样
 以下脚本主要有两大功能：
-
-各个表中数据列缺失值统计（采样缺失值，如采样10000条）
-从各个表中获取数据样例
-
+各个表中数据列缺失值统计（采样缺失值，如采样10000条）从各个表中获取数据样例
 
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
@@ -623,9 +533,7 @@ for x in result_list:
             result_list_schemaDetail_pdf.loc[index_number,
                                          str_sample_data_column_name] = sample_data_column_value
 
-最后一步写入excel ，结合excel 的一些筛选统计工作，我们可以让协助的业务部门，架构部门也更好的了解整个合作伙伴的数据
-
-代码如下：使用前记得安装
+最后一步写入excel ，结合excel 的一些筛选统计工作，我们可以让协助的业务部门，架构部门也更好的了解整个合作伙伴的数据  代码如下：使用前记得安装
 conda install openpyxl
 
 #  pandas to excel 由于是第三方库，写的时候可能报错，如
@@ -640,8 +548,7 @@ writer.save()
 
 
 8.python missingno 缺失值可视化分析
-主要用到missingno  对缺失值进行可视化分析，what is missingno
-missingno provides a small toolset of flexible and easy-to-use missing data visualizations and utilities that allows you to get a quick visual summary of the completeness (or lack thereof) of your dataset.
+主要用到missingno 对缺失值进行可视化分析，what is missingno missingno provides a small toolset of flexible and easy-to-use missing data visualizations and utilities that allows you to get a quick visual summary of the completeness (or lack thereof) of your dataset.
 github 链接:https://github.com/ResidentMario/missingno
 对于我们的测试库, 以下代码运行在jupyter notebook 中
 test_oracle_obj = OracleBaseTool.OracleBaseTool('c##test','test','127.0.0.1','orcl')
@@ -655,19 +562,16 @@ pdf = pd.DataFrame(result_list[1:], columns = result_list[0] )
 missingno.matrix(pdf, labels=True)
 
 
-柱状图分析，该图按照数据排序，可视化了数据空缺的空间视图。
-
-条形图， 该图展现缺失值数量对比情况。
+柱状图分析，该图按照数据排序，可视化了数据空缺的空间视图。  条形图， 该图展现缺失值数量对比情况。
 missingno.bar(pdf)
 
-
-缺失值的相关性分析，既 一个变量的缺失和另一个变量 的关系，由于我们的样例数据较少，所以效果不明显，我们同时看一个官网的例子。
+ 缺失值的相关性分析，既 一个变量的缺失和另一个变量 的关系，由于我们的样例数据较少，所以效果不明显，我们同时看一个官网的例子。
 missingno.heatmap(pdf)
 
-
-
+ 
 缺失值的层次聚类分析，内在逻辑和上面类似，不过是用了不同的算法及展现形式。
 missingno.dendrogram(pdf)
+
 
 
 

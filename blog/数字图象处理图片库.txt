@@ -1,60 +1,90 @@
 
 
 
-    
-推荐几个免费的国外图像库，数字图像处理必备
      
-        分类：            
+推荐几个免费的国外图像库，数字图像处理必备      
 
-学术资源              2007-11-14 13:24    
-6091人阅读     
-评论(6)    
-收藏    
-举报    
+        分类：              学术资源              
+ 2007-11-14 13:24     
+ 6091人阅读     
+  评论(6)     
+ 收藏     
+ 举报     
 
-图像处理databasematlabdownloadimageurl
-原文地址：http://blog.sina.com.cn/s/blog_53c74fa1010002pn.html
-做数字图像处理的，怎能没有一个图库？虽说自己可以建立，可是如果是比较知名的图库，做出来的实验结果才能比较让人信服。coral是很有名，可他要收费。我寻寻觅觅，还是找到了一些图库，有的是纯texture图库，比如著名的vistex，有的是faceimages，有的也有RGB真彩色图的。下面罗列了一些url，可以找到对应的。
- 
-1、http://vismod.media.mit.edu/
-这是美国麻省media实验室的一个网页，该实验室在数字图像处理方面还是很有成就的。在download里面会有很多有用的东西。比如vistex or faceimages and others
- 
-2、http://www.dice.ucl.ac.be/mlg/index.php?page=DataBases
-这是ucl的machine learning group的database
- 
-3、http://sipi.usc.edu/services/database/index.html
-这是著名的美国南加州大学的USI-SIPI image database，有纹理图和真彩图
- 
-4、http://www.cs.washington.edu/research/imagedatabase/
-这是华盛顿大学的Ground truth Database。这个图库我用的最多，因为目前做真彩色图作的比较多，而作单纯的纹理不是很多。该database里的图片都是RGB，jpeg格式的，对于matlab来说是很方便处理的。
- 
-所有图库我都下载过，链接均有效。当然我也不知道何时会失效，一般来说保留的时间应该比较长吧，因为都是大学在做的研究，前人学完了后人还需要。所以，基本上从我开始作发现这些图库开始，到现在已经半年了。依然保留着呢。
-有需要的或者近期有需要的还是尽快下载吧。 
- 
-补充几个：
-卡内基的库
+
+图像处理
+database
+matlab
+download
+image
+url
+
+
+ 原文地址：http://blog.sina.com.cn/s/blog_53c74fa1010002pn.html
+ 
+ 做数字图像处理的，怎能没有一个图库？虽说自己可以建立，可是如果是比较知名的图库，做出来的实验结果才能比较让人信服。coral是很有名，可他要收费。我寻寻觅觅，还是找到了一些图库，有的是纯texture图库，比如著名的vistex，有的是faceimages，有的也有RGB真彩色图的。下面罗列了一些url，可以找到对应的。
+   
+  1、http://vismod.media.mit.edu/
+  这是美国麻省media实验室的一个网页，该实验室在数字图像处理方面还是很有成就的。在download里面会有很多有用的东西。比如vistex or faceimages and others
+   
+  2、http://www.dice.ucl.ac.be/mlg/index.php?page=DataBases
+  这是ucl的machine learning group的database
+   
+  3、http://sipi.usc.edu/services/database/index.html
+  这是著名的美国南加州大学的USI-SIPI image database，有纹理图和真彩图
+   
+  4、http://www.cs.washington.edu/research/imagedatabase/
+  这是华盛顿大学的Ground truth Database。这个图库我用的最多，因为目前做真彩色图作的比较多，而作单纯的纹理不是很多。该database里的图片都是RGB，jpeg格式的，对于matlab来说是很方便处理的。
+   
+  所有图库我都下载过，链接均有效。当然我也不知道何时会失效，一般来说保留的时间应该比较长吧，因为都是大学在做的研究，前人学完了后人还需要。所以，基本上从我开始作发现这些图库开始，到现在已经半年了。依然保留着呢。
+  有需要的或者近期有需要的还是尽快下载吧。 
+
+
+  
+
+
+ 补充几个：
+
+
+ 卡内基的库
+
+
 http://www.cs.cmu.edu/~cil/v-images.html
- 
-uc伯克利的库：
+
+
+  
+
+
+ uc伯克利的库：
+
+
 http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/segbench/
- 
+
+
+  
+
+
 http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/resources.html
 
 
-原文地址：http://blog.sina.com.cn/s/blog_53c74fa1010002pn.html
-做数字图像处理的，怎能没有一个图库？虽说自己可以建立，可是如果是比较知名的图库，做出来的实验结果才能比较让人信服。coral是很有名，可他要收费。我寻寻觅觅，还是找到了一些图库，有的是纯texture图库，比如著名的vistex，有的是faceimages，有的也有RGB真彩色图的。下面罗列了一些url，可以找到对应的。
- 
-1、http://vismod.media.mit.edu/
-这是美国麻省media实验室的一个网页，该实验室在数字图像处理方面还是很有成就的。在download里面会有很多有用的东西。比如vistex or faceimages and others
- 
-2、http://www.dice.ucl.ac.be/mlg/index.php?page=DataBases
-这是ucl的machine learning group的database
- 
-3、http://sipi.usc.edu/services/database/index.html
-这是著名的美国南加州大学的USI-SIPI image database，有纹理图和真彩图
- 
-4、http://www.cs.washington.edu/research/imagedatabase/
-这是华盛顿大学的Ground truth Database。这个图库我用的最多，因为目前做真彩色图作的比较多，而作单纯的纹理不是很多。该database里的图片都是RGB，jpeg格式的，对于matlab来说是很方便处理的。
- 
-所有图库我都下载过，链接均有效。当然我也不知道何时会失效，一般来说保留的时间应该比较长吧，因为都是大学在做的研究，前人学完了后人还需要。所以，基本上从我开始作发现这些图库开始，到现在已经半年了。依然保留着呢。
-有需要的或者近期有需要的还是尽快下载吧。 
+
+
+ 原文地址：http://blog.sina.com.cn/s/blog_53c74fa1010002pn.html
+ 
+ 做数字图像处理的，怎能没有一个图库？虽说自己可以建立，可是如果是比较知名的图库，做出来的实验结果才能比较让人信服。coral是很有名，可他要收费。我寻寻觅觅，还是找到了一些图库，有的是纯texture图库，比如著名的vistex，有的是faceimages，有的也有RGB真彩色图的。下面罗列了一些url，可以找到对应的。
+   
+  1、http://vismod.media.mit.edu/
+  这是美国麻省media实验室的一个网页，该实验室在数字图像处理方面还是很有成就的。在download里面会有很多有用的东西。比如vistex or faceimages and others
+   
+  2、http://www.dice.ucl.ac.be/mlg/index.php?page=DataBases
+  这是ucl的machine learning group的database
+   
+  3、http://sipi.usc.edu/services/database/index.html
+  这是著名的美国南加州大学的USI-SIPI image database，有纹理图和真彩图
+   
+  4、http://www.cs.washington.edu/research/imagedatabase/
+  这是华盛顿大学的Ground truth Database。这个图库我用的最多，因为目前做真彩色图作的比较多，而作单纯的纹理不是很多。该database里的图片都是RGB，jpeg格式的，对于matlab来说是很方便处理的。
+   
+  所有图库我都下载过，链接均有效。当然我也不知道何时会失效，一般来说保留的时间应该比较长吧，因为都是大学在做的研究，前人学完了后人还需要。所以，基本上从我开始作发现这些图库开始，到现在已经半年了。依然保留着呢。
+  有需要的或者近期有需要的还是尽快下载吧。 
+

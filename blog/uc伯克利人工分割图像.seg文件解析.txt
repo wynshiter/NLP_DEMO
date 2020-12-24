@@ -2,10 +2,12 @@
 
 
 之前看到
+
 ﻿﻿
+
 http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/segbench/
 提供的人工图像分割的.seg格式的文件，他们提供了linux系统下面的matlab代码，什么的，但是我们要在windows平台下面用就比较麻烦，就心血来潮写一个试试，还请大牛们指点一二啊，嘿嘿嘿
-
+ 
 下面是SegHuman.h
 
 /*
@@ -112,8 +114,8 @@ private:
 
 #endif // SEGHMAN
 
-
-
+ 
+ 
 下面是：SegHuman.cpp
 #include "stdafx.h"
 #include "SegHuman.h"
@@ -216,10 +218,10 @@ if (4 == sscanf(strbuff.c_str(),"%d %d %d %d",&temp.segment_number, &temp.row, &
 
 	return false;
 }
-
-
+ 
+ 
 下面的任务就是修改代码，把它用在OpenCV中，来显示人工分割的图像啦!
-
-
+ 
+ 
 
 

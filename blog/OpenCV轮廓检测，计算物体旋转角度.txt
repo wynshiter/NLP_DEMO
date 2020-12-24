@@ -166,7 +166,7 @@ int main()
 	//waitKey(0);
 
 	// testing the bounding box 
-	//////////////////////////////////////////////////////////////////////////////
+	//
 	//霍夫变换进行直线检测，此处使用的是probabilistic Hough transform（cv::HoughLinesP）而不是standard Hough transform（cv::HoughLines）
 
 	cv::Mat result_line(image.size(),CV_8U,cv::Scalar(255));
@@ -194,7 +194,7 @@ int main()
 	cv::imshow("line",result_line);
 	//waitKey(0);
 
-	/////////////////////////////////////////////////////////////////////////////////////////////
+	/
 	//
 
 	//std::vector<std::vector<cv::Point>>::const_iterator itc_rec= contours.begin();
@@ -246,8 +246,7 @@ int main()
 
 
 }
-
- 
+  
  
  
 

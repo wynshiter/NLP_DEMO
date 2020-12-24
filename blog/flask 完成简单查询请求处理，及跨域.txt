@@ -5,7 +5,11 @@
 
 
 
-文章大纲flask通用项目结构flask 简介主体代码逻辑flask 跨域问题的处理flask 日志flask 微服务Flask-RESTful启动服务命令
+
+文章大纲
+flask通用项目结构flask 简介主体代码逻辑flask 跨域问题的处理flask 日志flask 微服务Flask-RESTful启动服务命令
+
+
 
 flask通用项目结构
 | - projectName
@@ -139,19 +143,16 @@ if __name__ == '__main__':
     # CORS(app, supports_credentials=True)
 
 flask 跨域问题的处理
-在处理跨域问题时候，应该把下列代码弄成全局的，也就是放
-app = Flask(name)
-cors = CORS(app)
+在处理跨域问题时候，应该把下列代码弄成全局的，也就是放 app = Flask(name) cors = CORS(app)
 否则跨域问题依然存在，报错信息为：
 Access to XMLHttpRequest at ‘-----’ from origin ‘http://localhost:63342’ has been blocked by CORS policy: Response to preflight request doesn’t pass access control check: No ‘Access-Control-Allow-Origin’ header is present on the requested resource.
 flask 日志
 https://blog.csdn.net/iszhenyu/article/details/56846551
 flask 微服务Flask-RESTful
-写完了发现
-https://flask-restful.readthedocs.io/en/latest/
+写完了发现 https://flask-restful.readthedocs.io/en/latest/
 启动服务命令
-参考：https://www.cnblogs.com/zzyoucan/p/7764590.html
-nohup command > myout.file 2>&1 &
+参考：https://www.cnblogs.com/zzyoucan/p/7764590.html nohup command > myout.file 2>&1 &
+
 
 
 

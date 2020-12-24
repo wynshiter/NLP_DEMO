@@ -8,32 +8,23 @@
 昨天去西工大，听了一场Graph Asia的报告，里面有个Microsoft的人讲述自己怎么写paper。纠正了我一直以来的一个误区：就是做完实验再写paper，这个是不对的，应该像软件工程的开发流程一样，文档先行才对，一遍写文档一边写代码。
 还有一点感悟就是，关于图像分割这块的内容，大家都做的比较多了，怎么样让自己的工作出彩，还有原创性的idea很重要。
  
-图论方法的主要思想是将图像映射成加权图,把图像像素看作图的顶点, 邻接像素之间的关系看作图的边, 邻接像素之间的相似性看作边的权值, 根据边的权值设计能量函数,
-通过最小化能量函数完成对图的分割, 从而实现图像分割. 基于图论的分割方法对图像进行分割时优点明显:
-
-1) 图论是一门研究比较早而且已经发展成熟的学科, 具有较好的数学基础. 针对某个问题, 图论中有多个方法可以解决;
-
-2) 图像和图之间非常相似. 在图像映射为图之后, 便可以利用图论中的各种理论和数学工具进行图像分割.
-
+图论方法的主要思想是将图像映射成加权图,把图像像素看作图的顶点, 邻接像素之间的关系看作图的边, 邻接像素之间的相似性看作边的权值, 根据边的权值设计能量函数, 通过最小化能量函数完成对图的分割, 从而实现图像分割. 基于图论的分割方法对图像进行分割时优点明显: 
+1) 图论是一门研究比较早而且已经发展成熟的学科, 具有较好的数学基础. 针对某个问题, 图论中有多个方法可以解决; 
+2) 图像和图之间非常相似. 在图像映射为图之后, 便可以利用图论中的各种理论和数学工具进行图像分割. 
  
 目前常用的基于图论的分割方法包括最小割 (通常称为图割)、归一化割等. 和图割相比, 归一化割存在以下几点不足：
-1) 没有嵌入一元 (Unary) 项, 如各自图结点的先验, 相当于对所有结点都是零先验;
-
+1) 没有嵌入一元 (Unary) 项, 如各自图结点的先验, 相当于对所有结点都是零先验; 
 2) 需要计算大矩阵的广义特征向量, 尽管采取了复杂度抑制措施, 计算量仍很大；
 3) 只能逼近全局最优解; 
 4) 倾向于分割出的类具有相同的类内相似度. 
  
 因此, 尽管图割容易分离出小目标, 但图割方法的优点更加明显：
 1) 在全局最优的框架下进行分割, 保证了能量函数的全局最优解;
-2) 同时利用了图像的像素灰度信息和区域边界信息, 分割效果好;
-
-3) 用户交互简单且方便, 只需在目标内部和背景区域标记少量的种子点, 对种子点的具体位置也没有严格要求, 而且通过预处理方法自动确定种子点, 也可让图割方法自动化.
-
+2) 同时利用了图像的像素灰度信息和区域边界信息, 分割效果好; 
+3) 用户交互简单且方便, 只需在目标内部和背景区域标记少量的种子点, 对种子点的具体位置也没有严格要求, 而且通过预处理方法自动确定种子点, 也可让图割方法自动化. 
  
-因此, 近 10 年来, 基于图割的图像分割方法的发展和应用尤为广泛. 经典的图割只能精确求解特定的能量函数, 而对其他能量函数需要用线性规划松弛方法来求解, 有两个思路可实现:
-
-1) 基于移动制造的方法, 包括 α 扩展和 α−β 交换等, 不试图精确地求解松弛问题;
-
+因此, 近 10 年来, 基于图割的图像分割方法的发展和应用尤为广泛. 经典的图割只能精确求解特定的能量函数, 而对其他能量函数需要用线性规划松弛方法来求解, 有两个思路可实现: 
+1) 基于移动制造的方法, 包括 α 扩展和 α−β 交换等, 不试图精确地求解松弛问题; 
 2) 基于消息传递的方法, 包括信念传播 (Belief propagation) 和 TRW (Tree-reweightedmessage-passing) 等, 试图精确地求解松弛问题.
  
 参考文献[7]中证明了，最小割等价于能量函数最小化：
@@ -47,18 +38,12 @@
  
  
 参考文献
-[1] Y. Boykov, and M. P. Jolly, "Interactive graph cuts for optimal boundary and region segmentation of objects in N-D images",
-Proceeding of IEEE International Conference on Computer Vision, 1:105~112, July 2001.
-[2] C. Rother, A. Blake, and V. Kolmogorov, "Grabcut – interactive foreground extraction using iterated graph cuts",
-Proceedings of ACM SIGGRAPH 2004, 23(3):307~312, August 2004.
-[3] A. Agarwala, M. Dontcheva, M. Agrawala, et al, "Interactive digital photomontage",
-Proceedings of ACM SIGGRAPH 2004, 23(3):294~302, August 2004.
-[4] Y. Li, J. Sun, C. Tang, et al, "Interacting with images: Lazy snapping",
-Proceedings of ACM SIGGRAPH 2004, 23(3):303~308, August 2004.
-[5] A. Blake, C. Rother, M. Brown, et al, "Interactive Image Segmentation using an adaptive GMMRF model".
-Proceedings of European Conference on Computer Vision, pp. 428~441, May 2004.
-[6] V. Kwatra, A. Schodl, I. Essa, et al, "Graphcut Textures: Image and Video Synthesis Using Graph Cuts".
-Proceedings of ACM Siggraph 2003, pp.277~286, Augst 2003.
+[1] Y. Boykov, and M. P. Jolly, "Interactive graph cuts for optimal boundary and region segmentation of objects in N-D images", Proceeding of IEEE International Conference on Computer Vision, 1:105~112, July 2001.
+[2] C. Rother, A. Blake, and V. Kolmogorov, "Grabcut – interactive foreground extraction using iterated graph cuts", Proceedings of ACM SIGGRAPH 2004, 23(3):307~312, August 2004.
+[3] A. Agarwala, M. Dontcheva, M. Agrawala, et al, "Interactive digital photomontage", Proceedings of ACM SIGGRAPH 2004, 23(3):294~302, August 2004.
+[4] Y. Li, J. Sun, C. Tang, et al, "Interacting with images: Lazy snapping", Proceedings of ACM SIGGRAPH 2004, 23(3):303~308, August 2004.
+[5] A. Blake, C. Rother, M. Brown, et al, "Interactive Image Segmentation using an adaptive GMMRF model". Proceedings of European Conference on Computer Vision, pp. 428~441, May 2004.
+[6] V. Kwatra, A. Schodl, I. Essa, et al, "Graphcut Textures: Image and Video Synthesis Using Graph Cuts". Proceedings of ACM Siggraph 2003, pp.277~286, Augst 2003.
 [7] Song-Tao L I U, Fu-Liang Y I N. 基于图割的图像分割方法及其新进展[J]. 自动化学报, 2012, 38(6): 911-922.
  
 

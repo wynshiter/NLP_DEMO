@@ -1,25 +1,38 @@
 
 
 
-﻿﻿
-Remove Element 
-Total Accepted: 60351 
-Total Submissions: 187833 
-My Submissions
-                      
+
+ ﻿﻿
+
+Remove Element
+ Total Accepted: 60351
+ Total Submissions: 187833
+ My Submissions
+
+                       
 
 
 
 
-Given an array and a value, remove all instances of that value in place and return the new length.
 
-The order of elements can be changed. It doesn't matter what you leave beyond the new length.
-
-
-Show Tags
+Given an array and a value, remove all instances of that value in place and return the new length. 
+The order of elements can be changed. It doesn't matter what you leave beyond the new length. 
 
 
-c++ 解决方案：
+    Show Tags
+   
+
+
+
+
+
+
+
+    c++ 解决方案：
+   
+
+
+
 
 class Solution {
 public:
@@ -39,6 +52,10 @@ public:
 };
 
 
+
+
+
+
 int removeElement(vector<int>& nums, int val)
 {
     vector<int>::iterator  itr = nums.begin();
@@ -53,13 +70,24 @@ int removeElement(vector<int>& nums, int val)
 }
 
 
+
+
+
+
 int removeElement(int A[], int n, int elem) {
     int begin=0;
     for(int i=0;i<n;i++) if(A[i]!=elem) A[begin++]=A[i];
     return begin;
 }
 
-python解决方案：
+
+
+
+
+
+    python解决方案：
+   
+
 class Solution:
 # @param    A       a list of integers
 # @param    elem    an integer, value need to be removed
@@ -73,10 +101,21 @@ def removeElement(self, A, elem):
     return i
 
 
-史上最简洁的解决方案：
+
+
+
+
+    史上最简洁的解决方案：
+   
+
 def removeElement(self, nums, val):
         nums[:] = [x for x in nums if x!=val]
         return len(nums)
+
+
+
+
+
 
 
 

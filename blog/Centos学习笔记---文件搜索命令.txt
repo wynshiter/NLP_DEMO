@@ -5,131 +5,56 @@
 2012-2-8 星期三
 文件搜索命令:
 
-which [命令名称]
-功能：显示系统命令所在目录(绝对路径)
-
-$which ls
-whereis可以表现出命令的帮助信息，帮助文件说存放的信息
+ which [命令名称] 功能：显示系统命令所在目录(绝对路径)
+ $which ls whereis可以表现出命令的帮助信息，帮助文件说存放的信息
  
 
 find --通用查找命令
-
-语法：find[搜索路径][搜索关键字]
-功能：查找文件或目录
+ 语法：find[搜索路径][搜索关键字] 功能：查找文件或目录
  
--name 根据文件名来查找
-find /etc -name init
-在目录/etc中查找文件init（只匹配文件名init，通配符*匹配任意字符包括零个字符）
-init* ： 以init开头的文件
-？：匹配单个字符 init？？？：init后面还有三个符号
--size 文件大小 block数据块 512字节
-100MB=102400kb=204800数据块block（只支持数据块的表示方法）
-find /-size+204800
-在根目录下查找大于100mb的文件
-（大于+  小于-    等于 ）
-find /home -user samlee
-在根目录下查找所有者为samlee的文件
+-name 根据文件名来查找 find /etc -name init 在目录/etc中查找文件init（只匹配文件名init，通配符*匹配任意字符包括零个字符） init* ： 以init开头的文件 ？：匹配单个字符 init？？？：init后面还有三个符号 -size 文件大小 block数据块 512字节 100MB=102400kb=204800数据块block（只支持数据块的表示方法）
+ find /-size+204800 在根目录下查找大于100mb的文件 （大于+  小于-    等于 ） find /home -user samlee 在根目录下查找所有者为samlee的文件
  
-时间
-1.ctime ，atime ，mtime天为单位
-2.cmin，amin，mmin分钟为单位
-c-change改变，表示文件的属性被修改过
-a-access访问
-m-modify修改 ，表示文件的内容被修改过
--之内
-+超过
+时间 1.ctime ，atime ，mtime天为单位 2.cmin，amin，mmin分钟为单位 c-change改变，表示文件的属性被修改过 a-access访问 m-modify修改 ，表示文件的内容被修改过 -之内 +超过
  
 find /etc -mmin -120
 find /etc -ctime -1
 
-
-在/etc下查找24小时内被修改过属性的文件和目录
-find /etc -size +163840 -a -size -204800
-
-在/etc下查找大于80mb小于100mb的文件
-find /etc -name inittab -exec ls -l{} \;
-
-在/etc 下查找inittab文件并显示其详细信息
+ 在/etc下查找24小时内被修改过属性的文件和目录 find /etc -size +163840 -a -size -204800
+ 在/etc下查找大于80mb小于100mb的文件 find /etc -name inittab -exec ls -l{} \;
+ 在/etc 下查找inittab文件并显示其详细信息
 
 -type 文件类型 f 二进制文件 l 软链接文件 d 目录
-1.连接符 -a and 逻辑与 -o or 逻辑或
-2.连接符 find .....-exec 命令 {} \;
-                              {}find查询的结果
-                               \转义符，使用符号命令本身的意思
-                   -ok 询问确认
- 
+1.连接符 -a and 逻辑与 -o or 逻辑或 2.连接符 find .....-exec 命令 {} \;                               {}find查询的结果                                \转义符，使用符号命令本身的意思                    -ok 询问确认  
 
-
-无论文件名叫什么都可以根据文件的i节点来进行查找
-内核才能调用他。
+ 无论文件名叫什么都可以根据文件的i节点来进行查找 内核才能调用他。
  
 
 文件搜索命令：locate
-
-locate（搜索关键字）
-列出所有跟file相关的文件
-文件搜索命令：updatedb
-执行权限：root
-语法：updatedb
-功能描述：建立整个系统目录文件的数据库
-范例：#updatedb
+ locate（搜索关键字） 列出所有跟file相关的文件
+文件搜索命令：updatedb 执行权限：root 语法：updatedb 功能描述：建立整个系统目录文件的数据库 范例：#updatedb
  
 文件搜索命令：grep
 
-
-语法：grep[指定字串][源文件]
-功能描述：在文件中搜索字串匹配的行并输出
-范例：grep ftp /etc/services
+ 语法：grep[指定字串][源文件] 功能描述：在文件中搜索字串匹配的行并输出 范例：grep ftp /etc/services
  
 
-帮助命令：
-命令名称：man
-
-命令的英文原意：manual
-命令所在的路径：/user/bin/man
-执行权限：所用用户
-语法：man[命令或者配置文件]
-功能描述：获得帮助信息
-man ls 查看ls命令的帮助信息
-man services 查看配置文件services的帮助信息
+帮助命令： 命令名称：man
+ 命令的英文原意：manual 命令所在的路径：/user/bin/man 执行权限：所用用户 语法：man[命令或者配置文件] 功能描述：获得帮助信息
+man ls 查看ls命令的帮助信息 man services 查看配置文件services的帮助信息
  
  
-帮助指令：info
-语法：info[任何关键字]
-功能描述：获得帮助信息{unix中没有这个命令}
+帮助指令：info 语法：info[任何关键字] 功能描述：获得帮助信息{unix中没有这个命令}
  
 帮助命令：whatis
-
-whatis whatis
-指令名称：whatis apropos makewhatis
-search the whatis database for strings
- 
-语法：whatis apropos [任何关键字]
-功能描述：获得索引的简短说明信息
-apropos fstab 相当于man -k
-补充命令：help 查看shell内置命令的帮助
+ whatis whatis 指令名称：whatis apropos makewhatis search the whatis database for strings   语法：whatis apropos [任何关键字] 功能描述：获得索引的简短说明信息 apropos fstab 相当于man -k
+ 补充命令：help 查看shell内置命令的帮助
  
 linux 常用命令：压缩解压命令
-
--gz
-命令的英文原意：Gnu zip
-语法：gzip 选项[文件]
-功能描述：压缩文件
-压缩后文件格式： .gz
-1. 只能压缩文件，不能压缩目录
-2.不保留源文件
+ -gz 命令的英文原意：Gnu zip 语法：gzip 选项[文件] 功能描述：压缩文件 压缩后文件格式： .gz
+1. 只能压缩文件，不能压缩目录 2.不保留源文件
  
-解压缩命令：gunzip
-语法：gunzip选项[压缩文件]
-功能描述：解压缩.gz的压缩文件
-范例：gunzip file1.gz
-压缩解压目录：tar
-命令名称：tar
-语法 tar选项[cvf][目录]
-     -c 产生.tar打包文件
-     -v 显示详细信息
-     -f 指定压缩后的文件名
-     -z 打包的同时压缩
-压缩后的文件格式：.tar.gz
+解压缩命令：gunzip 语法：gunzip选项[压缩文件] 功能描述：解压缩.gz的压缩文件 范例：gunzip file1.gz
+ 压缩解压目录：tar 命令名称：tar 语法 tar选项[cvf][目录]      -c 产生.tar打包文件      -v 显示详细信息      -f 指定压缩后的文件名      -z 打包的同时压缩 压缩后的文件格式：.tar.gz
 
 

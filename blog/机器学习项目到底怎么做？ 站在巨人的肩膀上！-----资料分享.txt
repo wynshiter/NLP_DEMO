@@ -4,7 +4,6 @@
 
 
 
-
 很久没有更新图形图像处理方面的博客了，最近在培训数据发掘方面的技术，就把学到的东西和大家分享下。机器学习的项目到底怎么做呢？具体如何和业务结合落地，我们一起来慢慢探索这整个的生态圈。
 
 1. 压箱底的资料
@@ -13,91 +12,52 @@
 http://www.ipol.im/?utm_source=doi
 
 1.2 https://www.codecademy.com/ ----在线编程自学成才
-我的python就是在这个网站自学的，基本上把python的基本数据结构，list，dist等等介绍了一遍，只要一周左右甚至更短的时间就可以基本掌握一门全新的语言
-
+我的python就是在这个网站自学的，基本上把python的基本数据结构，list，dist等等介绍了一遍，只要一周左右甚至更短的时间就可以基本掌握一门全新的语言 
 1.3 在线绘制框图----没有visio的最好选择
 https://www.processon.com/
 
 如果没有visio这是最好的选择！
 1.4 一些大牛的博客
-刘未鹏
-http://mindhacks.cn/
-http://mindhacks.cn/2011/11/04/how-to-interview-a-person-for-two-years/
-http://mindhacks.cn/2012/08/27/modern-cpp-practices/
-廖雪峰的python教程
-https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000
+刘未鹏 http://mindhacks.cn/ http://mindhacks.cn/2011/11/04/how-to-interview-a-person-for-two-years/ http://mindhacks.cn/2012/08/27/modern-cpp-practices/
+廖雪峰的python教程 https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000
 1.5 写技术博客的选择
 在csdn耕耘了8年有余，一直很喜欢这里，然而不知道为何身边的朋友高手就是github，stackoverflow。学习过程中不时记录总结的习惯非常重要，正所谓温故而知新。
 后面我也准备尝试一些其他的平台
-
-知乎：https://www.zhihu.com/people/wynshiter/activities
-https://cn.wordpress.org/
-简书：
-https://pages.github.com/
-
+知乎：https://www.zhihu.com/people/wynshiter/activitieshttps://cn.wordpress.org/简书：https://pages.github.com/
 1.6 机器学习算法的c++ sdk（提供更多选择）
 
 Dlib是一个使用现代C++技术编写的跨平台的通用库，遵守Boost Software licence.它包含机器学习算法和工具，用于在C++中创建复杂的软件来解决现实问题。它在工业和学术界被广泛应用于各种领域，包括机器人，嵌入式设备，移动电话和大型高性能计算环境。
-主要特点如下：
-1.完善的文档：每个类每个函数都有详细的文档，并且提供了大量的示例代码，如果你发现文档描述不清晰或者没有文档，告诉作者，作者会立刻添加。
-2.可移植代码：代码符合ISO C++标准，不需要第三方库支持，支持win32、Linux、Mac OS X、Solaris、HPUX、BSDs 和 POSIX 系统
-3.线程支持：提供简单的可移植的线程API
-4.网络支持：提供简单的可移植的Socket API和一个简单的Http服务器
-5.图形用户界面：提供线程安全的GUI API
-6.数值算法：矩阵、大整数、随机数运算等
-7.机器学习算法：
-8.图形模型算法：
-9.图像处理：支持读写Windows BMP文件，不同类型色彩转换
-10.数据压缩和完整性算法：CRC32、Md5、不同形式的PPM算法
-11.测试：线程安全的日志类和模块化的单元测试框架以及各种测试assert支持
-12.一般工具：XML解析、内存管理、类型安全的big/little endian转换、序列化支持和容器类
+主要特点如下： 1.完善的文档：每个类每个函数都有详细的文档，并且提供了大量的示例代码，如果你发现文档描述不清晰或者没有文档，告诉作者，作者会立刻添加。 2.可移植代码：代码符合ISO C++标准，不需要第三方库支持，支持win32、Linux、Mac OS X、Solaris、HPUX、BSDs 和 POSIX 系统 3.线程支持：提供简单的可移植的线程API 4.网络支持：提供简单的可移植的Socket API和一个简单的Http服务器 5.图形用户界面：提供线程安全的GUI API 6.数值算法：矩阵、大整数、随机数运算等 7.机器学习算法： 8.图形模型算法： 9.图像处理：支持读写Windows BMP文件，不同类型色彩转换 10.数据压缩和完整性算法：CRC32、Md5、不同形式的PPM算法 11.测试：线程安全的日志类和模块化的单元测试框架以及各种测试assert支持 12.一般工具：XML解析、内存管理、类型安全的big/little endian转换、序列化支持和容器类
 参考网页：
 
-2017年最牛逼的五个机器学习项目
-https://www.kdnuggets.com/2017/01/five-machine-learning-projects-cant-overlook-january.html
+2017年最牛逼的五个机器学习项目 https://www.kdnuggets.com/2017/01/five-machine-learning-projects-cant-overlook-january.html
 
 
-35个最牛逼的机器学习项目
-https://mp.weixin.qq.com/s/zBaOHSMqC7v7dML9AWPLiA
+35个最牛逼的机器学习项目 https://mp.weixin.qq.com/s/zBaOHSMqC7v7dML9AWPLiA
 
 
-使用dlib 的python接口实现换脸
-http://python.jobbole.com/82546/
+使用dlib 的python接口实现换脸 http://python.jobbole.com/82546/
 
 1.7 可视化感受机器学习的整个过程
 1.神经网络的训练：http://playground.tensorflow.org
-我们选择一个数据为非线性切分的复杂例子
+我们选择一个数据为非线性切分的复杂例子 
+2.两层简单神经网络演示非线性切分 http://cs.stanford.edu/people/karpathy/convnetjs//demo/classify2d.html
+3.神经网络进行手写字符识别 http://terencebroad.com/convnetvis/vis.html 
 
-2.两层简单神经网络演示非线性切分
-http://cs.stanford.edu/people/karpathy/convnetjs//demo/classify2d.html
-3.神经网络进行手写字符识别
-http://terencebroad.com/convnetvis/vis.html
-
-
-2.  Transwarp 机器学习培训
+2. Transwarp 机器学习培训
 转型机器学习方向的过程是痛苦的。最近在上海花了一周时间参加transwarp的数据分析师培训，这是我时隔7年之后再次踏上魔都的土地。上次来这里还是7年前来看上海世博会，不同的是此处上海之行是由北京启程。我乘坐的是最早一班复兴号列车，由于很多外国人都在新奇 的拍照，这一路风驰电掣的路过祖国的大好河山，让我也怀揣着满满的民族自豪感惊异于祖国 的发展速度。2010年那会来上海一趟多难呀，尤其要买个卧铺，真是难上加难。
 非常感谢单位领导给予的宝贵培训机会，之前说实话并未有全面系统的学过机器学习内容。但最重要的还是不知道：真实，工业级，业务上究竟怎么开展机器学习与业务的结合工作。这次培训基本给了我答案。transwarp 通过
 推荐其支持托拉拽的机器学习产品sophon，让我直观的感受了整套机器学习工具平台的使用过程，以及机器学习模型的建模套路。其中之前我一直不太注重的有以下两点：
-1.特征工程，归一化，字符串索引
-2.评价指标，roc，方差和等
+1.特征工程，归一化，字符串索引 2.评价指标，roc，方差和等
 ##2.1 机器学习的算法
 
 2.2 到底如何衡量业务是否需要机器学习？
-
-业务问题是否适用机器学习算法？
-如何选择模型
-设计开发节奏
-最终产品的检验
-
+业务问题是否适用机器学习算法？如何选择模型设计开发节奏最终产品的检验
 2.3 完整的数据发掘建模流程
 
 2.4 特征工程
 特征工程是机器学习的决定性因素，是机器学习成功的关键
-“数据和特征决定了机器学习的上限，而模型和算法只是逼近这个上限而已”
-纵观Kaggle、KDD，阿里天池等国内外大大小小的比赛，每个竞赛的冠军其实
-并没有用到很高深的算法，大多数都是在特征工程这个环节做出了出色的工作，
-然后使用一些常见的算法，比如Linear Regression（线性回归），就能得到出色的
-性能。
+“数据和特征决定了机器学习的上限，而模型和算法只是逼近这个上限而已” 纵观Kaggle、KDD，阿里天池等国内外大大小小的比赛，每个竞赛的冠军其实 并没有用到很高深的算法，大多数都是在特征工程这个环节做出了出色的工作， 然后使用一些常见的算法，比如Linear Regression（线性回归），就能得到出色的 性能。
 领域特定知识（ domain specific knowledge），
 
 最近还看到公众号上面一些好的文章，整取领悟以后分享出来
@@ -106,25 +66,21 @@ http://terencebroad.com/convnetvis/vis.html
 KNIME https://www.knime.com/
 对于机器学习和数据科学的初学者来说，最大的挑战之一是需要同时学习太多知识，特别是如果你不知道如何编码。你需要快速地适应线性代数、统计以及其他数学概念，并学习如何编码它们，对于新用户来说，这可能会有点难以承受。
 如果你没有编码的背景并且发现很难学习下去，这时你可以用一个GUI驱动的工具来学习数据科学。当你刚开始学习的时候，可以集中精力学习实际的项目。一旦适应了基本的概念，你就可以在以后慢慢学习如何编写代码。
-在今天的文章中，我将介绍一个基于GUI的工具：KNIME
-
+在今天的文章中，我将介绍一个基于GUI的工具：KNIME 
 sophon
 星环还通过Transwarp Sophon来帮助数据工程师开发数据挖掘的应用。Sophon提供了可视化界面工具Midas 用于创建模型,用户只需通过拖拽数据源对象和运算符就能完成模型设计,然后将设计的模型在TDH集群上训 练或预测分析。
 此外,Sophon还整合了深度学习框架Tensorflow,使用户可以通过拖拽生成各种神经网络模型,灵活调参和训练,将大数据和人工智能结合起来推动业务创新。
 
 3. 经典案例----泰坦尼克乘客的生还预测，房价预测
-http://blog.csdn.net/sinat_32547403/article/details/71269804
-http://blog.csdn.net/ZengHaihong/article/details/53199559
+http://blog.csdn.net/sinat_32547403/article/details/71269804 http://blog.csdn.net/ZengHaihong/article/details/53199559
 4. 优秀开源机器学习库
-28款GitHub最流行的开源机器学习项目
-https://yq.aliyun.com/articles/30794
-15 个开源的顶级人工智能工具
-http://blog.jobbole.com/106447/
+28款GitHub最流行的开源机器学习项目 https://yq.aliyun.com/articles/30794
+15 个开源的顶级人工智能工具 http://blog.jobbole.com/106447/
 5.普通程序员如何学习机器学习
 https://www.zhihu.com/question/51039416
-https://github.com/Avik-Jain/100-Days-of-ML-Code-Chinese-Version
-
+https://github.com/Avik-Jain/100-Days-of-ML-Code-Chinese-Version 
 未完待续。。。。
+
 
 
 

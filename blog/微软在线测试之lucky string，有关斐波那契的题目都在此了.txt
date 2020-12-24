@@ -2,8 +2,8 @@
 
 
 
-
-
+ 
+ 
 解决方案：
 
 int _tmain(int argc,_TCHAR* argv[])
@@ -45,16 +45,15 @@ int _tmain(int argc,_TCHAR* argv[])
     return 0;
 }
 
-
-
-讨论贴：
+ 
+  讨论贴： 
 http://bbs.csdn.net/topics/391023839
-
+ 
 后面碰见有关斐波那契数列的题目非常多，这块还有一个求期望的：
 http://bbs.csdn.net/topics/391822110
 正确答案：
-http://blog.csdn.net/u010476094/article/details/48110405
+http://blog.csdn.net/u010476094/article/details/48110405 
 这他妈的也太难算了吧
-
+  
 
 

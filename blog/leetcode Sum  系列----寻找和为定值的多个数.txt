@@ -4,30 +4,22 @@
 
 
 
-
 july 大神有个程序员编程艺术系列，第五章《寻找和为定值的多个数》,现在我们站在大牛的肩膀上，对leetcode上n个数求和的系列问题做个阶段性总结。
 
-1.leetcode No.1 2sum
-Given an array of integers, return indices of the two numbers such that they add up to a specific target. 
-You may assume that each input would have exactly one solution, and you may not use the same element twice. 
-Example: 
-Given nums = [2, 7, 11, 15], target = 9,
-Because nums[0] + nums[1] = 2 + 7 = 9, 
-return [0, 1].
+
+
+  1.leetcode No.1 2sum
+ 
+Given an array of integers, return indices of the two numbers such that they add up to a specific target.  You may assume that each input would have exactly one solution, and you may not use the same element twice.  Example:  Given nums = [2, 7, 11, 15], target = 9,
+Because nums[0] + nums[1] = 2 + 7 = 9,  return [0, 1].
 http://blog.csdn.net/gatieme/article/details/50596965
 1.1 双向扫描
 时间复杂度O（N）,空间复杂度O(N)
-暴力穷举的办法我们就不说了任选两个数判断和是否为输入即可 
-a[i]在序列中，如果a[i]+a[k]=sum的话，那么sum-a[i]（a[k]）也必然在序列中，举个例子，如下：
-原始序列：1、2、4、7、11、15  
-用输入数字15 减一下各个数，得到对应的 
-序列为： 
-对应序列：14、13、11、8、4、0
+暴力穷举的办法我们就不说了任选两个数判断和是否为输入即可  a[i]在序列中，如果a[i]+a[k]=sum的话，那么sum-a[i]（a[k]）也必然在序列中，举个例子，如下：
+原始序列：1、2、4、7、11、15  用输入数字15 减一下各个数，得到对应的  序列为：  对应序列：14、13、11、8、4、0
 第一个数组以一指针i从数组最左端开始向右扫描，第二个数组以一指针j 从数组最右端开始向左扫描，如果下面出现了和上面一样的数，即a[*i]=a[*j]，就找出这俩个数来了。如上，i，j最终在第一个，和第二个序列中找到了相同的数4 和11，所以符合条件的两个数，即为4+11=15。
  
-然后用两个指针i，j，各自指向数组的首尾 
-两端，令i=0，j=n-1，然后i++，j–，逐次判断a[i]+a[j]?=sum，如果某一刻a[i]+a[j]>sum， 
-则要想办法让sum 的值减小，所以此刻i 不动，j–，如果某一刻a[i]+a[j]
+然后用两个指针i，j，各自指向数组的首尾  两端，令i=0，j=n-1，然后i++，j–，逐次判断a[i]+a[j]?=sum，如果某一刻a[i]+a[j]>sum，  则要想办法让sum 的值减小，所以此刻i 不动，j–，如果某一刻a[i]+a[j]
 // leetcode1-2Sum.cpp : 定义控制台应用程序的入口点。
 //
 
@@ -255,18 +247,15 @@ class Solution:
                 # 否则这两个数的和为target, 则返回
                 return (dict[target - num[i]] , i )
 
-2. leetcode No.15 3Sum
+
+
+  2. leetcode No.15 3Sum
+ 
 Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 Note: The solution set must not contain duplicate triplets.
 For example, given array S = [-1, 0, 1, 2, -1, -4],
-A solution set is: 
-[ 
-  [-1, 0, 1], 
-  [-1, -1, 2] 
-]
-思路： 
-- 1，先按照由小到大把数组排序 
-- 2，循环取第i位，数值a[i],  后面剩余的由旁边向中间扫描，看是否符合 a[m]+a[n] == -a[i]，如果a[m]+a[n]>-a[i]，则向右边移动m，如果小于则向左边移动n 
+A solution set is:  [  [-1, 0, 1],  [-1, -1, 2]  ]
+思路：  - 1，先按照由小到大把数组排序  - 2，循环取第i位，数值a[i], 后面剩余的由旁边向中间扫描，看是否符合 a[m]+a[n] == -a[i]，如果a[m]+a[n]>-a[i]，则向右边移动m，如果小于则向左边移动n 
 典型c++解法如下：
 class Solution
 {
@@ -315,7 +304,10 @@ public:
     return result;
     }
 };
- 3. leetcode No.16 3Sum Closest
+
+
+   3. leetcode No.16 3Sum Closest
+ 
 Given an array S of n integers, find three integers in S such that the sum is closest to a given number, target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
 For example, given array S = {-1 2 1 -4}, and target = 1.
 
@@ -343,16 +335,14 @@ public:
             return result;
         }
 };
- 4. leetcode No.18 4Sum
+
+
+   4. leetcode No.18 4Sum
+ 
 Given an array S of n integers, are there elements a, b, c, and d in S such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
 Note: The solution set must not contain duplicate quadruplets.
 For example, given array S = [1, 0, -1, 0, -2, 2], and target = 0.
-A solution set is: 
-[ 
-  [-1,  0, 0, 1], 
-  [-2, -1, 1, 2], 
-  [-2,  0, 0, 2] 
-]
+A solution set is:  [  [-1, 0, 0, 1],  [-2, -1, 1, 2],  [-2, 0, 0, 2]  ]
 // O(n^3)
 class Solution {
 public:
@@ -380,12 +370,12 @@ public:
         return vector<vector<int> > (res.begin(), res.end());
     }
 };
- 5. 举一反三 n Sum
-https://www.jianshu.com/p/3d1791cfba53 
-http://blog.csdn.net/XingKong_678/article/details/50894322 
-http://blog.csdn.net/yuanwei1314/article/details/42963229
-输入两个整数n 和m，从数列1，2，3…….n 中随意取几个数, 
-使其和等于m ,要求将其中所有的可能组合列出来。
+
+
+   5. 举一反三 n Sum
+ 
+https://www.jianshu.com/p/3d1791cfba53  http://blog.csdn.net/XingKong_678/article/details/50894322  http://blog.csdn.net/yuanwei1314/article/details/42963229
+输入两个整数n 和m，从数列1，2，3…….n 中随意取几个数,  使其和等于m ,要求将其中所有的可能组合列出来。
 // 21 题递归方法
 //copyright@ July && yansha
 //July、yansha，updated。
@@ -428,6 +418,8 @@ int main()
 
     find_factor(sum,n);
     return 0;
-} 
+}
+
+
 
 

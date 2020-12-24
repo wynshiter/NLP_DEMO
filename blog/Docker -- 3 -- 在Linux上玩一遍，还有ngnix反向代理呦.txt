@@ -1,0 +1,375 @@
+
+
+
+
+
+在前面已经尝试着使用了一些docker的功能，并且能够部署一个网站，这里是最近部署网站的一些心得。
+目前电信网申请的ip默认80和8080端口都是封闭的，然后我就默默的试了一下443端口，结果可以用，所以，就全站https来玩吧。此文中的网站部署就是基于https，nginx，docker进行部署，这样带来的好处有很多，首先nginx可以进行反向代理，担任就可以使用一些简单的均衡负载，这里就不讨论HA和KEPPALIVED的使用了。而有趣的是docker正好可以实现多个实例的启用，并且可以分布在不同的机器上，这样用这几个东西，可以搭建一个稳定，可扩容的容器来进行网站部署了。
+
+Docker
+此次服务器的系统信息
+1
+2
+3
+4
+5
+6
+[xxxx@localhost ~]$ lsb_release -a
+LSB Version:	:core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:desktop-4.1-amd64:desktop-4.1-noarch:languages-4.1-amd64:languages-4.1-noarch:printing-4.1-amd64:printing-4.1-noarch
+Distributor ID:	CentOS
+Description:	CentOS Linux release 7.2.1511 (Core)
+Release:	7.2.1511
+Codename:	Core
+
+让Linux的Docker跑起来
+首先安装docker，没啥说的sudo yum install docker -y，安装完成后，使用的时候报了这样一个问题
+1
+Cannot connect to the Docker daemon. Is the docker daemon running on this host?
+
+看来是docker没启动，使用ps看了一下京城，确实是没开docker服务造成的，docker的命令连不上docker实例造成的。
+1
+2
+3
+4
+5
+6
+7
+8
+9
+[xxxxxx@localhost ~]$ ps -ef | grep docker
+xxxxxx   14831 11586  0 09:36 pts/1    00:00:00 grep --color=auto docker
+[xxxxxx@localhost ~]$ service docker start
+Redirecting to /bin/systemctl start  docker.service
+==== AUTHENTICATING FOR org.freedesktop.systemd1.manage-units ===
+Authentication is required to manage system services or units.
+Authenticating as: root
+Password:
+==== AUTHENTICATION COMPLETE ===
+
+开启来，使用了一下docker命令还是报错，使用ps看了一下进程，发现docker服务已经开启
+1
+2
+3
+[xxx@localhost ~]$ ps -ef | grep docker
+root     14895     1  0 09:36 ?        00:00:00 /usr/bin/dockerd-current --add-runtime docker-runc=/usr/libexec/docker/docker-runc-current --default-runtime=docker-runc --exec-opt native.cgroupdriver=systemd --userland-proxy-path=/usr/libexec/docker/docker-proxy-current --selinux-enabled --log-driver=journald --signature-verification=false
+root     14906 14895  0 09:36 ?        00:00:00 /usr/bin/docker-containerd-current -l unix:///var/run/docker/libcontainerd/docker-containerd.sock --shim docker-containerd-shim --metrics-interval=0 --start-timeout 2m --state-dir /var/run/docker/libcontainerd/containerd --runtime docker-runc --runtime-args --systemd-cgroup=true
+
+然后只能查一查什么问题了，看来我遇到了和参考2一样的问题了，使用sudo在加上docker命令就一切正常了，这是什么鬼鬼鬼？可能是由于docker进程是root用户启动的吧。
+写docker-compose.yml
+docker跑起来以后，通过对文章开始的需求分析，nginx服务器直接装在物理机器上，不进行docker化，docker上要放的是一个msql实例，一个或多个tomcat实例，这里我们用一个实例还做测试环境。
+看一下docker-compose目录结构
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+nswp
+├── data
+│   └── mysql
+├── docker-compose.yml
+├── logs
+├── mysql
+│   └── Dockerfile
+└── tomcat
+   ├── Dockerfile
+   ├── cert
+   │   ├── xxx.key
+   │   ├── xxx.pem
+   │   ├── xxx.pfx
+   │   ├── xxx.zip
+   │   └── xxx.txt
+   └── server.xml
+
+直接贴出docker-compose.yml的代码
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+#构建tomcat
+tomcat:
+#tomcat目录在tomcat文件夹下
+build: ./tomcat
+#将实例8443端口映射到本地48443端口
+ports:
+- "48443:8443"
+#实例内部使用连接mysql实例，这里端口号要使用mysql实例的内部端口号
+links:
+- "mysql"
+#挂在两个目录，一个日志目录，一个web目录
+volumes:
+- /home/xxxxxx/docker/nswp/www:/usr/local/tomcat/webapps
+- /home/xxxxxx/docker/nswp/logs:/usr/local/tomcat/logs
+#构建tomcatmysql
+mysql:
+build: ./mysql
+ports:
+- "43306:3306"
+# 将msyql的数据库文件存储在本地
+volumes:
+- /home/xxxxxx/docker/nswp/data/mysql:/var/lib/mysql
+#此处是为了解决mysql的编码问题，防止中文乱码
+command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --init-connect='SET NAMES utf8;' --innodb-flush-log-at-trx-commit=0
+environment:
+#设置mysql root用户初始密码为123456
+MYSQL_ROOT_PASSWORD: 123456
+
+分别看一下tomcat和mysql的Dockerfile。
+tomcat
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+#使用官方的tomcat7和jre7
+FROM tomcat:7-jre7
+#配置系统时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+#删除默认的web目录，重新创建web目录和cert，因为是要使用https，cert下放的是证书文件
+RUN rm -rf /usr/local/tomcat/webapps
+RUN mkdir /usr/local/tomcat/webapps
+RUN mkdir /usr/local/tomcat/cert
+#将tomcat的配置文件server.xml替换
+ADD  server.xml     /usr/local/tomcat/conf/server.xml
+ADD  cert           /usr/local/tomcat/cert
+
+msyql没啥说的
+1
+2
+3
+4
+5
+FROM mysql:5.6
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
+有了这些文件以后，记得将几个挂在目录的权限更改，要不然构建的时候会提示Permission denied错误，具体方法，见下面的过程中遇到的一些问题的第三小点。
+然后使用sudo docker-compose build 和 sudo docker-compose up开心玩耍吧。
+一些测试结果
+在没有修改docker-compose.yml的情况下，使用docker-compose build后重新启动容器，发现对数据库的变更没有修改，经过分析是这样的，我们对数据库的数据库文件时挂在主机上的，主机上的数据库文件并没有进行修改，所以在启动mysql实例的时候，经过mysql检查有数据库文件存在并没有重新创建文件，则使用的是过去老的文件，而数据库元数据也在这些文件中，所有就不会产生数据库文件丢失或者修改的问题。当修改了docker-compose配置文件后，会重新构建，当修改了每个组件的dockfile后，会重新构建image。
+过程中遇到的一些问题
+docker强制批量删除none的image镜像
+今天用的的时候发现好多名字为none的镜像，也不知道是干啥的，如代码
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+~ ⮀ docker images  -a
+REPOSITORY                    TAG                 IMAGE ID            CREATED             SIZE
+ysrc/xunfeng                  latest              f36ad378ce3a        7 weeks ago         676 MB
+test_php                      latest              a9f6fbd333a2        7 weeks ago         362 MB
+<none>                        <none>              e45c0dceafb9        7 weeks ago         181 MB
+test_nginx                    latest              bf0d37221331        7 weeks ago         181 MB
+php                           5.6-fpm-alpine      d8b8c23ff108        8 weeks ago         54.5 MB
+supervisord                   latest              569f95736129        8 weeks ago         292 MB
+<none>                        <none>              b4aa8b82cd57        8 weeks ago         292 MB
+<none>                        <none>              8e9a0c97a133        8 weeks ago         292 MB
+<none>                        <none>              958c08978b0c        8 weeks ago         292 MB
+<none>                        <none>              3138e3644958        8 weeks ago         292 MB
+<none>                        <none>              a713034800d6        8 weeks ago         292 MB
+<none>                        <none>              d8991f8aa3c6        8 weeks ago         257 MB
+<none>                        <none>              bcdc472cc73a        8 weeks ago         208 MB
+<none>                        <none>              89e045811261        8 weeks ago         203 MB
+<none>                        <none>              adcd83eecb0d        8 weeks ago         203 MB
+<none>                        <none>              c6bb44d794ea        8 weeks ago         169 MB
+<none>                        <none>              15f104cdeb77        8 weeks ago         169 MB
+nginx                         1.10.2              c2d83d8cde8d        2 months ago        181 MB
+php                           5.6-fpm             55423bcf0cfc        2 months ago        362 MB
+test_mysql                    latest              e1406e1f7c42        2 months ago        328 MB
+mysql                         5.6                 e1406e1f7c42        2 months ago        328 MB
+mysql                         5.7                 594dc21de8de        2 months ago        400 MB
+ubuntu                        16.04               c73a085dc378        4 months ago        127 MB
+redis                         latest              1aa84b1b434e        4 months ago        183 MB
+tomcat                        latest              30d95ba23356        5 months ago        355 MB
+rabbitmq                      latest              e47df982f144        5 months ago        179 MB
+mysql                         latest              18f13d72f7f0        5 months ago        383 MB
+daocloud.io/aber/pocscan      latest              f606a8e3422d        7 months ago        573 MB
+hello-world                   latest              c54a2cc56cbb        7 months ago        1.85 kB
+tutum/mongodb                 latest              64ca9521c703        12 months ago       503 MB
+kitematic/hello-world-nginx   latest              03b4557ad7b9        20 months ago       7.91 MB
+ubuntu                        13.04               a58cd502f927        2 years ago         169 MB
+
+删除这些东西，使用命令
+1
+sudo docker rmi $(sudo docker images -f "dangling=true" -q)
+
+具体原因见这篇博客
+x509: certificate has expired or is not yet valid 问题
+在pull新的images时，遭遇了这样的问题：
+1
+2
+3
+4
+5
+6
+7
+8
+~ ⮀ docker pull ubuntu:14.04
+14.04: Pulling from library/ubuntu
+c60055a51d74: Pulling fs layer
+755da0cdb7d2: Pulling fs layer
+969d017f67e6: Pulling fs layer
+37c9a9113595: Waiting
+a3d9f8479786: Waiting
+error pulling image configuration: Get https://acs-cn-hangzhou-mirror.oss-cn-hangzhou.aliyuncs.com/docker/registry/v2/blobs/sha256/b9/xxx/data?Expires=xxx&OSSAccessKeyId=xxxx&Signature=xxxx: x509: certificate has expired or is not yet valid
+
+网上都说是系统时间不正确，同步时间后会正确，但我的这里很明显不是这个问题，因为系统时间是定期去和时间服务器自动update的。各种操作后不知道什么原因，最后把server重启了一次，就可以正常的进行pull操作了。
+Permission denied问题
+在使用docker-compose up启动实例时，发现报错
+1
+chown: cannot read directory '/var/lib/mysql/': Permission denied
+
+这个报错的主要原因是因为CentOS7中的安全模块selinux把权限禁掉了，导致docker不能够正常的访问主机目录，挂载目录出现问题。解决方案有三种：
+在运行容器的时候，给容器加特权，也就是加上 –privileged=true 参数，如下
+1
+docker run -it --name=master --hostname=master -v /data/share/master:/opt/share --privileged=true   centos-hadoop /bin/bash
+
+在docker-compose.yml文件中，可采用添加privileged:true这样的参数达到同样的效果，具体的docker-compose参数可以看参考链接5。
+临时关闭selinux
+1
+setenforce 0
+
+当然，没有了安全模块，那么目录就是随便访问挂载了。这个方案最好还是只测试用，用完了以后记得打开selinux。
+添加selinux规则，改变要挂载的目录的安全性文本，和第二条的区别就是一个全局，一个局部，推荐使用这种方法。
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+# 更改安全性文本的格式如下
+chcon [-R] [-t type] [-u user] [-r role] 文件或者目录
+选顷不参数：
+-R  ：连同该目录下癿次目录也同时修改；
+-t  ：后面接安全性本文的类型字段！例如 httpd_sys_content_t ；
+-u  ：后面接身份识别，例如 system_u；
+-r  ：后面街觇色，例如 system_r
+chcon -Rt svirt_sandbox_file_t /data/share/master
+
+
+Mac下其实也有这个策略，但是在docker app下有一个File Sharing选项卡，在里面可以增加共享目录，原理应该和这个是差不多的。
+
+一次性关闭所有容器
+1
+sudo docker stop $(sudo docker ps -a -q)
+
+记得给docker实例修改时间
+给ubuntu14.04修改事件为shanghai时间，其他的系统可以自行搜索。在Dockerfile里增加命令
+1
+2
+3
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN dpkg-reconfigure --frontend noninteractive tzdata
+
+就可以把实例事件修改为东八区的事件啦。
+修改mysql的字符集，要不然中文会乱码
+在部署网站跑起来以后，发现中文会乱码，则想到是mysql编码的问题，至于编码问题，可是全部使用utf-8来解决，具体解决方案
+1
+2
+3
+4
+5
+6
+7
+8
+9
+mysql:
+build: ./mysql
+ports:
+- "43306:3306"
+volumes:
+- /home/xxxxxx/docker/nswp/data/mysql:/var/lib/mysql
+command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --init-connect='SET NAMES utf8;' --innodb-flush-log-at-trx-commit=0
+environment:
+MYSQL_ROOT_PASSWORD: 123456
+
+可以看到，是向docker-compose.yml文件中构建mysql的地方中间加上一段command，command: mysqld --character-set-server=utf8 --collation-server=utf8_general_ci --init-connect='SET NAMES utf8;' --innodb-flush-log-at-trx-commit=0，这样就可以解决mysql的乱码问题。
+参考链接
+
+haproxy+keepalived实现高可用负载均衡Docker实践6：Cannot connect to the Docker daemon.阿里云部署Docker（6）—-删除镜像Docker使用-v挂载主机目录到容器后出现Permission deniedDocker Compose—简化复杂容器应用的利器Docker 的 MySQL 官方镜像如何设置时区
+
+
+

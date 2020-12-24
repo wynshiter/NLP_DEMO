@@ -3,21 +3,21 @@
 
 昨天根据uc伯克利的人工图像分割文件.seg,显示图像的时候调用了OpenCV的库函数，图片都能用imwrite写好，但是imshow死活显示不出来。
 今天早上发现原来是imshow()后面应该加上：cvWaitKey(0);
-
-
-
-
-
-
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 下面两个帖子也是同样的问题：
-
+ 
 http://www.cnblogs.com/krisdy/archive/2009/05/26/1429448.html
-
+ 
 http://blog.163.com/yuyang_tech/blog/static/2160500832013917111920645/
  
  
@@ -30,47 +30,76 @@ IplImage *src;
 	Mat mat(src);
 	imshow("who",mat);//这块还是出错
 
- 
- 
-最后找到了这个帖子：
- 
+
+  
+
+
+  
+
+
+ 最后找到了这个帖子：
+
+
+  
+
+
 http://bbs.csdn.net/topics/350004415
- 
-果然是lib库的版本加载错误了，我去，调试了一下午。。。
- 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <opencv2/features2d/features2d.hpp>
-#include <opencv2/legacy/legacy.hpp>
-using namespace cv;
-#pragma comment(lib,"opencv_core2410.lib")
-#pragma comment(lib,"opencv_highgui2410.lib")
-#pragma comment(lib,"opencv_imgproc2410.lib")
-#pragma comment(lib,"opencv_features2d2410.lib")
-#pragma comment(lib,"opencv_calib3d2410.lib")
-#pragma comment(lib,"opencv_legacy2410.lib")
+
+
+  
+
+
+ 果然是lib库的版本加载错误了，我去，调试了一下午。。。
+
+
+  
+
+#include <opencv2/core/core.hpp> #include <opencv2/highgui/highgui.hpp> #include <opencv2/imgproc/imgproc.hpp> #include <opencv2/imgproc/imgproc_c.h> #include <opencv2/calib3d/calib3d.hpp> #include <opencv2/features2d/features2d.hpp> #include <opencv2/legacy/legacy.hpp> using namespace cv;
+#pragma comment(lib,"opencv_core2410.lib") #pragma comment(lib,"opencv_highgui2410.lib") #pragma comment(lib,"opencv_imgproc2410.lib") #pragma comment(lib,"opencv_features2d2410.lib") #pragma comment(lib,"opencv_calib3d2410.lib") #pragma comment(lib,"opencv_legacy2410.lib")
+
 特别注意上述版本到底是debug还是release版本的
- 
-debug版本的：后缀都加个d
- 
-#pragma comment(lib,"opencv_core2410d.lib")
-#pragma comment(lib,"opencv_highgui2410d.lib")
-#pragma comment(lib,"opencv_imgproc2410d.lib")
-#pragma comment(lib,"opencv_features2d2410d.lib")
-#pragma comment(lib,"opencv_calib3d2410d.lib")
-#pragma comment(lib,"opencv_legacy2410d.lib")
- 
- 
-同样是lib库的版本不对问题，可能造成：
- 
-1.未经处理的异常
-2.ntdll.dll未能加载符号
- 
+
 
  
+
+
+debug版本的：后缀都加个d
+
+
+ 
+
+
+#pragma comment(lib,"opencv_core2410d.lib") #pragma comment(lib,"opencv_highgui2410d.lib") #pragma comment(lib,"opencv_imgproc2410d.lib") #pragma comment(lib,"opencv_features2d2410d.lib") #pragma comment(lib,"opencv_calib3d2410d.lib") #pragma comment(lib,"opencv_legacy2410d.lib")
+
+
+ 
+
+
+ 
+
+
+同样是lib库的版本不对问题，可能造成：
+
+
+ 
+
+
+1.未经处理的异常
+
+
+2.ntdll.dll未能加载符号
+
+
+ 
+
+
+
+
+
+ 
+
+
 ﻿﻿
+
 
 

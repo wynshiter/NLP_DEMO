@@ -4,16 +4,8 @@
 
 
 
-
 1.Harris角点检测
-Harris角点检测算法是一个极为简单的角点检测算法，该算法在1988年就被发明了，算法的主要思想是如果像素周围显示存在多于一个方向的边，我们认为该点为兴趣点。基本原理是根据公式： 
- 
-化简为求解矩阵，最后根据矩阵的特征值判断是否为角点 
- 
- 
-实现效果： 
- 
-代码（不用OpenCV）：
+Harris角点检测算法是一个极为简单的角点检测算法，该算法在1988年就被发明了，算法的主要思想是如果像素周围显示存在多于一个方向的边，我们认为该点为兴趣点。基本原理是根据公式：    化简为求解矩阵，最后根据矩阵的特征值判断是否为角点      实现效果：    代码（不用OpenCV）：
 
 # -*- coding: utf-8 -*-
 from pylab import *
@@ -248,13 +240,8 @@ show()
 
 
 OpenCV函数cv2.cornerHarris() 有四个参数 其作用分别为 :
-img - Input image, it should be grayscale and float32 type. 
-blockSize - It is the size of neighbourhood considered for corner detection 
-ksize - Aperture parameter of Sobel derivative used. 
-k - Harris detector free parameter in the equation.
-当然可以使用OpenCV在亚像素上提高算法的精度，使用函数cv2.cornerSubPix()，不过应该使用最新版的OpenCV 我电脑上是2.4.9版本，好像文档[2]中的代码没有调试通过， 
-下面是OpenCV代码的效果： 
-
+img - Input image, it should be grayscale and float32 type.  blockSize - It is the size of neighbourhood considered for corner detection  ksize - Aperture parameter of Sobel derivative used.  k - Harris detector free parameter in the equation.
+当然可以使用OpenCV在亚像素上提高算法的精度，使用函数cv2.cornerSubPix()，不过应该使用最新版的OpenCV 我电脑上是2.4.9版本，好像文档[2]中的代码没有调试通过，  下面是OpenCV代码的效果：  
 代码：
 # -*- coding: utf-8 -*-
 """
@@ -289,19 +276,10 @@ print cv2.__version__
 a = np.arange(10)
 print(a)
 2.sift特征
-在Harris角点中对于下图所示的特征，小窗口中可能认为是角点，当窗口尺寸变化，则可能检测不到角点。 
- 
-2004年提出的Scale Invariant Feature Transform (SIFT) 是改进的基于尺度不变的特征检测器。
+在Harris角点中对于下图所示的特征，小窗口中可能认为是角点，当窗口尺寸变化，则可能检测不到角点。    2004年提出的Scale Invariant Feature Transform (SIFT) 是改进的基于尺度不变的特征检测器。
 SIFT特征包括兴趣点检测器和描述子，它对于尺度，旋转和亮度都具有不变性。
-有下面四个步骤 
-1. Scale-space Extrema Detection 
-2. Keypoint Localization 
-3. Orientation Assignment 
-4. Keypoint Descriptor 
-5. Keypoint Matching
-sift特征点检测效果： 
- 
-sift的OpenCV代码比较简单：
+有下面四个步骤  1. Scale-space Extrema Detection  2. Keypoint Localization  3. Orientation Assignment  4. Keypoint Descriptor  5. Keypoint Matching
+sift特征点检测效果：    sift的OpenCV代码比较简单：
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jun 11 20:22:51 2016
@@ -333,9 +311,7 @@ cv2.imshow("sift_keypoint",img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 3.SURF特征点
-In 2006, three people, Bay, H., Tuytelaars, T. and Van Gool, L, published another paper, “SURF: Speeded Up Robust Features” which introduced a new algorithm called SURF. As name suggests, it is a speeded-up version of SIFT. 
- 在SURF算法中，特征点的判据为某像素亮度的Hessian矩阵的行列式(Dxx*Dyy-Dxy*Dxy)为一个极值。由于Hessian矩阵的计算需要用到偏导数的计算，这一般通过像素点亮度值与高斯核的某一方向偏导数卷积而成；在SURF算法里，为提高算法运行速度，在精度影响很小的情况下，用近似的盒状滤波器（0，1，1组成的box filter）代替高斯核。因为滤波器仅有0，-1,1，因此卷积的计算可以用积分图像（Integral image）来优化（O(1)的时间复杂度），大大提高了效率。 
- Surf在速度上比sift要快许多，这主要得益于它的积分图技术，已经Hessian矩阵的利用减少了降采样过程，另外它得到的特征向量维数也比较少，有利于更快的进行特征点匹配。
+In 2006, three people, Bay, H., Tuytelaars, T. and Van Gool, L, published another paper, “SURF: Speeded Up Robust Features” which introduced a new algorithm called SURF. As name suggests, it is a speeded-up version of SIFT.  在SURF算法中，特征点的判据为某像素亮度的Hessian矩阵的行列式(Dxx*Dyy-Dxy*Dxy)为一个极值。由于Hessian矩阵的计算需要用到偏导数的计算，这一般通过像素点亮度值与高斯核的某一方向偏导数卷积而成；在SURF算法里，为提高算法运行速度，在精度影响很小的情况下，用近似的盒状滤波器（0，1，1组成的box filter）代替高斯核。因为滤波器仅有0，-1,1，因此卷积的计算可以用积分图像（Integral image）来优化（O(1)的时间复杂度），大大提高了效率。  Surf在速度上比sift要快许多，这主要得益于它的积分图技术，已经Hessian矩阵的利用减少了降采样过程，另外它得到的特征向量维数也比较少，有利于更快的进行特征点匹配。
 基于surf的人脸识别：
 # -*- coding: utf-8 -*-
 """
@@ -419,8 +395,7 @@ else:
 #cv2.destroyAllWindows()
 4.ORB特征
 一种新的具有局部不变性的特征 —— ORB特征，从它的名字中可以看出它是对FAST特征点与BREIF特征描述子的一种结合与改进，这个算法是由Ethan Rublee,Vincent Rabaud,Kurt Konolige以及Gary R.Bradski在2011年一篇名为“ORB：An Efficient Alternative to SIFT or SURF”的文章中提出。就像文章题目所写一样，ORB是除了SIFT与SURF外一个很好的选择，而且它有很高的效率，最重要的一点是它是免费的，SIFT与SURF都是有专利的，你如果在商业软件中使用，需要购买许可。
-实现效果： 
-
+实现效果：  
 代码：
 # -*- coding: utf-8 -*-
 """
@@ -540,7 +515,8 @@ http://stackoverflow.com/questions/20259025/module-object-has-no-attribute-drawm
 '''
 未完待续
 参考文献
-[1]http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_table_of_contents_feature2d/py_table_of_contents_feature2d.html 
-[2]http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_features_harris/py_features_harris.html#exercises 
+[1]http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_table_of_contents_feature2d/py_table_of_contents_feature2d.html  [2]http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_feature2d/py_features_harris/py_features_harris.html#exercises
+
+
 
 

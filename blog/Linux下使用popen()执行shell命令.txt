@@ -1,8 +1,7 @@
 
 
 
-                                            
- 
+                      
 
 
 简单说一下popen()函数
@@ -24,6 +23,8 @@ int pclose(FILE *stream);
 附上一个例子：
 
 
+
+
 //execute shell command
 //执行一个shell命令，输出结果逐行存储在resvec中，并返回行数
 int32_t myexec(const char *cmd, vector<string> &resvec) {
@@ -42,9 +43,16 @@ int32_t myexec(const char *cmd, vector<string> &resvec) {
     pclose(pp); //关闭管道
     return resvec.size();
 }
+
  
+   
+
  
+   
+
 上面的那个vector<string>感觉不是很常用，所以改成一下sting版本了：
+
+
 
 int myexec(const char *cmd, string &resvec)
  {
@@ -67,11 +75,17 @@ int myexec(const char *cmd, string &resvec)
     return resvec.size();
 }
 
-使用时候：
- 
-  string str_kernel;
-    myexec("uname -sr",str_kernel);
-    cout<<str_kernel<<endl;
+
+ 使用时候：
+   
+
+     
+   
+
+      string str_kernel;
+         myexec("uname -sr",str_kernel);
+         cout<<str_kernel<<endl;
+   
 
 
 

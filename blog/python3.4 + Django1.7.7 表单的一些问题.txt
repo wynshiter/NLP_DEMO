@@ -3,15 +3,15 @@
 
 
 上面是没有调用cleaned_data的提交结果，可见模版直接把form里面的整个标签都接收过来了
-
-
-
+ 
+ 
+ 
 下面是调用cleaned_data 的结果
+ 
+ 
 
-
-
-
-
+ 
+ 
 
 django 的表单，提交上来之后是这样的：
 #coding： gb2312
@@ -29,16 +29,16 @@ class ContactForm(forms.Form):
         if num_words < 1:#单词个数
             raise forms.ValidationError("your word is too short!")
         return message
-
+ 
 比如下面这句：
-
+ 
 email = forms.EmailField(required=False,label='Email')#非必要字段
 其实可以作为非必要字段，required=False
-
+ 
 由于调用form.cleaned_data#只有各个字段都符合要求时才有对应的cleaned_data，之前好像必须得：
 if form.is_valid():#说明各个字段的输入值都符合要求
 所以上述字段required=False，在测试东西或者自己写东西，等安全性不高的场合就比较必要了
-
+ 
 #coding： gb2312
 from django.http import HttpResponse
 import datetime,calendar
@@ -156,9 +156,10 @@ def download_file(request):
     return response#HttpResponse(data, content_type="text/plain")
     
 
-
-
+ 
+ 
 提交给模版的html：
+ 
 
 <html>
 <style type="text/css">
@@ -186,29 +187,26 @@ def download_file(request):
 </body>
 </html>
 
-
-Django本身内建有一些app，例如注释系统和自动管理界面。 
-app的一个关键点是它们是很容易移植到其他project和被多个project复用。
-对于如何架构Django代码并没有快速成套的规则。
-如果你只是建造一个简单的Web站点，那么可能你只需要一个app就可以了；
-但如果是一个包含许多不相关的模块的复杂的网站，
-例如电子商务和社区之类的站点，那么你可能需要把这些模块划分成不同的app，以便以后复用。
- 
- 数据库模型有有效性验证
+ 
+ 
+Django本身内建有一些app，例如注释系统和自动管理界面。  app的一个关键点是它们是很容易移植到其他project和被多个project复用。
+对于如何架构Django代码并没有快速成套的规则。 如果你只是建造一个简单的Web站点，那么可能你只需要一个app就可以了； 但如果是一个包含许多不相关的模块的复杂的网站， 例如电子商务和社区之类的站点，那么你可能需要把这些模块划分成不同的app，以便以后复用。
+   数据库模型有有效性验证
 C:\Python27\Lib\site-packages\Django-1.7.1-py2.7.egg\django\bin\mysite>python manage.py sqlall books
 CommandError: App 'books' has migrations. Only the sqlmigrate and sqlflush commands can be used when an app has migrations.
 此时需要输入如下部分即可
 C:\Python27\Lib\site-packages\Django-1.7.1-py2.7.egg\django\bin\mysite>python manage.py makemigrations
 C:\Python27\Lib\site-packages\Django-1.7.1-py2.7.egg\django\bin\mysite>python manage.py migrate
-
-若上述问题依旧：
-Since there is still a bit of backwards compatibility with django 1.6 and below you can still use the sql commands from django-admin. However, you have to delete the migrations folder first.
-To get the create statements you need to remove the migrations folder
-直接删除books app下面的migrations文件夹
+ 若上述问题依旧： Since there is still a bit of backwards compatibility with django 1.6 and below you can still use the sql commands from django-admin. However, you have to delete the migrations folder first.
+To get the create statements you need to remove the migrations folder 直接删除books app下面的migrations文件夹 
 
 
+ 
 
-﻿﻿
-﻿﻿
+ ﻿﻿
+
+
+ ﻿﻿
+
 
 

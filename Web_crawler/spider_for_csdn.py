@@ -33,9 +33,8 @@ CURRENT_URL = os.path.dirname(__file__)
 PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
 
-
-
-STR_PAGE_URL_PREFIX = 'https://blog.csdn.net/wangyaninglm/'
+## 目前前缀有变化和个人博客首页做了区别 https://blog.csdn.net/wangyaninglm/
+STR_PAGE_URL_PREFIX = 'https://season.blog.csdn.net/'
 COPYRIGHT_NOTICE = '版权声明：本文为博主原创文章，未经博主允许不得转载。'
 
 socket.setdefaulttimeout(5000)  # 设置全局超时函数
@@ -172,7 +171,12 @@ def getpage_all_bloglinks(url, url_pattern):
                 article_id = page_link.split('/')[-1]
                 create_time = page_obj.find_all(name='span', attrs={'class': 'date'})[0].get_text()
                 click_number = page_obj.find_all(name='span', attrs={'class': 'read-num'})[0].get_text()
-                comment_number = page_obj.find_all(name='span', attrs={'class': 'read-num'})[1].get_text()
+                # 判断文章还没有评论的情况
+                if len(page_obj.find_all(name='span', attrs={'class': 'read-num'})) == 2:
+                    comment_number = page_obj.find_all(name='span', attrs={'class': 'read-num'})[1].get_text()
+                else:
+                    comment_number = 0
+
 
                 date_format = '%Y-%m-%d %H:%M:%S'
                 create_time = validate_date(create_time).group(0)
@@ -239,7 +243,7 @@ def main():
     # import spider_selenium
     # page_index = spider_selenium.get_csdn_page_index(STR_PAGE_URL_PREFIX, 'ui-pager')
     #不需要这个太重型的selenium 工具的话，人肉写上分页数
-    page_index = 11
+    page_index = 13
     # 输入分页数据量
     for i in range(1, page_index + 1):
         temp_blog_obj = getpage_all_bloglinks((list_page_str + str(i)), STR_PAGE_URL_PREFIX)

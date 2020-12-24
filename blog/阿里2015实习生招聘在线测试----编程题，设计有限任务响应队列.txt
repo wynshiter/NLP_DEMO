@@ -2,14 +2,15 @@
 
 
 
-
+ 
 讨论帖子：
-
-
+ 
+ 
 http://bbs.csdn.net/topics/391009829
-
+ 
 解决方案：
-
+ 
+ 
 
 #include <algorithm>
 #include <forward_list>
@@ -128,5 +129,8 @@ int main()
 
 
 
+ 
+ 
+ 
 
 

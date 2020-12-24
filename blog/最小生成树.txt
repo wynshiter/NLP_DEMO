@@ -1,256 +1,255 @@
 
 
 
+
+#include<iostream>
+#include<stdlib.h>//产生随机数组用
+#include<time.h> //同上
+
+using namespace std;
+
+
+class MyArc
+{
+public:
+    int m_beginVex;
+    int m_endVex;
+    int m_weight;
+    MyArc(int beginVex,int endVex,int weight);
+    MyArc(){}
+    bool operator < (const MyArc& arc)
+    {
+        return m_weight<arc.m_weight;
+    }
+    bool operator == (const MyArc& arc)
+    {
+        return m_weight==arc.m_weight;
+    }
+    bool operator > (const MyArc& arc)
+    {
+        return m_weight>arc.m_weight;
+    }
+};
+
+MyArc::MyArc(int beginVex,int endVex,int weight):m_beginVex(beginVex),m_endVex(endVex),m_weight(weight)
+{
+
+}
+
+class Graph
+{
+public:
+    int m_vexnum;//顶点数
+    int m_arcnum;//弧数目
+    int *m_pmatrix;
+public:
+    ~Graph();
+    Graph(int vexnum);
+    Graph(int vexnum,int *pmatrix);
+    void insert(MyArc arc);//按权值大小排序插入
+    bool bound(int x);   //判断顶点x是否已与其它顶点连通
+
+};
+
+//构造函数
+Graph::Graph(int vexnum)
+{
+    m_pmatrix=new int[vexnum*vexnum];
+    m_vexnum=vexnum;
+    m_arcnum=0;
+    for(int i=0;i<vexnum*vexnum;++i)
+    {
+        m_pmatrix[i]=0; //初始化邻接矩阵
+    }
+
+
+}
+
+//构造函数
+Graph::Graph(int vexnum,int *pmatrix)
+{
+    m_vexnum=vexnum;
+    // m_arcnum=arcnum;
+    m_pmatrix=new int[m_vexnum*m_vexnum];
+    for(int i=0;i<m_vexnum*m_vexnum;++i)
+    {
+        m_pmatrix[i]=pmatrix[i];
+    }
+}
+
+//测试 顶点x是否已与其他点连通
+bool Graph::bound(int x)
+{
+    for(int i=0;i<m_vexnum;++i) if(m_pmatrix[x+i*m_vexnum]!=0) return true;
+    return false;
+}
+
+//在邻接表中连通 arc表示的边，并且设置权
+void Graph::insert(MyArc arc)
+{
+    m_pmatrix[arc.m_beginVex*m_vexnum+arc.m_endVex]=arc.m_weight;
+    m_pmatrix[arc.m_endVex*m_vexnum+arc.m_beginVex]=arc.m_weight;
+    ++m_arcnum;
+}
+//析构
+Graph::~Graph()
+{
+    delete[] m_pmatrix;
+    m_pmatrix = NULL;
+}
+
+class MyQueues
+{
+public:
+    list<MyArc> m_list;
+    MyQueues(){}
+    void insert(const MyArc& arc);//边按权值插入队列中合适位置,
+    void InsertGraph(const Graph &graph);//将图的连通分量插入队列
+    MyArc pop();
+};
+//边出队
+MyArc MyQueues::pop()
+{
+    MyArc arc=m_list.front();
+    m_list.pop_front();
+    return arc;
+}
+//边按权值插入队列中合适位置,
+void MyQueues::insert(const MyArc& arc)
+{
+    list<MyArc>::iterator pos=m_list.begin();
+    while(pos!=m_list.end())
+    {
+        if(*pos>arc) break;
+        else
+            ++pos;
+    }
+    m_list.insert(pos,arc);
+}
+//将图的连通分量插入队列
+void MyQueues::InsertGraph(const Graph &graph)
+{
+    for(int i=0;i<graph.m_vexnum;++i)
+    {
+        for(int j=i+1;j<graph.m_vexnum;++j)//上三角矩阵的联通分量
+              {
+                if(graph.m_pmatrix[i*graph.m_vexnum+j])
+                    insert(MyArc(i,j,graph.m_pmatrix[i*graph.m_vexnum+j]));
+              }
+    }
+}
+//用随机数组初始化matrix数组并且打印
+void SetMatrix(int vexnum,int *pmatrix)
+{
+    srand((unsigned)time(NULL));
+    for(int i=0;i<vexnum;++i)//产生随机权值矩阵
+    {
+        for(int j=i;j<vexnum;++j)
+        {
+              if(j==i)
+              {
+                  pmatrix[i*vexnum+j]=0;
+                  continue;
+              }
+              int rnum=rand();
+              rnum%=99;
+              rnum++;//产生1~99的随机整数作为边的权值
+              pmatrix[i*vexnum+j]=rnum;//先填写上三角矩阵
+              pmatrix[j*vexnum+i]=rnum;//后填写下三角矩阵
+        }
+    }
+    cout<<"***随机产生的各边权值矩阵 [顶点数为 "<<vexnum<<"] ****\n";
+  for(int i=0;i<vexnum;++i)//输出随机权值矩阵
+    {
+        for(int j=0;j<vexnum;++j)
+        {
+              cout<<pmatrix[i*vexnum+j]<<"\t";
+        }
+        cout<<endl;
+    }
+
+}
+
+
+//判断连通边arc后 图graph 是否存在回路
+bool IsCycle(Graph& graph, MyArc& arc)
+{
+    list<int> mylist;
+    mylist.push_back(arc.m_beginVex);
+    int *ps=new int[graph.m_vexnum];
+    for(int i=0;i<graph.m_vexnum;++i)
+        ps[i]=0;
+    while(!mylist.empty())
+    {
+        int x=mylist.front();
+        ps[x]=1;
+        mylist.pop_front();
+        for(int i=0;i<graph.m_vexnum;++i)
+        {
+              if(graph.m_pmatrix[i+x*graph.m_vexnum]!=0)
+              {
+                  if(i==arc.m_endVex) return true;
+                  if(ps[i]!=1) mylist.push_back(i);
+              }
+        }
+    }
+    delete[] ps;
+    return false;//遍历完成没有环
+}
+
+//克鲁斯卡尔算法
+void kruskal(const Graph& graph,Graph& smtree)
+{
+    MyQueues arcqueues;//保存从小到大排列的边
+    arcqueues.InsertGraph(graph);
+    MyArc myarc;//Arc表示边的类型
+    int arcnum=0; //边的个数
+    while(arcnum<graph.m_vexnum-1)//此处的含义为边的数目正好为顶点数目减一，注意与prim算法表达式相同但是含义不同
+    {
+        myarc=arcqueues.pop();
+        if(!IsCycle(smtree,myarc))
+        {
+              smtree.insert(myarc);
+              ++arcnum;
+        }
+    }
+}
+
+//输出最小生成树
+void SmallestTreeOutput(const Graph& smtree)
+{
+    cout<<"最小生成树:"<<endl;
+    for(int i=0;i<smtree.m_vexnum;++i)//输出最小树
+        for(int j=i+1;j<smtree.m_vexnum;++j)
+              if(smtree.m_pmatrix[i*smtree.m_vexnum+j])
+                  cout<<'('<<i<<','<<j<<','<<smtree.m_pmatrix[i*smtree.m_vexnum+j]<<')'<<endl;
+}
+
+
+/*
+主函数
+*/
+
+int main()
+{
+    int i;
+    cout<<"请输入顶点数目:";
+    cin>>i;
+    int vex=i;
+    int *matrix=new int[vex*vex];
+    cout<<endl;
+    SetMatrix(vex,matrix);
+    Graph graph(vex,matrix),smtree(vex);
+    kruskal(graph,smtree);
+    SmallestTreeOutput(smtree);
+    delete []matrix;
+}
+
+
+
+
+
 
-#include<iostream>
-#include<stdlib.h>//产生随机数组用
-#include<time.h> //同上
-
-using namespace std;
-
-
-class MyArc
-{
-public:
-    int m_beginVex;
-    int m_endVex;
-    int m_weight;
-    MyArc(int beginVex,int endVex,int weight);
-    MyArc(){}
-    bool operator < (const MyArc& arc)
-    {
-        return m_weight<arc.m_weight;
-    }
-    bool operator == (const MyArc& arc)
-    {
-        return m_weight==arc.m_weight;
-    }
-    bool operator > (const MyArc& arc)
-    {
-        return m_weight>arc.m_weight;
-    }
-};
-
-MyArc::MyArc(int beginVex,int endVex,int weight):m_beginVex(beginVex),m_endVex(endVex),m_weight(weight)
-{
-
-}
-
-class Graph
-{
-public:
-    int m_vexnum;//顶点数
-    int m_arcnum;//弧数目
-    int *m_pmatrix;
-public:
-    ~Graph();
-    Graph(int vexnum);
-    Graph(int vexnum,int *pmatrix);
-    void insert(MyArc arc);//按权值大小排序插入
-    bool bound(int x);   //判断顶点x是否已与其它顶点连通
-
-};
-
-//构造函数
-Graph::Graph(int vexnum)
-{
-    m_pmatrix=new int[vexnum*vexnum];
-    m_vexnum=vexnum;
-    m_arcnum=0;
-    for(int i=0;i<vexnum*vexnum;++i)
-    {
-        m_pmatrix[i]=0; //初始化邻接矩阵
-    }
-
-
-}
-
-//构造函数
-Graph::Graph(int vexnum,int *pmatrix)
-{
-    m_vexnum=vexnum;
-    // m_arcnum=arcnum;
-    m_pmatrix=new int[m_vexnum*m_vexnum];
-    for(int i=0;i<m_vexnum*m_vexnum;++i)
-    {
-        m_pmatrix[i]=pmatrix[i];
-    }
-}
-
-//测试 顶点x是否已与其他点连通
-bool Graph::bound(int x)
-{
-    for(int i=0;i<m_vexnum;++i) if(m_pmatrix[x+i*m_vexnum]!=0) return true;
-    return false;
-}
-
-//在邻接表中连通 arc表示的边，并且设置权
-void Graph::insert(MyArc arc)
-{
-    m_pmatrix[arc.m_beginVex*m_vexnum+arc.m_endVex]=arc.m_weight;
-    m_pmatrix[arc.m_endVex*m_vexnum+arc.m_beginVex]=arc.m_weight;
-    ++m_arcnum;
-}
-//析构
-Graph::~Graph()
-{
-    delete[] m_pmatrix;
-    m_pmatrix = NULL;
-}
-
-class MyQueues
-{
-public:
-    list<MyArc> m_list;
-    MyQueues(){}
-    void insert(const MyArc& arc);//边按权值插入队列中合适位置,
-    void InsertGraph(const Graph &graph);//将图的连通分量插入队列
-    MyArc pop();
-};
-//边出队
-MyArc MyQueues::pop()
-{
-    MyArc arc=m_list.front();
-    m_list.pop_front();
-    return arc;
-}
-//边按权值插入队列中合适位置,
-void MyQueues::insert(const MyArc& arc)
-{
-    list<MyArc>::iterator pos=m_list.begin();
-    while(pos!=m_list.end())
-    {
-        if(*pos>arc) break;
-        else
-            ++pos;
-    }
-    m_list.insert(pos,arc);
-}
-//将图的连通分量插入队列
-void MyQueues::InsertGraph(const Graph &graph)
-{
-    for(int i=0;i<graph.m_vexnum;++i)
-    {
-        for(int j=i+1;j<graph.m_vexnum;++j)//上三角矩阵的联通分量
-              {
-                if(graph.m_pmatrix[i*graph.m_vexnum+j])
-                    insert(MyArc(i,j,graph.m_pmatrix[i*graph.m_vexnum+j]));
-              }
-    }
-}
-//用随机数组初始化matrix数组并且打印
-void SetMatrix(int vexnum,int *pmatrix)
-{
-    srand((unsigned)time(NULL));
-    for(int i=0;i<vexnum;++i)//产生随机权值矩阵
-    {
-        for(int j=i;j<vexnum;++j)
-        {
-              if(j==i)
-              {
-                  pmatrix[i*vexnum+j]=0;
-                  continue;
-              }
-              int rnum=rand();
-              rnum%=99;
-              rnum++;//产生1~99的随机整数作为边的权值
-              pmatrix[i*vexnum+j]=rnum;//先填写上三角矩阵
-              pmatrix[j*vexnum+i]=rnum;//后填写下三角矩阵
-        }
-    }
-    cout<<"***随机产生的各边权值矩阵 [顶点数为 "<<vexnum<<"] ****\n";
-  for(int i=0;i<vexnum;++i)//输出随机权值矩阵
-    {
-        for(int j=0;j<vexnum;++j)
-        {
-              cout<<pmatrix[i*vexnum+j]<<"\t";
-        }
-        cout<<endl;
-    }
-
-}
-
-
-//判断连通边arc后 图graph 是否存在回路
-bool IsCycle(Graph& graph, MyArc& arc)
-{
-    list<int> mylist;
-    mylist.push_back(arc.m_beginVex);
-    int *ps=new int[graph.m_vexnum];
-    for(int i=0;i<graph.m_vexnum;++i)
-        ps[i]=0;
-    while(!mylist.empty())
-    {
-        int x=mylist.front();
-        ps[x]=1;
-        mylist.pop_front();
-        for(int i=0;i<graph.m_vexnum;++i)
-        {
-              if(graph.m_pmatrix[i+x*graph.m_vexnum]!=0)
-              {
-                  if(i==arc.m_endVex) return true;
-                  if(ps[i]!=1) mylist.push_back(i);
-              }
-        }
-    }
-    delete[] ps;
-    return false;//遍历完成没有环
-}
-
-//克鲁斯卡尔算法
-void kruskal(const Graph& graph,Graph& smtree)
-{
-    MyQueues arcqueues;//保存从小到大排列的边
-    arcqueues.InsertGraph(graph);
-    MyArc myarc;//Arc表示边的类型
-    int arcnum=0; //边的个数
-    while(arcnum<graph.m_vexnum-1)//此处的含义为边的数目正好为顶点数目减一，注意与prim算法表达式相同但是含义不同
-    {
-        myarc=arcqueues.pop();
-        if(!IsCycle(smtree,myarc))
-        {
-              smtree.insert(myarc);
-              ++arcnum;
-        }
-    }
-}
-
-//输出最小生成树
-void SmallestTreeOutput(const Graph& smtree)
-{
-    cout<<"最小生成树:"<<endl;
-    for(int i=0;i<smtree.m_vexnum;++i)//输出最小树
-        for(int j=i+1;j<smtree.m_vexnum;++j)
-              if(smtree.m_pmatrix[i*smtree.m_vexnum+j])
-                  cout<<'('<<i<<','<<j<<','<<smtree.m_pmatrix[i*smtree.m_vexnum+j]<<')'<<endl;
-}
-
-
-/*
-主函数
-*/
-
-int main()
-{
-    int i;
-    cout<<"请输入顶点数目:";
-    cin>>i;
-    int vex=i;
-    int *matrix=new int[vex*vex];
-    cout<<endl;
-    SetMatrix(vex,matrix);
-    Graph graph(vex,matrix),smtree(vex);
-    kruskal(graph,smtree);
-    SmallestTreeOutput(smtree);
-    delete []matrix;
-}
-
-
-
-
-
-
-
- 
+  
 
 

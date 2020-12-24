@@ -1,20 +1,24 @@
 
 
 
-﻿﻿
-Contains Duplicate 
-Total Accepted: 26477 
-Total Submissions: 73478 
-My Submissions
+
+ ﻿﻿
+
+Contains Duplicate
+ Total Accepted: 26477
+ Total Submissions: 73478
+ My Submissions
+
+
 
 
 
 
 
 Given an array of integers, find if the array contains any duplicates. Your function should return true if any value appears at least twice in the array, and it should return false if every element is distinct.
-
+ 
 我的解决方案：很显然不是最优的，记录每个插入的状态，看起来也不是很简洁，但是对于方案二的优势是在对于长数组时候，第一个有重复的数字就退出了
-
+ 
 class Solution {
 public:
     bool containsDuplicate(vector<int>& nums)
@@ -44,21 +48,33 @@ public:
     }
 };
 
-非常简洁的解决方案，类似python 了，但是stl 中的set是基于平衡树的，而python中是hash树，所以python可能会高效一些
-：
+
+
+
+
+   非常简洁的解决方案，类似python 了，但是stl 中的set是基于平衡树的，而python中是hash树，所以python可能会高效一些
+  
+
+   ：
+  
+
 class Solution {
 public:
     bool containsDuplicate(vector<int>& nums) {
         return nums.size() > set<int>(nums.begin(), nums.end()).size();        
     }
 };
+
+
 python 的版本：
+
 class Solution:
     def containsDuplicate(self, nums):
         return len(nums) > len(set(nums))
 
 
-c++ 的hash版本：同类的hash code是相同的，这是一个非常重要的编程思想
+ c++ 的hash版本：同类的hash code是相同的，这是一个非常重要的编程思想
+
 class Solution {
 public:
     bool containsDuplicate(vector<int>& nums) {
@@ -77,7 +93,8 @@ public:
 
 
 
-c++排序版本：
+ c++排序版本：
+
 +2 votes
 942 views
 class Solution {
@@ -103,6 +120,10 @@ public:
         return false;
     }
 };
+
+
+
+
 
 
 

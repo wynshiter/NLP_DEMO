@@ -4,30 +4,16 @@
 
 
 
-
 最近代码写的少了，而leetcode一直想做一个python，c/c++解题报告的专题，c/c++一直是我非常喜欢的，c语言编程练习的重要性体现在linux内核编程以及一些大公司算法上机的要求，python主要为了后序转型数据分析和机器学习，所以今天来做一个难度为hard 的简单正则表达式匹配。
-做了很多leetcode题目，我们来总结一下套路： 
-首先一般是检查输入参数是否正确，然后是处理算法的特殊情况，之后就是实现逻辑，最后就是返回值。
+做了很多leetcode题目，我们来总结一下套路：  首先一般是检查输入参数是否正确，然后是处理算法的特殊情况，之后就是实现逻辑，最后就是返回值。
 当编程成为一种解决问题的习惯，我们就成为了一名纯粹的程序员
 
 leetcode 10 Regular Expression Matching
 （简单正则表达式匹配）
 题目描述
 
-Implement regular expression matching with support for ‘.’ and ‘*’. 
-  ‘.’ Matches any single character. 
-  ‘*’ Matches zero or more of the preceding element. 
-  The matching should cover the entire input string (not partial). 
-  The function prototype should be: 
-  bool isMatch(const char *s, const char *p)
-Some examples: 
-  isMatch(“aa”,”a”) → false 
-  isMatch(“aa”,”aa”) → true 
-  isMatch(“aaa”,”aa”) → false 
-  isMatch(“aa”, “a*”) → true 
-  isMatch(“aa”, “.*”) → true 
-  isMatch(“ab”, “.*”) → true 
-  isMatch(“aab”, “c*a*b”) → true
+Implement regular expression matching with support for ‘.’ and ‘*’.  ‘.’ Matches any single character.  ‘*’ Matches zero or more of the preceding element.  The matching should cover the entire input string (not partial).  The function prototype should be:  bool isMatch(const char *s, const char *p)
+Some examples:  isMatch(“aa”,”a”) → false  isMatch(“aa”,”aa”) → true  isMatch(“aaa”,”aa”) → false  isMatch(“aa”, “a*”) → true  isMatch(“aa”, “.*”) → true  isMatch(“ab”, “.*”) → true  isMatch(“aab”, “c*a*b”) → true
 
 
 题目意义及背景
@@ -43,33 +29,21 @@ It might seem deceptively easy even you know the general idea, but programming i
 s = “ac”, p = “ab*c”
 After the first ‘a’, we see that there is no b’s to skip for “b*”. We match the last ‘c’ on both side and conclude that they both match.
 It seems that being greedy is good. But how about this case?
-s = “abbc”, p = “ab*bbc” 
-When we see “b*” in p, we would have skip all b’s in s. They both should match, but we have no more b’s to match. Therefore, the greedy approach fails in the above case.
+s = “abbc”, p = “ab*bbc”  When we see “b*” in p, we would have skip all b’s in s. They both should match, but we have no more b’s to match. Therefore, the greedy approach fails in the above case.
 可能还有人说，如果碰到这种情况可以先看一下*后面的内容，但是碰见下面的情况就不好办了。
-s = “abcbcd”, p = “a.*c.*d” 
-Here, “.*” in p means repeat ‘.’ 0 or more times. Since ‘.’ can match any character, it is not clear how many times ‘.’ should be repeated. Should the ‘c’ in p matches the first or second ‘c’ in s? 
-所以： 
-Unfortunately, there is no way to tell without using some kind of exhaustive search（穷举搜索）.
+s = “abcbcd”, p = “a.*c.*d”  Here, “.*” in p means repeat ‘.’ 0 or more times. Since ‘.’ can match any character, it is not clear how many times ‘.’ should be repeated. Should the ‘c’ in p matches the first or second ‘c’ in s? 
+所以：  Unfortunately, there is no way to tell without using some kind of exhaustive search（穷举搜索）.
 Hints:
 A sample diagram of a deterministic finite state automata (DFA). DFAs are useful for doing lexical analysis and pattern matching. An example is UNIX’s grep tool. Please note that this post does not attempt to descibe a solution using DFA.
 什么是DFA？
 Solution
 主要解决方案是回溯法，使用递归或者dp
 We need some kind of backtracking mechanism （回溯法）such that when a matching fails, we return to the last successful matching state and attempt to match more characters in s with ‘*’. This approach leads naturally to recursion.
-The recursion mainly breaks down elegantly to the following two cases: 主要考虑两种递归情况 
-  1. If the next character of p is NOT ‘*’, then it must match the current character of s. Continue pattern matching with the next character of both s and p. 
-  2. If the next character of p is ‘*’, then we do a brute force exhaustive matching of 0, 1, or more repeats of current character of p… Until we could not match any more characters. 
-You would need to consider the base case carefully too. That would be left as an exercise to the reader.
+The recursion mainly breaks down elegantly to the following two cases: 主要考虑两种递归情况  1. If the next character of p is NOT ‘*’, then it must match the current character of s. Continue pattern matching with the next character of both s and p.  2. If the next character of p is ‘*’, then we do a brute force exhaustive matching of 0, 1, or more repeats of current character of p… Until we could not match any more characters.  You would need to consider the base case carefully too. That would be left as an exercise to the reader.
 Below is the extremely concise code (Excluding comments and asserts, it’s about 10 lines of code).
 解题过程如下：
 
-1、考虑特殊情况即*s字符串或者*p字符串结束。 
-  （1）s字符串结束，要求*p也结束或者间隔‘’ （例如p=”a*b*c……”），否则无法匹配 
-  （2）*s字符串未结束，而*p字符串结束，则无法匹配 
-  2、*s字符串与*p字符串均未结束 
-  （1）(p+1)字符不为’‘，则只需比较s字符与*p字符，若相等则递归到(s+1)字符串与*(p+1)字符串的比较，否则无法匹配。 
-  （2）(p+1)字符为’‘，则p字符可以匹配*s字符串中从0开始任意多（记为i）等于*p的字符，然后递归到(s+i+1)字符串与*(p+2)字符串的比较， 
-  只要匹配一种情况就算完全匹配。
+1、考虑特殊情况即*s字符串或者*p字符串结束。  （1）s字符串结束，要求*p也结束或者间隔‘’ （例如p=”a*b*c……”），否则无法匹配  （2）*s字符串未结束，而*p字符串结束，则无法匹配  2、*s字符串与*p字符串均未结束  （1）(p+1)字符不为’‘，则只需比较s字符与*p字符，若相等则递归到(s+1)字符串与*(p+1)字符串的比较，否则无法匹配。  （2）(p+1)字符为’‘，则p字符可以匹配*s字符串中从0开始任意多（记为i）等于*p的字符，然后递归到(s+i+1)字符串与*(p+2)字符串的比较，  只要匹配一种情况就算完全匹配。
 
 bool isMatch(const char *s,const char *p)
 {
@@ -95,18 +69,11 @@ bool isMatch(const char *s,const char *p)
     return isMatch(s,p+2);
 }
 
-此代码运行时间：18ms 
-
+此代码运行时间：18ms  
 
 Further Thoughts:
 
-Some extra exercises to this problem: 
-    1. If you think carefully, you can exploit some cases that the above code runs in exponential complexity. Could you think of some examples? How would you make the above code more efficient? 
-    2. Try to implement partial matching instead of full matching. In addition, add ‘^’ and ‘$’ to the rule. ‘^’ matches the starting position within the string, while ‘$’ matches the ending position of the string. 
-    3. Try to implement wildcard matching where ‘*’ means any sequence of zero or more characters. 
-  For the interested reader, real world regular expression matching (such as the grep tool) are usually implemented by applying formal language theory. To understand more about it, you may read this article. 
-  Rating: 4.8/5 (107 votes cast) 
-  Regular Expression Matching, 4.8 out of 5 based on 107 ratings
+Some extra exercises to this problem:  1. If you think carefully, you can exploit some cases that the above code runs in exponential complexity. Could you think of some examples? How would you make the above code more efficient?  2. Try to implement partial matching instead of full matching. In addition, add ‘^’ and ‘$’ to the rule. ‘^’ matches the starting position within the string, while ‘$’ matches the ending position of the string.  3. Try to implement wildcard matching where ‘*’ means any sequence of zero or more characters.  For the interested reader, real world regular expression matching (such as the grep tool) are usually implemented by applying formal language theory. To understand more about it, you may read this article.  Rating: 4.8/5 (107 votes cast)  Regular Expression Matching, 4.8 out of 5 based on 107 ratings
 
 leetcode的 解题报告提醒我们说：
 leetcode的解答报告中说的If you are stuck, recursion is your friend.
@@ -140,9 +107,7 @@ class Solution {
 };
 
 c++解决方案：
-My concise recursive and DP solutions with full explanation in C++ 
-  ●  
-Please refer to my blog post if you have any comment. Wildcard matching problem can be solved similarly.
+My concise recursive and DP solutions with full explanation in C++  ●  Please refer to my blog post if you have any comment. Wildcard matching problem can be solved similarly.
 class Solution {
 public:
     bool isMatch(string s, string p) {
@@ -193,8 +158,7 @@ public:
 };
 
 The shortest AC code.
-1.’.’ is easy to handle. if p has a ‘.’, it can pass any single character in s except ‘\0’. 
-2.” is a totally different problem. if p has a ” character, it can pass any length of first-match characters in s including ‘\0’.
+1.’.’ is easy to handle. if p has a ‘.’, it can pass any single character in s except ‘\0’.  2.” is a totally different problem. if p has a ” character, it can pass any length of first-match characters in s including ‘\0’.
   class Solution {
     public:
     bool matchFirst(const char *s, const char *p){
@@ -232,14 +196,9 @@ public:
     }
 };
 
-9-lines 16ms C++ DP Solutions with Explanations 
-  ● 
+9-lines 16ms C++ DP Solutions with Explanations  ● 
 
-This problem has a typical solution using Dynamic Programming. We define the state P[i][j] to be true if s[0..i) matches p[0..j) and false otherwise. Then the state equations are: 
-        a. P[i][j] = P[i - 1][j - 1], if p[j - 1] != ‘*’ && (s[i - 1] == p[j - 1] || p[j - 1] == ‘.’); 
-        b. P[i][j] = P[i][j - 2], if p[j - 1] == ‘*’ and the pattern repeats for 0 times; 
-        c. P[i][j] = P[i - 1][j] && (s[i - 1] == p[j - 2] || p[j - 2] == ‘.’), if p[j - 1] == ‘*’ and the pattern repeats for at least 1 times. 
-  Putting these together, we will have the following code.
+This problem has a typical solution using Dynamic Programming. We define the state P[i][j] to be true if s[0..i) matches p[0..j) and false otherwise. Then the state equations are:  a. P[i][j] = P[i - 1][j - 1], if p[j - 1] != ‘*’ && (s[i - 1] == p[j - 1] || p[j - 1] == ‘.’);  b. P[i][j] = P[i][j - 2], if p[j - 1] == ‘*’ and the pattern repeats for 0 times;  c. P[i][j] = P[i - 1][j] && (s[i - 1] == p[j - 2] || p[j - 2] == ‘.’), if p[j - 1] == ‘*’ and the pattern repeats for at least 1 times.  Putting these together, we will have the following code.
 
 class Solution {
 public:
@@ -342,8 +301,7 @@ public:
     }
 };
 
-c语言参考解决方案： 
-3ms C solution using O(mn) time and O(n) space
+c语言参考解决方案：  3ms C solution using O(mn) time and O(n) space
 bool isMatch(char *s, char *p){
     int i;
 
@@ -398,8 +356,8 @@ bool isMatch(char* s, char* p) {
 }
 
 参考文献
-http://articles.leetcode.com/regular-expression-matching 
-http://blog.csdn.net/gatieme/article/details/51049244 
-http://www.jianshu.com/p/85f3e5a9fcda id="tmp_downloadhelper_iframe" style="display: none;"> 
+http://articles.leetcode.com/regular-expression-matching  http://blog.csdn.net/gatieme/article/details/51049244  http://www.jianshu.com/p/85f3e5a9fcda id="tmp_downloadhelper_iframe" style="display: none;">
+
+
 
 

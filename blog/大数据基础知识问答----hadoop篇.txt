@@ -4,7 +4,6 @@
 
 
 
-
 handoop相关知识点
 1.Hadoop是什么？
 Hadoop是一个由Apache基金会所开发的分布式系统基础架构。用户可以在不了解分布式底层细节的情况下，开发分布式程序。充分利用集群的威力进行高速运算和存储。
@@ -13,40 +12,29 @@ Hadoop is a distributed computing platform written in Java. It incorporates feat
 HDFS和MapReduce。HDFS为海量的数据提供了存储，则MapReduce为海量的数据提供了计算。
 3.Hadoop的主要优点？
 Hadoop的主要优点有以下几个：
-(a) 高可靠性。Hadoop按位存储和处理数据的能力值得人们信赖。
-(b)高扩展性。Hadoop是在可用的计算机集簇间分配数据并完成计算任务的，这些集簇可以方便地扩展到数以千计的节点中。
-(c)高效性。Hadoop能够在节点之间动态地移动数据，并保证各个节点的动态平衡，因此处理速度非常快。
-(d)高容错性。Hadoop能够自动保存数据的多个副本，并且能够自动将失败的任务重新分配。
-(e)低成本。与一体机、商用数据仓库以及QlikView、Yonghong Z-Suite等数据集市相比，hadoop是开源的，项目的软件成本因此会大大降低。
+(a) 高可靠性。Hadoop按位存储和处理数据的能力值得人们信赖。(b)高扩展性。Hadoop是在可用的计算机集簇间分配数据并完成计算任务的，这些集簇可以方便地扩展到数以千计的节点中。(c)高效性。Hadoop能够在节点之间动态地移动数据，并保证各个节点的动态平衡，因此处理速度非常快。(d)高容错性。Hadoop能够自动保存数据的多个副本，并且能够自动将失败的任务重新分配。(e)低成本。与一体机、商用数据仓库以及QlikView、Yonghong Z-Suite等数据集市相比，hadoop是开源的，项目的软件成本因此会大大降低。
 4.HDFS是什么？
 Hadoop实现了一个分布式文件系统（Hadoop Distributed File System），简称HDFS。
-
-HDFS有高容错性的特点，并且设计用来部署在低廉的（low-cost）硬件上；而且它提供高吞吐量（high throughput）来访问应用程序的数据，适合那些有着超大数据集（large data set）的应用程序。HDFS放宽了（relax）POSIX的要求，可以以流的形式访问（streaming access）文件系统中的数据。
+  HDFS有高容错性的特点，并且设计用来部署在低廉的（low-cost）硬件上；而且它提供高吞吐量（high throughput）来访问应用程序的数据，适合那些有着超大数据集（large data set）的应用程序。HDFS放宽了（relax）POSIX的要求，可以以流的形式访问（streaming access）文件系统中的数据。
 对外部客户机而言，HDFS就像一个传统的分级文件系统。可以创建、删除、移动或重命名文件，等等。但是 HDFS 的架构是基于一组特定的节点构建的，这是由它自身的特点决定的。
-这些节点包括 NameNode（仅一个），它在 HDFS 内部提供元数据服务；DataNode，它为 HDFS 提供存储块。由于仅存在一个 NameNode，因此这是 HDFS 的一个缺点（单点失败）。 
-存储在 HDFS 中的文件被分成块，然后将这些块复制到多个计算机中（DataNode）。这与传统的 RAID 架构大不相同。块的大小（通常为 64MB）和复制的块数量在创建文件时由客户机决定。NameNode 可以控制所有文件操作。HDFS 内部的所有通信都基于标准的 TCP/IP 协议。
+这些节点包括 NameNode（仅一个），它在 HDFS 内部提供元数据服务；DataNode，它为 HDFS 提供存储块。由于仅存在一个 NameNode，因此这是 HDFS 的一个缺点（单点失败）。  存储在 HDFS 中的文件被分成块，然后将这些块复制到多个计算机中（DataNode）。这与传统的 RAID 架构大不相同。块的大小（通常为 64MB）和复制的块数量在创建文件时由客户机决定。NameNode 可以控制所有文件操作。HDFS 内部的所有通信都基于标准的 TCP/IP 协议。
 HDFS的部分特性：
-1.  一致性，高可用性，分区容错性 2.  存储超大文件 3.  一次写入，多次读取（流式数据访问） 4.  运行在普通廉价的服务器上 5.  以高延迟为代价 6.  不适合存储大量小容量的文件 7.  会在多个datanode上存储多份副本，默认3份，三份副本一般会保存在两个或者两个以上的服务器中 8. namenode 负责管理文件目录，文件和block的对应关系以及block和datanode的对应关系 9.  datanode负责存储，大部分的容错机制都是在datanode上实现
+1. 一致性，高可用性，分区容错性  2. 存储超大文件  3. 一次写入，多次读取（流式数据访问）  4. 运行在普通廉价的服务器上  5. 以高延迟为代价  6. 不适合存储大量小容量的文件  7. 会在多个datanode上存储多份副本，默认3份，三份副本一般会保存在两个或者两个以上的服务器中  8. namenode 负责管理文件目录，文件和block的对应关系以及block和datanode的对应关系  9. datanode负责存储，大部分的容错机制都是在datanode上实现
 5、NameNode是什么？
-NameNode 是一个通常在 HDFS 实例中的单独机器上运行的软件。 
-它负责管理文件系统名称空间和控制外部客户机的访问。NameNode 决定是否将文件映射到 DataNode 上的复制块上。对于最常见的 3 个复制块，第一个复制块存储在同一机架的不同节点上，最后一个复制块存储在不同机架的某个节点上。
+NameNode 是一个通常在 HDFS 实例中的单独机器上运行的软件。  它负责管理文件系统名称空间和控制外部客户机的访问。NameNode 决定是否将文件映射到 DataNode 上的复制块上。对于最常见的 3 个复制块，第一个复制块存储在同一机架的不同节点上，最后一个复制块存储在不同机架的某个节点上。
 NameNode本身不可避免地具有SPOF（Single Point Of Failure）单点失效的风险，主备模式并不能解决这个问题，通过Hadoop Non-stop namenode才能实现100% uptime可用时间。
 6.What is the purpose of the secondary name-node?
 The term “secondary name-node” is somewhat misleading. It is not a name-node in the sense that data-nodes cannot connect to the secondary name-node, and in no event it can replace the primary name-node in case of its failure.
 The only purpose of the secondary name-node is to perform periodic checkpoints. The secondary name-node periodically downloads current name-node image and edits log files, joins them into new image and uploads the new image back to the (primary and the only) name-node. See User Guide.
-So if the name-node fails and you can restart it on the same physical node then there is no need to shutdown data-nodes, just the name-node need to be restarted. If you cannot use the old node anymore you will need to copy the latest image somewhere else. The latest image can be found either on the node that used to be the primary before failure if available; or on the secondary  
-name-node. 
+So if the name-node fails and you can restart it on the same physical node then there is no need to shutdown data-nodes, just the name-node need to be restarted. If you cannot use the old node anymore you will need to copy the latest image somewhere else. The latest image can be found either on the node that used to be the primary before failure if available; or on the secondary  name-node. 
 The latter will be the latest checkpoint without subsequent edits logs, that is the most recent name space modifications may be missing there. You will also need to restart the whole cluster in this case.
 7. I have a new node I want to add to a running Hadoop cluster; how do I start services on just one node?
-This also applies to the case where a machine has crashed and rebooted, etc, and you need to get it to rejoin the cluster. You do not need to shutdown and/or restart the entire cluster in this case. 
-First, add the new node’s DNS name to the conf/slaves file on the master node. 
-Then log in to the new slave node and execute:
+This also applies to the case where a machine has crashed and rebooted, etc, and you need to get it to rejoin the cluster. You do not need to shutdown and/or restart the entire cluster in this case.  First, add the new node’s DNS name to the conf/slaves file on the master node.  Then log in to the new slave node and execute:
 $ cd path/to/hadoop
 $ bin/hadoop-daemon.sh start datanode
 $ bin/hadoop-daemon.sh start tasktracker
 8. Is there an easy way to see the status and health of my cluster?
-There are web-based interfaces to both the JobTracker (MapReduce master) and NameNode (HDFS master) which display status pages about the state of the entire system.  
-By default, these are located at: http://job.tracker.addr:50030/ and http://name.node.addr:50070/.
+There are web-based interfaces to both the JobTracker (MapReduce master) and NameNode (HDFS master) which display status pages about the state of the entire system.  By default, these are located at:  http://job.tracker.addr:50030/ and http://name.node.addr:50070/.
 The JobTracker status page will display the state of all nodes, as well as the job queue and status about all currently running jobs and tasks. TheNameNode status page will display the state of all nodes and the amount of free space, and provides the ability to browse the DFS via the web.
 $ bin/hadoop dfsadmin -report
 9、DataNode如何理解？
@@ -55,29 +43,14 @@ Hadoop 集群包含一个 NameNode 和大量 DataNode。DataNode 通常以机架
 DataNode 响应来自 HDFS 客户机的读写请求。它们还响应来自 NameNode 的创建、删除和复制块的命令。NameNode 依赖来自每个 DataNode 的定期心跳（heartbeat）消息。每条消息都包含一个块报告，NameNode 可以根据这个报告验证块映射和其他文件系统元数据。如果 DataNode 不能发送心跳消息，NameNode 将采取修复措施，重新复制在该节点上丢失的块。
 10、如何理解Google集群系统原型？
 Google的数据中心使用廉价的Linux PC机组成集群，在上面运行各种应用。核心组件是3个：
-(a) GFS（Google File System）。一个分布式文件系统，隐藏下层负载均衡，冗余复制等细节，对上层程序提供一个统一的文件系统API接口。Google根据自己的需求对它进行了特别优化，包括：超大文件的访问，读操作比例远超过写操作，PC机极易发生故障造成节点失效等。GFS把文件分成64MB的块，分布在集群的机器上，使用Linux的文件系统存放。同时每块文件至少有3份以上的冗余。中心是一个Master节点，根据文件索引，找寻文件块。详见Google的工程师发布的GFS论文。
-(b) MapReduce。Google发现大多数分布式运算可以抽象为MapReduce操作。Map是把输入Input分解成中间的Key/Value对，Reduce把Key/Value合成最终输出Output。这两个函数由程序员提供给系统，下层设施把Map和Reduce操作分布在集群上运行，并把结果存储在GFS上。
-(c) BigTable。一个大型的分布式数据库，这个数据库不是关系式的数据库。像它的名字一样，就是一个巨大的表格，用来存储结构化的数据。
+(a) GFS（Google File System）。一个分布式文件系统，隐藏下层负载均衡，冗余复制等细节，对上层程序提供一个统一的文件系统API接口。Google根据自己的需求对它进行了特别优化，包括：超大文件的访问，读操作比例远超过写操作，PC机极易发生故障造成节点失效等。GFS把文件分成64MB的块，分布在集群的机器上，使用Linux的文件系统存放。同时每块文件至少有3份以上的冗余。中心是一个Master节点，根据文件索引，找寻文件块。详见Google的工程师发布的GFS论文。(b) MapReduce。Google发现大多数分布式运算可以抽象为MapReduce操作。Map是把输入Input分解成中间的Key/Value对，Reduce把Key/Value合成最终输出Output。这两个函数由程序员提供给系统，下层设施把Map和Reduce操作分布在集群上运行，并把结果存储在GFS上。(c) BigTable。一个大型的分布式数据库，这个数据库不是关系式的数据库。像它的名字一样，就是一个巨大的表格，用来存储结构化的数据。
 11、Hadoop生态圈子项目有哪些？
-(a)HDFS: Hadoop分布式文件系统(Distributed File System)  
-(b)MapReduce：MapReduce是处理大量半结构化数据集合的编程模型 
-(c)HBase: 类似Google BigTable的分布式NoSQL列数据库。 
-(d)Hive：数据仓库工具，由Facebook贡献。 
-(e)Zookeeper：分布式锁设施，提供类似Google Chubby的功能，由Facebook贡献。 
-(f)Avro：新的数据序列化格式与传输工具，将逐步取代Hadoop原有的IPC机制。 
-(g)Pig: 大数据分析平台，为用户提供多种接口。 
-(h)Ambari：Hadoop管理工具，可以快捷的监控、部署、管理集群。 
-(i)Sqoop：于在HADOOP与传统的数据库间进行数据的传递。
+(a)HDFS: Hadoop分布式文件系统(Distributed File System)  (b)MapReduce：MapReduce是处理大量半结构化数据集合的编程模型  (c)HBase: 类似Google BigTable的分布式NoSQL列数据库。  (d)Hive：数据仓库工具，由Facebook贡献。  (e)Zookeeper：分布式锁设施，提供类似Google Chubby的功能，由Facebook贡献。  (f)Avro：新的数据序列化格式与传输工具，将逐步取代Hadoop原有的IPC机制。  (g)Pig: 大数据分析平台，为用户提供多种接口。  (h)Ambari：Hadoop管理工具，可以快捷的监控、部署、管理集群。  (i)Sqoop：于在HADOOP与传统的数据库间进行数据的传递。
 12、Hadoop1.x与Hadoop2.x的区别？
 Hadoop2.x中有两个重要的变更：
-(a)HDFS的NameNode可以以集群的方式部署，增强了NameNode的水平扩展能力和可用性 
-(b)MapReduce将JobTrack中的资源管理及任务生命周期管理（包括定时触发及监控），拆分成两个独立的组件，并更名为YARN
+(a)HDFS的NameNode可以以集群的方式部署，增强了NameNode的水平扩展能力和可用性  (b)MapReduce将JobTrack中的资源管理及任务生命周期管理（包括定时触发及监控），拆分成两个独立的组件，并更名为YARN
 13、Hadoop2.x解决了Hadoop1.x中的哪些问题
-(a)2.x解决了1.x中的namenode单点故障问题 
-(b)解决了namenode内存压力过大难以扩展问题 
-(c)解决了JobTrack单点故障问题 
-(d)解决了JobTrack访问压力过大问题 
-(e)解决了对MapReduce之外的框架支持问题
+(a)2.x解决了1.x中的namenode单点故障问题  (b)解决了namenode内存压力过大难以扩展问题  (c)解决了JobTrack单点故障问题  (d)解决了JobTrack访问压力过大问题  (e)解决了对MapReduce之外的框架支持问题
 Hadoop例题—-填空篇
 1.在数据分析与挖掘中对数据的访问性要求包括：交互性访问、____、迭代计算、_____，HADOOP仅仅支持了其中____，而Spark则支持所有4种方式。
 2.2004年Google发表的三篇著名的分布式论文是关于分布式计算、_分布式数据库、分布式文件系统，分别对应的开源实现是____mapreduce_、BIGTABLE__、_GFS_______。
@@ -101,21 +74,12 @@ Spark的rdd也是一个非常有用的中间件，它为spark各类组件提供�
 (e)Zookeeper：分布式锁设施，提供类似Google Chubby的功能，由Facebook贡献。
 
 Hadoop例题—-上机操作
-HDFS基本操作 
-- 拷贝文件到HDFS 
-- 考出文件到本地文件系统 
-- 修改文件目录权限 
-- HDFS NameNode/DataNode Web监控 
-例题： 
-1. 请按以下要求运行hadoop 自带的wordcount程序  
-     a) 将输入文件wordcount1.txt和wordcount2.txt 拷贝到hdfs 的/input/ 
-     b) 修改文件的权限为777 
-     c）运行wordcount 的hadoop sample程序统计wordcount1.txt和wordcount2.txt 合计出现的单词个数 
-     d）将输出结果拷贝到本地文件系统，答印结果. 
-     e）将hdfs上的输出文件夹out删除
+HDFS基本操作  - 拷贝文件到HDFS  - 考出文件到本地文件系统  - 修改文件目录权限  - HDFS NameNode/DataNode Web监控  例题：  1. 请按以下要求运行hadoop 自带的wordcount程序  a) 将输入文件wordcount1.txt和wordcount2.txt 拷贝到hdfs 的/input/  b) 修改文件的权限为777  c）运行wordcount 的hadoop sample程序统计wordcount1.txt和wordcount2.txt 合计出现的单词个数  d）将输出结果拷贝到本地文件系统，答印结果.  e）将hdfs上的输出文件夹out删除
 hadoop fs -copyFromLocal /data/wordcount/* /input/
 hadoop fs -chmod 777 /input
 hadoop jar hadoop-mapreduce-examples-2.7.2.jar wordcount /input /out
-hadoop fs -copyToLocal /out /data/ 
+hadoop fs -copyToLocal /out /data/
+
+
 
 

@@ -1,0 +1,46 @@
+
+
+
+
+
+
+
+
+文章大纲
+
+NumPy
+what is numpy
+Array object
+Tricks and Tips
+基础知识点
+
+
+
+
+NumPy 数组类型
+NumPy 数组生成
+
+
+列表或元组转换
+`arange` 方法创建
+`linspace` 方法创建
+`ones` 方法创建
+`zeros` 方法创建
+`eye` 方法创建
+从已知数据创建
+`ndarray` 数组属性
+ 
+数组维度和形状
+ 
+ 
+参考文献
+
+
+
+
+NumPy
+
+
+
+
+

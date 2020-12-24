@@ -1,36 +1,410 @@
 
 
 
-    OpenMP2.5规范中，对于可以多线程执行的循环有如下5点约束：
-1.循环语句中的循环变量必须是有符号整形，如果是无符号整形就无法使用，OpenMP3.0中取消了这个约束
-2.循环语句中的比较操作必须是这样的样式：loop_variable <,<=,>,>=loop_invariant_interger
-3.循环语句中必须是整数加，整数减，加减的数值必须是循环不变量
-4.如果比较操作是《，《=，那么循环变量的值在每次迭代时候必须增加，反之亦然
-5.循环必须是单入口，单出口，内部没有跳转语句
+
+  
+    OpenMP2.5规范中，对于可以多线程执行的循环有如下5点约束：
+
+
+ 1.循环语句中的循环变量必须是有符号整形，如果是无符号整形就无法使用，OpenMP3.0中取消了这个约束
+
+
+ 2.循环语句中的比较操作必须是这样的样式：loop_variable <,<=,>,>=loop_invariant_interger
+
+
+ 3.循环语句中必须是整数加，整数减，加减的数值必须是循环不变量
+
+
+ 4.如果比较操作是《，《=，那么循环变量的值在每次迭代时候必须增加，反之亦然
+
+
+ 5.循环必须是单入口，单出口，内部没有跳转语句
+
+
+
+
 
 将循环多线程化所面临的挑战
-1.循环迭代相关
-因为OpenMP编译指导是对编译器发出的命令，所以编译器会将该循环编译成多线程代码，但由于循环迭代相关的存在，多线程代码将不能成功执行。
-
-2.数据竞争
 
 
-3.数据相关（以下假设为语句S2与语句S1存在数据相关）：
-相关的种类（相关不等于循环迭代相关）：
-1）流相关：S1先写某一存储单元，而后S2又读该单元
-2）输出相关：两个语句写同一存储单元
-3）反相关：一个语句先读一单元，然后另一语句写该单元
-相关产生的方式：
-1）S1在循环的一次迭代中访问存储单元L，S2在随后的一次迭代中访问L（是循环迭代相关）
-2）S1和S2在同一循环迭代中访问同一存储单元L，但S1的执行在S2之前。（非循环迭代相关）
+ 1.循环迭代相关
 
-数据竞争：      数据竞争可能是由于输出相关引起的，编译器不会进行数据竞争的检测，Intel线程检测器可以检测数据竞争。用类似于互斥量的机制进行私有化和同步，可以消除数据竞争。#pragma omp parallel for private(x)       for(i=0;i<80;i++)       {         x=sin(i);         if(x>0.6)x=0.6;         printf("sin(%d)=%f\n",i,x);        }6.管理共享数据和私有数据：private:每个线程都拥有该变量的一个单独的副本，可以私有的访问         1）private：说明列表中的每个变量对于每个线程都应该有一个私有副本。这个私有副本用变量的默认值进行初始化         2）firstprivate:见13数据的Copy-in 和Copy-out         3）lastprivate:见13数据的Copy-in 和Copy-out         4）reduction:         5）threadprivate:指定由每个线程私有的全局变量有三种方法声明存储单元为私有：         1）使用private,firstprivate,lastprivate,reduction子句         2）使用threadprivate         3）在循环内声明变量，并且不使用static关键字shared:所有线程都能够访问该单元，并行区域内使用共享变量时，如果存在写操作，必须对共享变量加以保护default:并行区中所有变量都是共享的，除下列三种情况下：          1）在parallel for循环中，循环索引时私有的。          2）并行区中的局部变量是私有的          3）所有在private,firstprivate,lastprivate,reduction子句中列出的变量是私有的7.循环调度与分块     为了提供一种简单的方法以便能够在多个处理器之间调节工作负载，OpenMP给出了四种调度方案：static,dynamic,runtime,guided.     默认情况下，OpenMP采用静态平均调度策略，但是可以通过调用schedule(kind[,chunksize])子句提供循环调度信息如：#pragma omp for schedule (kind[,chunk-size])   //chunk-size为块大小guided根据环境变量里的设置来进行对前三种的调度在windows环境中，可以在”系统属性|高级|环境变量”对话框中进行设置环境变量。8.有效地使用归约：sum=0;for(k=0;k<100;k++){    sum=sum+func(k);}     为了完成这种形式的循环计算，其中的操作必须满足算术结合律和交换律，同时sum是共享的，这样循环内部都可以加给这个变量，同时又必须是私有的，以避免在相加时的数据竞争。reduction子句可以用来有效地合并一个循环中某些关于一个或多个变量的满足结合律的算术归约操作。reduction子句主要用来对一个或多个参数条目指定一个操作符，每个线程将创建参数条目的一个私有拷贝，在区域的结束处，将用私有拷贝的值通过指定的运行符运算，原始的参数条目被运算结果的值更新。sum=0;#pragma omp parallel for reduction(+:sum)for(k=0;k<100;k++){    sum=sum+func(k);}9.降低线程开销：当编译器生成的线程被执行时，循环的迭代将被分配给该线程，在并行区的最后，所有的线程都被挂起，等待共同进入下一个并行区、循环或结构化块。              如果并行区域、循环或结构化块是相邻的，那么挂起和恢复线程的开销就是没必要的。举例如下：                #pragma omp parallel //并行区内                {                   #pragma omp for // 任务分配for循环                          for(k=0;k<m;k++){                               fun1(k);                           }                   #pragma omp for                          for(k=0;k<m;k++){                               fun2(k);                           }                }10.任务分配区：     现实中应用程序的所有性能敏感的部分不是都在一个并行区域内执行，所以OpenMP用任务分配区这种结构来处理非循环代码。任务分配区可以指导OpenMP编译器和运行时库将应用程序中标示出的结构化块分配到用于执行并行区域的一组线程上。举例如下：              #pragma omp parallel //并行区内                {                   #pragma omp for // 任务分配for循环                          for(k=0;k<m;k++){                               fun1(k);                           }                   #pragma omp sections private(y,z)                     {                           #pragme omp section//任务分配section                               {y=sectionA(x);}                           #pragme omp section                               {z=sectionB(x);}                     }                                   }11.使用Barrier和Nowait:      栅障（Barrier）是OpenMP用于线程同步的一种方法。线程遇到栅障是必须等待，直到并行区中的所有线程都到达同一点。注意：在任务分配for循环和任务分配section结构中，我们已经隐含了栅障，在parallel,for,sections,single结构的最后，也会有一个隐式的栅障。隐式的栅障会使线程等到所有的线程继续完成当前的循环、结构化块或并行区，再继续执行后面的工作。可以使用nowait去掉这个隐式的栅障去掉隐式栅障，例如：                #pragma omp parallel //并行区内                {                   #pragma omp for nowait // 任务分配for循环                          for(k=0;k<m;k++){                               fun1(k);                           }                   #pragma omp sections private(y,z)                     {                           #pragme omp section//任务分配section                               {y=sectionA(x);}                           #pragme omp section                               {z=sectionB(x);}                     }                                   }     因为第一个 任务分配for循环和第二个任务分配section代码块之间不存在数据相关。加上显示栅障，例如：                              #pragma omp parallel shared(x,y,z) num_threads(2)//使用的线程数为2                               {                                   int tid=omp_get_thread_num();                                   if(tid==0)                                       y=fun1();//第一个线程得到y                                   else                                         z=fun2();//第二个线程得到z                                   #pragma omp barrier //显示加上栅障，保证y和z在使用前已有值                                   #pragma omp for                                           for(k=0;k<100;k++)                                                   x[k]=y+z;                               }12.单线程和多线程交错执行：      当开发人员为了减少开销而把并行区设置的很大时，有些代码很可能只执行一次，并且由一个线程执行，这样单线程和多线程需要交错执行举例如下：               #pragma omp parallel //并行区              {                    int tid=omp_get_thread_num();//每个线程都调用这个函数，得到线程号                     //这个循环被划分到多个线程上进行                      #pragma omp for nowait                      for(k=0;k<100;k++)                            x[k]=fun1(tid);//这个循环的结束处不存在使所有线程进行同步的隐式栅障                    #pragma omp master                      y=fn_input_only(); //只有主线程会调用这个函数                    #pragma omp barrier   //添加一个显示的栅障对所有的线程同步，从而确保x[0-99]和y处于就绪状态                     //这个循环也被划分到多个线程上进行                    #pragma omp for nowait                      for(k=0;k<100;k++)                         x[k]=y+fn2(x[k]); //这个线程没有栅障，所以不会相互等待                     //一旦某个线程执行完上面的代码，不需要等待就可以马上执行下面的代码                     #pragma omp single //注意：single后面意味着有隐式barrier                     fn_single_print(y);                      //所有的线程在执行下面的函数前会进行同步                     #pragma omp master                     fn_print_array(x);//只有主线程会调用这个函数              } 13.数据的Copy-in 和Copy-out:      在并行化一个程序的时候，一般都必须考虑如何将私有变量的初值复制进来（Copy-in ），以初始化线程组中各个线程的私有副本。在并行区的最后，还要将最后一次迭代/结构化块中计算出的私有变量复制出来（Copy-out），复制到主线程中的原始变量中。firstprivate:使用变量在主线程的值对其在每个线程的对应私有变量进行初始化。一般来说，临时私有变量的初值是未定义的。lastprivate:可以将最后一次迭代/结构化块中计算出来的私有变量复制出来，复制到主线程对应的变量中，一个变量可以同时用firstprivate和lastprivate来声明。copyin:将主线程的threadprivate变量的值复制到执行并行区的每个线程的threadprivate变量中。copyprivate:使用一个私有变量将某一个值从一个成员线程广播到执行并行区的其他线程。该子句可以关联single结构(用于single指令中的指定变量为多个线程的共享变量)，在所有的线程都离开该结构中的同步点之前，广播操作就已经完成。14.保护共享变量的更新操作：     OpenMP支持critical和atomic编译指导，可以用于保护共享变量的更新，避免数据竞争。包含在某个临界段且由atomic编译指导所标记的代码块可能只由一个线程执行。例如：#pragma omp critical　　　{              if(max<new_value) max=new_value;         }15.OpenMP库函数（#include <omp.h>）：int omp_get_num_threads(void); //获取当前使用的线程个数int omp_set_num_threads(int NumThreads);//设置要使用的线程个数int omp_get_thread_num(void);//返回当前线程号int omp_get_num_procs(void);//返回可用的处理核个数
+
+ 因为OpenMP编译指导是对编译器发出的命令，所以编译器会将该循环编译成多线程代码，但由于循环迭代相关的存在，多线程代码将不能成功执行。
 
 
 
-下面我们来看一个具体的应用例，从硬盘读入两幅图像，对这两幅图像分别提取特征点，特征点匹配，最后将图像与匹配特征点画出来。理解该例子需要一些图像处理的基本知识，我不在此详细介绍。另外，编译该例需要opencv，我用的版本是2.3.1，关于opencv的安装与配置也不在此介绍。我们首先来看传统串行编程的方式。
 
 
+ 2.数据竞争
+
+
+
+
+
+
+
+
+ 3.数据相关（以下假设为语句S2与语句S1存在数据相关）：
+
+
+ 相关的种类（相关不等于循环迭代相关）：
+
+
+ 1）流相关：S1先写某一存储单元，而后S2又读该单元
+
+
+ 2）输出相关：两个语句写同一存储单元
+
+
+ 3）反相关：一个语句先读一单元，然后另一语句写该单元
+
+
+ 相关产生的方式：
+
+
+ 1）S1在循环的一次迭代中访问存储单元L，S2在随后的一次迭代中访问L（是循环迭代相关）
+
+
+ 2）S1和S2在同一循环迭代中访问同一存储单元L，但S1的执行在S2之前。（非循环迭代相关）
+
+
+
+
+
+数据竞争：
+
+      数据竞争可能是由于输出相关引起的，编译器不会进行数据竞争的检测，Intel线程检测器可以检测数据竞争。
+
+用类似于互斥量的机制进行私有化和同步，可以消除数据竞争。
+
+#pragma omp parallel for private(x)
+
+       for(i=0;i<80;i++)
+
+       {
+
+         x=sin(i);
+
+         if(x>0.6)x=0.6;
+
+         printf("sin(%d)=%f\n",i,x); 
+
+       }
+
+6.
+
+管理共享数据和私有数据：
+
+private:每个线程都拥有该变量的一个单独的副本，可以私有的访问
+
+         1）private：说明列表中的每个变量对于每个线程都应该有一个私有副本。这个私有副本用变量的默认值进行初始化
+
+         2）firstprivate:见13数据的Copy-in 和Copy-out
+
+         3）lastprivate:见13数据的Copy-in 和Copy-out
+
+         4）reduction:
+
+         5）threadprivate:指定由每个线程私有的全局变量
+
+有三种方法声明存储单元为私有：
+
+         1）使用private,firstprivate,lastprivate,reduction子句
+
+         2）使用threadprivate
+
+         3）在循环内声明变量，并且不使用static关键字
+
+shared:所有线程都能够访问该单元，并行区域内使用共享变量时，如果存在写操作，必须对共享变量加以保护
+
+default:并行区中所有变量都是共享的，除下列三种情况下：
+
+          1）在parallel for循环中，循环索引时私有的。
+
+          2）并行区中的局部变量是私有的
+
+          3）所有在private,firstprivate,lastprivate,reduction子句中列出的变量是私有的
+
+7.
+
+循环调度与分块
+
+     为了提供一种简单的方法以便能够在多个处理器之间调节工作负载，OpenMP给出了四种调度方案：
+
+static,dynamic,runtime,guided.
+
+     默认情况下，OpenMP采用静态平均调度策略，但是可以通过调用schedule(kind[,chunksize])子句提供循环调度信息
+
+如：#pragma omp for schedule (kind[,chunk-size])   //chunk-size为块大小
+
+guided根据环境变量里的设置来进行对前三种的调度
+
+在windows环境中，可以在”系统属性|高级|环境变量”对话框中进行设置环境变量。
+
+8.
+
+有效地使用归约：
+
+sum=0;
+
+for(k=0;k<100;k++)
+
+{
+
+    sum=sum+func(k);
+
+}
+
+     为了完成这种形式的循环计算，其中的操作必须满足算术结合律和交换律，同时sum是共享的，这样循环内部都可以加给这个变量，同时又必须是私有的，以避免在相加时的数据竞争。
+
+reduction子句可以用来有效地合并一个循环中某些关于一个或多个变量的满足结合律的算术归约操作。reduction子句主要用来对一个或多个参数条目指定一个操作符，每个线程将创建参数条目的一个私有拷贝，在区域的结束处，将用私有拷贝的值通过指定的运行符运算，原始的参数条目被运算结果的值更新。
+
+sum=0;
+
+#pragma omp parallel for reduction(+:sum)
+
+for(k=0;k<100;k++)
+
+{
+
+    sum=sum+func(k);
+
+}
+
+9.
+
+降低线程开销：当编译器生成的线程被执行时，循环的迭代将被分配给该线程，在并行区的最后，所有的线程都被挂起，等待共同进入下一个并行区、循环或结构化块。
+
+              如果并行区域、循环或结构化块是相邻的，那么挂起和恢复线程的开销就是没必要的。
+
+举例如下：
+
+                #pragma omp parallel //并行区内
+
+                {
+
+                   #pragma omp for // 任务分配for循环
+
+                          for(k=0;k<m;k++){
+
+                               fun1(k);
+
+                           }
+
+                   #pragma omp for
+
+                          for(k=0;k<m;k++){
+
+                               fun2(k);
+
+                           }
+
+                }
+
+10.任务分配区：
+
+     现实中应用程序的所有性能敏感的部分不是都在一个并行区域内执行，所以OpenMP用任务分配区这种结构来处理非循环代码。
+
+任务分配区可以指导OpenMP编译器和运行时库将应用程序中标示出的结构化块分配到用于执行并行区域的一组线程上。
+
+举例如下：
+
+              #pragma omp parallel //并行区内
+
+                {
+
+                   #pragma omp for // 任务分配for循环
+
+                          for(k=0;k<m;k++){
+
+                               fun1(k);
+
+                           }
+
+                   #pragma omp sections private(y,z)
+
+                     {
+
+                           #pragme omp section//任务分配section
+
+                               {y=sectionA(x);}
+
+                           #pragme omp section
+
+                               {z=sectionB(x);}
+
+                     }                   
+
+                }
+
+11.
+
+使用Barrier和Nowait:
+
+      栅障（Barrier）是OpenMP用于线程同步的一种方法。线程遇到栅障是必须等待，直到并行区中的所有线程都到达同一点。
+
+注意：在任务分配for循环和任务分配section结构中，我们已经隐含了栅障，在parallel,for,sections,single结构的最后，也会有一个隐式的栅障。
+
+隐式的栅障会使线程等到所有的线程继续完成当前的循环、结构化块或并行区，再继续执行后面的工作。可以使用nowait去掉这个隐式的栅障
+
+去掉隐式栅障，例如：
+
+                #pragma omp parallel //并行区内
+
+                {
+
+                   #pragma omp for nowait // 任务分配for循环
+
+                          for(k=0;k<m;k++){
+
+                               fun1(k);
+
+                           }
+
+                   #pragma omp sections private(y,z)
+
+                     {
+
+                           #pragme omp section//任务分配section
+
+                               {y=sectionA(x);}
+
+                           #pragme omp section
+
+                               {z=sectionB(x);}
+
+                     }                   
+
+                }
+
+     因为第一个 任务分配for循环和第二个任务分配section代码块之间不存在数据相关。
+
+加上显示栅障，例如：
+
+                              #pragma omp parallel shared(x,y,z) num_threads(2)//使用的线程数为2
+
+                               {
+
+                                   int tid=omp_get_thread_num();
+
+                                   if(tid==0)
+
+                                       y=fun1();//第一个线程得到y
+
+                                   else 
+
+                                        z=fun2();//第二个线程得到z
+
+                                   #pragma omp barrier //显示加上栅障，保证y和z在使用前已有值
+
+                                   #pragma omp for
+
+                                           for(k=0;k<100;k++)
+
+                                                   x[k]=y+z;
+
+                               }
+
+12.
+
+单线程和多线程交错执行：
+
+      当开发人员为了减少开销而把并行区设置的很大时，有些代码很可能只执行一次，并且由一个线程执行，这样单线程和多线程需要交错执行
+
+举例如下：
+
+               #pragma omp parallel //并行区
+
+              {
+
+                    int tid=omp_get_thread_num();//每个线程都调用这个函数，得到线程号
+
+                     //这个循环被划分到多个线程上进行
+
+                      #pragma omp for nowait
+
+                      for(k=0;k<100;k++)
+
+                            x[k]=fun1(tid);//这个循环的结束处不存在使所有线程进行同步的隐式栅障
+
+                    #pragma omp master
+
+                      y=fn_input_only(); //只有主线程会调用这个函数
+
+                    #pragma omp barrier   //添加一个显示的栅障对所有的线程同步，从而确保x[0-99]和y处于就绪状态
+
+                     //这个循环也被划分到多个线程上进行
+
+                    #pragma omp for nowait
+
+                      for(k=0;k<100;k++)
+
+                         x[k]=y+fn2(x[k]); //这个线程没有栅障，所以不会相互等待
+
+                     //一旦某个线程执行完上面的代码，不需要等待就可以马上执行下面的代码
+
+                     #pragma omp single //注意：single后面意味着有隐式barrier
+
+                     fn_single_print(y);
+
+                      //所有的线程在执行下面的函数前会进行同步
+
+                     #pragma omp master
+
+                     fn_print_array(x);//只有主线程会调用这个函数
+
+              } 
+
+13.
+
+数据的Copy-in 和Copy-out:
+
+      在并行化一个程序的时候，一般都必须考虑如何将私有变量的初值复制进来（Copy-in ），以初始化线程组中各个线程的私有副本。
+
+在并行区的最后，还要将最后一次迭代/结构化块中计算出的私有变量复制出来（Copy-out），复制到主线程中的原始变量中。
+
+firstprivate:使用变量在主线程的值对其在每个线程的对应私有变量进行初始化。一般来说，临时私有变量的初值是未定义的。
+
+lastprivate:可以将最后一次迭代/结构化块中计算出来的私有变量复制出来，复制到主线程对应的变量中，一个变量可以同时用firstprivate和lastprivate来声明。
+
+copyin:将主线程的threadprivate变量的值复制到执行并行区的每个线程的threadprivate变量中。
+
+copyprivate:使用一个私有变量将某一个值从一个成员线程广播到执行并行区的其他线程。该子句可以关联single结构(用于single指令中的指定变量为多个线程的共享变量)，在所有的线程都离开该结构中的同步点之前，广播操作就已经完成。
+
+14.
+
+保护共享变量的更新操作：
+
+     OpenMP支持critical和atomic编译指导，可以用于保护共享变量的更新，避免数据竞争。包含在某个临界段且由atomic编译指导所标记的代码块可能只由一个线程执行。
+
+例如：#pragma omp critical
+
+　　　{
+
+              if(max<new_value) max=new_value;
+
+         }
+
+15.
+
+OpenMP库函数（#include <omp.h>）：
+
+int omp_get_num_threads(void); //获取当前使用的线程个数
+
+int omp_set_num_threads(int NumThreads);//设置要使用的线程个数
+
+int omp_get_thread_num(void);//返回当前线程号
+
+int omp_get_num_procs(void);//返回可用的处理核个数
+
+
+
+
+
+
+ 下面我们来看一个具体的应用例，从硬盘读入两幅图像，对这两幅图像分别提取特征点，特征点匹配，最后将图像与匹配特征点画出来。理解该例子需要一些图像处理的基本知识，我不在此详细介绍。另外，编译该例需要opencv，我用的版本是2.3.1，关于opencv的安装与配置也不在此介绍。我们首先来看传统串行编程的方式。
+ 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include <iostream>
@@ -68,9 +442,12 @@ int main( ){
 
 
 
-很明显，读入图像，提取特征点与特征描述子这部分可以改为并行执行，修改如下：
 
 
+
+
+ 很明显，读入图像，提取特征点与特征描述子这部分可以改为并行执行，修改如下：
+ 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include <iostream>
@@ -107,16 +484,16 @@ int main( ){
 
 
 
-
-
-
-两种执行方式做比较，时间为：2.343秒v.s. 1.2441秒
-
-在上面代码中，为了改成适合#pragma omp parallel for执行的方式，我们用了STL的vector来分别存放两幅图像、特征点与特征描述子，但在某些情况下，变量可能不适合放在vector里，此时应该怎么办呢？这就要用到openMP的另一个工具，section，代码如下：
+  
 
 
 
 
+
+ 两种执行方式做比较，时间为：2.343秒v.s. 1.2441秒
+ 在上面代码中，为了改成适合#pragma omp parallel for执行的方式，我们用了STL的vector来分别存放两幅图像、特征点与特征描述子，但在某些情况下，变量可能不适合放在vector里，此时应该怎么办呢？这就要用到openMP的另一个工具，section，代码如下：
+  
+ 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include <iostream>
@@ -163,41 +540,71 @@ int main( ){
 
 
 
-上面代码中，我们首先用#pragma omp parallel sections将要并行执行的内容括起来，在它里面，用了两个#pragma omp section，每个里面执行了图像读取、特征点与特征描述子提取。将其简化为伪代码形式即为：
+
+
+
+
+
+
+ 上面代码中，我们首先用#pragma omp parallel sections将要并行执行的内容括起来，在它里面，用了两个#pragma omp section，每个里面执行了图像读取、特征点与特征描述子提取。将其简化为伪代码形式即为：
+
+
 
 
  1 #pragma omp parallel sections 2 { 3     #pragma omp section 4     { 5         function1(); 6     } 7 　　#pragma omp section 8     { 9         function2();10     }11 }
 
 
 
-意思是：parallel sections里面的内容要并行执行，具体分工上，每个线程执行其中的一个section，如果section数大于线程数，那么就等某线程执行完它的section后，再继续执行剩下的section。在时间上，这种方式与人为用vector构造for循环的方式差不多，但无疑该种方式更方便，而且在单核机器上或没有开启openMP的编译器上，该种方式不需任何改动即可正确编译，并按照单核串行方式执行。
 
-以上分享了这两天关于openMP的一点学习体会，其中难免有错误，欢迎指正。另外的一点疑问是，看到各种openMP教程里经常用到private,shared等来修饰变量，这些修饰符的意义和作用我大致明白，但在我上面所有例子中，不加这些修饰符似乎并不影响运行结果，不知道这里面有哪些讲究。
-
-在写上文的过程中，参考了包括以下两个网址在内的多个地方的资源，不再一 一列出，在此一并表示感谢。
-
-http://blog.csdn.net/drzhouweiming/article/details/4093624
-http://software.intel.com/zh-cn/articles/more-work-sharing-with-openmp
+ 意思是：parallel sections里面的内容要并行执行，具体分工上，每个线程执行其中的一个section，如果section数大于线程数，那么就等某线程执行完它的section后，再继续执行剩下的section。在时间上，这种方式与人为用vector构造for循环的方式差不多，但无疑该种方式更方便，而且在单核机器上或没有开启openMP的编译器上，该种方式不需任何改动即可正确编译，并按照单核串行方式执行。
+ 以上分享了这两天关于openMP的一点学习体会，其中难免有错误，欢迎指正。另外的一点疑问是，看到各种openMP教程里经常用到private,shared等来修饰变量，这些修饰符的意义和作用我大致明白，但在我上面所有例子中，不加这些修饰符似乎并不影响运行结果，不知道这里面有哪些讲究。
+ 在写上文的过程中，参考了包括以下两个网址在内的多个地方的资源，不再一 一列出，在此一并表示感谢。
+ http://blog.csdn.net/drzhouweiming/article/details/4093624 http://software.intel.com/zh-cn/articles/more-work-sharing-with-openmp
 
 
-OpenMP嵌套并行：
+
+
+
+
+ OpenMP嵌套并行：
+
+
 
 http://blog.csdn.net/zhuxianjianqi/article/details/8287937
 
 
-一些优秀博客的加速例子：
+
+
+
+
+ 一些优秀博客的加速例子：
+
+
+
+
 
 
 http://www.cnblogs.com/LBSer/p/4604754.html
+
+
 
 
 http://www.cnblogs.com/louyihang-loves-baiyan/p/4913164.html
 
 
 
-参考文献：
+
+
+
+
+
+
+ 参考文献：
+
+
 
 http://www.cnblogs.com/yangyangcv/archive/2012/03/23/2413335.html
+
 
 
 

@@ -12,7 +12,6 @@ Write a function to find the longest common prefix string amongst an array of st
 我的解决方案：
  
  
-
 class Solution {
 public:
     string longestCommonPrefix(vector<string>& strs)
@@ -50,7 +49,6 @@ public:
  
  
 c++解决方案：
-
 class Solution {
 public:
     string longestCommonPrefix(vector<string>& strs) {
@@ -132,7 +130,6 @@ public:
 python解决方案：
  
  
-
 class Solution:
     # @return a string
     def longestCommonPrefix(self, strs):
@@ -183,5 +180,6 @@ class Solution:
  
  
  
-﻿﻿ 
+﻿﻿
+
 

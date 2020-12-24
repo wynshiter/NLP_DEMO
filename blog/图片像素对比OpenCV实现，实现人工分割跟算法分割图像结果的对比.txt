@@ -3,122 +3,121 @@
 
 图片对比，计算不同像素个数，已经比率。实现人工分割跟算法分割图像结果的对比，但是只能用灰度图像作为输入
  
-// imageMaskComparison.cpp : 定义控制台应用程序的入口点。
-//
-
-// imageMaskComparison.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <iostream>
-using namespace std;
-using namespace cv;
-
-int main()
-{
-
-
-	String image_name,image1,image2;
-	cout<<"input Parameters:"<<endl;
-
-	cout<<"image name 1 : ";
-	cin>>image1;
-	cout<<"image name 2 : ";
-	cin>>image2;
-
-
-	Mat img1 = imread((char *)image1.c_str(), CV_LOAD_IMAGE_GRAYSCALE);
-	Mat img2 = imread((char *)image2.c_str(), CV_LOAD_IMAGE_GRAYSCALE);//两幅图像的大小需要一致 
-	imshow("img1",img1);
-	imshow("img2",img2);
-
-	Mat img_result1 , img_result2 , img_result ;
-
-	img_result1.create(img1.rows,img1.cols,CV_8UC1);
-	img_result1 = 255;
-
-	img_result2.create(2,img1.size,CV_8UC1);
-	img_result2 = 255;
-
-	img_result.create(img2.rows,img2.cols,CV_8UC1);
-	img_result = 0;
-
-	//subtract(img1,img2, img_result1);
-	//subtract(img2,img1, img_result2);
-	//add(img_result1, img_result2, img_result1);
-
-	absdiff(img1,img2,img_result);
-
-	int init_index = 0;
-
-	
-	/*
-	for(int i=0; i<img_result.rows; i++)
-	{
-		for(int j=0; j<img_result.cols; j++) 
-		{
-			if (img_result.at<uchar>(i,j)== 255)
-			{
-				init_index++;
-			}
-			
-			
-			
-		}
-	}
-	
-
-
-
-	*/
-	
-
-	int count = 0;
-	
-
-	for(int i=0; i<img1.rows; i++)
-	{
-		
-		
-		for(int j=0; j<img1.cols; j++) 
-		{
-			
-			
-			if ( img1.at<uchar>(i,j) == img2.at<uchar>(i,j))
-			{
-				
-				img_result.at<uchar>(i,j) = (uchar)255;
-			}
-			else
-			{
-				count++;
-				img_result.at<uchar>(i,j) = (uchar)0;
-			}
-
-		}
-	}
-	
-
-	int sum = img1.cols*img1.rows;
-	double error_ratio = count/(double)sum;
-	
-	//cout<<init_index<<endl;
-	cout<<"number of different pixel:"<<count<<endl;
-	cout<<"error ratio: "<<error_ratio<<endl;
-	imwrite("result.bmp",img_result);
-
-	//imshow("result1", img_result1);
-	//imshow("result2", img_result2);
-	 namedWindow( "result", CV_WINDOW_AUTOSIZE );
-	imshow("result", img_result);
-	waitKey();
-	return 0;
+// imageMaskComparison.cpp : 定义控制台应用程序的入口点。
+//
+
+// imageMaskComparison.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <iostream>
+using namespace std;
+using namespace cv;
+
+int main()
+{
+
+
+	String image_name,image1,image2;
+	cout<<"input Parameters:"<<endl;
+
+	cout<<"image name 1 : ";
+	cin>>image1;
+	cout<<"image name 2 : ";
+	cin>>image2;
+
+
+	Mat img1 = imread((char *)image1.c_str(), CV_LOAD_IMAGE_GRAYSCALE);
+	Mat img2 = imread((char *)image2.c_str(), CV_LOAD_IMAGE_GRAYSCALE);//两幅图像的大小需要一致 
+	imshow("img1",img1);
+	imshow("img2",img2);
+
+	Mat img_result1 , img_result2 , img_result ;
+
+	img_result1.create(img1.rows,img1.cols,CV_8UC1);
+	img_result1 = 255;
+
+	img_result2.create(2,img1.size,CV_8UC1);
+	img_result2 = 255;
+
+	img_result.create(img2.rows,img2.cols,CV_8UC1);
+	img_result = 0;
+
+	//subtract(img1,img2, img_result1);
+	//subtract(img2,img1, img_result2);
+	//add(img_result1, img_result2, img_result1);
+
+	absdiff(img1,img2,img_result);
+
+	int init_index = 0;
+
+	
+	/*
+	for(int i=0; i<img_result.rows; i++)
+	{
+		for(int j=0; j<img_result.cols; j++) 
+		{
+			if (img_result.at<uchar>(i,j)== 255)
+			{
+				init_index++;
+			}
+			
+			
+			
+		}
+	}
+	
+
+
+
+	*/
+	
+
+	int count = 0;
+	
+
+	for(int i=0; i<img1.rows; i++)
+	{
+		
+		
+		for(int j=0; j<img1.cols; j++) 
+		{
+			
+			
+			if ( img1.at<uchar>(i,j) == img2.at<uchar>(i,j))
+			{
+				
+				img_result.at<uchar>(i,j) = (uchar)255;
+			}
+			else
+			{
+				count++;
+				img_result.at<uchar>(i,j) = (uchar)0;
+			}
+
+		}
+	}
+	
+
+	int sum = img1.cols*img1.rows;
+	double error_ratio = count/(double)sum;
+	
+	//cout<<init_index<<endl;
+	cout<<"number of different pixel:"<<count<<endl;
+	cout<<"error ratio: "<<error_ratio<<endl;
+	imwrite("result.bmp",img_result);
+
+	//imshow("result1", img_result1);
+	//imshow("result2", img_result2);
+	 namedWindow( "result", CV_WINDOW_AUTOSIZE );
+	imshow("result", img_result);
+	waitKey();
+	return 0;
 }
-
- 
+  
  
 
  

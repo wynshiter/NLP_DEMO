@@ -1,27 +1,24 @@
 
 
 
+ 
+Remove Duplicates from Sorted ArrayTotal Accepted: 66627 Total Submissions: 212739  My Submissions 
 
-Remove Duplicates from Sorted ArrayTotal Accepted:
-66627 Total Submissions:
-212739 
-My Submissions 
-                      
+                       
+
 
 
 
 
 Given a sorted array, remove the duplicates in place such that each element appear onlyonce and return the new length.
 Do not allocate extra space for another array, you must do this in place with constant memory.
-For example,
-Given input array nums = [1,1,2], 
-Your function should return length = 2, with the first two elements ofnums being
-1 and 2 respectively. It doesn't matter what you leave beyond the new length
+For example, Given input array nums = [1,1,2], 
+Your function should return length = 2, with the first two elements ofnums being 1 and 2 respectively. It doesn't matter what you leave beyond the new length
 
 
 
-
-
+ 
+ 
 64ms好像有点慢了，这个方法有点讨巧了，绕过了算法的部分，以后还是少写这样的代码，多练习算法
 我的解决方案：
 class Solution {
@@ -42,8 +39,8 @@ public:
         return nums.size();
     }
 };
-
-
+ 
+ 
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
@@ -59,9 +56,14 @@ public:
     }
 };
 
-
+ 
 一行代码的STL:
+
 class Solution { public: int removeDuplicates(int A[], int n) { return distance(A, unique(A, A+n)); } };
+
+
+
+ 
 
 int removeDuplicates(vector<int>& nums) {
     if(nums.size() <= 1) return nums.size();
@@ -75,7 +77,11 @@ int removeDuplicates(vector<int>& nums) {
     return nums.size();
 }   
 
+
+
+
 python解决方案：
+
 class Solution:
     # @param a list of integers
     # @return an integer
@@ -94,6 +100,11 @@ class Solution:
 
 
 
-﻿﻿
+
+ 
+ 
+
+ ﻿﻿
+
 
 

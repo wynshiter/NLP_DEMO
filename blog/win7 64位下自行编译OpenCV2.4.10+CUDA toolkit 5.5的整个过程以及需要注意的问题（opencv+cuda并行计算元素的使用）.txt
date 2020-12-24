@@ -1,8 +1,7 @@
 
 
 
-       
-
+        
 首先说明的是，这个帖子是成功的编译了dll，但是这个dll使用的时候还是很容易出现各种问题的。
 发现错误可能是由于系统安装了太多版本的opencv，环境变量的设置混乱，造成dll版本加载不对的问题。
  
@@ -50,17 +49,12 @@ CUDA_PATH_V5_0 = C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\
  
  
 手动配置环境变量。在系统环境变量中新建如下项：
-CUDA_SDK_PATH = C:\ProgramData\NVIDIA Corporation\CUDA Samples\v5.0
-CUDA_LIB_PATH = %CUDA_PATH%\lib\X64
-CUDA_BIN_PATH = %CUDA_PATH%\bin
-CUDA_SDK_LIB_PATH = %CUDA_SDK_PATH%\common\lib\x64
-CUDA_SDK_BIN_PATH = %CUDA_SDK_PATH%\bin\win64
+CUDA_SDK_PATH = C:\ProgramData\NVIDIA Corporation\CUDA Samples\v5.0 CUDA_LIB_PATH = %CUDA_PATH%\lib\X64 CUDA_BIN_PATH = %CUDA_PATH%\bin CUDA_SDK_LIB_PATH = %CUDA_SDK_PATH%\common\lib\x64 CUDA_SDK_BIN_PATH = %CUDA_SDK_PATH%\bin\win64
  
  
 然后在系统环境变量Path 后添加如下内容：
 
-
-;%CUDA_LIB_PATH%;%CUDA_BIN_PATH%;%CUDA_SDK_LIB_PATH%;%CUDA_SDK_BIN_PATH%;
+ ;%CUDA_LIB_PATH%;%CUDA_BIN_PATH%;%CUDA_SDK_LIB_PATH%;%CUDA_SDK_BIN_PATH%;
  
  
 3. 安装TBB
@@ -82,20 +76,17 @@ CUDA_SDK_BIN_PATH = %CUDA_SDK_PATH%\bin\win64
  
  
 
-i7的处理器大概能编译3个小时左右。。。
+ i7的处理器大概能编译3个小时左右。。。
  
 加速方法，可以缩短到一个小时左右！就是只针对响应的显卡版本进行设置：
-由于这样直接生成的解决方案需对不同的GPU架构分别编译，编译时间过长（数小时），
-建议针对所用显卡进行配置（据称可达原时间六分之一）：
-找到如下两项
+由于这样直接生成的解决方案需对不同的GPU架构分别编译，编译时间过长（数小时）， 建议针对所用显卡进行配置（据称可达原时间六分之一）： 找到如下两项
  
  
  
 
+  
  
- 
-清空CUDA_ARCH_PTX，将CUDA_ARCH_BIN中仅保留所需GPU架构，
-确定所需架构，请查询https://developer.nvidia.com/cuda-gpus重新configure。（建议使用以上方法先编译一边，确定没有错误，再为所有架构重新编译，花了四天的时间得到的教训）
+清空CUDA_ARCH_PTX，将CUDA_ARCH_BIN中仅保留所需GPU架构， 确定所需架构，请查询https://developer.nvidia.com/cuda-gpus 重新configure。（建议使用以上方法先编译一边，确定没有错误，再为所有架构重新编译，花了四天的时间得到的教训）
  
  
  
@@ -104,7 +95,7 @@ i7的处理器大概能编译3个小时左右。。。
 
 
  
-
+ 
  
  
 以上是转载的内容，这里要说几个需要注意的地方：
@@ -121,36 +112,36 @@ i7的处理器大概能编译3个小时左右。。。
  
 测试代码：
  
-<span style="font-size:18px;">// first.cpp : 定义控制台应用程序的入口点。
-//
-
-#include "stdafx.h"
-#include <iostream>
-#include "opencv2/opencv.hpp"
-#include "opencv2/gpu/gpu.hpp"
-
-#pragma comment(lib,"opencv_gpu2410.lib")
-#pragma comment(lib,"opencv_core2410.lib")
-
-using namespace std; 
-using namespace cv; 
-using namespace cv::gpu;
-int main()
-{
-	int i;
-	try
-	{
-		cout << getCudaEnabledDeviceCount();
-	}
-	catch(const cv::Exception& ex)
-	{
-		cout << "Error:" << ex.what() <<endl;
-	}
-	system("PAUSE");
-	return 0;
-}
+<span style="font-size:18px;">// first.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include "opencv2/opencv.hpp"
+#include "opencv2/gpu/gpu.hpp"
+
+#pragma comment(lib,"opencv_gpu2410.lib")
+#pragma comment(lib,"opencv_core2410.lib")
+
+using namespace std; 
+using namespace cv; 
+using namespace cv::gpu;
+int main()
+{
+	int i;
+	try
+	{
+		cout << getCudaEnabledDeviceCount();
+	}
+	catch(const cv::Exception& ex)
+	{
+		cout << "Error:" << ex.what() <<endl;
+	}
+	system("PAUSE");
+	return 0;
+}
 </span>
- 
+  
  
  
  

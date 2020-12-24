@@ -5,21 +5,21 @@
 
 
 
-文章大纲Elastic search & kibana & 分词器 安装版本控制下载地址Elastic search安装kibana 安装分词器配置
+
+文章大纲
+Elastic search & kibana & 分词器 安装版本控制下载地址Elastic search安装kibana 安装分词器配置hanlp 分词器配置ik 分词器配置
+
+
+
+
 
 Elastic search & kibana & 分词器 安装
 版本控制
-ES版本：7.2.0
-分词器版本：
-kibana 版本：7.2.0
+ES版本：7.2.0 分词器版本： kibana 版本：7.2.0
 下载地址
-ES 下载地址：https://www.elastic.co/cn/downloads/past-releases/elasticsearch-7-2-0
-kibana 下载地址：https://www.elastic.co/cn/downloads/past-releases/kibana-7-2-0
-hanlp 分词器下载地址： https://github.com/KennFalcon/elasticsearch-analysis-hanlp 
+ES 下载地址：https://www.elastic.co/cn/downloads/past-releases/elasticsearch-7-2-0 kibana 下载地址：https://www.elastic.co/cn/downloads/past-releases/kibana-7-2-0 hanlp 分词器下载地址： https://github.com/KennFalcon/elasticsearch-analysis-hanlp 
 Elastic search安装
-
 0.添加es 用户，并新建目录
-
 不能以root 方式运行elasticSearch
 groupadd elasticsearch 
 useradd elasticsearch -g elasticsearch
@@ -27,19 +27,14 @@ useradd elasticsearch -g elasticsearch
 chown -R elasticsearch:elasticsearch /home/elasticsearch
 
 
-
 1.修改 配置文件 elasticsearch.yml
-
 cluster.name: fastclaim
 node.name: node-test
 network.host: 172.31.3.50
 http.port: 9200
 cluster.initial_master_nodes: ["node-test"]
 
-
 2.针对无法创建本地文件问题，用户最大可创建文件数太小
-
-
 切换到root用户，编辑limits.conf配置文件
 vi /etc/security/limits.conf
 #末尾添加
@@ -48,9 +43,7 @@ vi /etc/security/limits.conf
 * soft nproc 65536
 * hard nproc 65536
 
-
 3.针对无法创建本地线程问题，用户最大可创建线程数太小
-
 vi /etc/security/limits.d/90-nproc.conf
 将
  * soft nproc 1024
@@ -58,19 +51,14 @@ vi /etc/security/limits.d/90-nproc.conf
  * soft nproc 4096
  
 
-
-4.针对最大虚拟内存太小
-解决方法：切换到root用户下，修改配置文件sysctl.conf
-
+4.针对最大虚拟内存太小 解决方法：切换到root用户下，修改配置文件sysctl.conf
 vi /etc/sysctl.conf
 添加配置
 vm.max_map_count=655360
 执行命令
 sysctl -p
 
-
 5.重新启动，启动成功
-
 如果要在后台运行，使用./bin/elasticsearch -d启动
 curl 172.31.3.50:9200
 
@@ -93,11 +81,8 @@ curl 172.31.3.50:9200
 }
 
 kibana 安装
-
 1.安装及启动
-
-tar -xzvf 解压缩后，进行安装，
-vim config/kibana.yml
+tar -xzvf 解压缩后，进行安装， vim config/kibana.yml
 # 修改如下四行
 server.port: 5601
 server.host: "172.31.3.50"
@@ -108,44 +93,26 @@ kibana.index: ".kibana"
 
 nohup ./bin/kibana >/dev/null &
 
-
 2.开发工具地址
-
 http://IP:5601/app/kibana#/dev_tools/console?_g=()
 分词器配置
+hanlp 分词器配置
 参考链接：https://github.com/KennFalcon/elasticsearch-analysis-hanlp
-
 1.下载安装ES对应Plugin Release版本
-
 安装方式：
 方式一
 a. 下载对应的release安装包，最新release包可从baidu盘下载（链接:https://pan.baidu.com/s/1mFPNJXgiTPzZeqEjH_zifw 密码:i0o7）
-b. 执行如下命令安装，其中PATH为插件包绝对路径：
-./bin/elasticsearch-plugin install file://${PATH}
+b. 执行如下命令安装，其中PATH为插件包绝对路径： ./bin/elasticsearch-plugin install file://${PATH}
 方式二
-a. 使用elasticsearch插件脚本安装command如下：
-./bin/elasticsearch-plugin install https://github.com/KennFalcon/elasticsearch-analysis-hanlp/releases/download/v7.2.0/elasticsearch-analysis-hanlp-7.2.0.zip
-
-2.安装数据包
-release包中存放的为HanLP源码中默认的分词数据，若要下载完整版数据包，请查看HanLP Release。
-数据包目录：ES_HOME/plugins/analysis-hanlp
-注：因原版数据包自定义词典部分文件名为中文，这里的hanlp.properties中已修改为英文，请对应修改文件名
-hanlp.properties 在
-/home/elasticsearch/elasticsearch-7.2.0/config/analysis-hanlp 目录中
-
+a. 使用elasticsearch插件脚本安装command如下： ./bin/elasticsearch-plugin install https://github.com/KennFalcon/elasticsearch-analysis-hanlp/releases/download/v7.2.0/elasticsearch-analysis-hanlp-7.2.0.zip
+2.安装数据包 release包中存放的为HanLP源码中默认的分词数据，若要下载完整版数据包，请查看HanLP Release。 数据包目录：ES_HOME/plugins/analysis-hanlp 注：因原版数据包自定义词典部分文件名为中文，这里的hanlp.properties中已修改为英文，请对应修改文件名 hanlp.properties 在 /home/elasticsearch/elasticsearch-7.2.0/config/analysis-hanlp 目录中
 因为aws ec2 里面网络环境比较好，推荐直接在线安装。
-
 3.重启Elasticsearch
-
 注：上述说明中的ES_HOME为自己的ES安装路径，需要绝对路径
-
 4.配置自定义词典并热更新
-
 在本版本中，增加了词典热更新，修改步骤如下：
 
-a. 在ES_HOME/plugins/analysis-hanlp/data/dictionary/custom目录中新增自定义词典
-b. 修改hanlp.properties，修改CustomDictionaryPath，增加自定义词典配置
-c. 等待1分钟后，词典自动加载
+a. 在ES_HOME/plugins/analysis-hanlp/data/dictionary/custom目录中新增自定义词典 b. 修改hanlp.properties，修改CustomDictionaryPath，增加自定义词典配置 c. 等待1分钟后，词典自动加载
 
 具体脚本，以医学常用词典medical.txt 为例
 mv /tmp/medical.txt /home/elasticsearch/
@@ -167,20 +134,9 @@ vim /home/elasticsearch/elasticsearch-7.2.0/config/analysis-hanlp/hanlp.properti
 CustomDictionaryPath=data/dictionary/custom/CustomDictionary.txt; ModernChineseSupplementaryWord.txt; ChinesePlaceName.txt ns; PersonalName.txt; OrganizationName.txt; ShanghaiPlaceName.txt ns;data/dictionary/person/nrf.txt nrf; medical.txt;
 
 注：每个节点都需要做上述更改
-
 5.提供的分词方式说明
-
-hanlp: hanlp默认分词
-hanlp_standard: 标准分词
-hanlp_index: 索引分词
-hanlp_nlp: NLP分词
-hanlp_n_short: N-最短路分词
-hanlp_dijkstra: 最短路分词
-hanlp_crf: CRF分词（已有最新方式）
-hanlp_speed: 极速词典分词
-
+hanlp: hanlp默认分词 hanlp_standard: 标准分词 hanlp_index: 索引分词 hanlp_nlp: NLP分词 hanlp_n_short: N-最短路分词 hanlp_dijkstra: 最短路分词 hanlp_crf: CRF分词（已有最新方式） hanlp_speed: 极速词典分词
 6.分词样例
-
 GET /_analyze?pretty
 {
   "analyzer" : "hanlp_crf",
@@ -204,6 +160,76 @@ GET /_analyze?pretty
     }
   ]
 }
+
+ik 分词器配置
+ik 分词器
+PUT /test_ik
+
+POST /test_ik/_mapping
+{
+        "properties": {
+            "content": {
+                "type": "text",
+                "analyzer": "ik_max_word",
+                "search_analyzer": "ik_smart"
+            }
+        }
+}
+
+POST /test_ik/_create/1
+{"content":"美国留给伊拉克的是个烂摊子吗"}
+
+
+POST /test_ik/_search
+{
+
+    "query" : { "match" : { "content" : "美国" }},
+
+    "highlight" : {
+        "pre_tags" : ["<tag1>", "<tag2>"],
+        "post_tags" : ["</tag1>", "</tag2>"],
+        "fields" : {
+            "content" : {}
+        }
+    }
+}
+
+## result
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 1,
+      "relation" : "eq"
+    },
+    "max_score" : 0.2876821,
+    "hits" : [
+      {
+        "_index" : "test_ik",
+        "_type" : "_doc",
+        "_id" : "1",
+        "_score" : 0.2876821,
+        "_source" : {
+          "content" : "美国留给伊拉克的是个烂摊子吗"
+        },
+        "highlight" : {
+          "content" : [
+            "<tag1>美国</tag1>留给伊拉克的是个烂摊子吗"
+          ]
+        }
+      }
+    ]
+  }
+}
+
+
 
 
 

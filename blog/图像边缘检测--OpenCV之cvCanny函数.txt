@@ -5,84 +5,24 @@
 分类： C/C++
 void cvCanny( const CvArr* image, CvArr* edges, double threshold1, double threshold2, int aperture_size=3 ); image单通道输入图像.edges单通道存储边缘的输出图像threshold1第一个阈值threshold2第二个阈值aperture_sizeSobel 算子内核大小 (见 cvSobel).
 函数 cvCanny 采用 CANNY 算法发现输入图像的边缘而且在输出图像中标识这些边缘。threshold1和threshold2 当中的小阈值用来控制边缘连接，大的阈值用来控制强边缘的初始分割。
-注意事项：cvCanny只接受单通道图像作为输入。 外部链接：经典的canny自调整阈值算法的一个opencv的实现见在OpenCV中自适应确定canny算法的分割门限参考OpenCV中文官网：http://www.opencv.org.cn/index.php/Cv%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86#Canny说明：OpenCV中cvCanny函数用到了cvSobel的差分计算。下图为OpenCV的cvCanny函数效果
+注意事项：cvCanny只接受单通道图像作为输入。 外部链接：经典的canny自调整阈值算法的一个opencv的实现见在OpenCV中自适应确定canny算法的分割门限参考OpenCV中文官网：http://www.opencv.org.cn/index.php/Cv%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86#Canny
+说明：OpenCV中cvCanny函数用到了cvSobel的差分计算。下图为OpenCV的cvCanny函数效果
 
 点击(此处)折叠或打开
-#include "stdafx.h" 
-#include <cv.h> 
-#include <cxcore.h> 
-#include <highgui.h> 
-#include <cmath> 
-using namespace std; 
-using namespace cv; 
-int main(int argc ,char ** argv) 
-{ 
-IplImage * pImg=NULL; 
-    IplImage * pCannyImg=NULL; 
-if (argc ==2&&(pImg=cvLoadImage(argv[1],0))!=0) 
-{ 
-        pCannyImg=cvCreateImage(cvGetSize(pImg),IPL_DEPTH_8U,1); 
-        cvCanny(pImg,pCannyImg,50,150,3); 
-//创建窗口 
-        cvNamedWindow("src", 1); 
-        cvNamedWindow("canny",1); 
-//显示图像 
-        cvShowImage( "src", pImg ); 
-        cvShowImage( "canny", pCannyImg ); 
-        cvWaitKey(0); //等待按键 
-//销毁窗口 
-        cvDestroyWindow( "src" ); 
-        cvDestroyWindow( "canny" ); 
-//释放图像 
-        cvReleaseImage( &pImg ); 
-        cvReleaseImage( &pCannyImg ); 
-        return 0; 
-} 
-    return -1; 
-}
+#include "stdafx.h"  #include <cv.h>  #include <cxcore.h>  #include <highgui.h>  #include <cmath>  using namespace std;  using namespace cv;  int main(int argc ,char ** argv)  {  IplImage * pImg=NULL;      IplImage * pCannyImg=NULL;  if (argc ==2&&(pImg=cvLoadImage(argv[1],0))!=0)  {          pCannyImg=cvCreateImage(cvGetSize(pImg),IPL_DEPTH_8U,1);          cvCanny(pImg,pCannyImg,50,150,3);  //创建窗口          cvNamedWindow("src", 1);          cvNamedWindow("canny",1);  //显示图像          cvShowImage( "src", pImg );          cvShowImage( "canny", pCannyImg );          cvWaitKey(0); //等待按键  //销毁窗口          cvDestroyWindow( "src" );          cvDestroyWindow( "canny" );  //释放图像          cvReleaseImage( &pImg );          cvReleaseImage( &pCannyImg );          return 0;  }      return -1;  }
 重要：Canny原理：链接及内容：http://blog.csdn.net/likezhaobin/article/details/6892176
  
 opencv2版本：
-// canny边缘检测.cpp : 定义控制台应用程序的入口点。 
-//
+// canny边缘检测.cpp : 定义控制台应用程序的入口点。  //
 #include "stdafx.h"
-
-#include "stdafx.h" 
-#include <cv.h> 
-#include <cxcore.h> 
-#include <highgui.h> 
-#include <cmath>
-#include <opencv2/imgproc/imgproc.hpp>  
-#include <opencv2/highgui/highgui.hpp>  
-#include <iostream>  
-  
-#pragma comment(lib,"opencv_core2410d.lib")            
-#pragma comment(lib,"opencv_highgui2410d.lib")            
-#pragma comment(lib,"opencv_imgproc2410d.lib") 
-using namespace std; 
-using namespace cv;
-int main(int argc ,char ** argv) 
-{ 
-    IplImage * pImg=NULL; 
-    IplImage * pCannyImg=NULL;
-
-    cv::Mat src = cv::imread("swan.jpg");  
-    if (src.empty())  
-        return -1;  
-      
-    cv::Mat bw;  
-    cv::cvtColor(src, bw, CV_BGR2GRAY);  
-    Mat canny_mat(src.size(),CV_8U); 
-    
-        //cvCanny(pImg,pCannyImg,50,150,3); 
-        cv::Canny(bw,canny_mat,50,150,3); 
-    
-        imshow("canny",canny_mat);
+ #include "stdafx.h"  #include <cv.h>  #include <cxcore.h>  #include <highgui.h>  #include <cmath>
+#include <opencv2/imgproc/imgproc.hpp>   #include <opencv2/highgui/highgui.hpp>   #include <iostream>      #pragma comment(lib,"opencv_core2410d.lib")             #pragma comment(lib,"opencv_highgui2410d.lib")             #pragma comment(lib,"opencv_imgproc2410d.lib") 
+using namespace std;  using namespace cv;
+int main(int argc ,char ** argv)  {      IplImage * pImg=NULL;      IplImage * pCannyImg=NULL;
+     cv::Mat src = cv::imread("swan.jpg");       if (src.empty())           return -1;              cv::Mat bw;       cv::cvtColor(src, bw, CV_BGR2GRAY);  
+    Mat canny_mat(src.size(),CV_8U);               //cvCanny(pImg,pCannyImg,50,150,3);          cv::Canny(bw,canny_mat,50,150,3);               imshow("canny",canny_mat);
         cvWaitKey(0); //等待按键
-
-        return 0; 
-    
-}
+         return 0;       }
 
  
 边缘检测后：

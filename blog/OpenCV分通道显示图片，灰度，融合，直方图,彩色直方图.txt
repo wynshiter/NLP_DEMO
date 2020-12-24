@@ -221,8 +221,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
-
- 
+  
  
  
 实现效果：
@@ -312,8 +311,7 @@ int main( int argc, char** argv )
 	cvWaitKey(0);
 }
 
-
- 
+  
 输入图像：
  
 

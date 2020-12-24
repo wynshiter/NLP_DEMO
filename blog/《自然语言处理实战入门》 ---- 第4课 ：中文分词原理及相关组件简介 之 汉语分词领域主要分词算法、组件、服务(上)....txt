@@ -1,0 +1,245 @@
+
+
+
+
+目录
+
+0.内容梗概
+1. 基于传统统计算法的分词组件
+    1.1 hanlp : Han Language Processing
+    1.2 语言技术平台（Language Technology Platform，LTP）
+    1.3 汉语分词系统ICTCLAS
+    1.4 thulac 一个高效的中文词法分析工具包
+    1.5 pkuseg多领域中文分词工具
+    1.6 其他知名开源分词组件
+参考文献
+
+0.内容梗概
+《自然语言处理实战入门》 第4课 ：中文分词原理及相关组件简介的 主要内容 有如下三个部分：
+
+汉语语言学简介汉语分词领域主要服务、手段、方法分词原理最佳实践（以jieba为例）
+
+由于博客太长，我拆分成三篇分别进行阐述
+中文分词原理及相关组件简介 之 ---- 汉语语言学中文分词原理及相关组件简介 之 ---- 分词领域主要分词算法、组件、服务（上）中文分词原理及相关组件简介 之 ---- 分词领域主要分词算法、组件、服务（下）中文分词原理及相关组件简介 之 ---- 分词算法原理，分词效果评测最佳实践
+
+
+
+视频学习链接：https://edu.csdn.net/course/play/20769/305748
+
+本节课，《汉语分词主要分词服务手段及方法》，以下组件主要介绍及使用python 版本进行汉语分词。我们按照分词组件的基础算法将他们分成三类：
+
+1.传统分词组件，基于统计类算法
+2.基于深度学习算法
+3.云计算厂商API
+
+其中顺带一提的是开源的分词组件也有对应的开源协议，我们做工程的过程中如果使用了对应的开源组件，那么还是需要遵守对应的开源协议，下图是阮一峰老师给出的如何选择开源协议参考图
+这张图简单明了，如果非要排序的话，我们可以认为开源协议由右边到左边，自由度依次降低。
+1. 基于传统统计算法的分词组件
+基于词典的分词方法，有诸多限制，不能完成新词识别分割的问题，目前学界，工业界基本都采用基于统计的方法进行汉语分词。下面我们分别就目前业界使用频率最高的一些分词组件依次介绍。
+1.1 hanlp : Han Language Processing
+首先来看，HanLP是一系列模型与算法组成的NLP工具包，由大快搜索主导并完全开源，目标是普及自然语言处理在生产环境中的应用。HanLP具备功能完善、性能高效、架构清晰、语料时新、可自定义的特点。
+官网链接：http://hanlp.com/github：https://github.com/hankcs/HanLPpython 调用：https://github.com/hankcs/pyhanlpdocker 中使用：https://hub.docker.com/r/samurais/hanlp-api/开源协议：Apache License 2.0
+1.1.1 pyhanlp 安装
+其实 hanlp 是java 写的，所以它的python版本是利用python 的JPype 库通过共享内存的方式在java 和CPython 两个虚拟机之间进行调用，这样的方式不仅简洁而且，保证了性能。
+由于我们整个系列课程的环境是用conda 构建的，参见：conda基本环境配置 初始化环境时候会安装vs2015_runtime，还有一个基本要求是机器要有 java 环境，python 环境的硬件位数是一样的，确保了操作系统、java、 python的环境统一然后其实就是安装jpye ：https://jpype.readthedocs.io/en/latest/ 使用jpye去调用hanlp。
+java
+
+java version "1.8.0_162" Java(TM) SE Runtime Environment (build 1.8.0_162-b12) Java HotSpot(TM) 64-Bit Server VM (build 25.162-b12, mixed mode)
+
+python
+
+Python 3.6.8 |Anaconda, Inc.| (default, Feb 21 2019, 18:30:04) [MSC v.1916 64 bit (AMD64)] on win32
+
+然后 pip 安装
+python -m pip install --upgrade pippip install jpype1pip install pyhanlp
+报错参考：手动配置pyhanlpwindows安装指南
+1.1.2 功能及分词样例
+分词样例程序
+from pyhanlp import *print(HanLP.segment('你好，欢迎在Python中调用HanLP的API'))for term in HanLP.segment('下雨天地面积水'):    print('{}\t{}'.format(term.word, term.nature)) # 获取单词与词性testCases = [    "商品和服务",    "结婚的和尚未结婚的确实在干扰分词啊",    "买水果然后来世博园最后去世博会",    "中国的首都是北京",    "欢迎新老师生前来就餐",    "工信处女干事每月经过下属科室都要亲口交代24口交换机等技术性器件的安装工作",    "随着页游兴起到现在的页游繁盛，依赖于存档进行逻辑判断的设计减少了，但这块也不能完全忽略掉。"]for sentence in testCases: print(HanLP.segment(sentence))
+输出
+[你好/vl, ，/w, 欢迎/v, 在/p, Python/nx, 中/f, 调用/v, HanLP/nx, 的/ude1, API/nx]下雨天    n地面    n积水    n[商品/n, 和/cc, 服务/vn][结婚/vi, 的/ude1, 和/cc, 尚未/d, 结婚/vi, 的/ude1, 确实/ad, 在/p, 干扰/vn, 分词/n, 啊/y][买/v, 水果/n, 然后/c, 来/vf, 世博园/n, 最后/f, 去/vf, 世博会/n][中国/ns, 的/ude1, 首都/n, 是/vshi, 北京/ns][欢迎/v, 新/a, 老/a, 师生/n, 前来/vi, 就餐/vi][工信处/n, 女干事/n, 每月/t, 经过/p, 下属/v, 科室/n, 都/d, 要/v, 亲口/d, 交代/v, 24/m, 口/n, 交换机/n, 等/udeng, 技术性/n, 器件/n, 的/ude1, 安装/v, 工作/vn][随着/p, 页游/nz, 兴起/v, 到/v, 现在/t, 的/ude1, 页游/nz, 繁盛/a, ，/w, 依赖于/v, 存档/vi, 进行/vn, 逻辑/n, 判断/v, 的/ude1, 设计/vn, 减少/v, 了/ule, ，/w, 但/c, 这/rzv, 块/q, 也/d, 不能/v, 完全/ad, 忽略/v, 掉/v, 。/w]
+分词模块两种调用方式
+pyhanlp 主要有两种方式调用 分词器，以感知机分词器为例
+
+调用方式
+1：使用JClass直接获取java类 调用方式
+2：python 接口传参
+
+# 感知器分词 调用方式1PerceptronLexicalAnalyzer = JClass('com.hankcs.hanlp.model.perceptron.PerceptronLexicalAnalyzer')analyzer = PerceptronLexicalAnalyzer()print(analyzer.analyze("上海华安工业（集团）公司董事长谭旭光和秘书胡花蕊来到美国纽约现代艺术博物馆参观"))result_perceptron = analyzer.analyze("上海华安工业（集团）公司董事长谭旭光和秘书胡花蕊来到,美国纽约现代艺术博物馆参观")# 感知器分词 调用方式2perceptron_segment = HanLP.newSegment('perceptron')for term in perceptron_segment.seg('下雨天地面积水'):    print('{}\t{}'.format(term.word, term.nature)) # 获取单词与词性
+输出：
+[上海/ns 华安/nz 工业/n （/w 集团/n ）/w 公司/n]/nt 董事长/n 谭旭光/nr 和/c 秘书/n 胡花蕊/nr 来到/v [美国纽约/ns 现代/ntc 艺术/n 博物馆/n]/ns 参观/v下雨    v天地    n面积    n水    n
+1.1.3 分词原理
+参考介绍：https://blog.csdn.net/FontThrone/article/details/82792377
+pyhanlp 支持但不限于以下几种分词方式：
+自定义词典极速词典分词索引分词CRF分词感知机词法分析
+以下分别就hanlp分词技术的核心算法，简短介绍。
+1.维特比 (viterbi)：效率和效果的最佳平衡。也是最短路分词，HanLP最短路求解采用Viterbi算法
+2.双数组trie树 (dat)：极速词典分词，千万字符每秒（可能无法获取词性，此处取决于你的词典）
+3.条件随机场 (crf)：分词、词性标注与命名实体识别精度都较高，适合要求较高的NLP任务
+4.感知机 (perceptron)：分词、词性标注与命名实体识别，支持在线学习. 目前感知机分词是所有“由字构词”的分词器实现中最快的
+5.N最短路 (nshort)：命名实体识别稍微好一些，牺牲了速度
+上述分词方式的分词原理各不相同，分词过程中需要加载对应的算法模块。
+官网给出了hanlp 集成的3个有代表性分词算法及其相关构建架构的简介
+
+结构化感知机标注框架隐马角色标注CRF词法分析
+
+1.1.4 特点、性能、准确率
+0.功能丰富，扩展性强，开源协议弹性大 14 大类功能。Apache 2.0 协议基本上可以随便改，随便商用
+1.衍生项目丰富，生态链效应明显 衍生项目列表
+2.性能 hanlp java版 性能及准确性指标
+
+1.2 语言技术平台（Language Technology Platform，LTP）
+语言技术平台（Language Technology Platform，LTP）是哈工大社会计算与信息检索研究中心历时十年研制的一整套开放中文自然语言处理系统。 LTP制定了基于XML的语言处理结果表示，并在此基础上提供了一整套自底向上的丰富、高效、高精度的中文自然语言处理模块 （包括词法、句法、语义等5项中文处理核心技术，在多次国内外技术评测中获得优异成绩， 特别是获得CoNLL 2009国际句法和语义分析联合评测的第一名），应用程序接口，可视化工具，以及能够以网络服务使用的语言技术云。 学术版LTP已共享给500多家研究机构免费使用，百度、腾讯、华为、金山等企业付费使用LTP商业版本。2010年，LTP荣获行业最高奖--“钱伟长中文信息处理科学技术一等奖”。
+“语言云” 以哈工大社会计算与信息检索研究中心研发的 “语言技术平台（LTP）” 为基础，为用户提供高效精准的中文自然语言处理云服务。使用 “语言云” 非常简单，只需要根据 API 参数构造 HTTP 请求即可在线获得分析结果，而无需下载 SDK 、无需购买高性能的机器，同时支持跨平台、跨语言编程等。2014年11月，哈工大联合科大讯飞公司共同推出 “哈工大-讯飞语言云”，借鉴了讯飞在全国性大规模云计算服务方面的丰富经验，显著提升 “语言云” 对外服务的稳定性和吞吐量，为广大用户提供电信级稳定性和支持全国范围网络接入的语言云服务，有效支持包括中小企业在内开发者的商业应用需要。
+科大讯飞云服务中的 NLP 词法分析相关服务，由云孚科技提供 ：https://www.xfyun.cn/services/lexicalAnalysis
+LTP 本身是用c++编写的，所以性能上相对于其他开源分词组件要好很多，我们关注其python 版本,pyltp 是 LTP 的 Python 封装，提供了分词，词性标注，命名实体识别，依存句法分析，语义角色标注的功能。
+官网：哈工大语言云文档：https://pyltp.readthedocs.io/zh_CN/latest/api.htmlc++ github地址（新版支持docker）：https://github.com/HIT-SCIR/ltppython github 地址: https://github.com/HIT-SCIR/pyltpdocker中使用：http://ltp.ai/docs/install.html#开源协议 ：LTP 协议（商用付费）
+
+1.2.1 LTP 安装
+由于pyltp 不支持conda python 环境
+Py2.6Py2.6Py3.4Py3.5Py3.6conda-pythonLinux支持支持支持支持支持不支持Mac OS支持支持支持支持支持不支持Windows VS2015不支持不支持不支持支持支持不支持Windows VS2017不支持不支持不支持支持支持不支持
+所以一般是在一个裸的原始的python 环境进行安装，而且windows下面得有Visual C++ 环境。除了环境安装上有点问题之外，使用起来还是很不友好的。另外一个需要注意的点就是模型需要单独下载。
+1.2.2 功能及分词样例
+可以参考我们github中的代码样例: pyltp 分词样例
+import osfrom pyltp import SentenceSplitterfrom pyltp import SegmentorLTP_DATA_DIR =  r'D:\code\python\csdn_nlp\ltp_data_v3.4.0'  # ltp模型目录的路径cws_model_path = os.path.join(LTP_DATA_DIR, 'cws.model')  # 分词模型路径，模型名称为`cws.model`"""分词"""defsegmentor(sentence=None):    try:        segmentor = Segmentor()  # 初始化实例        segmentor.load(cws_model_path)  # 加载模型        words = segmentor.segment(sentence)  # 分词    #默认可以这样输出    #print ('\t'.join(words))    # 可以转换成List 输出        words_list = list(words)        segmentor.release()  # 释放模型        return words_list    except Exception as e:        print(e)        return ''    finally:        pass
+1.2.3 分词原理
+整体功能文档介绍：http://www.ltp-cloud.com/intro
+原理出处：https://github.com/HIT-SCIR/ltp-cws
+LTP的分词模块基于结构化感知器（Structured Perceptron）算法构建，具有准确率高、速度快等优点；同时支持用户自定义词典，适应不同用户的需求；另外还新增了个性化（增量式）训练功能，用户可以根据自己的实际需求，如对新领域的文本进行分词等，自行标注少量句子的分词结果（比如对LTP分词结果的修正），LTP分词模块可以重新训练一个更好应对新领域的分词器，进一步提高新领域上分词的准确率。
+
+在LTP中，我们将分词任务建模为基于字的序列标注问题。对于输入句子的字序列，模型给句子中的每个字标注一个标识词边界的标记。
+同时，为了提高互联网文本特别是微博文本的处理性能。我们在分词系统中加入如下一些优化策略：
+英文、URI一类特殊词识别规则利用空格等自然标注线索在统计模型中融入词典信息从大规模未标注数据中统计字间互信息、上下文丰富程度
+1.2.4 特点、性能、准确率
+特点
+概括的说：速度快！准确率高！ 由于底层是c++编写，几大功能对应的模型文件较大。故而使用起来有一点的环境依赖，且python 版本不支持conda 安装一大遗憾。
+问题
+环境依赖，不支持conda
+准确率及性能指标
+http://www.ltp-cloud.com/intro#cws
+在人民日报语料集基础上 测试结果|P |R |F |-|-|-|-| |开发集| 0.973152 |0.972430| 0.972791 |测试集 |0.972316| 0.970354| 0.972433 运行时内存：119m 速度：176.91k/s CLP 2012 评测任务1：微博领域的汉语分词，第二名。
+
+1.3 汉语分词系统ICTCLAS
+该系统为汉语自然语言处理领域顶尖大牛，北京理工大学张华平博士20年的专业技术积累，NShort 革命性分词算法的发明者。
+主要功能包括中文分词；英文分词；中英文混合分词，词性标注；命名实体识别；新词识别；关键词提取；支持用户专业词典与微博分析。NLPIR系统支持多种编码、多种操作系统、多种开发语言与平台。
+主页：http://ictclas.nlpir.org/在线演示系统：http://ictclas.nlpir.org/nlpir/github地址：https://github.com/NLPIR-team/NLPIRPython版本：https://github.com/tsroten/pynlpir主要文档：NLPIR-ICTCLAS 中英文分词系统功能模块使用手册Free software: MIT license
+
+罗尼·奥沙利文（Ronnie O'Sullivan），1975年12月5日出生，世界著名斯诺克球手，因击球速度快，打法流畅，球迷赠与“The Rocket（火箭）”之称，他是斯诺克运动中罕见的天才型选手。
+作为斯诺克有史以来最具天赋球手，左手技术和右手技术一样出色，他第一次参加比赛就打破了世界纪录，取得了惊人的成绩，自从1992年转为职业选手以来，创下了一系列惊人的记录。15岁时，他就成为世界青年锦标赛的冠军；同年，在参加英国业余锦标赛时，他又成为赢得比赛单杆147满分杆的最年青球手 2 ；17岁时，获得第一个排名赛冠军头衔——英国锦标赛冠军，从而成为当时世界上最年轻的世界排名赛冠军得主。
+
+分词结果
+
+该平台的特点为：功能丰富，分词，语义，实体发现准确率高，近期发布了最新的2018版。
+1.3.1 安装
+安装非常简单
+安装简介：https://pynlpir.readthedocs.io/en/latest/installation.htmlpip install pynlpir to install PyNLPIRpynlpir update to download the latest license
+1.3.2 功能及分词样例
+pynlpir 的分词调用比较简单，同样的两种方式调用接口，以下分别给出样例说明：
+1. python接口
+import pynlpirpynlpir.open()s = 'NLPIR分词系统前身为2000年发布的ICTCLAS词法分析系统，从2009年开始，为了和以前工作进行大的区隔，并推广NLPIR自然语言处理与信息检索共享平台，调整命名为NLPIR分词系统。'print(pynlpir.segment(s3))print(pynlpir.segment(s3, pos_tagging=False))
+输出
+# Sample output: [('NLPIR', 'noun'), ('分词', 'verb'), ('系统', 'noun'), ('前身', 'noun'), ('为', 'preposition'), ('2000年', 'time word'), ('发布', 'verb'), . . . ]# Sample output: ['NLPIR', '分词', '系统', '前身', '为', '2000年', '发布', . . . ]
+2. Access to NLPIR's C functions via ctypes
+from pynlpir import nlpirimport ctypesprint(type(nlpir.PACKAGE_DIR))#python与传参到c接口编码需要转一下，所有字符串前面加一个b或者转utf-8就可以了。nlpir.Init((nlpir.PACKAGE_DIR).encode('utf-8'),nlpir.UTF8_CODE,None)result_seg_test = nlpir.ParagraphProcess(s3.encode('utf-8'), True)print(result_seg_test.decode('utf-8'))
+输出
+NLPIR/n 分词/v 系统/n 前身/n 为/p 2000年/t 发布/v 的/ude1 ICTCLAS/n 词法/n 分析/vn 系统/n ，/wd 从/p 2009年/t 开始/v ，/wd 为了/p 和/cc 以前/f 工作/vn 进行/vx 大/a 的/ude1 区/n 隔/v ，/wd 并/cc 推广/v NLPIR/n 自然/n 语言/n 处理/vn 与/cc 信息/n 检索/vn 共享/vn 平台/n ，/wd 调整/v 命名/v 为/v NLPIR/n 分词/v 系统/n 。/wj
+1.3.3 分词原理
+分词模块流程图NLPIR/ICTCLAS分词系统，采用层叠隐马模型[参考张华平 博士编写的《大数据搜索与挖掘》]，基于层次隐马尔可夫模型的方法旨在将汉语分词、切分排歧、未登录词识别、 词性标注等浅层语言分析任务融合到一个相对统一的理论模型中。具体做法 如下。
+(1) 在预处理的阶段，采取N最短路径粗分方法,快速得到能覆盖歧义的最佳 N个粗切分结果。(2) 在粗分结果集上，釆用底层隐马尔可夫模型识别出普通无嵌套的人名、地 名，并依次采取高层隐马尔可夫模型识别出嵌套了人名、地名的复杂地名和机 构名。(3) 将识别出的未登录词以计算出来的概率加入到基于类的切分隐马尔可夫 模型中，未登录词与歧义均不作为特例，与普通词一起参与各种候选结果的竞争。(4) 在全局最优的分词结果上进行词性的隐马尔可夫标注。以下为nlpir 分词算法流程图。
+ nlpir 分词准确率接近98.23%，具备准确率高、速度快、可适应性强等优势。它能够真正理解中文，利用机器学习解决歧义切分与词性标注歧义问题。张博士先后倾力打造十余年，内核升级10次，全球用户突破30万。
+1.3.4 特点、性能、准确率
+1.开源的不是很彻底
+需要频繁更新key核心算法是封装好的lib
+2.速度快，准确率高
+ownthink 各大中文分词性能评测
+综合性能排名前三！
+3.技术优势明细，算法独创性高
+
+1.4 thulac 一个高效的中文词法分析工具包
+THULAC（THU Lexical Analyzer for Chinese）由清华大学自然语言处理与社会人文计算实验室研制推出的一套中文词法分析工具包，具有中文分词和词性标注功能。THULAC具有如下几个特点：
+
+能力强。 利用我们集成的目前世界上规模最大的人工分词和词性标注中文语料库（约含5800万字）训练而成，模型标注能力强大。 准确率高。 该工具包在标准数据集Chinese Treebank（CTB5）上分词的F1值可达97.3％，词性标注的F1值可达到92.9％，与该数据集上最好方法效果相当。 速度较快。 同时进行分词和词性标注速度为300KB/s，每秒可处理约15万字。只进行分词速度可达到1.3MB/s。
+
+官网：http://thulac.thunlp.org/c++ 版本：https://github.com/thunlp/THULACpython版本：https://github.com/thunlp/THULAC-Pythonpython版本开源协议：MIT1.4.1 安装
+pip install thulac
+1.4.2 功能及分词样例
+分词样例：
+import thulacthu1 = thulac.thulac()  #默认模式text = thu1.cut("我爱北京天安门", text=True)  #进行一句话分词print(text)
+输出
+我_r  爱_v  北京_ns  天安门_ns
+1.4.3 分词原理
+https://github.com/thunlp/THULAC-Python/issues/69
+1.4.4 特点、性能、准确率
+研究目的免费开放源代码，用于商业目的，需要洽谈技术许可协议。
+thulac根据第二届国际汉语分词测评发布的国际中文分词测评标准，对不同软件进行了速度和准确率测试。
+在统一测试环境下，对若干流行分词软件和THULAC进行了测试，使用的模型为各分词软件自带模型。THULAC使用的是随软件提供的简单模型Model_1。评测环境为 Intel Core i5 2.4 GHz 评测结果如下
+msr_test（560KB）
+AlgorithmTimePrecisionRecallLTP-3.2.03.21s0.8670.896ICTCLAS(2015版)0.55s0.8690.914jieba0.26s0.8140.809THULAC0.62s0.8770.899
+存在的问题
+功能较为单一，两三年没更新了
+
+1.5 pkuseg多领域中文分词工具
+源自北大 pkuseg：一个多领域中文分词工具包 (English Version)
+github: https://github.com/lancopku/PKUSeg-python开源协议：MIT
+语料看着像那么回事，但有一个问题就是速度太慢。初始化要从github 下载训练好的模型文件，众所周知的原因，非常慢。领域分词不错，可以一试。
+pkuseg具有如下几个特点：
+1.多领域分词。 不同于以往的通用中文分词工具，此工具包同时致力于为不同领域的数据提供个性化的预训练模型。根据待分词文本的领域特点，用户可以自由地选择不同的模型。在使用中，如果用户明确待分词的领域，可加载对应的模型进行分词。如果用户无法确定具体领域，推荐使用在混合领域上训练的通用模型。各领域分词样例可参考 example.txt。细分领域模型如下：
+
+news: 在MSRA（新闻语料）上训练的模型。web: 在微博（网络文本语料）上训练的模型。medicine: 在医药领域上训练的模型。tourism: 在旅游领域上训练的模型。mixed: 混合数据集训练的通用模型。随pip包附带的是此模型。
+
+2.更高的分词准确率。 相比于其他的分词工具包，当使用相同的训练数据和测试数据，pkuseg可以取得更高的分词准确率。 3.支持用户自训练模型。 支持用户使用全新的标注数据进行训练。 4.支持词性标注。
+1.5.1 安装
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple pkuseg
+1.5.2 功能及分词样例
+import pkusegseg = pkuseg.pkuseg(model_name='medicine',postag=True)  # 程序会自动下载所对应的细领域模型text = seg.cut('乙肝大三阳冠心病都是慢性病')              # 进行分词string_冠心病 = '''冠状动脉粥样硬化性心脏病是冠状动脉血管发生动脉粥样硬化病变而引起血管腔狭窄或阻塞，造成心肌缺血、缺氧或坏死而导致的心脏病，常常被称为“冠心病”。但是冠心病的范围可能更广泛，还包括炎症、栓塞等导致管腔狭窄或闭塞。世界卫生组织将冠心病分为5大类：无症状心肌缺血（隐匿性冠心病）、心绞痛、心肌梗死、缺血性心力衰竭（缺血性心脏病）和猝死5种临床类型。临床中常常分为稳定性冠心病和急性冠状动脉综合征。'''print(text)print(seg.cut(string_冠心病))
+输出
+[('乙肝大三', 'n'), ('阳冠心病', 'n'), ('都', 'd'), ('是', 'v'), ('慢性病', 'n')][('冠状动脉粥样硬化性心脏病', 'n'), ('是', 'v'), ('冠状动脉', 'n'), ('血管', 'n'), ('发生', 'v'), ('动脉粥样硬化', 'vn'), ('病变', 'vn'), ('而', 'c'), ('引起', 'v'), ('血管腔', 'n'), ('狭窄', 'a'), ('或', 'c'), ('阻塞', 'v'), ('，', 'w'), ('造成', 'v'), ('心肌', 'n'), ('缺血', 'v'), ('、', 'w'), ('缺氧', 'v'), ('或', 'c'), ('坏死', 'v'), ('而', 'c'), ('导致', 'v'), ('的', 'u'), ('心脏病', 'n'), ('，', 'w'), ('常常', 'd'), ('被', 'p'), ('称为', 'v'), ('“', 'w'), ('冠心病', 'n'), ('”', 'w'), ('。', 'w'), ('但是', 'c'), ('冠心病', 'n'), ('的', 'u'), ('范围', 'n'), ('可能', 'v'), ('更', 'd'), ('广泛', 'a'), ('，', 'w'), ('还', 'd'), ('包括', 'v'), ('炎症', 'n'), ('、', 'w'), ('栓塞', 'n'), ('等', 'u'), ('导致', 'v'), ('管腔', 'n'), ('狭窄', 'a'), ('或闭塞', 'a'), ('。', 'w'), ('世界卫生组织', 'n'), ('将', 'p'), ('冠心病', 'n'), ('分为', 'v'), ('5', 'm'), ('大', 'a'), ('类', 'q'), ('：', 'w'), ('无症状', 'b'), ('心肌', 'n'), ('缺血', 'v'), ('（', 'w'), ('隐匿性', 'n'), ('冠心病', 'n'), ('）', 'w'), ('、', 'w'), ('心绞痛', 'n'), ('、', 'w'), ('心肌梗死', 'v'), ('、', 'w'), ('缺血性', 'n'), ('心力衰竭', 'i'), ('（', 'w'), ('缺血性心脏病', 'n'), ('）', 'w'), ('和', 'c'), ('猝死', 'v'), ('5', 'm'), ('种', 'q'), ('临床', 'vn'), ('类型', 'n'), ('。', 'w'), ('临床', 'v'), ('中', 'f'), ('常常', 'd'), ('分为', 'v'), ('稳定性', 'n'), ('冠心病', 'n'), ('和', 'c'), ('急性', 'b'), ('冠状动脉综合征', 'vn'), ('。', 'w')]
+1.5.3 分词原理
+参考：https://github.com/lancopku/pkuseg-python/wiki/FAQ
+pkuseg-python主要基于经典的CRF模型，辅以我们提出的ADF训练方法(Sun, et al., 2012)和我们精调的特征，以实现更快的训练速度、更高的测试效果和更好的泛化能力：
+在CRF模型中，特征选取对分词结果和分词性能有着不小的影响，获得一套效果好、泛化能力较强、分词速度适中的特征往往需要耗费大量时间。我们的代码中包含了这样一套精调的特征，在领域内的训练和测试表明，pkuseg使用的特征可以有效提升不同语料的测试集上的效果。
+ADF训练方法则可以加快训练速度和收敛效果，为DIY用户、希望自己训练模型的用户提供较好的训练体验。在接下来的版本中，我们计划迁移C#版本中的深度学习模型(Xu and Sun, 2016)，但具体施工日期仍需要确定。
+1.5.4 特点、性能、准确率
+细领域训练及测试结果
+
+1.6 其他知名开源分词组件
+之所以将下面这些开源分词组件归为其他分词组件，我自己的想法是这些分词组件背后没有大公司或者开源组织的有力支撑，就意味着即使再好用，比如jieba 分词，但凡说道开源汉语分词都会把jieba 请出来分一下，但是随着时间的流逝，她们的技术会渐渐过时，碰见新的问题也就不太有效果了。
+1.6.1 SnowNLP
+功能比较丰富的NLP 综合开源库，但是已经5-6年没有更新过了。分词原理使用：Character-Based Generative Model
+SnowNLP 比较亮眼的功能还有以下一些：
+文本分类（Naive Bayes）转换成拼音（Trie树实现的最大匹配）繁体转简体（Trie树实现的最大匹配）提取文本关键词（TextRank算法）提取文本摘要（TextRank算法）tf，idfTokenization（分割成句子）文本相似（BM25）
+SnowNLP ：https://github.com/isnowfy/snownlp
+
+1.6.2 结巴
+“结巴”中文分词：做最好的 Python 中文分词组件
+"Jieba" (Chinese for "to stutter") Chinese text segmentation: built to be the best Python Chinese word segmentation module.
+支持三种分词模式：
+精确模式，试图将句子最精确地切开，适合文本分析；全模式，把句子中所有的可以成词的词语都扫描出来, 速度非常快，但是不能解决歧义；搜索引擎模式，在精确模式的基础上，对长词再次切分，提高召回率，适合用于搜索引擎分词。
+支持繁体分词
+github地址：https://github.com/fxsjy/jieba开源协议：MIT 授权协议
+jieba 分词的网上介绍太多了，本文不做太多介绍，只说几个我觉的 jieba 做的好的地方
+
+1.安装使用方便，分词速度快。2.添加了非常实用的tf-idf, textrank 功能 3.代码简洁
+
+
+
+组件整体对比
+
+工程化使用推荐排序前三：
+HanlpLTPNLPIR
+参考文献
+1.《自然语言处理理论与实践》
+2.《智能问答与深度学习》 https://github.com/l11x0m7/book-of-qna-code
+3.《Python自然语言处理实战：核心技术与算法》 https://github.com/nlpinaction/learning-nlp
+4.黄昌宁, 赵海. 中文分词十年回顾[J]. 中文信息学报, 2007, 21(3):8-19.
+5.一文详解中英文在NLP上的10大差异点
+6.中文NLP的分词真有必要吗？李纪为团队四项任务评测一探究竟 | ACL 2019
+7.深入NLP———看中文分词如何影响你的生活点滴
+8.精通数据科学:从线性回归到深度学习
+9.Jiagu深度学习自然语言处理工具
+10.ownthink 各大中文分词性能评测
+
+hanlp 作者新书 《自然语言处理入门》 看看写序的大牛你就乖乖买了，哈哈
+
+
+

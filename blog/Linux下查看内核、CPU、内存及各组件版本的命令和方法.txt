@@ -13,18 +13,9 @@
 
 
 
-查看内核版本： uname -a
-                         more /etc/*release 
-                         more /etc/redhat-release
-                         more /proc/version 
-查看CPU信息：grep "model name" /proc/cpuinfo
-                         more /proc/cpuinfo
-查看CPU位数：getconf LONG_BIT
-                         ls   如果在root下ls有lib64 文件夹说明系统64
-查看libc、gcc版本：ldd /sbin/mii-tool
-                                rpm -qa | grep glibc
-                                gcc –v
-查看内存信息：more /proc/meminfo
+
+查看内核版本： uname -a                          more /etc/*release                           more /etc/redhat-release                          more /proc/version   查看CPU信息：grep "model name" /proc/cpuinfo                          more /proc/cpuinfo  查看CPU位数：getconf LONG_BIT                          ls   如果在root下ls有lib64 文件夹说明系统64  查看libc、gcc版本：ldd /sbin/mii-tool                                 rpm -qa | grep glibc                                 gcc –v  查看内存信息：more /proc/meminfo 
+
     grep MemTotal /proc/meminfo
 
 
@@ -40,8 +31,13 @@
 
 
 
+
 CentOS查看CPU、内存、版本等系统信息
+
  
+ 
+
+
 
 　　CentOS查看系统信息
 　　一：查看CPU
@@ -119,12 +115,7 @@ CentOS查看CPU、内存、版本等系统信息
 　　修改主机名就是修改这个文件，同时最好也把host文件也修改
  
  
-1. 内核版本：popen("uname -sr", "r");
-2.内存容量：/proc/meminfo ‘MemTotal:’字段
-3.操作系统版本：/etc/issue 或者 /etc/*ease
-4.当前用户名：a.getuid()获取当前用户的uid;b.getpwuid(uid)或者用户名
-5.cpu名称:/proc/cpuinfo ’model name‘字段
-6.cpu内核数：/proc/cpuinfo 'processor'字段最大值+1(逻辑核数)， 'physical id'字段最大值 + 1
+ 1. 内核版本：popen("uname -sr", "r"); 2.内存容量：/proc/meminfo ‘MemTotal:’字段 3.操作系统版本：/etc/issue 或者 /etc/*ease 4.当前用户名：a.getuid()获取当前用户的uid;b.getpwuid(uid)或者用户名 5.cpu名称:/proc/cpuinfo ’model name‘字段 6.cpu内核数：/proc/cpuinfo 'processor'字段最大值+1(逻辑核数)， 'physical id'字段最大值 + 1
 
 
 
@@ -132,5 +123,6 @@ CentOS查看CPU、内存、版本等系统信息
 
 
 
- 
+
+
 

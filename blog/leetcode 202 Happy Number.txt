@@ -3,12 +3,12 @@
 
  
 Write an algorithm to determine if a number is "happy".
-A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits, and repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a
- cycle which does not include 1. Those numbers for which this process ends in 1 are happy numbers.
+A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits, and repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process ends in 1 are happy numbers.
 Example: 19 is a happy number
-12 + 92 = 8282 + 22 = 6862 + 82 = 10012 + 02 + 02 = 1我的解决方案：
-
-
+12 + 92 = 8282 + 22 = 6862 + 82 = 10012 + 02 + 02 = 1
+我的解决方案：
+ 
+ 
 // happy number.cpp : Defines the entry point for the console application.
 //
 
@@ -66,14 +66,14 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
+ 
 
-
-
-
-
+ 
+ 
+ 
 最短的一个代码，用了些数论的知识吧：
 https://leetcode.com/discuss/33014/4ms-5-line-c-code
-
+ 
 bool isHappy(int n) {
     while(n>6){
         int next = 0;
@@ -83,12 +83,15 @@ bool isHappy(int n) {
     return n==1;
 }
 
-
-
+ 
+ 
 两个python代码：
+ 
+ 
+
+ ﻿﻿
 
 
-﻿﻿
  def isHappy(self, n):
     return self.isHappyHelper(n, {})
 
@@ -105,6 +108,10 @@ def isHappyHelper(self, n, prev):
         new += int(char)**2
 
     return self.isHappyHelper(new, prev)
+
+
+
+
 
 
 class Solution:
@@ -133,6 +140,14 @@ def convert(self, n):
 
 
 
-﻿﻿
+
+
+
+
+
+
+
+ ﻿﻿
+
 
 

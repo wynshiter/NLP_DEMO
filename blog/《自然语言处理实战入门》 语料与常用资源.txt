@@ -1,0 +1,41 @@
+
+
+
+
+
+
+
+
+文章大纲
+
+工具库
+
+
+中文提取
+信息抽取
+ 
+词法分析语料库
+
+
+各类词库
+词向量库
+命名实体识别库
+ 
+句法分析语料库
+参考文献
+
+
+
+
+工具库
+中文提取
+Chinese extraction
+
+import re
+def Chinese_word_extraction(content_raw):
+    chinese_pattern = u"([\u4e00-\u9fa5]+)"
+ 	chi_pattern =
+
+
+
+

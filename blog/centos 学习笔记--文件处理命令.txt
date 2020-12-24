@@ -2,92 +2,30 @@
 
 
  
-2012-2-4
-文件处理命令：cat 命令英文原意： concateate and display files
-命令所在路径：/bin/cat
-执行权限：所有用户
-语法：cat[文件名]
-功能描述：显示文件内容
-范例：$cat/etc/issue
-      $cat/etc/services
-文件处理命令：more  //可以分页显示文件
-范例：$more /etc/services
-语法：more【文件名】
-     （空格）或f    显示下一页
-      （Enter）     显示下一行
-      q或Q        退出 
-     
-文件处理命令：head 查看文件的前几行
-head -num[文件名]
-范例：$head -5 /etc/services
-文件处理命令：tail查看文件的前几行
-tail -num[文件名]
-tail -f  动态显示更新内容
-范例：$tail -5 /etc/services
+2012-2-4 文件处理命令：cat 命令英文原意： concateate and display files 命令所在路径：/bin/cat 执行权限：所有用户 语法：cat[文件名] 功能描述：显示文件内容 范例：$cat/etc/issue       $cat/etc/services
+ 文件处理命令：more  //可以分页显示文件 范例：$more /etc/services 语法：more【文件名】      （空格）或f    显示下一页       （Enter）     显示下一行       q或Q        退出       
+文件处理命令：head 查看文件的前几行 head -num[文件名] 范例：$head -5 /etc/services
+文件处理命令：tail查看文件的前几行 tail -num[文件名] tail -f  动态显示更新内容 范例：$tail -5 /etc/services
  
-文件处理命令 ：ln 
-命令的英文原意：link
-语法：ln -s[源文件][目标文件]
-范例： $ln -s /etc/issue /issue.soft
-软链接文件的权限： lrwxrwxrwx-->指向源文件，只是一个符号链接
-时间值：软链接创建时候的时间值
-类似于windows的快捷方式。
-硬链接：ln /etc/issue /issue.hard
-我们发现硬链接所有的属性和源文件相同。
-硬链接的大小和源文件的大小一样，而且是和源文件同步更新的
-ls -i i-inode i节点
-内核需要处理响应的数字表示来确认相应的对象，每个文件必须有一个i节点。
-但并不是一个i节点就对应一个文件。
-硬链接和源文件有相同的i节点，软连接和源文件的i节点不同
-所以硬链接和源文件可以同时更新。
+文件处理命令 ：ln  命令的英文原意：link 语法：ln -s[源文件][目标文件] 范例： $ln -s /etc/issue /issue.soft 软链接文件的权限： lrwxrwxrwx-->指向源文件，只是一个符号链接 时间值：软链接创建时候的时间值 类似于windows的快捷方式。
+硬链接：ln /etc/issue /issue.hard 我们发现硬链接所有的属性和源文件相同。 硬链接的大小和源文件的大小一样，而且是和源文件同步更新的
+ ls -i i-inode i节点 内核需要处理响应的数字表示来确认相应的对象，每个文件必须有一个i节点。 但并不是一个i节点就对应一个文件。 硬链接和源文件有相同的i节点，软连接和源文件的i节点不同 所以硬链接和源文件可以同时更新。
  
-权限处理命令：chmod
-命令的英文原意：
-语法 chmod [{ugo}{+-=}{rwx}][文件或目录]
-           [mode=421][文件或目录]
-功能描述：改变文件或目录的权限
-chmod u +
-      g -
-      o =
-u--所有者
-g--所属组
-o--其他人
-rwx 可读可写可执行
-ls -a a
-chmod u+wx 文件或目录
-chmod o-rx
-chmod g=rwx
-rwx 可读可写可执行
-r-4
-w-2
-x-1
-数字代表相应的权限
-rwx r-x r--
-7   5   4
-rw- r-x --x
-6   5   1
+权限处理命令：chmod 命令的英文原意： 语法 chmod [{ugo}{+-=}{rwx}][文件或目录]            [mode=421][文件或目录] 功能描述：改变文件或目录的权限 chmod u +       g -       o = u--所有者 g--所属组 o--其他人 rwx 可读可写可执行
+ls -a a chmod u+wx 文件或目录 chmod o-rx chmod g=rwx
+ rwx 可读可写可执行 r-4 w-2 x-1 数字代表相应的权限
+rwx r-x r-- 7   5   4 rw- r-x --x 6   5   1
 chmod 641 a 也可以改变权限
-对文件有r权限
-r-cat more head tail
-w-echo vi 对一个文件具有写权限并不代表能够删除文件
-x-命令，脚本
-目录的权限
-r-表示可以列出目录中的内容
-w-表示可以在目录中创建删除文件touch， mkdir，rm
-x-表示可以进入这个目录
+对文件有r权限 r-cat more head tail w-echo vi 对一个文件具有写权限并不代表能够删除文件 x-命令，脚本
+目录的权限 r-表示可以列出目录中的内容 w-表示可以在目录中创建删除文件touch， mkdir，rm x-表示可以进入这个目录
  
  
-权限管理命令：chown
-改变文件的所有者
-chgrp：改变文件的所属组
+权限管理命令：chown 改变文件的所有者 chgrp：改变文件的所属组
  
  
-权限管理命令：umask
-默认创建文件的权限掩码值
-umask -S
+权限管理命令：umask 默认创建文件的权限掩码值 umask -S
  
  
-linux权限规则：
-缺省创建的文件不能授予可执行x权限（因此比较安全）
+linux权限规则： 缺省创建的文件不能授予可执行x权限（因此比较安全） 
 
 

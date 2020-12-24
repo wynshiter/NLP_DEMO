@@ -4,18 +4,12 @@
 
 
 
-
 作者：一人
 项目中需要计算两个电视节目的相似程度，有人提出将自然语言处理当中的经典TF-IDF（Item frequency-inverse document frequency）引入作为节目的特征，然后使用余弦距离进行相似度计算。由于TF-IDF的应用领域与电视节目的信息表示不符，因此将其应用于电视节目相似度计算当中是不合适的。本文首先介绍视频语义的表示，接着对于文本语义的TF-IDF进行分析，最后描述提出的方案，解释当中的误区并做说明。
 视频与文本的语义表示
 视频语义的标签化表示
 视频内容的提取技术有以下几种1：
-
-对视频中物品进行识别形成序列
-对视频截图的语义序列与字幕的语义序列进行结合
-提取标题的关键词
-人工制作视频标签
-
+对视频中物品进行识别形成序列对视频截图的语义序列与字幕的语义序列进行结合提取标题的关键词人工制作视频标签
 当前由于相关技术并不成熟，业界大多采用最后一种方法，人工从标签库当中选取部分作为视频内容的表示。具体节目的表示示例如下：
 {
     "alias" : "伯恩的身份/叛谍追击/神鬼认证",
@@ -40,42 +34,284 @@
 In information retrieval, tf–idf or TFIDF, short for term frequency–inverse document frequency, is a numerical statistic that is intended to reflect how important a word is to a document in a collection or corpus. It is often used as a weighting factor in searches of information retrieval, text mining, and user modeling. The tf-idf value increases proportionally to the number of times a word appears in the document and is offset by the frequency of the word in the corpus, which helps to adjust for the fact that some words appear more frequently in general.
 
 对于它的解释说明，TF-IDF表示词语对于文献的重要程度。专业解释为词语蕴含的信息在文献信息中所占的比重2。它有以下两个特点：
-
-一篇文档中该词出现的次数越多，它的值越大。
-有该词出现的文档数目越大，它的值越小。
-
+一篇文档中该词出现的次数越多，它的值越大。有该词出现的文档数目越大，它的值越小。
 计算公式如下：
 
-tf(t,d)=ft,dndtf(t,d)=ft,dndtf(t,d) = \frac{f_{t,d}} {n_d}
-idf(t,D)=logN|{d∈D:t∈d}|idf(t,D)=logN|{d∈D:t∈d}|idf(t, D) = log\frac{N} {|\{d \in D: t \in d\}|}
-tf−idf=tf∗idftf−idf=tf∗idftf-idf = tf * idf
 
-ft,dft,df_{t,d}表示词ttt在文献ddd中出现的次数，ndndn_d表示文献ddd中词的个数。NNN是语料库中文献的个数，|{d∈D:t∈d}||{d∈D:t∈d}||\{d \in D: t \in d\}|表示有该词语出现的文献数目。
+tf(t,d)=ft,dnd
+
+   
+    
+     t
+    
+    
+     f
+    
+    
+     (
+    
+    
+     t
+    
+    
+     ,
+    
+    
+     d
+    
+    
+     )
+    
+    
+     =
+    
+    
+     
+      
+       f
+      
+      
+       
+        t
+       
+       
+        ,
+       
+       
+        d
+       
+      
+     
+     
+      
+       n
+      
+      
+       d
+      
+     
+    
+   tf(t,d) = \frac{f_{t,d}} {n_d}
+
+idf(t,D)=logN|{d∈D:t∈d}|
+
+   
+    
+     i
+    
+    
+     d
+    
+    
+     f
+    
+    
+     (
+    
+    
+     t
+    
+    
+     ,
+    
+    
+     D
+    
+    
+     )
+    
+    
+     =
+    
+    
+     l
+    
+    
+     o
+    
+    
+     g
+    
+    
+     
+      N
+     
+     
+      
+       
+        |
+       
+      
+      
+       {
+      
+      
+       d
+      
+      
+       ∈
+      
+      
+       D
+      
+      
+       :
+      
+      
+       t
+      
+      
+       ∈
+      
+      
+       d
+      
+      
+       }
+      
+      
+       
+        |
+       
+      
+     
+    
+   idf(t, D) = log\frac{N} {|\{d \in D: t \in d\}|}
+
+tf−idf=tf∗idf
+
+   
+    
+     t
+    
+    
+     f
+    
+    
+     −
+    
+    
+     i
+    
+    
+     d
+    
+    
+     f
+    
+    
+     =
+    
+    
+     t
+    
+    
+     f
+    
+    
+     ∗
+    
+    
+     i
+    
+    
+     d
+    
+    
+     f
+    
+   tf-idf = tf * idf
+
+
+ft,d
+
+   
+    
+     
+      f
+     
+     
+      
+       t
+      
+      
+       ,
+      
+      
+       d
+      
+     
+    
+   f_{t,d}表示词
+t
+
+   
+    
+     t
+    
+   t在文献ddd中出现的次数，
+nd
+
+   
+    
+     
+      n
+     
+     
+      d
+     
+    
+   n_d表示文献
+d
+
+   
+    
+     d
+    
+   d中词的个数。NNN是语料库中文献的个数，
+|{d∈D:t∈d}|
+
+   
+    
+     
+      |
+     
+    
+    
+     {
+    
+    
+     d
+    
+    
+     ∈
+    
+    
+     D
+    
+    
+     :
+    
+    
+     t
+    
+    
+     ∈
+    
+    
+     d
+    
+    
+     }
+    
+    
+     
+      |
+     
+    
+   |\{d \in D: t \in d\}|表示有该词语出现的文献数目。
 结果示例如下：
-
-
-
-word
-TF-IDF
-
-
-
-我
-0.0012
-
-
-爱
-0.0025
-
-
-北京天安门
-0.0128
-
-
-…
-…
-
-
+wordTF-IDF我0.0012爱0.0025北京天安门0.0128……
 文献语义的表示如下：
 [x_0, x_1, x_2, ...] = [0.0012, 0.0025, 0.0128, ...]
 这里词语“我”与“爱”在很多文档中会出现，认为它蕴含的信息量就少，因此TF-IDF值较低；“北京天安门”相较而言出现次数就少，因此认为它蕴含的信息量就大，TF-IDF值就大。
@@ -90,7 +326,11 @@ IDF会扭曲视频的语义表示
 
 学习博客和公开课的知识是初学者学习的常见方式，但是不可停留在只是知道如何做，需追求对其中原理的理解。当与别人意见不一致时，更不可不假思索直接使用博客内容作为自己的证明材料，千万铭记，别人的不一定是对的，我们要以批判的角度对待别人的东西。在回顾这个内容的过程当中，吾亦受益匪浅。
 
-呢喃，视频内容语义智能提取技术，知乎专栏，2017-05-08 
-[^tfidf]: wikipedia, TF-IDF，维基百科， 2018-03-22 ↩吴军，数学之美[第11章]，2012 ↩ 
+
+
+呢喃，视频内容语义智能提取技术，知乎专栏，2017-05-08  [^tfidf]: wikipedia, TF-IDF，维基百科， 2018-03-22 ↩吴军，数学之美[第11章]，2012 ↩
+
+
+
 
 

@@ -4,24 +4,14 @@
 
 
 
-
 Given a linked list, remove the nth node from the end of list and return its head.
-For example, 
-   Given linked list: 1->2->3->4->5, and n = 2.
+For example,  Given linked list: 1->2->3->4->5, and n = 2.
 After removing the second node from the end, the linked list becomes 1->2->3->5.
-Note: 
- Given n will always be valid. 
- Try to do this in one pass. 
+Note:  Given n will always be valid.  Try to do this in one pass. 
 解决方案：
 Because the linked list have no knowledge about the previous nodes, we have to provide such information.
-The difference between the final node and the to-be-delete node is N, hence we can utilize this information. 
-•front pointer points to the node which is N step away from the to-be-delete node 
-•rear pointer points to the to-be-delete node.
-The algorithms is described as below: 
-•First driving front pointer N step forward. 
-•Secondly, move the 2 pointers 1 step ahead till the front pointer reach the end simultaneously, which will cause the rear pointer points to the previous node of the to-be-delete node. 
-• 
-Finally, jump the rear->next node by rear->next = rear->next->next.
+The difference between the final node and the to-be-delete node is N, hence we can utilize this information.  •front pointer points to the node which is N step away from the to-be-delete node  •rear pointer points to the to-be-delete node.
+The algorithms is described as below:  •First driving front pointer N step forward.  •Secondly, move the 2 pointers 1 step ahead till the front pointer reach the end simultaneously, which will cause the rear pointer points to the previous node of the to-be-delete node.  •  Finally, jump the rear->next node by rear->next = rear->next->next.
 下面的代码稍微有一个疑问：
 http://bbs.csdn.net/topics/391029228
 class Solution {
@@ -77,6 +67,8 @@ class Solution:
         slow.next = slow.next.next
 
         return dummyHead.next
- 
+
+
+
 
 

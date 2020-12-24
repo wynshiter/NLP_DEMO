@@ -41,6 +41,7 @@
  
  
 主要代码：
+
 void cGAMachine::SetupNextGeneration()//生成下一代基因,进化到下一代
 
 {
@@ -224,8 +225,7 @@ return m_genomes[0];
  
 
 
-
- 
+  
  
  
 实验结果：
@@ -1118,8 +1118,7 @@ int main()
 
 
 
-
- 
+  
 
 
 

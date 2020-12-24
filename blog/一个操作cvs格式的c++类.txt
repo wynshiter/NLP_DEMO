@@ -119,8 +119,7 @@ int GetParamFromArea(std::string Str, std::vector<std::vector<T> >& IntVec, char
 
 
 };
-
-CCSVOperator.h
+ CCSVOperator.h
  
 #pragma once
 #include "StringParser.h"
@@ -157,15 +156,14 @@ public:
 };
 
 
-
- 
+  
  
  
 CSVOperator.cpp
 #include "CSVOperator.h"
 
 
-//////////////////////////////////////////////////////////////////////////
+//
 //CSV operator
 
 CCSVOperator::CCSVOperator(const char* path)
@@ -370,8 +368,7 @@ bool CCSVOperator::SaveCSV(const char* path)
 
     return true;
 }
-
- 
+  
 CVS_OP.CPP
  
 // CSV_OP.cpp : 定义控制台应用程序的入口点。
@@ -436,8 +433,7 @@ int _tmain(int argc, _TCHAR* argv[])
 }
 
 
-
-效果如下：
+ 效果如下：
  
 
  

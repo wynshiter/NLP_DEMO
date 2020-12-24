@@ -1,0 +1,39 @@
+
+
+
+
+
+
+
+
+文章大纲
+
+简介
+机器学习的正确解决路径
+处理文本数据
+特征抽取
+pipeline
+
+
+pipeline 可视化
+ 
+常见问题与实用技巧
+A Basic Example
+Preprocessing The Data
+
+
+Standardization
+Normalization
+Binarization
+Encoding Categorical Features
+Imputing Missing Values
+Generating Polynomial Features
+Training And Test Data
+ 
+
+
+
+
+
+
+
