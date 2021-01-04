@@ -25,13 +25,16 @@ from lxml import etree
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 ###-----以下导入 其他文件夹的包
-from Database import blog, mySQLiteForblog
-from src import assistance_tool
-import myLog
 
 CURRENT_URL = os.path.dirname(__file__)
 PARENT_URL = os.path.abspath(os.path.join(CURRENT_URL, os.pardir))
 sys.path.append(PARENT_URL)
+
+from Database import blog, mySQLiteForblog
+from src import assistance_tool
+from src import myLog
+
+
 
 ## 目前前缀有变化和个人博客首页做了区别 https://blog.csdn.net/wangyaninglm/
 STR_PAGE_URL_PREFIX = 'https://season.blog.csdn.net/'
@@ -200,7 +203,7 @@ def getpage_all_bloglinks(url, url_pattern):
                                           create_time_month=create_time_month,
                                           create_time_week=create_time_week,
                                           create_time_hour=create_time_hour)
-                print(temp_blog)
+                #print(temp_blog)
                 list_blog_obj.append(temp_blog)
             else:
                 pass
@@ -228,7 +231,7 @@ def main():
     # log.logger.warning('警告')
     # log.logger.error('报错')
     # log.logger.critical('严重')
-    myLog.Logger('./log/error.log', level='error').logger.error('error')
+    #myLog.Logger('./log/error.log', level='error').logger.error('error')
 
     start_time = assistance_tool.set_starttime()
     log.logger.debug('starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')

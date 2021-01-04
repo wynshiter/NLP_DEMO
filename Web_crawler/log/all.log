@@ -1,44 +1,4 @@
-2020-12-23 08:22:28,151 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:22:35,495 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:248] - DEBUG: 获取所有博客链接完成
-2020-12-23 08:22:35,495 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:257] - DEBUG: 获取所有博客内容完成
-2020-12-23 08:22:37,130 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:271] - DEBUG: 博客内容入库完成
-2020-12-23 08:23:07,420 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:25:01,547 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:230] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:31:27,959 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:229] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:32:21,514 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:229] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:48:52,876 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:58:06,402 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 08:58:13,304 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 09:04:16,561 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 09:04:17,401 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 09:08:32,778 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 09:08:40,102 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 09:14:16,526 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 09:14:17,916 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 10:33:42,900 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 10:33:50,371 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 10:40:06,143 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 10:40:07,527 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 11:12:27,954 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 11:12:35,807 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 11:19:15,874 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 11:19:17,440 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 15:22:16,335 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 15:22:24,370 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 15:28:54,409 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 15:28:55,216 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 16:08:41,709 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 16:08:54,939 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 16:13:40,196 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 16:13:48,082 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 16:16:32,980 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 16:16:41,629 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 16:23:04,334 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 16:23:05,673 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 16:25:45,828 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 16:25:53,692 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 16:32:41,067 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:261] - DEBUG: 获取所有博客内容完成
-2020-12-23 16:32:42,035 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:275] - DEBUG: 博客内容入库完成
-2020-12-23 16:47:02,072 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-2020-12-23 16:47:15,806 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:252] - DEBUG: 获取所有博客链接完成
-2020-12-23 17:42:31,782 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:234] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-01-03 22:38:20,109 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:237] - DEBUG: starting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2021-01-03 22:38:27,534 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:255] - DEBUG: 获取所有博客链接完成
+2021-01-03 22:45:28,723 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:264] - DEBUG: 获取所有博客内容完成
+2021-01-03 22:45:30,102 - D:/code/python/csdn_nlp/NLP_DEMO/Web_crawler/spider_for_csdn.py[line:278] - DEBUG: 博客内容入库完成

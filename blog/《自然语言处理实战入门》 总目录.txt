@@ -32,7 +32,7 @@ python 开发环境搭建
 网络爬虫
 爬取本人CSDN博客网络爬虫简介
 开源库
- NLP开源工具包与云服务提供商  基础库 ---- NumPy  基础库 ---- Pandas  基础库 ---- Pandas(练习篇)  机器学习 ---- Scikit-learn  深度学习 ---- TensorFlow  深度学习 ---- Keras  深度学习 ---- Pytorch 待补充  语料与常用资源 
+ NLP开源工具包与云服务提供商  基础库 ---- NumPy  基础库 ---- Pandas  基础库 ---- Pandas(练习篇)  基础库 ---- SciPy  基础库 ---- matplotlib  机器学习 ---- Scikit-learn  深度学习 ---- TensorFlow  深度学习 ---- Keras  深度学习 ---- Pytorch 待补充  语料与常用资源 
 深度学习基础
 深度学习组件TensorFlow2.0初探
 
